@@ -1,0 +1,106 @@
+﻿<Bindings>
+	<Layer name="SI_KEYBINDINGS_LAYER_GENERAL">
+		<Category name="|cd5b526BeamMeUp|r - Teleporter">
+		
+			<Action name="BMU_TOGGLE_MAIN">
+				<Down>BMU.PortalHandlerKeyPress(0)</Down>
+			</Action>
+			
+			<Action name="BMU_TOGGLE_MAIN_ACTIVE_QUESTS">
+				<Down>BMU.PortalHandlerKeyPress(9)</Down>
+			</Action>
+			
+			<Action name="BMU_TOGGLE_MAIN_RELATED_ITEMS">
+				<Down>BMU.PortalHandlerKeyPress(4)</Down>
+			</Action>
+			
+			<Action name="BMU_TOGGLE_MAIN_CURRENT_ZONE">
+				<Down>BMU.PortalHandlerKeyPress(1)</Down>
+			</Action>
+			
+			<Action name="BMU_TOGGLE_MAIN_DELVES">
+				<Down>BMU.PortalHandlerKeyPress(5)</Down>
+			</Action>
+			
+			<Action name="BMU_TOGGLE_MAIN_DUNGEON_FINDER">
+				<Down>BMU.PortalHandlerKeyPress(6)</Down>
+			</Action>
+			
+			<Action name="BMU_WAYSHRINE_UNLOCK">
+				<Down>BMU.PortalHandlerKeyPress(10)</Down>
+			</Action>
+			
+			<Action name="BMU_REFRESH">
+				<Down>BMU.PortalHandlerKeyPress(11)</Down>
+			</Action>
+			
+			
+			<Action name="BMU_GROUP_LEADER">
+				<Down>BMU.PortalHandlerKeyPress(12)</Down>
+			</Action>
+			
+			<Action name="BMU_CURRENT_ZONE">
+				<Down>BMU.PortalHandlerKeyPress(17)</Down>
+			</Action>
+			
+			<Action name="BMU_TRACKED_QUEST">
+				<Down>BMU.PortalHandlerKeyPress(19)</Down>
+			</Action>
+			
+			<Action name="BMU_PRIMARY_RESIDENCE">
+				<Down>BMU.PortalHandlerKeyPress(13)</Down>
+			</Action>
+
+			<Action name="BMU_PRIMARY_RESIDENCE_OUTSIDE">
+				<Down>BMU.PortalHandlerKeyPress(18)</Down>
+			</Action>
+			
+			<Action name="BMU_GUILD_HOUSE">
+				<Down>BMU.PortalHandlerKeyPress(14)</Down>
+			</Action>
+			
+			
+			<Action name="BMU_FAVORITE_ZONE_1">
+				<Down>BMU.PortalHandlerKeyPress(15, 1)</Down>
+			</Action>
+			
+			<Action name="BMU_FAVORITE_ZONE_2">
+				<Down>BMU.PortalHandlerKeyPress(15, 2)</Down>
+			</Action>
+			
+			<Action name="BMU_FAVORITE_ZONE_3">
+				<Down>BMU.PortalHandlerKeyPress(15, 3)</Down>
+			</Action>
+			
+			<Action name="BMU_FAVORITE_ZONE_4">
+				<Down>BMU.PortalHandlerKeyPress(15, 4)</Down>
+			</Action>
+			
+			<Action name="BMU_FAVORITE_ZONE_5">
+				<Down>BMU.PortalHandlerKeyPress(15, 5)</Down>
+			</Action>
+			
+			
+			<Action name="BMU_FAVORITE_PLAYER_1">
+				<Down>BMU.PortalHandlerKeyPress(16, 1)</Down>
+			</Action>
+			
+			<Action name="BMU_FAVORITE_PLAYER_2">
+				<Down>BMU.PortalHandlerKeyPress(16, 2)</Down>
+			</Action>
+			
+			<Action name="BMU_FAVORITE_PLAYER_3">
+				<Down>BMU.PortalHandlerKeyPress(16, 3)</Down>
+			</Action>
+			
+			<Action name="BMU_FAVORITE_PLAYER_4">
+				<Down>BMU.PortalHandlerKeyPress(16, 4)</Down>
+			</Action>
+			
+			<Action name="BMU_FAVORITE_PLAYER_5">
+				<Down>BMU.PortalHandlerKeyPress(16, 5)</Down>
+			</Action>
+			
+		</Category>
+	</Layer>
+</Bindings>

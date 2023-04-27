@@ -127,9 +127,9 @@ end
 
 -- send addon messages to the chat
 function BMU.printToChat(text)
-	prefix = "[" .. BMU.var.appNameAbbr .. "]"
-	prefix_colorized = BMU.colorizeText(prefix, "white")
-	
+	local prefix = "[" .. BMU.var.appNameAbbr .. "]"
+	local prefix_colorized = BMU.colorizeText(prefix, "white")
+
 	d(prefix_colorized .. ": " .. text)
 end
 -----------------------------------------
@@ -294,7 +294,7 @@ BMU.blacklistForSlashPorting = {}
 BMU.blacklistOthers = {821, 826}
 
 -- all Outlaws Refuges
-BMU.blacklistRefuges = {746, 747, 748, 479, 750, 751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761, 780, 837, 971, 982, 1028, 1088, 1178, 1252, 1293, 1319, 1367}
+BMU.blacklistRefuges = {746, 747, 748, 479, 750, 751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761, 780, 837, 971, 982, 1028, 1088, 1178, 1252, 1293, 1319, 1367, 1412}
 
 
 -- just Cyrodiil
@@ -311,7 +311,7 @@ BMU.blacklistBattlegrounds = {509, 511, 510, 508, 513, 512, 514, 517, 518}
 BMU.blacklistGroupDungeons = {380, 935, 126, 931, 176, 681, 1055, 131, 1052, 31, 22, 38, 1009, 144, 936, 130, 932, 1010, 146, 933, 63, 930, 449, 64, 148, 848, 843, 283, 934, 11, 973, 974, 688, 678, 1080, 1081, 1122, 1123, 1152, 1153, 1201, 1197, 1228, 1229, 1267, 1268, 1301, 1302, 1360, 1361, 1389, 1390}
 
 -- 12 men Raids (Trials) -- order -> http://en.uesp.net/wiki/Online:Trials
-BMU.blacklistRaids = {1000, 638, 636, 639, 725, 1051, 975, 1121, 1196, 1263, 1344}
+BMU.blacklistRaids = {1000, 638, 636, 639, 725, 1051, 975, 1121, 1196, 1263, 1344, 1427}
 
 -- Solo Arenas -- https://en.uesp.net/wiki/Online:Arenas (Maelstrom Arena, Vateshran Hollows)
 BMU.blacklistSoloArenas = {677, 1227}
@@ -323,7 +323,7 @@ BMU.blacklistGroupArenas = {635, 1082}
 BMU.blacklistGroupZones = {890, 893, 895, 897, 899, 904, 906, 908, 907, 913, 909, 914, 915, 916}
 
 -- Houses
-BMU.blacklistHouses = {940, 942, 941, 939, 938, 937, 859, 858, 878, 868, 869, 873, 860, 861, 877, 852, 853, 881, 867, 866, 874, 863, 862, 876, 871, 870, 872, 864, 865, 875, 855, 854, 880, 856, 857, 879, 944, 943, 945, 882, 883, 994, 995, 997, 996, 1005, 1008, 1007, 1006, 1042, 1043, 1044, 1045, 1059, 1060, 1061, 1063, 1108, 1109, 1064, 1125, 1126, 1128, 1129, 1130, 1154, 1155, 1192, 1193, 1199, 1200, 1218, 1219, 1220, 1233, 1234, 1264, 1265, 1270, 1271, 1275, 1276, 1277, 1307, 1342, 1343, 1306, 1345, 1363, 1364, 1432}
+BMU.blacklistHouses = {940, 942, 941, 939, 938, 937, 859, 858, 878, 868, 869, 873, 860, 861, 877, 852, 853, 881, 867, 866, 874, 863, 862, 876, 871, 870, 872, 864, 865, 875, 855, 854, 880, 856, 857, 879, 944, 943, 945, 882, 883, 994, 995, 997, 996, 1005, 1008, 1007, 1006, 1042, 1043, 1044, 1045, 1059, 1060, 1061, 1063, 1108, 1109, 1064, 1125, 1126, 1128, 1129, 1130, 1154, 1155, 1192, 1193, 1199, 1200, 1218, 1219, 1220, 1233, 1234, 1264, 1265, 1270, 1271, 1275, 1276, 1277, 1307, 1342, 1343, 1306, 1345, 1363, 1364, 1432, 1433, 1434, 1435}
 
 -----------------------------------------
 
@@ -551,10 +551,21 @@ BMU.overlandDelvesPublicDungeons = {
 		delves = {1374, 1375},
 		publicDungeons = {},
 	},
+	-- Telvanni Peninsula
+	[1414] = {
+    	delves = {1396, 1397, 1398},
+    	publicDungeons = {1415},
+  	},
+  	-- Apocrypha
+  	[1413] = {
+    	delves = {1399, 1400, 1401},
+    	publicDungeons = {1416},
+  },
 	}
 			
 
 -- maps nodeIndicies with specific/selected zoneIds
+-- structure: [<zone_id of the instance>] = {<node_index>, <abbreviation>, <DLC name>}
 BMU.nodeIndexMap = {
 	-- SOLO ARENAS
 	[677] = {250, "MSA / MA", "Orsinium"},
@@ -574,6 +585,7 @@ BMU.nodeIndexMap = {
 	[1196] = {434, "KA", "Greymoor"},
 	[1263] = {468, "RG", "Blackwood"},
 	[1344] = {488, "DR/DSR", "High Isle"},
+	[1427] = {534, "SE", "Necrom"},
 	-- GROUP DUNGEONS
 	[38] = {186, "BHH / Blackheart"},
 	[380] = {194, "BC1 / Banished 1"},
@@ -833,11 +845,11 @@ BMU.treasureAndSurveyMaps = {
 	},
 	-- Hew's Bane
 	[816] = {
-	treasure = {43733, 43734},
+		treasure = {43733, 43734},
 	},
 	-- Gold Coast
 	[823] = {
-	treasure = {43735, 43736},
+		treasure = {43735, 43736},
 	},
 	-- Vvardenfell
 	[849] = {
@@ -961,6 +973,22 @@ BMU.treasureAndSurveyMaps = {
 		treasure = {192370, 192371},
 		clue = {191158},
 	},
+	-- Telvanni Peninsula
+	[1414] = {
+		woodworker = {198297},
+		blacksmith = {198291},
+		jewelry = {198294},
+		treasure = {196201, 196202, 198087, 198098, 198099, 198100},
+		clue = {197842, 197843},   -- TODO
+  	},
+    -- Apocrypha
+  	[1413] = {
+		alchemist = {198288},
+		enchanter = {198289},
+		clothier = {198290},
+		treasure = {196203, 198101, 198102},
+		clue = {197842, 197843},   -- TODO
+  	},
 }
 
 

@@ -2286,8 +2286,8 @@ function BMU.createDungeonRecord(zoneId)
 	entry.textColorZoneName = "white"
 	
 	-- in the case that new DLC dungeons from PTS are already added but not published on live servers so far
-	-- prevent them from showing as empty row
-	if not entry.zoneNameUnformatted or entry.zoneNameUnformatted == "" then
+	-- prevent them from showing as empty row or invalid entry
+	if not entry.zoneNameUnformatted or entry.zoneNameUnformatted == "" or not BMU.nodeIndexMap[zoneId] then
 		return nil
 	end
 	
@@ -2452,6 +2452,9 @@ function BMU.getMainZoneId(zoneId)
 	elseif zoneId == 1286 or zoneId == 1282 or zoneId == 1283 then
 		-- Deadlands/Fargrave(City)/The Shambles
 		return 1286
+	elseif zoneId == 1413 or zoneId == 1414 then
+		-- Telvanni Peninsula/Apocrypha
+		return 1413
 	else
 		return false
 	end

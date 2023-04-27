@@ -1467,7 +1467,7 @@ local function SetupUI()
 		local tooltipTextCompletion = ""
 		if BMU.isZoneOverlandZone() then
 			-- add wayshrine discovery info from ZoneGuide
-			-- Attention: if the user is in Arteum, he will see the total number of wayshrines (inclusive Summerset)
+			-- Attention: if the user is in Artaeum, he will see the total number of wayshrines (inclusive Summerset)
 			-- however, when starting the auto unlock the function getZoneWayshrineCompletion() will check which wayshrines are really located on this map
 			local zoneWayhsrineDiscoveryInfo, zoneWayshrineDiscovered, zoneWayshrineTotal = BMU.getZoneGuideDiscoveryInfo(GetZoneId(GetUnitZoneIndex("player")), ZONE_COMPLETION_TYPE_WAYSHRINES)
 			if zoneWayhsrineDiscoveryInfo ~= nil then

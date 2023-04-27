@@ -326,26 +326,25 @@ end
 
 
 
-function BMU.sc_findNodesofZoneId(zoneId)
-	local list = {zoneId}
-	local counter = 1
-	for _, zoneId in ipairs(list) do
-		for i = 1, GetNumFastTravelNodes() do
-			local known, name, normalizedX, normalizedY, icon, glowIcon, poiType, isShownInCurrentMap, linkedCollectibleIsLocked = GetFastTravelNodeInfo(i)
-			if string.match(string.lower(name), string.lower(BMU.formatName(GetZoneNameById(zoneId), true))) then
-				d("MATCH" .. counter .. ": " .. name .. "(" .. i.. ") | " .. GetZoneNameById(zoneId) .. "(" .. zoneId .. ")")
-				counter = counter + 1
-			end
-		end
-	end
-	--d(counter)
-end
-
-function BMU.sc_printAllDungeonNodesOfCurrentZone()
+function BMU.sc_printNodesOfCurrentZone()
 	for i = 1, GetNumFastTravelNodes() do
 		local known, name, normalizedX, normalizedY, icon, glowIcon, poiType, isShownInCurrentMap, linkedCollectibleIsLocked = GetFastTravelNodeInfo(i)
-		if poiType == POI_TYPE_GROUP_DUNGEON and isShownInCurrentMap then
-			d("NodeIndex: " .. i .. "  |  " .. name)
+		if isShownInCurrentMap then
+			local type = "unknown"
+			if poiType == POI_TYPE_GROUP_DUNGEON then
+				type = "Group Dungeon"
+			elseif poiType == POI_TYPE_PUBLIC_DUNGEON then
+				type = "Public Dungeon"
+			elseif poiType == POI_TYPE_WAYSHRINE then
+				type = "Wayshrine"
+			elseif poiType == POI_TYPE_OBJECTIVE then
+				type = "Objective"
+			elseif poiType == POI_TYPE_ACHIEVEMENT then
+				type = "Achievement"
+			elseif poiType == POI_TYPE_HOUSE then
+				type = "House"
+			end
+			d("NodeIndex: " .. i .. "  |  " .. name .. " (" .. type .. ")")
 		end
 	end
 end

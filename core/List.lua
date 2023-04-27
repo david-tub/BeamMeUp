@@ -566,7 +566,7 @@ end
 ------------------------------------------------------------
 
 -- uses the zone completion data to find out how many wayhrines are discovered in the zone
--- since the ZoneGuide of e.g. Summerset includes the wayshrines of Arteum, we need to seperate how many wayshrines are really in the zone 
+-- since the ZoneGuide of e.g. Summerset includes the wayshrines of Artaeum, we need to seperate how many wayshrines are really in the zone 
 -- returns:
 -- 1. number of wayshrines that are located in the zone
 -- 2. number of discovered wayshrines that are located in the zone

@@ -644,7 +644,7 @@ BMU.nodeIndexMap = {
 
 -----------------------------------------
 
------------------------------------------ Treasure/Survey Maps
+----------------------------------------- Treasure/Survey Maps/Clues
 
 
 BMU.treasureAndSurveyMaps = {

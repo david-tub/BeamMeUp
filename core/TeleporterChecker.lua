@@ -2282,8 +2282,13 @@ end
 function BMU.createDungeonRecord(zoneId)
 	local entry = BMU.createClickableZoneRecord(zoneId)
 	entry.isDungeon = true
-	entry.textColorDisplayName = "white"
-	entry.textColorZoneName = "white"
+	if zoneId == BMU.savedVarsServ.favoriteDungeon then
+		entry.textColorDisplayName = "gold"
+		entry.textColorZoneName = "gold"
+	else
+		entry.textColorDisplayName = "white"
+		entry.textColorZoneName = "white"
+	end
 	
 	-- in the case that new DLC dungeons from PTS are already added but not published on live servers so far
 	-- prevent them from showing as empty row or invalid entry

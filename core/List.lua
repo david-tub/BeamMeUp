@@ -1648,11 +1648,13 @@ function BMU.refreshListAuto()
 		inputString = BMU.win.Searcher_Zone:GetText()
 	end
 	
-	if BMU.state == 11 or BMU.state == 13 or BMU.state == 14 then
-		-- if list of own houses (11) or guilds (13) or Dungeon Finder (14) dont auto refresh
+	if BMU.state == 11 or BMU.state == 13 then
+		-- if list of own houses (11) or guilds (13) dont auto refresh
 		return
 	elseif BMU.state == 12 then
 		BMU.createTablePTF()
+	elseif BMU.state == 14 then
+		BMU.createTableDungeons()
 	else
 		BMU.createTable({index=BMU.state, inputString=inputString, fZoneId=BMU.stateZoneId, filterSourceIndex=BMU.stateSourceIndex, dontResetSlider=true})
 	end
@@ -1887,6 +1889,15 @@ function BMU.clickOnZoneName(button, record)
 		if not inDungeonTab and not inOwnHouseTab and not inQuestTab and not inItemsTab then
 			if BMU.savedVarsChar.sorting == 3 or BMU.savedVarsChar.sorting == 4 then
 				AddCustomMenuItem(SI.get(SI.TELE_UI_RESET_COUNTER_ZONE), function() BMU.savedVarsAcc.portCounterPerZone[record.zoneId] = nil BMU.refreshListAuto() end)
+			end
+		end
+
+		-- favorite a dungeon
+		if inDungeonTab then
+			if BMU.savedVarsServ.favoriteDungeon == record.zoneId then
+				AddCustomMenuItem(SI.get(SI.TELE_UI_REMOVE_FAVORITE_ZONE), function() BMU.savedVarsServ.favoriteDungeon = 0 BMU.refreshListAuto() end)
+			else
+				AddCustomMenuItem(SI.get(SI.TELE_UI_FAVORITE_ZONE), function() BMU.savedVarsServ.favoriteDungeon = record.zoneId BMU.refreshListAuto() end)
 			end
 		end
 		

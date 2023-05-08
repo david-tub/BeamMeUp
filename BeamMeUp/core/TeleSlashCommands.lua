@@ -351,6 +351,43 @@ end
 
 
 
+function BMU.sc_checkPartnerGuilds()
+	d("----------")
+	d("Waiting for guild data ...")
+	-- request guild data loading
+	BMU.requestGuildData()
+	zo_callLater(function() BMU.sc_checkPartnerGuilds_2() end, 2000)
+end
+
+
+function BMU.sc_checkPartnerGuilds_2()
+	local list_guildNames = {}
+	local list_guildIds = {}
+	local count = 0
+
+	for _, guildId in pairs(BMU.var.partnerGuilds[GetWorldName()]) do
+		local guildData = GUILD_BROWSER_MANAGER:GetGuildData(guildId)
+		if not guildData then
+			-- at least one guild is not loaded, wait and try again
+			zo_callLater(function() BMU.sc_checkPartnerGuilds_2() end, 1000)
+			return
+		else
+			table.insert(list_guildNames, guildData.guildName)
+			table.insert(list_guildIds, guildId)
+			count = count + 1
+		end
+	end
+
+	-- all guild data loaded
+	d("Guild Data (" .. count .. "):")
+	for i=1, #list_guildNames do
+		d(list_guildIds[i] .. " | " .. list_guildNames[i])
+	end
+	d("----------")
+end
+
+
+
 function BMU.sc_printPortCounterPerZone(option)
 	for zoneId, num in pairs(BMU.savedVarsAcc.portCounterPerZone) do
 		d(GetZoneNameById(zoneId) .. " - " .. zoneId .. ": " .. num)
@@ -383,53 +420,5 @@ function BMU.sc_printQuests(option)
 		d("ZoneName/Index: " .. zoneName .. " - " .. zoneIndex)
 		d("Starting ZoneIndex: " .. GetJournalQuestStartingZone(i))
 		d("Steps: " .. GetJournalQuestNumSteps(i))
-	end
-end
-
-
-function test()
-	local link = "|H1:item:156616:6:1:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0|h|h"
-	--GetItemLinkItemStyle(GetItemLink(0, 5)))
-	d(GetItemLinkItemStyle(link))
-end
-
-
-function test2()
-	for i = 1, 500 do
-            displayName, Note, GuildMemberRankIndex, status, secsSinceLogoff = GetGuildMemberInfo(GetGuildId(1), i)
-            hasCharacter, characterName, zoneName, classType, alliance, level, championRank, zoneId = GetGuildMemberCharacterInfo(GetGuildId(1), i)
-			--d(displayName)
-			--d(GetGuildMemberCharacterInfo(GetGuildId(1), i))
-		if displayName == "@AndVinny" then
-			d(GetGuildMemberCharacterInfo(GetGuildId(1), i))
-		end
-	end
-end
-
-
-function testGeoParentZones()
-	local count = 0
-	for zoneId=1, 1400 do
-		if GetZoneNameById(zoneId) ~= "" then
-			local myParentZone = BMU.getParentZoneId(zoneId)
-			local libZoneParentZone = LibZone:GetZoneGeographicalParentZoneId(zoneId)
-			if myParentZone ~= libZoneParentZone then
-				count = count + 1
-				d(GetZoneNameById(zoneId) .. " | BMU: " .. GetZoneNameById(myParentZone) .. "(" .. tostring(myParentZone) .. ") | LibZone: " .. GetZoneNameById(libZoneParentZone) .. "(" .. tostring(libZoneParentZone) .. ")")
-			end
-		end
-	end
-	d("NO MATCH: " .. count)
-end
-
-
-function testWayshrineFind(zoneId)
-	local mapIndex = BMU.getMapIndex(zoneId)
-	ZO_WorldMap_SetMapByIndex(mapIndex)
-	for i = 1, GetNumFastTravelNodes() do
-		local known, name, normalizedX, normalizedY, icon, glowIcon, poiType, isShownInCurrentMap, linkedCollectibleIsLocked = GetFastTravelNodeInfo(i)
-		if isShownInCurrentMap and poiType == POI_TYPE_WAYSHRINE then
-			d("MATCH: " .. name)
-		end
 	end
 end

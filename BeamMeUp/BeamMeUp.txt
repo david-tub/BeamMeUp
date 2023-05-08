@@ -11,6 +11,7 @@
 
 
 ## Globals / data sets
+GuildData.lua
 TeleporterGlobals.lua
 
 

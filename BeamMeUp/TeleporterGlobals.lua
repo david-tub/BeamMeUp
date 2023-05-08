@@ -26,19 +26,10 @@ BMU.var = {
 	colDarkRed	 = "a20000", -- dark red (for unrelated quests)
 	colGray		 = "8c8c8c", -- light gray for placeholder
   },
-  BMUGuilds = {
-	["EU Megaserver"] = {569082, 582568, 620882, 633582},
-	["NA Megaserver"]	= {591705, 666643, 708141, 720529},
-  },
-  partnerGuilds = {
- 	["EU Megaserver"] = {635942, 570448, 7871, 631764, 661070, 389326, 634734, 677494, 418220, 649984, 701658, 704816, 489026, 713576, 430368, 724742, 18459, 732916, 163802, 725690, 747096, 439872, 738288, 756036, 742682, 611168, 527788, 782574},
-	["NA Megaserver"] = {698893, 601183, 738065, 738317, 677323, 704951, 785051, 789007, 264915, 434691, 809511, 591467, 774767, 630613, 401657, 197803, 869871, 781641},
-  },
-  guildHouse			= {
-	-- per server displayName and houseId
-	["EU Megaserver"]	= {"@DeadSoon", 81},
-	["NA Megaserver"]	= {"@Ladytala", 47},
-  }
+  
+  BMUGuilds = BMU_GuildData.officialGuilds,
+  partnerGuilds = BMU_GuildData.partnerGuilds,
+  guildHouse = BMU_GuildData.guildHouses,
 }
 
 -- libraries

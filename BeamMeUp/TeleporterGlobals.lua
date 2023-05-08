@@ -810,7 +810,7 @@ BMU.treasureAndSurveyMaps = {
 		clothier = {57755},
 		jewelry = {139426},
 		treasure = {43661, 43662, 43663, 43664, 43665, 43666, 44934},
-		clue = {187890},
+		clue = {187890, 197843},
 	},
 	-- Coldharbour
 	[347] = {
@@ -979,7 +979,7 @@ BMU.treasureAndSurveyMaps = {
 		blacksmith = {198291},
 		jewelry = {198294},
 		treasure = {196201, 196202, 198087, 198098, 198099, 198100},
-		clue = {197842, 197843},   -- TODO
+		clue = {197842},
   	},
     -- Apocrypha
   	[1413] = {
@@ -987,7 +987,6 @@ BMU.treasureAndSurveyMaps = {
 		enchanter = {198289},
 		clothier = {198290},
 		treasure = {196203, 198101, 198102},
-		clue = {197842, 197843},   -- TODO
   	},
 }
 

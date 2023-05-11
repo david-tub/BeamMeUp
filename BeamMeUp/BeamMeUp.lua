@@ -64,9 +64,9 @@ function BMU.PortalHandlerKeyPress(index, favorite)
 		BMU.portToBMUGuildHouse()
 		return
 	end
-	
-	-- Unlock Wayshrines
-	if index == 10 then
+
+	-- Unlock Wayshrines (does not work in gamepad mode)
+	if index == 10 and not IsInGamepadPreferredMode() then
 		BMU.showDialogAutoUnlock()
 		return
 	end
@@ -115,14 +115,16 @@ function BMU.PortalHandlerKeyPress(index, favorite)
 			return
 		end
 		
-		-- open specific tab
-		SetGameCameraUIMode(true)
-		BMU.OpenTeleporter(false)
-		if index == 6 then
-			-- dungeon finder
-			BMU.createTableDungeons()
-		else
-			BMU.createTable({index=index})
+		if not IsInGamepadPreferredMode() then
+			-- open specific tab
+			SetGameCameraUIMode(true)
+			BMU.OpenTeleporter(false)
+			if index == 6 then
+				-- dungeon finder
+				BMU.createTableDungeons()
+			else
+				BMU.createTable({index=index})
+			end
 		end
 	else
 		-- window is shown
@@ -561,6 +563,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["favoriteListZones"] = {},
 		["favoriteListPlayers"] = {},
 		["lastofflineReminder"] = 1632859025, -- just a timestamp (2021/09/28)
+		["favoriteDungeon"] = 0, -- zone_id of the favorite dungeon
 	}
 	
 	BMU.DefaultsCharacter = {

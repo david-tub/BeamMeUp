@@ -46,7 +46,7 @@ local function SetupOptionsMenu(index) --index == Addon name
     local optionsData = {
 	     {
               type = "description",
-              text = "Get the most out of the addon by using it together with the following addons.",
+              text = "Get the most out of BeamMeUp by using it together with the following addons.",
 			  submenu = "deps",
          },
 		 {
@@ -118,7 +118,6 @@ local function SetupOptionsMenu(index) --index == Addon name
               text = "Use pings on the map (rally points) instead of zooming when you click on specific zone names or group members. An option in the 'Extra Features' allows you to toggle between the map ping and the zoom & pan feature.",
 			  submenu = "deps",
          },
-		 --[[
 		 {
               type = "divider",
 			  submenu = "deps",
@@ -133,7 +132,7 @@ local function SetupOptionsMenu(index) --index == Addon name
 		 {
               type = "button",
               name = "Open addon website",
-			  func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info2143-BeamMeUp-TeleporterFastTravel.html") end,
+			  func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info3624-IsJustaBeamMeUpGamepadPlugin.html") end,
 			  width = "half",
 			  submenu = "deps",
          },
@@ -142,7 +141,6 @@ local function SetupOptionsMenu(index) --index == Addon name
               text = "Use BeamMeUp in the gamepad mode. Finally, BeamMeUp gets a dedicated gamepad support. |cFF00FFIsJusta|r Beam Me Up Gamepad Plugin integrates the features of BeamMeUp in the gamepad interface and allows you to travel more comfortable than ever before.",
 			  submenu = "deps",
          },
-		 --]]
 		 {
               type = "slider",
               name = SI.get(SI.TELE_SETTINGS_NUMBER_LINES),
@@ -966,7 +964,7 @@ function BMU.getStringIsInstalledLibrary(addonName)
 		end
 	end
 	
-	-- GamePadMode coming soon
+	-- GamePadMode "IsJustaBmuGamepadPlugin"
 	if string.lower(addonName) == "gamepad" then
 		if IsJustaBmuGamepadPlugin or IJA_BMU_GAMEPAD_PLUGIN then
 			return stringInstalled
@@ -1467,7 +1465,7 @@ local function SetupUI()
 		local tooltipTextCompletion = ""
 		if BMU.isZoneOverlandZone() then
 			-- add wayshrine discovery info from ZoneGuide
-			-- Attention: if the user is in Arteum, he will see the total number of wayshrines (inclusive Summerset)
+			-- Attention: if the user is in Artaeum, he will see the total number of wayshrines (inclusive Summerset)
 			-- however, when starting the auto unlock the function getZoneWayshrineCompletion() will check which wayshrines are really located on this map
 			local zoneWayhsrineDiscoveryInfo, zoneWayshrineDiscovered, zoneWayshrineTotal = BMU.getZoneGuideDiscoveryInfo(GetZoneId(GetUnitZoneIndex("player")), ZONE_COMPLETION_TYPE_WAYSHRINES)
 			if zoneWayhsrineDiscoveryInfo ~= nil then

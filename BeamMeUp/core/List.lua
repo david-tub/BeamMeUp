@@ -566,7 +566,7 @@ end
 ------------------------------------------------------------
 
 -- uses the zone completion data to find out how many wayhrines are discovered in the zone
--- since the ZoneGuide of e.g. Summerset includes the wayshrines of Arteum, we need to seperate how many wayshrines are really in the zone 
+-- since the ZoneGuide of e.g. Summerset includes the wayshrines of Artaeum, we need to seperate how many wayshrines are really in the zone 
 -- returns:
 -- 1. number of wayshrines that are located in the zone
 -- 2. number of discovered wayshrines that are located in the zone
@@ -1887,6 +1887,15 @@ function BMU.clickOnZoneName(button, record)
 		if not inDungeonTab and not inOwnHouseTab and not inQuestTab and not inItemsTab then
 			if BMU.savedVarsChar.sorting == 3 or BMU.savedVarsChar.sorting == 4 then
 				AddCustomMenuItem(SI.get(SI.TELE_UI_RESET_COUNTER_ZONE), function() BMU.savedVarsAcc.portCounterPerZone[record.zoneId] = nil BMU.refreshListAuto() end)
+			end
+		end
+
+		-- favorite a dungeon
+		if inDungeonTab then
+			if BMU.savedVarsServ.favoriteDungeon == record.zoneId then
+				AddCustomMenuItem(SI.get(SI.TELE_UI_REMOVE_FAVORITE_ZONE), function() BMU.savedVarsServ.favoriteDungeon = 0 BMU.createTableDungeons() end)
+			else
+				AddCustomMenuItem(SI.get(SI.TELE_UI_FAVORITE_ZONE), function() BMU.savedVarsServ.favoriteDungeon = record.zoneId BMU.createTableDungeons() end)
 			end
 		end
 		

@@ -1852,8 +1852,7 @@ function BMU.clickOnZoneName(button, record)
 				}
 			else
 				-- number of favorites displayed in the context menu
-				local numFavorites = 10
-				for i=1, numFavorites, 1 do
+				for i=1, BMU.var.numFavoriteZones, 1 do
 					local favName = ""
 					if BMU.savedVarsServ.favoriteListZones[i] ~= nil then
 						favName = BMU.formatName(GetZoneNameById(BMU.savedVarsServ.favoriteListZones[i]), BMU.savedVarsAcc.formatZoneName)
@@ -2081,8 +2080,7 @@ function BMU.clickOnPlayerName(button, record)
 			}
 		else
 			-- number of favorites displayed in the context menu
-			local numFavorites = 5
-			for i=1, numFavorites, 1 do
+			for i=1, BMU.var.numFavoritePlayers, 1 do
 				local favName = ""
 				if BMU.savedVarsServ.favoriteListPlayers[i] ~= nil then
 					favName = BMU.savedVarsServ.favoriteListPlayers[i]
@@ -2452,19 +2450,17 @@ function BMU:tooltipTextEnter(control, text)
 end
 
 
+-- retrieves zone name from zoneId
+function BMU.getZoneIdFromZoneName(searchZoneName)
+	local libZoneData = BMU.LibZoneGivenZoneData
+	local zoneData = libZoneData[string.lower(BMU.lang)] or libZoneData["en"]
+	for zoneId, zoneName in pairs(zoneData) do
+		if string.lower(zoneName) == string.lower(searchZoneName) then
+			return zoneId
+		end
+	end
+end
+
+
 
 BMU.ListView = ListView
-
-
-------------- TEST INGAME STRINGS -------------
---[[
-local SI = BMU.SI
-local mkstr = ZO_CreateStringId
-
--- to consider
-mkstr(SI.TELE_UI_BTN_DUNGEON_FINDER, GetString(SI_CUSTOMERSERVICESUBMITFEEDBACKCATEGORIES10))					-- "Dungeons, Trials, & Arenas"
-mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, GetString(SI_CUSTOMERSERVICESUBMITFEEDBACKCATEGORIES10))	-- "Dungeons, Trials, & Arenas"
-
---mkstr(SI.TELE_SETTINGS_USE_PAN_AND_ZOOM, GetString(SI_WORLD_MAP_ZOOM))								-- "Zoom"
---mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT, GetString(SI_TOOLTIP_UNIT_MAP_RALLY_POINT))					-- "Group Rally Point"
---]]

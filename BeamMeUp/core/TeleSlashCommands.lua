@@ -46,30 +46,6 @@ function BMU.sc_toggleDebugMode()
 	else
 		BMU.debugMode = 1
 		BMU.printToChat("Debug mode enabled")
-		--[[
-		d("New slash commands available:")
-	
-		d("Printing of complete inventory (1): /bmu/debug/inv1")
-		SLASH_COMMANDS["/bmu/debug/inv1"] = BMU.sc_inv1
-	
-		d("Printing of complete inventory (2): /bmu/debug/inv2")
-		SLASH_COMMANDS["/bmu/debug/inv2"] = BMU.sc_inv2
-	
-		d("Printing of all POI in current zone: /bmu/debug/poi")
-		SLASH_COMMANDS["/bmu/debug/poi"] = BMU.sc_poi
-		
-		d("Testing library LibZone: /bmu/debug/libzone <zoneId>")
-		SLASH_COMMANDS["/bmu/debug/libzone"] = BMU.sc_testLibZone
-		
-		d("Initialization of Slash-Command-Porting: /bmu/debug/slashporting")
-		SLASH_COMMANDS["/bmu/debug/slashporting"] = BMU.sc_initializeSlashPorting
-		
-		d("Printing of all Quests and their location: /bmu/debug/quests")
-		SLASH_COMMANDS["/bmu/debug/quests"] = BMU.sc_printQuests
-		
-		-- refresh slash commands cache (for auto completing)
-		SLASH_COMMAND_AUTO_COMPLETE:InvalidateSlashCommandCache()
-		--]]
 	end
 end
 
@@ -78,35 +54,46 @@ function BMU.sc_switchLanguage(option)
 	if option == "de" or option == "en" or option == "fr" or option == "ru" or option == "es" or option == "pl" or option == "it" or option == "jp" or option == "br" or option == "kr" or option == "zh" then
 		SetCVar("language.2",option)
 	else
-		d("invalid language code")
-		d("only en, de, fr, ru, es, jp, pl, it, br, kr or zh allowed")
+		BMU.printToChat("invalid language code")
+		BMU.printToChat("only en, de, fr, ru, es, jp, pl, it, br, kr or zh allowed")
 	end
 end
 
 
+-- Examples:
+-- "/bmu/favorites/add/player 1 @Gamer1968PAN"
 function BMU.sc_addFavoritePlayer(option)
 	local options = BMU.sc_parseOptions(option)
-	local displayName = options[1]
-	local position = tonumber(options[2])
-	if displayName ~= nil and string.sub(displayName, 1, 1) == "@" and position ~= nil and position >= 1 and position <= 10 then
+	local position = tonumber(options[1])
+	local displayName = options[2]
+	
+	if displayName ~= nil and string.sub(displayName, 1, 1) == "@" and position ~= nil and position >= 1 and position <= BMU.var.numFavoritePlayers then
 		BMU.addFavoritePlayer(position, displayName)
 	else
-		d("invalid player name or slot")
-		d("player name has to begin with @... and slot must be a number between 1-10")
+		BMU.printToChat("invalid input")
+		BMU.printToChat("<favorite slot (1-5)>  <player name (@...)>")
 	end
 end
 
 
+-- Examples:
+-- "/bmu/favorites/add/zone 1 57"
+-- "/bmu/favorites/add/zone 1 Deshaan"
 function BMU.sc_addFavoriteZone(option)
 	local options = BMU.sc_parseOptions(option)
-	local zoneId = tonumber(options[1])
-	local position = tonumber(options[2])
+	local position = tonumber(options[1])
+	-- second parameter is number -> zoneId
+	-- or concat the params to one zone name (e.g. "High Isle" is incoming as 2 params)
+	local zoneNameOrId = tonumber(options[2]) or table.concat({unpack(options, 2)}, " ")
+
+	local zoneId = tonumber(zoneNameOrId) or BMU.getZoneIdFromZoneName(zoneNameOrId)
 	local zoneName = BMU.formatName(GetZoneNameById(zoneId), BMU.savedVarsAcc.formatZoneName)
-	if zoneName ~= nil and position ~= nil and position >= 1 and position <= 5 then
+	
+	if zoneName ~= nil and zoneName ~= "" and position ~= nil and position >= 1 and position <= BMU.var.numFavoriteZones then
 		BMU.addFavoriteZone(position, zoneId, zoneName)
 	else
-		d("invalid zone id or slot")
-		d("zone id must be exist and slot must be a number between 1-5")
+		BMU.printToChat("invalid input")
+		BMU.printToChat("<favorite slot (1-10)>  <zone (zoneId or zone name)>")
 	end
 end
 
@@ -114,7 +101,7 @@ end
 function BMU.sc_getCurrentZoneId()
 	local playersZoneIndex = GetUnitZoneIndex("player")
 	local playersZoneId = GetZoneId(playersZoneIndex)
-	d("Current zone id: " .. playersZoneId)
+	BMU.printToChat("Current zone id: " .. playersZoneId)
 end
 
 
@@ -122,7 +109,7 @@ function BMU.sc_customVoteUnanimous(option)
 	if option ~= nil and option ~= "" then
 		BeginGroupElection(GROUP_ELECTION_TYPE_GENERIC_UNANIMOUS, option)
 	else
-		d("invalid custom text")
+		BMU.printToChat("invalid custom text")
 	end
 end
 
@@ -131,7 +118,7 @@ function BMU.sc_customVoteSupermajority(option)
 	if option ~= nil and option ~= "" then
 		BeginGroupElection(GROUP_ELECTION_TYPE_GENERIC_SUPERMAJORITY, option)
 	else
-		d("invalid custom text")
+		BMU.printToChat("invalid custom text")
 	end
 end
 
@@ -140,7 +127,7 @@ function BMU.sc_customVoteSimplemajority(option)
 	if option ~= nil and option ~= "" then
 		BeginGroupElection(GROUP_ELECTION_TYPE_GENERIC_SIMPLEMAJORITY, option)
 	else
-		d("invalid custom text")
+		BMU.printToChat("invalid custom text")
 	end
 end
 

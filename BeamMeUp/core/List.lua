@@ -1415,11 +1415,19 @@ function ListView:update()
 					list.portalToPlayerTex:SetHidden(true)
 				end
 				
-			elseif message.isDungeon and CanLeaveCurrentLocationViaTeleport() then
+			elseif message.isDungeon and CanLeaveCurrentLocationViaTeleport() and CanJumpToPlayerInZone(message.zoneId) then
 				-- Dungeon Finder -> use nodeIndecies instead of travel to zoneId
 				list.portalToPlayerTex:SetHidden(false)
 				list.portalToPlayerTex:SetTexture(texture_normal)
-				list.portalToPlayerTex:SetHandler("OnMouseEnter", function(self) list.portalToPlayerTex:SetTexture(texture_over) BMU:tooltipTextEnter(list.portalToPlayerTex, message.difficultyText) BMU.pauseAutoRefresh = true end)
+				list.portalToPlayerTex:SetHandler("OnMouseEnter", function(self)
+					list.portalToPlayerTex:SetTexture(texture_over)
+					if GetInteractionType() ~= INTERACTION_FAST_TRAVEL then
+						-- show tooltip with costs only if player is not at a wayshrine
+						BMU:tooltipTextEnter(list.portalToPlayerTex, message.difficultyText .. "\n" .. BMU.colorizeText(string.format(GetString(SI_TOOLTIP_RECALL_COST) .. "%d", GetRecallCost()), "red"))
+					else
+						BMU:tooltipTextEnter(list.portalToPlayerTex, message.difficultyText)
+					end
+					BMU.pauseAutoRefresh = true end)
 				list.portalToPlayerTex:SetHandler("OnMouseExit", function(self) list.portalToPlayerTex:SetTexture(texture_normal) BMU:tooltipTextEnter(list.portalToPlayerTex) BMU.pauseAutoRefresh = false end)
 				list.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) BMU.clickOnTeleportToDungeonButton(list.portalToPlayerTex, button, message) end)
 				
@@ -1442,13 +1450,7 @@ function ListView:update()
 						BMU:tooltipTextEnter(list.portalToPlayerTex, BMU.colorizeText(string.format(GetString(SI_TOOLTIP_RECALL_COST) .. "%d", GetRecallCost()), "red"))
 					end
 					BMU.pauseAutoRefresh = true end)
-				list.portalToPlayerTex:SetHandler("OnMouseExit", function(self)
-					list.portalToPlayerTex:SetTexture(texture_normal)
-					if GetInteractionType() ~= INTERACTION_FAST_TRAVEL then
-						-- show tooltip with costs only if player is not at a wayshrine
-						BMU:tooltipTextEnter(list.portalToPlayerTex)
-					end
-					BMU.pauseAutoRefresh = false end)
+				list.portalToPlayerTex:SetHandler("OnMouseExit", function(self) list.portalToPlayerTex:SetTexture(texture_normal) BMU:tooltipTextEnter(list.portalToPlayerTex) BMU.pauseAutoRefresh = false end)
 				list.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) BMU.clickOnTeleportToPlayerButton(list.portalToPlayerTex, button, message) end)
 			else
 				-- no DisplayName -> no teleport possibility
@@ -1616,7 +1618,7 @@ function BMU.clickOnTeleportToDungeonButton(textureControl, button, message)
 		ClearMenu()
 		AddCustomMenuItem(BMU.textures.dungeonDifficultyNormal .. GetString(SI_DUNGEONDIFFICULTY1), function() BMU.setDungeonDifficulty(false) zo_callLater(function() BMU.clickOnTeleportToDungeonButton_2(message) end, 200) end)
 		AddCustomMenuItem(BMU.textures.dungeonDifficultyVeteran .. GetString(SI_DUNGEONDIFFICULTY2), function() BMU.setDungeonDifficulty(true) zo_callLater(function() BMU.clickOnTeleportToDungeonButton_2(message) end, 200) end)
-		ShowMenu()		
+		ShowMenu()
 	else
 		-- just start teleport
 		BMU.clickOnTeleportToDungeonButton_2(message)
@@ -1625,14 +1627,26 @@ end
 
 
 function BMU.clickOnTeleportToDungeonButton_2(message)
-	-- port to nodeIndex
-	BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. message.zoneName)
-	FastTravelToNode(message.nodeIndex)
-	if BMU.savedVarsAcc.closeOnPorting then
-		-- hide world map if open
-		SCENE_MANAGER:Hide("worldMap")
-		-- hide UI if open
-		BMU.HideTeleporter()
+	if GetInteractionType() == INTERACTION_FAST_TRAVEL then
+		-- player is at wayshrine and travels for free -> dont show any chat printouts
+		-- start travel to node
+		FastTravelToNode(message.nodeIndex)
+		return
+	else
+		-- port for costs
+		BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. message.zoneName .. " (" .. zo_strformat(SI_MONEY_FORMAT, GetRecallCost()) .. ")")
+		-- show additional animation
+		if BMU.savedVarsAcc.showTeleportAnimation then
+			BMU.showTeleportAnimation()
+		end
+		FastTravelToNode(message.nodeIndex)
+		if BMU.savedVarsAcc.closeOnPorting then
+			-- hide world map if open
+			SCENE_MANAGER:Hide("worldMap")
+			-- hide UI if open
+			BMU.HideTeleporter()
+		end
+		return
 	end
 end
 

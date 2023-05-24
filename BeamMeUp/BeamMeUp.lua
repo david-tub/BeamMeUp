@@ -64,9 +64,9 @@ function BMU.PortalHandlerKeyPress(index, favorite)
 		BMU.portToBMUGuildHouse()
 		return
 	end
-
-	-- Unlock Wayshrines (does not work in gamepad mode)
-	if index == 10 and not IsInGamepadPreferredMode() then
+	
+	-- Unlock Wayshrines
+	if index == 10 then
 		BMU.showDialogAutoUnlock()
 		return
 	end
@@ -115,16 +115,14 @@ function BMU.PortalHandlerKeyPress(index, favorite)
 			return
 		end
 		
-		if not IsInGamepadPreferredMode() then
-			-- open specific tab
-			SetGameCameraUIMode(true)
-			BMU.OpenTeleporter(false)
-			if index == 6 then
-				-- dungeon finder
-				BMU.createTableDungeons()
-			else
-				BMU.createTable({index=index})
-			end
+		-- open specific tab
+		SetGameCameraUIMode(true)
+		BMU.OpenTeleporter(false)
+		if index == 6 then
+			-- dungeon finder
+			BMU.createTableDungeons()
+		else
+			BMU.createTable({index=index})
 		end
 	else
 		-- window is shown

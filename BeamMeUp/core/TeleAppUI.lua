@@ -1928,7 +1928,7 @@ local function SetupUI()
 			
 		-- add dungeon difficulty toggle
 		if CanPlayerChangeGroupDifficulty() then
-			local menuIndex = AddCustomMenuItem(BMU.textures.dungeonDifficultyVeteran .. GetString(SI_DUNGEONDIFFICULTY2), function() BMU.setDungeonDifficulty(not ZO_ConvertToIsVeteranDifficulty(ZO_GetEffectiveDungeonDifficulty())) zo_callLater(function() BMU.createTableDungeons() end, 200) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
+			local menuIndex = AddCustomMenuItem(BMU.textures.dungeonDifficultyVeteran .. GetString(SI_DUNGEONDIFFICULTY2), function() BMU.setDungeonDifficulty(not ZO_ConvertToIsVeteranDifficulty(ZO_GetEffectiveDungeonDifficulty())) zo_callLater(function() BMU.createTableDungeons() end, 300) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 			if ZO_ConvertToIsVeteranDifficulty(ZO_GetEffectiveDungeonDifficulty()) then
 				ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 			end

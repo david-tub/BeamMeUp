@@ -30,6 +30,9 @@ BMU.var = {
   BMUGuilds = BMU_GuildData.officialGuilds,
   partnerGuilds = BMU_GuildData.partnerGuilds,
   guildHouse = BMU_GuildData.guildHouses,
+
+  numFavoriteZones = 10,
+  numFavoritePlayers = 5,
 }
 
 -- libraries

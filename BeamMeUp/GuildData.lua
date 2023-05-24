@@ -27,33 +27,32 @@ BMU_GuildData = {
     partnerGuilds = {
         ["EU Megaserver"] = {
             635942,			-- "In statu nascendi"			|@Alex183
-            570448,			-- "ShiZ laut Screenshot im Kommentarbereich - bisher leider keine Kontaktmöglichkeit
-            7871,			-- "Va Khaj Dar" laut Screenshot in Kommentarbereich - Beitrag im Forum gefunden und Kontaktaufnahme versucht
+            570448,			-- "ShiZ"                       |no contact yet
+              7871,			-- "Va Khaj Dar"                |no contact yet
             631764,			-- "Die magische Miezmuschel"	|@MiezeMelli
             661070,			-- "BMU Crossroad Alliance"		|@square252
             389326,			-- "Ork Mania"					|@OrkManiac4u
-            634734,			--  war ziemlich sicher Ork Mania II und nicht mehr existenzt
             677494,			-- "BMU Unofficial"				|@Kassec - unlisted aber Leader hat Discord
             418220,			-- "Frozen Lean Gang"			|@Vinc - über Discord angeschrieben
-            649984,			-- "Way to warm sands"			|@Ma'pyca 
-            701658,			-- "Armoored Rose"				|Discord-Name Лютобор Ingame noch rausfinden
+            649984,			-- "Way to warm sands"			|@Ma'pyca (ru)
+            701658,			-- "Armoored Rose"				|Discord-name Лютобор Ingame?
             704816,			-- "Reaper's Assasins"			|Original Leader @Hekate's_Realm -> Substitute Leader @BeamMeUp-Addon
-            489026,			-- "Magic Forest"				|@somedule Discord-Name Ingame noch rausfinden
+            489026,			-- "Magic Forest"				|@somedule Discord-name Ingame?
             713576,			-- "Spirits of the Lake"		|@TheMentor/@Th3M3nt0r
             430368,			-- "The Brotherhood of Askir"	|@Tianlein
             724742,			-- "BeamMeUp-Taverne"			|@Erzengel-Lucifer
-            18459,			-- "Chapions Guild"				|MagnumG Discord-Name Ingame noch rausfinden
-            732916,			-- "The Aimless Wanderers"		|Veritas Discord-Name Ingame noch rausfinden
-            163802,			-- "Fuego"						|Whasabi Discord-Name Ingame noch rausfinden
-            725690,			-- "Secret Squirrel Guild"		|
-            747096,			-- "BEER"						|pr0gress Discord-Name Ingame noch rausfinden
-            439872,			-- "Arkays Handelshof"			|
-            738288,			-- "Dragon's Imperium"			|
+            18459,			-- "Chapions Guild"				|MagnumG Discord-Name Ingame?
+            732916,			-- "The Aimless Wanderers"		|Veritas Discord-Name Ingame?
+            163802,			-- "Fuego"						|Whasabi Discord-Name Ingame?
+            725690,			-- "Secret Squirrel Guild"		|?
+            747096,			-- "BEER"						|pr0gress Discord-Name Ingame?
+            439872,			-- "Arkays Handelshof"			|?
+            738288,			-- "Dragon's Imperium"			|?
             756036,			-- "Die Ritter der Ananas"		|@XCrusaderX36
             742682,			-- "Grim Bastion"				|Ursprünglich SheldoRU, ✓Okc✓ Discord-Name Ingame noch rausfinden + nachfragen ob eintrag bestehen bleiben soll.
-            611168,			-- "Hermaeus Mora Army"			|triquetra Discord-Name Ingame noch rausfinden
-            527788,			-- "Akatosh Knights"			|likezed Discord-Name Ingame noch rausfinden
-            782574,			-- "Die reisenden Schatten"		|LaicosVK Discord-Name Ingame noch rausfinden
+            611168,			-- "Hermaeus Mora Army"			|triquetra Discord-Name Ingame?
+            527788,			-- "Akatosh Knights"			|likezed Discord-Name Ingame?
+            782574,			-- "Die reisenden Schatten"		|LaicosVK Discord-Name Ingame?
         },
         ["NA Megaserver"] = {
             698893,			-- "The Descendants"			|@ravenzwind

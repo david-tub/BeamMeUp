@@ -717,8 +717,15 @@ BMU.nodeIndexMap = {
 		updateNum = 0,
 		releaseDate = "2014/04"
 	},
-
-	[22] = {196, "VF / Volenfell"},
+	-- Volenfell
+	[22] = {
+		nodeIndex = 196,
+		abbreviation = "VF / Volenfell",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	
 	[31] = {185, "SW / Selene"},
 	[38] = {186, "BHH / Blackheart"},
 	[63] = {198, "DSC 1 / Darkshade 1"},

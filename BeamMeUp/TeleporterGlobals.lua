@@ -559,70 +559,217 @@ BMU.overlandDelvesPublicDungeons = {
 			
 
 -- maps nodeIndicies with specific/selected zoneIds
--- structure: [<zone_id of the instance>] = {<node_index>, <abbreviation>, <DLC name>}
+-- structure: [<zone_id of the instance>] = {<node_index>, <abbreviation>, <is DLC>, <DLC name>, <update>, <release date>}
 BMU.nodeIndexMap = {
 	-- SOLO ARENAS
-	[677] = {250, "MSA / MA", "Orsinium"},
-	[1227] = {457, "VH / Vateshran", "Markarth"},
+	-- Mahlstrom
+	[677] = {
+		nodeIndex = 250,
+		abbreviation = "MSA / MA",
+		isDLC = true,
+		updateName = "Orsinium",
+		updateNum = 8,
+		releaseDate = "2015/11"
+	},
+	-- Vateshran
+	[1227] = {
+		nodeIndex = 457,
+		abbreviation = "VH / Vateshran",
+		isDLC = true,
+		updateName = "Markarth",
+		updateNum = 28,
+		releaseDate = "2020/11"
+	},
+	
 	-- GROUP ARENAS
-	[635] = {270, "DSA"},
-	[1082] = {378, "BRP", "Murkmire"},
+	-- Dragonstar
+	[635] = {
+		nodeIndex = 270,
+		abbreviation = "DSA",
+		isBaseGame = true,
+		updateNum = 4,
+		releaseDate = "2014/09"
+	},
+	-- Black Rose Prison
+	[1082] = {
+		nodeIndex = 378,
+		abbreviation = "BRP",
+		isDLC = true,
+		updateName = "Murkmire",
+		updateNum = 20,
+		releaseDate = "2018/10"
+	},
+
 	-- TRIALS
-	[1000] = {346, "AS", "Clockwork City"},
-	[638] = {231, "AA"},
-	[636] = {230, "HRC / Hel Ra"},
-	[639] = {232, "SO"},
-	[725] = {258, "MoL", "Thieves Guild"},
-	[1051] = {364, "CR", "Summerset"},
-	[975] = {331, "HoF", "Morrowind"},
-	[1121] = {399, "SS", "Elsweyr"},
-	[1196] = {434, "KA", "Greymoor"},
-	[1263] = {468, "RG", "Blackwood"},
-	[1344] = {488, "DR/DSR", "High Isle"},
-	[1427] = {534, "SE", "Necrom"},
+	-- Hel Ra Citadel
+	[636] = {
+		nodeIndex = 230,
+		abbreviation = "HRC / Hel Ra",
+		isBaseGame = true,
+		updateNum = 1,
+		releaseDate = "2014/05"
+	},
+	-- Arterium Archive
+	[638] = {
+		nodeIndex = 231,
+		abbreviation = "AA",
+		isBaseGame = true,
+		updateNum = 1,
+		releaseDate = "2014/05"
+	},
+	-- Sanctum Ophidia
+	[639] = {
+		nodeIndex = 232,
+		abbreviation = "SO",
+		isBaseGame = true,
+		updateNum = 4,
+		releaseDate = "2014/09"
+	},
+	-- Maw of Lorkaj
+	[725] = {
+		nodeIndex = 258,
+		abbreviation = "MoL",
+		isDLC = true,
+		updateName = "Thieves Guild",
+		updateNum = 9,
+		releaseDate = "2016/03"
+	},
+	-- Hall of Fabrication
+	[975] = {
+		nodeIndex = 331,
+		abbreviation = "HoF",
+		isChapter = true,
+		updateName = GetString(SI_CHAPTER1),
+		updateNum = 14,
+		releaseDate = "2017/05"
+	},
+	-- Asylum Sanctorium
+	[1000] = {
+		nodeIndex = 346,
+		abbreviation = "AS",
+		isDLC = true,
+		updateName = "Clockwork City",
+		updateNum = 16,
+		releaseDate = "2017/10"
+	},
+	-- Cloudrest
+	[1051] = {
+		nodeIndex = 364,
+		abbreviation = "CR",
+		isChapter = true,
+		updateName = GetString(SI_CHAPTER2),
+		updateNum = 18,
+		releaseDate = "2018/05"
+	},
+	-- Sunspire
+	[1121] = {
+		nodeIndex = 399,
+		abbreviation = "SS",
+		isChapter = true,
+		updateName = GetString(SI_CHAPTER3),
+		updateNum = 22,
+		releaseDate = "2019/05"
+	},
+	-- Kyne's Aegis
+	[1196] = {
+		nodeIndex = 434,
+		abbreviation = "KA",
+		isChapter = true,
+		updateName = GetString(SI_CHAPTER4),
+		updateNum = 26,
+		releaseDate = "2020/05"
+	},
+	-- Rockgrove
+	[1263] = {
+		nodeIndex = 468,
+		abbreviation = "RG",
+		isChapter = true,
+		updateName = GetString(SI_CHAPTER5),
+		updateNum = 30,
+		releaseDate = "2021/06"
+	},
+	-- Dreadsail Reef
+	[1344] = {
+		nodeIndex = 488,
+		abbreviation = "DR/DSR",
+		isChapter = true,
+		updateName = GetString(SI_CHAPTER6),
+		updateNum = 34,
+		releaseDate = "2022/06"
+	},
+	-- Sanity's Edge
+	[1427] = {
+		nodeIndex = 534,
+		abbreviation = "SE",
+		isChapter = true,
+		updateName = GetString(SI_CHAPTER7),
+		updateNum = 38,
+		releaseDate = "2023/06"
+	},
+
 	-- GROUP DUNGEONS
-	[38] = {186, "BHH / Blackheart"},
-	[380] = {194, "BC1 / Banished 1"},
-	[935] = {262, "BC2 / Banished 2"},
-	[126] = {191, "EH1 / Elden1"},
-	[931] = {265, "EH2 / Elden2"},			
-	[176] = {197, "CoA 1"},
-	[681] = {268, "CoA 2"},
-	[1055] = {370, "MoS", "Wolfhunter"},
-	[131] = {188, "TI / Tempest"},
-	[1052] = {371, "MHK", "Wolfhunter"},
-	[31] = {185, "SW / Selene"},
+	-- Base Game
+	-- Vaults of Madness
+	[11] = {
+		nodeIndex = 184,
+		abbreviation = "VoM / Vaults",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+
 	[22] = {196, "VF / Volenfell"},
-	[1009] = {341, "FL", "Dragon Bones"},
-	[144] = {193, "SC1 / Spindle 1"},
-	[936] = {267, "SC2 / Spindle 2"},
-	[130] = {190, "CoH1 / Crypts 1"},
-	[932] = {269, "CoH2 / Crypts 2"},
-	[1010] = {363, "SCP", "Dragon Bones"},
-	[146] = {189, "WRS1 / Wayrest 1"},
-	[933] = {263, "WRS2 / Wayrest 2"},
+	[31] = {185, "SW / Selene"},
+	[38] = {186, "BHH / Blackheart"},
 	[63] = {198, "DSC 1 / Darkshade 1"},
-	[930] = {264, "DSC 2 / Darkshade 2"},
-	[449] = {195, "DFK / DK / Direfrost"},
 	[64] = {187, "Crucible"},
+	[126] = {191, "EH1 / Elden1"},
+	[130] = {190, "CoH1 / Crypts 1"},
+	[131] = {188, "TI / Tempest"},
+	[144] = {193, "SC1 / Spindle 1"},
+	[146] = {189, "WRS1 / Wayrest 1"},
 	[148] = {192, "AC / Arx"},
-	[848] = {261, "CoS", "Shadows of the Hist"},
-	[843] = {260, "RoM / Mazza", "Shadow of the Hist"},
+	[176] = {197, "CoA 1"},
 	[283] = {98, "FG1 / Fungal 1"},
+	[380] = {194, "BC1 / Banished 1"},
+	[449] = {195, "DFK / DK / Direfrost"},
+	[681] = {268, "CoA 2"},
+	[930] = {264, "DSC 2 / Darkshade 2"},
+	[931] = {265, "EH2 / Elden2"},
+	[932] = {269, "CoH2 / Crypts 2"},
+	[933] = {263, "WRS2 / Wayrest 2"},
 	[934] = {266, "FG2 / Fungal 2"},
-	[11] = {184, "VoM / Vaults"},
+	[935] = {262, "BC2 / Banished 2"},
+	[936] = {267, "SC2 / Spindle 2"},
+
+	-- DLC
+	-- Imperial City Prison
+	[678] = {
+		nodeIndex = 236,
+		abbreviation = "ICP / Prison",
+		isDLC = true,
+		updateName = "Imperial City",
+		updateNum = 7,
+		releaseDate = "2015/08"
+	},
+
+	[688] = {247, "WGT", "Imperial City"},
+	[843] = {260, "RoM / Mazza", "Shadow of the Hist"},
+	[848] = {261, "CoS", "Shadows of the Hist"},
 	[973] = {326, "BRF / BF", "Horns of the Reach"},
 	[974] = {332, "FH", "Horns of the Reach"},
-	[688] = {247, "WGT", "Imperial City"},
-	[678] = {236, "ICP / Prison", "Imperial City"},
+	[1009] = {341, "FL", "Dragon Bones"},
+	[1010] = {363, "SCP", "Dragon Bones"},
+	[1052] = {371, "MHK", "Wolfhunter"},
+	[1055] = {370, "MoS", "Wolfhunter"},
 	[1080] = {389, "FV / Frost", "Wrathstone"},
 	[1081] = {390, "DoM", "Wrathstone"},
 	[1122] = {391, "MGF / MF", "Scalebreaker"},
 	[1123] = {398, "LoM", "Scalebreaker"},
 	[1152] = {424, "IR / Ice", "Harrowstorm"},
 	[1153] = {425, "UG", "Harrowstorm"},
-	[1201] = {436, "CT", "Stonethorn"},
 	[1197] = {435, "SG", "Stonethorn"},
+	[1201] = {436, "CT", "Stonethorn"},
 	[1228] = {437, "BDV", "Flames of Ambition"},
 	[1229] = {454, "CD / Cauldron", "Flames of Ambition"},
 	[1267] = {470, "RPB", "Waking Flame"},

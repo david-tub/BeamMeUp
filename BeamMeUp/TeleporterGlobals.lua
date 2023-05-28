@@ -562,7 +562,7 @@ BMU.overlandDelvesPublicDungeons = {
 -- structure: [<zone_id of the instance>] = {<node_index>, <abbreviation>, <is DLC>, <DLC name>, <update>, <release date>}
 BMU.nodeIndexMap = {
 	-- SOLO ARENAS
-	-- Mahlstrom
+	-- Maelstrom Arena
 	[677] = {
 		nodeIndex = 250,
 		abbreviation = "MSA / MA",
@@ -571,7 +571,7 @@ BMU.nodeIndexMap = {
 		updateNum = 8,
 		releaseDate = "2015/11"
 	},
-	-- Vateshran
+	-- Vateshran Hollows
 	[1227] = {
 		nodeIndex = 457,
 		abbreviation = "VH / Vateshran",
@@ -582,7 +582,7 @@ BMU.nodeIndexMap = {
 	},
 	
 	-- GROUP ARENAS
-	-- Dragonstar
+	-- Dragonstar Arena
 	[635] = {
 		nodeIndex = 270,
 		abbreviation = "DSA",
@@ -609,7 +609,7 @@ BMU.nodeIndexMap = {
 		updateNum = 1,
 		releaseDate = "2014/05"
 	},
-	-- Arterium Archive
+	-- Aetherian Archive
 	[638] = {
 		nodeIndex = 231,
 		abbreviation = "AA",
@@ -625,7 +625,7 @@ BMU.nodeIndexMap = {
 		updateNum = 4,
 		releaseDate = "2014/09"
 	},
-	-- Maw of Lorkaj
+	-- Maw of Lorkhaj
 	[725] = {
 		nodeIndex = 258,
 		abbreviation = "MoL",
@@ -634,7 +634,7 @@ BMU.nodeIndexMap = {
 		updateNum = 9,
 		releaseDate = "2016/03"
 	},
-	-- Hall of Fabrication
+	-- Halls of Fabrication
 	[975] = {
 		nodeIndex = 331,
 		abbreviation = "HoF",

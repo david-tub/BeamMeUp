@@ -821,7 +821,6 @@ BMU.nodeIndexMap = {
 		updateNum = 0,
 		releaseDate = "2014/04"
 	},
-	[283] = {98, "FG1 / Fungal 1"},
 	-- The Banished Cells I
 	[380] = {
 		nodeIndex = 194,

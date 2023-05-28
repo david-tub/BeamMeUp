@@ -885,7 +885,7 @@ BMU.nodeIndexMap = {
 		updateNum = 0,
 		releaseDate = "2014/04"
 	},
-		-- Crypt of Hearts II
+	-- Crypt of Hearts II
 	[932] = {
 		nodeIndex = 269,
 		abbreviation = "CoH2 / Crypts 2",

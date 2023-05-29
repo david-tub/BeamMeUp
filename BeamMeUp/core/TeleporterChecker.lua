@@ -2153,8 +2153,11 @@ function BMU.createTableDungeons()
 				return a.acronym < b.acronym
 			end)
 		else
-			-- sort by name
+			-- sort by release and name
 			table.sort(resultListArenas, function(a, b)
+				if a.updateNum ~= b.updateNum then
+					return a.updateNum < b.updateNum
+				end
 				return a.zoneName < b.zoneName
 			end)
 		end
@@ -2185,8 +2188,11 @@ function BMU.createTableDungeons()
 				return a.acronym < b.acronym
 			end)
 		else
-			-- sort by name
-			table.sort(resultListGroupArenas, function(a, b)
+			-- sort by release and name
+			table.sort(resultListArenas, function(a, b)
+				if a.updateNum ~= b.updateNum then
+					return a.updateNum < b.updateNum
+				end
 				return a.zoneName < b.zoneName
 			end)
 		end
@@ -2217,8 +2223,11 @@ function BMU.createTableDungeons()
 				return a.acronym < b.acronym
 			end)
 		else
-			-- sort by name
-			table.sort(resultListTrials, function(a, b)
+			-- sort by release and name
+			table.sort(resultListArenas, function(a, b)
+				if a.updateNum ~= b.updateNum then
+					return a.updateNum < b.updateNum
+				end
 				return a.zoneName < b.zoneName
 			end)
 		end
@@ -2249,8 +2258,11 @@ function BMU.createTableDungeons()
 				return a.acronym < b.acronym
 			end)
 		else
-			-- sort by name
-			table.sort(resultListGroupDungeons, function(a, b)
+			-- sort by release and name
+			table.sort(resultListArenas, function(a, b)
+				if a.updateNum ~= b.updateNum then
+					return a.updateNum < b.updateNum
+				end
 				return a.zoneName < b.zoneName
 			end)
 		end
@@ -2297,12 +2309,19 @@ function BMU.createDungeonRecord(zoneId)
 	end
 	
 	local nodeObject = BMU.nodeIndexMap[zoneId]
-	entry.nodeIndex = nodeObject[1]
-	entry.acronym = nodeObject[2] or ""
-	entry.dlc = nodeObject[3] or ""
+	entry.nodeIndex = nodeObject.nodeIndex
+	entry.acronym = nodeObject.abbreviation or ""
+	entry.updateName = nodeObject.updateName or ""
+	entry.updateNum = nodeObject.updateNum or ""
+	entry.releaseDate = nodeObject.releaseDate or ""
+
+	entry.dungeonTooltip = {
+		string.format(GetString(SI_CHAPTER_UPGRADE_RELEASE_HEADER) .. ": %s (%s)", entry.updateNum, entry.releaseDate)
+	}
+
 	if BMU.savedVarsChar.df_showDLCNames then
-		-- use DLC names
-		entry.displayName = entry.dlc
+		-- use DLC/Chapter names
+		entry.displayName = entry.updateName
 	else
 		-- use acronyms
 		entry.displayName = entry.acronym

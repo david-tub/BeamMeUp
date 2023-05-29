@@ -54,16 +54,12 @@ if BMU.LAM == nil then
 	end
 end
 
+-- optional libraries
 BMU.LSC = LibSlashCommander
-if BMU.LSC == nil then
-	if LibStub then
-		BMU.LSC = LibStub('LibSlashCommander', true)
-	else
-		d("[" .. BMU.var.appName .. " - ERROR] unable to load library LibSlashCommander")
-	end
+if BMU.LSC == nil and LibStub then
+	BMU.LSC = LibStub('LibSlashCommander', true)
 end
 
--- optional libraries
 BMU.LibSets = LibSets
 if BMU.LibSets == nil and LibStub then
 	BMU.LibSets = LibStub('LibSets', true)

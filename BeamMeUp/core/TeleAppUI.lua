@@ -753,7 +753,7 @@ local function SetupOptionsMenu(index) --index == Addon name
          },
 	     {
               type = "description",
-              text = "Port to specific zone\n(Hint: when you start typing /<zone name> the Addons suggestion will also appears on top)\n" .. BMU.colorizeText("/bmutp/<zone name>\n", "gold") .. BMU.colorizeText("Example: /bmutp/deshaan", "lgray"),
+              text = "Port to specific zone\n(Hint: when you start typing /<zone name> the auto completion will appear on top)\n" .. BMU.colorizeText("/bmutp/<zone name>\n", "gold") .. BMU.colorizeText("Example: /bmutp/deshaan", "lgray"),
 			  submenu = "cc",
          },
 	     {
@@ -763,40 +763,36 @@ local function SetupOptionsMenu(index) --index == Addon name
          },
 	     {
               type = "description",
-              text = "Port to own primary residence\n" .. BMU.colorizeText("/bmutp/house", "gold"),
-			  submenu = "cc",
-         },
-	     {
-              type = "description",
               text = "Port to currently focused quest\n" .. BMU.colorizeText("/bmutp/quest", "gold"),
 			  submenu = "cc",
          },
+	     {
+              type = "description",
+              text = "Port into primary residence\n" .. BMU.colorizeText("/bmutp/house", "gold"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Port outside primary residence\n" .. BMU.colorizeText("/bmutp/house_out", "gold"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Port to current zone\n" .. BMU.colorizeText("/bmutp/current_zone", "gold"),
+			  submenu = "cc",
+         },
 		 {
               type = "divider",
 			  submenu = "cc",
          },
 	     {
-              type = "description",
-              text = "Add player favorite manually\n" .. BMU.colorizeText("/bmu/favorites/add/player <player name> <fav slot>\n", "gold") .. BMU.colorizeText("Example: /bmu/favorites/add/player @DeadSoon 1", "lgray"),
-			  submenu = "cc",
-         },
+			type = "description",
+			text = "Add zone favorite manually\n" .. BMU.colorizeText("/bmu/favorites/add/zone <fav slot> <zoneName or zoneId> \n", "gold") .. BMU.colorizeText("Example: /bmu/favorites/add/zone 1 Deshaan", "lgray"),
+			submenu = "cc",
+	   	 },
 	     {
               type = "description",
-              text = "Add zone favorite manually\n" .. BMU.colorizeText("/bmu/favorites/add/zone <zoneId> <fav slot>\n", "gold") .. BMU.colorizeText("Example: /bmu/favorites/add/zone 57 1", "lgray"),
-			  submenu = "cc",
-         },
-	     {
-              type = "description",
-              text = "Get current zoneId (where the player actually is)\n" .. BMU.colorizeText("/bmu/misc/current_zone_id", "gold"),
-			  submenu = "cc",
-         },
-		 {
-              type = "divider",
-			  submenu = "cc",
-         },
-	     {
-              type = "description",
-              text = "Promote BeamMeUp by printing short advertising text in the chat\n" .. BMU.colorizeText("/bmu/advertise", "gold"),
+              text = "Add player favorite manually\n" .. BMU.colorizeText("/bmu/favorites/add/player <fav slot> <player name>\n", "gold") .. BMU.colorizeText("Example: /bmu/favorites/add/player 1 @DeadSoon", "lgray"),
 			  submenu = "cc",
          },
 		 {
@@ -820,6 +816,26 @@ local function SetupOptionsMenu(index) --index == Addon name
          },
 		 {
               type = "divider",
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Promote BeamMeUp by printing short advertising text in the chat\n" .. BMU.colorizeText("/bmu/misc/advertise", "gold"),
+			  submenu = "cc",
+         },
+	     {
+			type = "description",
+			text = "Get current zone id (where the player actually is)\n" .. BMU.colorizeText("/bmu/misc/current_zone_id", "gold"),
+			submenu = "cc",
+	   	 },
+	     {
+              type = "description",
+              text = "Switch client language (instant reload!)\n" .. BMU.colorizeText("/bmu/misc/lang", "gold"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Enable debug mode\n" .. BMU.colorizeText("/bmu/misc/debug", "gold"),
 			  submenu = "cc",
          },
 	     {

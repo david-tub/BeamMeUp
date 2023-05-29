@@ -1,41 +1,55 @@
 -- all functions which are reachable via slash commands
 local SI = BMU.SI
-local LSC = BMU.LSC
 
+
+-- register chat command either with LibSlashCommander or traditional
+function BMU.registerChatCommand(command, callback, description)
+	if BMU.LSC then
+		BMU.LSC:Register(command, function(option) callback(option) end, description)
+	else
+		SLASH_COMMANDS[command] = function(option) callback(option) end
+	end
+end
+
+
+-- register/activate all chat commands
 function BMU.activateSlashCommands()
+
 	-- Debug Mode (new slash commands will be activated)
-	LSC:Register("/bmu/debug", function(option) BMU.sc_toggleDebugMode() end, "Enable debug mode")
+	BMU.registerChatCommand("/bmu/misc/debug", function(option) BMU.sc_toggleDebugMode() end, "Enable debug mode")
 	-- Switch language
-	LSC:Register("/bmu/lang", function(option) BMU.sc_switchLanguage(option) end, "Switch client language")
-	-- Adding new player favorite
-	LSC:Register("/bmu/favorites/add/player", function(option) BMU.sc_addFavoritePlayer(option) end, "Add player favorite")
-	-- Adding new zone favorite
-	LSC:Register("/bmu/favorites/add/zone", function(option) BMU.sc_addFavoriteZone(option) end, "Add zone favorite")
+	BMU.registerChatCommand("/bmu/misc/lang", function(option) BMU.sc_switchLanguage() end, "Switch client language")
 	-- Getting current zone id
-	LSC:Register("/bmu/misc/current_zone_id", function(option) BMU.sc_getCurrentZoneId() end, "Print current zone id")
-	-- Port to goup leader
-	LSC:Register("/bmutp/leader", function(option) BMU.portToGroupLeader() end, "Port to group leader")
-	-- Port to currently tracked/focused quest
-	LSC:Register("/bmutp/quest", function(option) BMU.portToTrackedQuestZone() end, "Port to focused quest")
-	-- Port into own primary residence
-	LSC:Register("/bmutp/house", function(option) BMU.portToOwnHouse(true, nil, false, nil) end, "Port into primary residence")
-	-- Port outside own primary residence
-	LSC:Register("/bmutp/house_out", function(option) BMU.portToOwnHouse(true, nil, true, nil) end, "Port outside primary residence")
+	BMU.registerChatCommand("/bmu/misc/current_zone_id", function(option) BMU.sc_getCurrentZoneId() end, "Print current zone id")
 	-- Advertise addon
-	LSC:Register("/bmu/advertise", function(option) StartChatInput("Fast Travel addon BeamMeUp. Check it out: http://bit.ly/bmu4eso") end, "Advertise BeamMeUp")
-	
-	
+	BMU.registerChatCommand("/bmu/misc/advertise", function(option) StartChatInput("Fast Travel addon BeamMeUp. Check it out: http://bit.ly/bmu4eso") end, "Advertise BeamMeUp")
+
+	-- Adding new player favorite
+	BMU.registerChatCommand("/bmu/favorites/add/player", function(option) BMU.sc_addFavoritePlayer(option) end, "Add player favorite")
+	-- Adding new zone favorite
+	BMU.registerChatCommand("/bmu/favorites/add/zone", function(option) BMU.sc_addFavoriteZone(option) end, "Add zone favorite")
+
+	-- Port to goup leader
+	BMU.registerChatCommand("/bmutp/leader", function(option) BMU.portToGroupLeader() end, "Port to group leader")
+	-- Port to currently tracked/focused quest
+	BMU.registerChatCommand("/bmutp/quest", function(option) BMU.portToTrackedQuestZone() end, "Port to focused quest")
+	-- Port into own primary residence
+	BMU.registerChatCommand("/bmutp/house", function(option) BMU.portToOwnHouse(true, nil, false, nil) end, "Port into primary residence")
+	-- Port outside own primary residence
+	BMU.registerChatCommand("/bmutp/house_out", function(option) BMU.portToOwnHouse(true, nil, true, nil) end, "Port outside primary residence")
+	-- add chat command for porting to current zone seperately
+	BMU.registerChatCommand("/bmutp/current_zone", function(option) BMU.portToCurrentZone() end, "Port to current zone")
+
 	-- Starting custom group vote
-	LSC:Register("/bmu/vote/custom_vote_unanimous", function(option) BMU.sc_customVoteUnanimous(option) end, "Custom vote (100%)")
-	LSC:Register("/bmu/vote/custom_vote_supermajority", function(option) BMU.sc_customVoteSupermajority(option) end, "Custom vote (>=60%)")
-	LSC:Register("/bmu/vote/custom_vote_simplemajority", function(option) BMU.sc_customVoteSimplemajority(option) end, "Custom vote (>=50%)")
-	
-	
+	BMU.registerChatCommand("/bmu/vote/custom_vote_unanimous", function(option) BMU.sc_customVoteUnanimous(option) end, "Custom vote (100%)")
+	BMU.registerChatCommand("/bmu/vote/custom_vote_supermajority", function(option) BMU.sc_customVoteSupermajority(option) end, "Custom vote (>=60%)")
+	BMU.registerChatCommand("/bmu/vote/custom_vote_simplemajority", function(option) BMU.sc_customVoteSimplemajority(option) end, "Custom vote (>=50%)")
+
 	-- Initialize chat commands for porting (/bmutp...)
 	BMU.sc_initializeSlashPorting()
-	
-	-- add chat command for porting to current zone seperately
-	LSC:Register("/bmutp/current_zone", function(option) BMU.portToCurrentZone() end, "Port to current zone")
+
+	-- refresh chat commands cache (for auto completing)
+	--SLASH_COMMAND_AUTO_COMPLETE:InvalidateSlashCommandCache()
 end
 
 
@@ -157,16 +171,14 @@ function BMU.sc_initializeSlashPorting()
 		
 		for zoneId, zoneName in pairs(zoneData) do
 			if type(zoneId) == "number" and type(zoneName) == "string" then
-				local comName = "/bmutp/" .. string.gsub(string.lower(BMU.formatName(zoneName, BMU.savedVarsAcc.formatZoneName)), " ", "_")
+				local zoneNameFormatted = BMU.formatName(zoneName, BMU.savedVarsAcc.formatZoneName)
+				local comName = "/bmutp/" .. string.gsub(string.lower(zoneNameFormatted), " ", "_")
 				if SLASH_COMMANDS[comName] == nil and CanJumpToPlayerInZone(zoneId) and not blacklistForSlashPorting[zoneId] then -- dont overwrite existing command, check for solo zones by game, check for blacklisting
-					LSC:Register(comName, function(option) BMU.sc_porting(zoneId) end, "")
+					BMU.registerChatCommand(comName, function(option) BMU.sc_porting(zoneId) end, zoneNameFormatted)
 				end
 			end
 		end
 	end
-
-	-- refresh chat commands cache (for auto completing)
-	--SLASH_COMMAND_AUTO_COMPLETE:InvalidateSlashCommandCache()
 end
 
 
@@ -277,42 +289,6 @@ function BMU.sc_hasObjectName(tab, key)
 end
 
 
-function BMU.sc_testTableMerge()
-	local function cat(t, ...)  
-		local new = {unpack(t)}  
-		for i,v in ipairs({...}) do  
-			for ii,vv in ipairs(v) do  
-				new[#new+1] = vv  
-			end  
-		end  
-		return new  
-	end
-	
-	
-	local a = {unpack(BMU.blacklistGroupArenas),
-				unpack(BMU.blacklistGroupZones),
-				unpack(BMU.blacklistGroupDungeons),
-				unpack(BMU.blacklistRaids)
-			}
-	local b = #BMU.blacklistGroupArenas + #BMU.blacklistGroupZones + #BMU.blacklistGroupDungeons + #BMU.blacklistRaids	
-	d(b .. ' == ' .. #a)
-	
-	local c = {}
-	c = {unpack(c), unpack(BMU.var.partnerGuilds[GetWorldName()])}
-	c = {unpack(c), unpack(BMU.var.partnerGuilds[GetWorldName()])}
-	local dd = #BMU.var.partnerGuilds[GetWorldName()] + #BMU.var.partnerGuilds[GetWorldName()]
-	d(dd .. ' == ' .. #c)
-	
-	local e = cat(BMU.blacklistGroupArenas, BMU.blacklistGroupZones, BMU.blacklistGroupDungeons, BMU.blacklistRaids)
-	d('NEU')
-	d(b .. ' == ' .. #e)
-	
-	local f = cat(BMU.var.partnerGuilds[GetWorldName()], BMU.var.partnerGuilds[GetWorldName()])
-	d(dd .. ' == ' .. #f)
-end
-
-
-
 function BMU.sc_printNodesOfCurrentZone()
 	for i = 1, GetNumFastTravelNodes() do
 		local known, name, normalizedX, normalizedY, icon, glowIcon, poiType, isShownInCurrentMap, linkedCollectibleIsLocked = GetFastTravelNodeInfo(i)
@@ -335,7 +311,6 @@ function BMU.sc_printNodesOfCurrentZone()
 		end
 	end
 end
-
 
 
 function BMU.sc_checkPartnerGuilds()

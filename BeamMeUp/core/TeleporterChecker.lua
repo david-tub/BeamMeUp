@@ -2189,7 +2189,7 @@ function BMU.createTableDungeons()
 			end)
 		else
 			-- sort by release and name
-			table.sort(resultListArenas, function(a, b)
+			table.sort(resultListGroupArenas, function(a, b)
 				if a.updateNum ~= b.updateNum then
 					return a.updateNum < b.updateNum
 				end
@@ -2224,7 +2224,7 @@ function BMU.createTableDungeons()
 			end)
 		else
 			-- sort by release and name
-			table.sort(resultListArenas, function(a, b)
+			table.sort(resultListTrials, function(a, b)
 				if a.updateNum ~= b.updateNum then
 					return a.updateNum < b.updateNum
 				end
@@ -2259,7 +2259,7 @@ function BMU.createTableDungeons()
 			end)
 		else
 			-- sort by release and name
-			table.sort(resultListArenas, function(a, b)
+			table.sort(resultListGroupDungeons, function(a, b)
 				if a.updateNum ~= b.updateNum then
 					return a.updateNum < b.updateNum
 				end
@@ -2311,7 +2311,7 @@ function BMU.createDungeonRecord(zoneId)
 	local nodeObject = BMU.nodeIndexMap[zoneId]
 	entry.nodeIndex = nodeObject.nodeIndex
 	entry.acronym = nodeObject.abbreviation or ""
-	entry.updateName = nodeObject.updateName or ""
+	entry.updateName = nodeObject.updateName or GetString(SI_CHAPTER0)
 	entry.updateNum = nodeObject.updateNum or ""
 	entry.releaseDate = nodeObject.releaseDate or ""
 

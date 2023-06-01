@@ -568,12 +568,15 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["sorting"] = 2,
 		["scanBankForMaps"] = true,
 		["showAllDelves"] = false,
-		["df_showArenas"] = true,
-		["df_showGroupArenas"] = true,
-		["df_showDungeons"] = true,
-		["df_showTrials"] = true,
-		["df_sortByAcronym"] = false,
-		["df_showDLCNames"] = false,
+		["dungeonFinder"] = {
+			["showArenas"] = true,
+			["showGroupArenas"] = true,
+			["showDungeons"] = true,
+			["showTrials"] = true,
+			["toggleSortByAcronymRelease"] = false,
+			["toggleShowAcronymUpdateName"] = false,
+			["toggleShowZoneNameDungeonName"] = false,
+		},
 		["displayLeads"] = true,
 		["displayMaps"] = {
 			["treasure"] = true,
@@ -587,7 +590,6 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		},
 		["houseNickNames"] = false,
 		["ptfHouseZoneNames"] = false,
-		["dfZoneNames"] = false,
 	}
 
 	--Add the LibZone datatable to Teleporter -> See event_add_on_loaded as LibZone will be definitely loaded then

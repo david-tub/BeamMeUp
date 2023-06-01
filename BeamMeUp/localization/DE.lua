@@ -48,10 +48,13 @@ mkstr(SI.TELE_UI_TOGGLE_TRIALS, "Prüfungen")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS, "Verliese")
 mkstr(SI.TELE_UI_TOGGLE_SORT_ACRONYM, "Nach Kürzel sortieren")
 mkstr(SI.TELE_UI_DAYS_LEFT, "%d Tage verbleibend")
-mkstr(SI.TELE_UI_TOGGLE_DLC_NAMES, "Zeige DLC Namen")
+mkstr(SI.TELE_UI_TOGGLE_UPDATE_NAME, "Zeige Update Name")
 mkstr(SI.TELE_UI_UNLOCK_WAYSHRINES, "Wegschreine automatisch freischalten")
 mkstr(SI.TELE_UI_SUBMENU_FAVORITES, "Favoriten")
-mkstr(SI.TELE_UI_SHOW_ZONE_NAMES, "Zeige Zonennamen")
+mkstr(SI.TELE_UI_TOOGLE_ZONE_NAME, "Zeige Zonen Name")
+mkstr(SI.TELE_UI_TOGGLE_SORT_RELEASE, "Nach Erscheinung sortieren")
+mkstr(SI.TELE_UI_TOGGLE_ACRONYM, "Zeige Kürzel")
+mkstr(SI.TELE_UI_TOOGLE_DUNGEON_NAME, "Zeige Instanz Name")
 
 
 

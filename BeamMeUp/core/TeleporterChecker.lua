@@ -2135,11 +2135,11 @@ function BMU.createTableDungeons()
 	local resultListTrials = {}
 	local resultListGroupDungeons = {}
 
-	if BMU.savedVarsChar.df_showArenas then		
+	if BMU.savedVarsChar.dungeonFinder.showArenas then		
 		for _, zoneId in ipairs(BMU.blacklistSoloArenas) do
 			local entry = BMU.createDungeonRecord(zoneId)
 			if entry then
-				if BMU.savedVarsChar.dfZoneNames then
+				if BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName then
 					-- show zone name instead of instance name
 					entry.zoneName = entry.parentZoneName
 				end
@@ -2147,7 +2147,7 @@ function BMU.createTableDungeons()
 			end
 		end
 		
-		if BMU.savedVarsChar.df_sortByAcronym then
+		if BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease then
 			-- sort by acronym
 			table.sort(resultListArenas, function(a, b)
 				return a.acronym < b.acronym
@@ -2170,11 +2170,11 @@ function BMU.createTableDungeons()
 	end
 	
 	
-	if BMU.savedVarsChar.df_showGroupArenas then
+	if BMU.savedVarsChar.dungeonFinder.showGroupArenas then
 		for _, zoneId in ipairs(BMU.blacklistGroupArenas) do
 			local entry = BMU.createDungeonRecord(zoneId)
 			if entry then
-				if BMU.savedVarsChar.dfZoneNames then
+				if BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName then
 					-- show zone name instead of instance name
 					entry.zoneName = entry.parentZoneName
 				end
@@ -2182,7 +2182,7 @@ function BMU.createTableDungeons()
 			end
 		end
 		
-		if BMU.savedVarsChar.df_sortByAcronym then
+		if BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease then
 			-- sort by acronym
 			table.sort(resultListGroupArenas, function(a, b)
 				return a.acronym < b.acronym
@@ -2205,11 +2205,11 @@ function BMU.createTableDungeons()
 	end
 	
 	
-	if BMU.savedVarsChar.df_showTrials then
+	if BMU.savedVarsChar.dungeonFinder.showTrials then
 		for _, zoneId in ipairs(BMU.blacklistRaids) do
 			local entry = BMU.createDungeonRecord(zoneId)
 			if entry then
-				if BMU.savedVarsChar.dfZoneNames then
+				if BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName then
 					-- show zone name instead of instance name
 					entry.zoneName = entry.parentZoneName
 				end
@@ -2217,7 +2217,7 @@ function BMU.createTableDungeons()
 			end
 		end
 		
-		if BMU.savedVarsChar.df_sortByAcronym then
+		if BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease then
 			-- sort by acronym
 			table.sort(resultListTrials, function(a, b)
 				return a.acronym < b.acronym
@@ -2240,11 +2240,11 @@ function BMU.createTableDungeons()
 	end
 
 
-	if BMU.savedVarsChar.df_showDungeons then
+	if BMU.savedVarsChar.dungeonFinder.showDungeons then
 		for _, zoneId in ipairs(BMU.blacklistGroupDungeons) do
 			local entry = BMU.createDungeonRecord(zoneId)
 			if entry then
-				if BMU.savedVarsChar.dfZoneNames then
+				if BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName then
 					-- show zone name instead of instance name
 					entry.zoneName = entry.parentZoneName
 				end
@@ -2252,7 +2252,7 @@ function BMU.createTableDungeons()
 			end
 		end
 		
-		if BMU.savedVarsChar.df_sortByAcronym then
+		if BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease then
 			-- sort by acronym
 			table.sort(resultListGroupDungeons, function(a, b)
 				return a.acronym < b.acronym
@@ -2319,12 +2319,12 @@ function BMU.createDungeonRecord(zoneId)
 		string.format(GetString(SI_CHAPTER_UPGRADE_RELEASE_HEADER) .. ": %s (%s)", entry.updateNum, entry.releaseDate)
 	}
 
-	if BMU.savedVarsChar.df_showDLCNames then
-		-- use DLC/Chapter names
-		entry.displayName = entry.updateName
-	else
+	if BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName then
 		-- use acronyms
 		entry.displayName = entry.acronym
+	else
+		-- use update name
+		entry.displayName = entry.updateName
 	end
 	entry.zoneName = BMU.formatName(entry.zoneNameUnformatted, BMU.savedVarsAcc.formatZoneName)
 	entry.difficultyText = GetString(SI_DUNGEONDIFFICULTY1)

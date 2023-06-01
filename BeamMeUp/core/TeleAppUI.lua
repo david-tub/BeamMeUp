@@ -1544,7 +1544,7 @@ local function SetupUI()
 			if button == MOUSE_BUTTON_INDEX_RIGHT then
 				-- toggle between zoner names and house names
 				ClearMenu()
-				local menuIndex = AddCustomMenuItem(SI.get(SI.TELE_UI_SHOW_ZONE_NAMES), function() BMU.savedVarsChar.ptfHouseZoneNames = not BMU.savedVarsChar.ptfHouseZoneNames BMU.clearInputFields() BMU.createTablePTF() end, MENU_ADD_OPTION_CHECKBOX)
+				local menuIndex = AddCustomMenuItem(SI.get(SI.TELE_UI_TOOGLE_ZONE_NAME), function() BMU.savedVarsChar.ptfHouseZoneNames = not BMU.savedVarsChar.ptfHouseZoneNames BMU.clearInputFields() BMU.createTablePTF() end, MENU_ADD_OPTION_CHECKBOX)
 				if BMU.savedVarsChar.ptfHouseZoneNames then
 					ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 				end
@@ -1901,46 +1901,81 @@ local function SetupUI()
 			{
 				{
 					label = SI.get(SI.TELE_UI_TOGGLE_ARENAS),
-					callback = function() BMU.savedVarsChar.df_showArenas = not BMU.savedVarsChar.df_showArenas BMU.createTableDungeons() end,
+					callback = function() BMU.savedVarsChar.dungeonFinder.showArenas = not BMU.savedVarsChar.dungeonFinder.showArenas BMU.createTableDungeons() end,
 					itemType = MENU_ADD_OPTION_CHECKBOX,
-					checked = function() return BMU.savedVarsChar.df_showArenas end,
+					checked = function() return BMU.savedVarsChar.dungeonFinder.showArenas end,
 				},
 				{
 					label = SI.get(SI.TELE_UI_TOGGLE_GROUP_ARENAS),
-					callback = function() BMU.savedVarsChar.df_showGroupArenas = not BMU.savedVarsChar.df_showGroupArenas BMU.createTableDungeons() end,
+					callback = function() BMU.savedVarsChar.dungeonFinder.showGroupArenas = not BMU.savedVarsChar.dungeonFinder.showGroupArenas BMU.createTableDungeons() end,
 					itemType = MENU_ADD_OPTION_CHECKBOX,
-					checked = function() return BMU.savedVarsChar.df_showGroupArenas end,
+					checked = function() return BMU.savedVarsChar.dungeonFinder.showGroupArenas end,
 				},
 				{
 					label = SI.get(SI.TELE_UI_TOGGLE_TRIALS),
-					callback = function() BMU.savedVarsChar.df_showTrials = not BMU.savedVarsChar.df_showTrials BMU.createTableDungeons() end,
+					callback = function() BMU.savedVarsChar.dungeonFinder.showTrials = not BMU.savedVarsChar.dungeonFinder.showTrials BMU.createTableDungeons() end,
 					itemType = MENU_ADD_OPTION_CHECKBOX,
-					checked = function() return BMU.savedVarsChar.df_showTrials end,
+					checked = function() return BMU.savedVarsChar.dungeonFinder.showTrials end,
 				},
 				{
 					label = SI.get(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS),
-					callback = function() BMU.savedVarsChar.df_showDungeons = not BMU.savedVarsChar.df_showDungeons BMU.createTableDungeons() end,
+					callback = function() BMU.savedVarsChar.dungeonFinder.showDungeons = not BMU.savedVarsChar.dungeonFinder.showDungeons BMU.createTableDungeons() end,
 					itemType = MENU_ADD_OPTION_CHECKBOX,
-					checked = function() return BMU.savedVarsChar.df_showDungeons end,
+					checked = function() return BMU.savedVarsChar.dungeonFinder.showDungeons end,
 				},
 			}, nil, nil, nil, 5
 		)
-		-- sorting
-		local menuIndex = AddCustomMenuItem(SI.get(SI.TELE_UI_TOGGLE_SORT_ACRONYM), function() BMU.savedVarsChar.df_sortByAcronym = not BMU.savedVarsChar.df_sortByAcronym BMU.clearInputFields() BMU.createTableDungeons() end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
-		if BMU.savedVarsChar.df_sortByAcronym then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
-		end
-		-- DLC names
-		menuIndex = AddCustomMenuItem(SI.get(SI.TELE_UI_TOGGLE_DLC_NAMES), function() BMU.savedVarsChar.df_showDLCNames = not BMU.savedVarsChar.df_showDLCNames BMU.clearInputFields() BMU.createTableDungeons() end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
-		if BMU.savedVarsChar.df_showDLCNames then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
-		end
-		
-		-- toggle between zoner names and house names
-		menuIndex = AddCustomMenuItem(SI.get(SI.TELE_UI_SHOW_ZONE_NAMES), function() BMU.savedVarsChar.dfZoneNames = not BMU.savedVarsChar.dfZoneNames BMU.clearInputFields() BMU.createTableDungeons() end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
-		if BMU.savedVarsChar.dfZoneNames then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
-		end
+
+		-- sorting (release or acronym)
+		AddCustomSubMenuItem(GetString(SI_GAMEPAD_SORT_OPTION),
+			{
+				{
+					label = SI.get(SI.TELE_UI_TOGGLE_SORT_RELEASE),
+					callback = function() BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease = not BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease BMU.clearInputFields() BMU.createTableDungeons() end,
+					itemType = MENU_ADD_OPTION_CHECKBOX,
+					checked = function() return not BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease end,
+				},
+				{
+					label = SI.get(SI.TELE_UI_TOGGLE_SORT_ACRONYM),
+					callback = function() BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease = not BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease BMU.clearInputFields() BMU.createTableDungeons() end,
+					itemType = MENU_ADD_OPTION_CHECKBOX,
+					checked = function() return BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease end,
+				},
+			}, nil, nil, nil, 5
+		)
+
+		-- display options (update name or acronym) (dungeon name or zone name)
+		AddCustomSubMenuItem(GetString(SI_GRAPHICS_OPTIONS_VIDEO_CATEGORY_DISPLAY),
+			{
+				{
+					label = SI.get(SI.TELE_UI_TOGGLE_UPDATE_NAME),
+					callback = function() BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName = not BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName BMU.clearInputFields() BMU.createTableDungeons() end,
+					itemType = MENU_ADD_OPTION_CHECKBOX,
+					checked = function() return not BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName end,
+				},
+				{
+					label = SI.get(SI.TELE_UI_TOGGLE_ACRONYM),
+					callback = function() BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName = not BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName BMU.clearInputFields() BMU.createTableDungeons() end,
+					itemType = MENU_ADD_OPTION_CHECKBOX,
+					checked = function() return BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName end,
+				},
+				{
+					label = "-",
+				},
+				{
+					label = SI.get(SI.TELE_UI_TOOGLE_DUNGEON_NAME),
+					callback = function() BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName = not BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName BMU.clearInputFields() BMU.createTableDungeons() end,
+					itemType = MENU_ADD_OPTION_CHECKBOX,
+					checked = function() return not BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName end,
+				},
+				{
+					label = SI.get(SI.TELE_UI_TOOGLE_ZONE_NAME),
+					callback = function() BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName = not BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName BMU.clearInputFields() BMU.createTableDungeons() end,
+					itemType = MENU_ADD_OPTION_CHECKBOX,
+					checked = function() return BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName end,
+				},
+			}, nil, nil, nil, 5
+		)
 			
 		-- add dungeon difficulty toggle
 		if CanPlayerChangeGroupDifficulty() then

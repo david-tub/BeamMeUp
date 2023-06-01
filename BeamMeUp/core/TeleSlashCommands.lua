@@ -18,7 +18,7 @@ function BMU.activateSlashCommands()
 	-- Debug Mode (new slash commands will be activated)
 	BMU.registerChatCommand("/bmu/misc/debug", function(option) BMU.sc_toggleDebugMode() end, "Enable debug mode")
 	-- Switch language
-	BMU.registerChatCommand("/bmu/misc/lang", function(option) BMU.sc_switchLanguage() end, "Switch client language")
+	BMU.registerChatCommand("/bmu/misc/lang", function(option) BMU.sc_switchLanguage(option) end, "Switch client language")
 	-- Getting current zone id
 	BMU.registerChatCommand("/bmu/misc/current_zone_id", function(option) BMU.sc_getCurrentZoneId() end, "Print current zone id")
 	-- Advertise addon

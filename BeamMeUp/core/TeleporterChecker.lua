@@ -2316,7 +2316,7 @@ function BMU.createDungeonRecord(zoneId)
 	entry.releaseDate = nodeObject.releaseDate or ""
 
 	entry.dungeonTooltip = {
-		string.format(GetString(SI_CHAPTER_UPGRADE_RELEASE_HEADER) .. ": %s (%s)", entry.updateNum, entry.releaseDate)
+		string.format(GetString(SI_CHAPTER_UPGRADE_RELEASE_HEADER) .. ": Update %s (%s)", entry.updateNum, entry.releaseDate)
 	}
 
 	if BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName then

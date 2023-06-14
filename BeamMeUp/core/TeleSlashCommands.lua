@@ -196,10 +196,13 @@ function BMU.sc_porting(zoneId)
 	local entry = resultTable[1]
 	
 	if entry.displayName ~= nil and entry.displayName ~= "" then
+		-- usual entry with player or house
 		BMU.PortalToPlayer(entry.displayName, entry.sourceIndexLeading, entry.zoneName, entry.zoneId, entry.category, true, true, true)
-	elseif BMU.savedVarsAcc.showZonesWithoutPlayers2 then
+	elseif BMU.savedVarsAcc.showZonesWithoutPlayers2 and BMU.isZoneOverlandZone(zoneId) then
+		-- travel for gold only possible for overland zones
 		BMU.PortalToZone(zoneId)
 	else
+		-- no travel option
 		BMU.printToChat(SI.get(SI.TELE_CHAT_NO_FAST_TRAVEL))
 	end
 end

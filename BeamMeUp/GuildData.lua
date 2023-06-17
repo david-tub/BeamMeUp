@@ -28,7 +28,7 @@ BMU_GuildData = {
         ["EU Megaserver"] = {
             635942,			-- "In statu nascendi"			|@Alex183
             570448,			-- "ShiZ"                       |no contact yet
-              7871,			-- "Va Khaj Dar"                |no contact yet
+              7871,			-- "Va Khaj Dar"                |Qa'Dar, Backstabkitty, DCougar
             631764,			-- "Die magische Miezmuschel"	|@MiezeMelli
             661070,			-- "BMU Crossroad Alliance"		|@square252
             389326,			-- "Ork Mania"					|@OrkManiac4u

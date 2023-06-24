@@ -69,7 +69,7 @@ BMU_GuildData = {
             591467,			-- "The Brotherhood of Askir"	|@Tianlein
             774767,			-- "Circus Sideshow"			|@AnnaPython
             630613,			-- "Seas of Oblivion"			|@Ocean Discord-Name Benutzer gelöscht Gilde nicht gelistet
-            401657,			-- "Zions of Chaos"				|@Shinigami Discord-Name Ingame noch rausfinden gilde aktuell nicht gelistet
+            401657,			-- "Zions of Chaos"				|@Shinigami Discord-Name Ingame @WrathofShinigami
             197803,			-- "Celestial Rift"				|@Shiseida Discord-Name Ingame noch rausfinden gilde aktuell nicht gelistet
             869871,			-- "Allegiance of Asgard"		|@joyousdeath Discord-Name Joy<3
             781641,			-- "Pride of Ebon"				|@LilMuffin Discord-Name Ingame noch raufinden

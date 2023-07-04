@@ -54,16 +54,12 @@ if BMU.LAM == nil then
 	end
 end
 
+-- optional libraries
 BMU.LSC = LibSlashCommander
-if BMU.LSC == nil then
-	if LibStub then
-		BMU.LSC = LibStub('LibSlashCommander', true)
-	else
-		d("[" .. BMU.var.appName .. " - ERROR] unable to load library LibSlashCommander")
-	end
+if BMU.LSC == nil and LibStub then
+	BMU.LSC = LibStub('LibSlashCommander', true)
 end
 
--- optional libraries
 BMU.LibSets = LibSets
 if BMU.LibSets == nil and LibStub then
 	BMU.LibSets = LibStub('LibSets', true)
@@ -559,80 +555,602 @@ BMU.overlandDelvesPublicDungeons = {
 			
 
 -- maps nodeIndicies with specific/selected zoneIds
--- structure: [<zone_id of the instance>] = {<node_index>, <abbreviation>, <DLC name>}
+-- structure: [<zone_id of the instance>] = {<node_index>, <abbreviation>, <is DLC>, <DLC name>, <update>, <release date>}
 BMU.nodeIndexMap = {
 	-- SOLO ARENAS
-	[677] = {250, "MSA / MA", "Orsinium"},
-	[1227] = {457, "VH / Vateshran", "Markarth"},
+	-- Maelstrom Arena
+	[677] = {
+		nodeIndex = 250,
+		abbreviation = "MSA / MA",
+		isDLC = true,
+		updateName = "Orsinium",
+		updateNum = 8,
+		releaseDate = "2015/11"
+	},
+	-- Vateshran Hollows
+	[1227] = {
+		nodeIndex = 457,
+		abbreviation = "VH / Vateshran",
+		isDLC = true,
+		updateName = "Markarth",
+		updateNum = 28,
+		releaseDate = "2020/11"
+	},
+	
 	-- GROUP ARENAS
-	[635] = {270, "DSA"},
-	[1082] = {378, "BRP", "Murkmire"},
+	-- Dragonstar Arena
+	[635] = {
+		nodeIndex = 270,
+		abbreviation = "DSA",
+		isBaseGame = true,
+		updateNum = 4,
+		releaseDate = "2014/09"
+	},
+	-- Black Rose Prison
+	[1082] = {
+		nodeIndex = 378,
+		abbreviation = "BRP",
+		isDLC = true,
+		updateName = "Murkmire",
+		updateNum = 20,
+		releaseDate = "2018/10"
+	},
+
 	-- TRIALS
-	[1000] = {346, "AS", "Clockwork City"},
-	[638] = {231, "AA"},
-	[636] = {230, "HRC / Hel Ra"},
-	[639] = {232, "SO"},
-	[725] = {258, "MoL", "Thieves Guild"},
-	[1051] = {364, "CR", "Summerset"},
-	[975] = {331, "HoF", "Morrowind"},
-	[1121] = {399, "SS", "Elsweyr"},
-	[1196] = {434, "KA", "Greymoor"},
-	[1263] = {468, "RG", "Blackwood"},
-	[1344] = {488, "DR/DSR", "High Isle"},
-	[1427] = {534, "SE", "Necrom"},
+	-- Hel Ra Citadel
+	[636] = {
+		nodeIndex = 230,
+		abbreviation = "HRC / Hel Ra",
+		isBaseGame = true,
+		updateNum = 1,
+		releaseDate = "2014/05"
+	},
+	-- Aetherian Archive
+	[638] = {
+		nodeIndex = 231,
+		abbreviation = "AA",
+		isBaseGame = true,
+		updateNum = 1,
+		releaseDate = "2014/05"
+	},
+	-- Sanctum Ophidia
+	[639] = {
+		nodeIndex = 232,
+		abbreviation = "SO",
+		isBaseGame = true,
+		updateNum = 4,
+		releaseDate = "2014/09"
+	},
+	-- Maw of Lorkhaj
+	[725] = {
+		nodeIndex = 258,
+		abbreviation = "MoL",
+		isDLC = true,
+		updateName = "Thieves Guild",
+		updateNum = 9,
+		releaseDate = "2016/03"
+	},
+	-- Halls of Fabrication
+	[975] = {
+		nodeIndex = 331,
+		abbreviation = "HoF",
+		isChapter = true,
+		updateName = GetString(SI_CHAPTER1),
+		updateNum = 14,
+		releaseDate = "2017/05"
+	},
+	-- Asylum Sanctorium
+	[1000] = {
+		nodeIndex = 346,
+		abbreviation = "AS",
+		isDLC = true,
+		updateName = "Clockwork City",
+		updateNum = 16,
+		releaseDate = "2017/10"
+	},
+	-- Cloudrest
+	[1051] = {
+		nodeIndex = 364,
+		abbreviation = "CR",
+		isChapter = true,
+		updateName = GetString(SI_CHAPTER2),
+		updateNum = 18,
+		releaseDate = "2018/05"
+	},
+	-- Sunspire
+	[1121] = {
+		nodeIndex = 399,
+		abbreviation = "SS",
+		isChapter = true,
+		updateName = GetString(SI_CHAPTER3),
+		updateNum = 22,
+		releaseDate = "2019/05"
+	},
+	-- Kyne's Aegis
+	[1196] = {
+		nodeIndex = 434,
+		abbreviation = "KA",
+		isChapter = true,
+		updateName = GetString(SI_CHAPTER4),
+		updateNum = 26,
+		releaseDate = "2020/05"
+	},
+	-- Rockgrove
+	[1263] = {
+		nodeIndex = 468,
+		abbreviation = "RG",
+		isChapter = true,
+		updateName = GetString(SI_CHAPTER5),
+		updateNum = 30,
+		releaseDate = "2021/06"
+	},
+	-- Dreadsail Reef
+	[1344] = {
+		nodeIndex = 488,
+		abbreviation = "DR/DSR",
+		isChapter = true,
+		updateName = GetString(SI_CHAPTER6),
+		updateNum = 34,
+		releaseDate = "2022/06"
+	},
+	-- Sanity's Edge
+	[1427] = {
+		nodeIndex = 534,
+		abbreviation = "SE",
+		isChapter = true,
+		updateName = GetString(SI_CHAPTER7),
+		updateNum = 38,
+		releaseDate = "2023/06"
+	},
+
 	-- GROUP DUNGEONS
-	[38] = {186, "BHH / Blackheart"},
-	[380] = {194, "BC1 / Banished 1"},
-	[935] = {262, "BC2 / Banished 2"},
-	[126] = {191, "EH1 / Elden1"},
-	[931] = {265, "EH2 / Elden2"},			
-	[176] = {197, "CoA 1"},
-	[681] = {268, "CoA 2"},
-	[1055] = {370, "MoS", "Wolfhunter"},
-	[131] = {188, "TI / Tempest"},
-	[1052] = {371, "MHK", "Wolfhunter"},
-	[31] = {185, "SW / Selene"},
-	[22] = {196, "VF / Volenfell"},
-	[1009] = {341, "FL", "Dragon Bones"},
-	[144] = {193, "SC1 / Spindle 1"},
-	[936] = {267, "SC2 / Spindle 2"},
-	[130] = {190, "CoH1 / Crypts 1"},
-	[932] = {269, "CoH2 / Crypts 2"},
-	[1010] = {363, "SCP", "Dragon Bones"},
-	[146] = {189, "WRS1 / Wayrest 1"},
-	[933] = {263, "WRS2 / Wayrest 2"},
-	[63] = {198, "DSC 1 / Darkshade 1"},
-	[930] = {264, "DSC 2 / Darkshade 2"},
-	[449] = {195, "DFK / DK / Direfrost"},
-	[64] = {187, "Crucible"},
-	[148] = {192, "AC / Arx"},
-	[848] = {261, "CoS", "Shadows of the Hist"},
-	[843] = {260, "RoM / Mazza", "Shadow of the Hist"},
-	[283] = {98, "FG1 / Fungal 1"},
-	[934] = {266, "FG2 / Fungal 2"},
-	[11] = {184, "VoM / Vaults"},
-	[973] = {326, "BRF / BF", "Horns of the Reach"},
-	[974] = {332, "FH", "Horns of the Reach"},
-	[688] = {247, "WGT", "Imperial City"},
-	[678] = {236, "ICP / Prison", "Imperial City"},
-	[1080] = {389, "FV / Frost", "Wrathstone"},
-	[1081] = {390, "DoM", "Wrathstone"},
-	[1122] = {391, "MGF / MF", "Scalebreaker"},
-	[1123] = {398, "LoM", "Scalebreaker"},
-	[1152] = {424, "IR / Ice", "Harrowstorm"},
-	[1153] = {425, "UG", "Harrowstorm"},
-	[1201] = {436, "CT", "Stonethorn"},
-	[1197] = {435, "SG", "Stonethorn"},
-	[1228] = {437, "BDV", "Flames of Ambition"},
-	[1229] = {454, "CD / Cauldron", "Flames of Ambition"},
-	[1267] = {470, "RPB", "Waking Flame"},
-	[1268] = {469, "TDC / DC", "Waking Flame"},
-	[1301] = {497, "TCA / CA", "Ascending Tide"},
-	[1302] = {498, "SR", "Ascending Tide"},
-	[1360] = {520, "ERE", "Lost Depths"},
-	[1361] = {521, "GD", "Lost Depths"},
-	[1389] = {531, "BS", "Scribes of Fate"},
-	[1390] = {532, "SH", "Scribes of Fate"},
+	-- Base Game
+	-- Vaults of Madness
+	[11] = {
+		nodeIndex = 184,
+		abbreviation = "VoM / Vaults",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Volenfell
+	[22] = {
+		nodeIndex = 196,
+		abbreviation = "VF / Volenfell",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Selene's Web
+	[31] = {
+		nodeIndex = 185,
+		abbreviation = "SW / Selene",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Blackheart Haven
+	[38] = {
+		nodeIndex = 186,
+		abbreviation = "BHH / Blackheart",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Darkshade Caverns I
+	[63] = {
+		nodeIndex = 198,
+		abbreviation = "DSC 1 / Darkshade 1",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Blessed Crucible
+	[64] = {
+		nodeIndex = 187,
+		abbreviation = "BC / Crucible",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Elden Hollow I
+	[126] = {
+		nodeIndex = 191,
+		abbreviation = "EH1 / Elden1",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Crypt of Hearts I
+	[130] = {
+		nodeIndex = 190,
+		abbreviation = "CoH1 / Crypts 1",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Tempest Island
+	[131] = {
+		nodeIndex = 188,
+		abbreviation = "TI / Tempest",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Spindleclutch I
+	[144] = {
+		nodeIndex = 193,
+		abbreviation = "SC1 / Spindle 1",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Wayrest Sewers I
+	[146] = {
+		nodeIndex = 189,
+		abbreviation = "WRS1 / Wayrest 1",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Arx Corinium
+	[148] = {
+		nodeIndex = 192,
+		abbreviation = "AC / Arx",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- City of Ash I
+	[176] = {
+		nodeIndex = 197,
+		abbreviation = "CoA 1",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Fungal Grotto I
+	[283] = {
+		nodeIndex = 98,
+		abbreviation = "FG1 / Fungal 1",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- The Banished Cells I
+	[380] = {
+		nodeIndex = 194,
+		abbreviation = "BC1 / Banished 1",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Direfrost Keep
+	[449] = {
+		nodeIndex = 195,
+		abbreviation = "DFK / DK / Direfrost",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Darkshade Caverns I
+	[930] = {
+		nodeIndex = 264,
+		abbreviation = "DSC 2 / Darkshade 2",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Elden Hollow II
+	[931] = {
+		nodeIndex = 265,
+		abbreviation = "EH2 / Elden2",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Wayrest Sewers II
+	[933] = {
+		nodeIndex = 263,
+		abbreviation = "WRS2 / Wayrest 2",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Fungal Grotto II
+	[934] = {
+		nodeIndex = 266,
+		abbreviation = "FG2 / Fungal 2",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- The Banished Cells II
+	[935] = {
+		nodeIndex = 262,
+		abbreviation = "BC2 / Banished 2",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Spindleclutch II
+	[936] = {
+		nodeIndex = 267,
+		abbreviation = "SC2 / Spindle 2",
+		isBaseGame = true,
+		updateNum = 0,
+		releaseDate = "2014/04"
+	},
+	-- Crypt of Hearts II
+	[932] = {
+		nodeIndex = 269,
+		abbreviation = "CoH2 / Crypts 2",
+		isBaseGame = true,
+		updateNum = 2,
+		releaseDate = "2014/06"
+	},
+	-- City of Ash II
+	[681] = {
+		nodeIndex = 268,
+		abbreviation = "CoA 2",
+		isBaseGame = true,
+		updateNum = 5,
+		releaseDate = "2014/11"
+	},
+
+	-- DLC
+	-- Imperial City Prison
+	[678] = {
+		nodeIndex = 236,
+		abbreviation = "ICP / Prison",
+		isDLC = true,
+		updateName = "Imperial City",
+		updateNum = 7,
+		releaseDate = "2015/08"
+	},
+	-- White-Gold Tower
+	[688] = {
+		nodeIndex = 247,
+		abbreviation = "WGT",
+		isDLC = true,
+		updateName = "Imperial City",
+		updateNum = 7,
+		releaseDate = "2015/08"
+	},
+	-- Ruins of Mazzatun
+	[843] = {
+		nodeIndex = 260,
+		abbreviation = "RoM / Mazza",
+		isDLC = true,
+		updateName = "Shadow of the Hist",
+		updateNum = 11,
+		releaseDate = "2016/08"
+	},
+	-- Cradle of Shadows
+	[848] = {
+		nodeIndex = 261,
+		abbreviation = "CoS",
+		isDLC = true,
+		updateName = "Shadow of the Hist",
+		updateNum = 11,
+		releaseDate = "2016/08"
+	},
+	-- Bloodroot Forge
+	[973] = {
+		nodeIndex = 326,
+		abbreviation = "BRF / BF",
+		isDLC = true,
+		updateName = "Horns of the Reach",
+		updateNum = 15,
+		releaseDate = "2017/08"
+	},
+	-- Falkreath Hold
+	[974] = {
+		nodeIndex = 332,
+		abbreviation = "FH",
+		isDLC = true,
+		updateName = "Horns of the Reach",
+		updateNum = 15,
+		releaseDate = "2017/08"
+	},
+	-- Fang Lair
+	[1009] = {
+		nodeIndex = 341,
+		abbreviation = "FL",
+		isDLC = true,
+		updateName = "Dragon Bones",
+		updateNum = 17,
+		releaseDate = "2018/02"
+	},
+	-- Scalecaller Peak
+	[1009] = {
+		nodeIndex = 341,
+		abbreviation = "SCP",
+		isDLC = true,
+		updateName = "Dragon Bones",
+		updateNum = 17,
+		releaseDate = "2018/02"
+	},
+	-- Moon Hunter Keep
+	[1052] = {
+		nodeIndex = 371,
+		abbreviation = "MHK",
+		isDLC = true,
+		updateName = "Wolfhunter",
+		updateNum = 19,
+		releaseDate = "2018/08"
+	},
+	-- March of Sacrifices
+	[1055] = {
+		nodeIndex = 370,
+		abbreviation = "MoS",
+		isDLC = true,
+		updateName = "Wolfhunter",
+		updateNum = 19,
+		releaseDate = "2018/08"
+	},
+	-- Frostvault
+	[1080] = {
+		nodeIndex = 389,
+		abbreviation = "FV / Frost",
+		isDLC = true,
+		updateName = "Wrathstone",
+		updateNum = 21,
+		releaseDate = "2019/02"
+	},
+	-- Depths of Malatar
+	[1081] = {
+		nodeIndex = 390,
+		abbreviation = "DoM",
+		isDLC = true,
+		updateName = "Wrathstone",
+		updateNum = 21,
+		releaseDate = "2019/02"
+	},
+	-- Moongrave Fane
+	[1122] = {
+		nodeIndex = 391,
+		abbreviation = "MGF / MF",
+		isDLC = true,
+		updateName = "Scalebreaker",
+		updateNum = 23,
+		releaseDate = "2019/08"
+	},
+	-- Lair of Maarselok
+	[1123] = {
+		nodeIndex = 398,
+		abbreviation = "LoM",
+		isDLC = true,
+		updateName = "Scalebreaker",
+		updateNum = 23,
+		releaseDate = "2019/08"
+	},
+	-- Icereach
+	[1152] = {
+		nodeIndex = 424,
+		abbreviation = "IR / Ice",
+		isDLC = true,
+		updateName = "Harrowstorm",
+		updateNum = 25,
+		releaseDate = "2020/03"
+	},
+	-- Unhallowed Grave
+	[1153] = {
+		nodeIndex = 425,
+		abbreviation = "UG",
+		isDLC = true,
+		updateName = "Harrowstorm",
+		updateNum = 25,
+		releaseDate = "2020/03"
+	},
+	-- Stone Garden
+	[1197] = {
+		nodeIndex = 435,
+		abbreviation = "SG",
+		isDLC = true,
+		updateName = "Stonethorn",
+		updateNum = 27,
+		releaseDate = "2020/09"
+	},
+	-- Castle Thorn
+	[1201] = {
+		nodeIndex = 436,
+		abbreviation = "CT",
+		isDLC = true,
+		updateName = "Stonethorn",
+		updateNum = 27,
+		releaseDate = "2020/09"
+	},
+	-- Black Drake Villa
+	[1228] = {
+		nodeIndex = 437,
+		abbreviation = "BDV",
+		isDLC = true,
+		updateName = "Flames of Ambition",
+		updateNum = 29,
+		releaseDate = "2021/03"
+	},
+	-- The Cauldron
+	[1229] = {
+		nodeIndex = 454,
+		abbreviation = "CD / Cauldron",
+		isDLC = true,
+		updateName = "Flames of Ambition",
+		updateNum = 29,
+		releaseDate = "2021/03"
+	},
+	-- Red Petal Bastion
+	[1267] = {
+		nodeIndex = 470,
+		abbreviation = "RPB",
+		isDLC = true,
+		updateName = "Waking Flame",
+		updateNum = 31,
+		releaseDate = "2021/08"
+	},
+	-- The Dread Cellar
+	[1268] = {
+		nodeIndex = 469,
+		abbreviation = "TDC / DC",
+		isDLC = true,
+		updateName = "Waking Flame",
+		updateNum = 31,
+		releaseDate = "2021/08"
+	},
+	-- Coral Aerie
+	[1301] = {
+		nodeIndex = 497,
+		abbreviation = "CA",
+		isDLC = true,
+		updateName = "Ascending Tide",
+		updateNum = 33,
+		releaseDate = "2022/03"
+	},
+	-- Shipwright’s Regret
+	[1302] = {
+		nodeIndex = 498,
+		abbreviation = "SR",
+		isDLC = true,
+		updateName = "Ascending Tide",
+		updateNum = 33,
+		releaseDate = "2022/03"
+	},
+	-- Earthen Root Enclave
+	[1360] = {
+		nodeIndex = 520,
+		abbreviation = "ERE",
+		isDLC = true,
+		updateName = "Lost Depths",
+		updateNum = 35,
+		releaseDate = "2022/08"
+	},
+	-- Graven Deep
+	[1361] = {
+		nodeIndex = 521,
+		abbreviation = "GD",
+		isDLC = true,
+		updateName = "Lost Depths",
+		updateNum = 35,
+		releaseDate = "2022/08"
+	},
+	-- Bal Sunnar
+	[1389] = {
+		nodeIndex = 531,
+		abbreviation = "BS",
+		isDLC = true,
+		updateName = "Scribes of Fate",
+		updateNum = 37,
+		releaseDate = "2023/03"
+	},
+	-- Scrivener's Hall
+	[1390] = {
+		nodeIndex = 532,
+		abbreviation = "SH",
+		isDLC = true,
+		updateName = "Scribes of Fate",
+		updateNum = 37,
+		releaseDate = "2023/03"
+	},
 }
 
 

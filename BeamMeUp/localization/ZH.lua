@@ -48,10 +48,13 @@ mkstr(SI.TELE_UI_TOGGLE_TRIALS, "试炼")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS, "组队地下城")
 mkstr(SI.TELE_UI_TOGGLE_SORT_ACRONYM, "以首字母排序")
 mkstr(SI.TELE_UI_DAYS_LEFT, "%d 天剩余")
-mkstr(SI.TELE_UI_TOGGLE_DLC_NAMES, "显示DLC名")
+mkstr(SI.TELE_UI_TOGGLE_UPDATE_NAME, "Show update name")
 mkstr(SI.TELE_UI_UNLOCK_WAYSHRINES, "自动发现指路祭坛")
 mkstr(SI.TELE_UI_SUBMENU_FAVORITES, "收藏夹")
-mkstr(SI.TELE_UI_SHOW_ZONE_NAMES, "Show zone names")
+mkstr(SI.TELE_UI_TOOGLE_ZONE_NAME, "Show zone name")
+mkstr(SI.TELE_UI_TOGGLE_SORT_RELEASE, "Sort by release")
+mkstr(SI.TELE_UI_TOGGLE_ACRONYM, "Show acronym")
+mkstr(SI.TELE_UI_TOOGLE_DUNGEON_NAME, "Show instance name")
  
  
  

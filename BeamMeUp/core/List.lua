@@ -1288,7 +1288,8 @@ function ListView:update()
 					table.insert(tooltipTextZone, v)
 				end
 			end
-			
+			------------------
+
 			-- guild tooltip
 			if message.guildTooltip then
 				ZO_DeepTableCopy(message.guildTooltip, tooltipTextZone)
@@ -1307,6 +1308,18 @@ function ListView:update()
 				-- do nothing
 				list.ColumnZoneNameTex:SetHidden(true)
 				list.ColumnZoneNameTex:SetHandler("OnMouseUp", nil)
+			end
+			------------------
+
+			if message.isDungeon then
+				if #tooltipTextZone > 0 then
+					-- add separator
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				end
+				-- add dungeon infos
+				for _, v in pairs(message.dungeonTooltip) do
+					table.insert(tooltipTextZone, v)
+				end
 			end
 			------------------
 			

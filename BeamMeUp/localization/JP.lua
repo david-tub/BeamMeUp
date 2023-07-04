@@ -48,10 +48,13 @@ mkstr(SI.TELE_UI_TOGGLE_TRIALS, "試練")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS, "グループダンジョン")
 mkstr(SI.TELE_UI_TOGGLE_SORT_ACRONYM, "頭文字で並び替え")
 mkstr(SI.TELE_UI_DAYS_LEFT, "残り日数 %d")
-mkstr(SI.TELE_UI_TOGGLE_DLC_NAMES, "DLC名を表示")
+mkstr(SI.TELE_UI_TOGGLE_UPDATE_NAME, "Show update name")
 mkstr(SI.TELE_UI_UNLOCK_WAYSHRINES, "旅の祠の自動解除")
 mkstr(SI.TELE_UI_SUBMENU_FAVORITES, "お気に入り")
-mkstr(SI.TELE_UI_SHOW_ZONE_NAMES, "Show zone names")
+mkstr(SI.TELE_UI_TOOGLE_ZONE_NAME, "Show zone name")
+mkstr(SI.TELE_UI_TOGGLE_SORT_RELEASE, "Sort by release")
+mkstr(SI.TELE_UI_TOGGLE_ACRONYM, "Show acronym")
+mkstr(SI.TELE_UI_TOOGLE_DUNGEON_NAME, "Show instance name")
 
 
 

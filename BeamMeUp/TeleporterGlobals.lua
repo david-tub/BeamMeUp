@@ -963,8 +963,8 @@ BMU.nodeIndexMap = {
 		releaseDate = "2018/02"
 	},
 	-- Scalecaller Peak
-	[1009] = {
-		nodeIndex = 341,
+	[1010] = {
+		nodeIndex = 363,
 		abbreviation = "SCP",
 		isDLC = true,
 		updateName = "Dragon Bones",

@@ -1428,7 +1428,7 @@ function ListView:update()
 					list.portalToPlayerTex:SetHidden(true)
 				end
 				
-			elseif message.isDungeon and CanLeaveCurrentLocationViaTeleport() and CanJumpToPlayerInZone(message.zoneId) then
+			elseif message.isDungeon and CanLeaveCurrentLocationViaTeleport() and (CanJumpToPlayerInZone(message.zoneId) or select(2, CanJumpToPlayerInZone(message.zoneId)) == JUMP_TO_PLAYER_RESULT_SOLO_ZONE) then -- CanJumpToPlayerInZone is false for solo arenas -> check reason value
 				-- Dungeon Finder -> use nodeIndecies instead of travel to zoneId
 				list.portalToPlayerTex:SetHidden(false)
 				list.portalToPlayerTex:SetTexture(texture_normal)

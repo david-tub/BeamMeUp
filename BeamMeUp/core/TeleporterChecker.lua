@@ -2158,7 +2158,7 @@ function BMU.createTableDungeons()
 			end
 		end
 		
-		if BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease then
+		if BMU.savedVarsChar.dungeonFinder.sortByAcronym then
 			-- sort by acronym
 			table.sort(resultListArenas, function(a, b)
 				return a.acronym < b.acronym
@@ -2167,7 +2167,7 @@ function BMU.createTableDungeons()
 			-- sort by release and name
 			table.sort(resultListArenas, function(a, b)
 				if a.updateNum ~= b.updateNum then
-					return a.updateNum < b.updateNum
+					return (a.updateNum < b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseASC) or (a.updateNum > b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseDESC)
 				end
 				return a.zoneName < b.zoneName
 			end)
@@ -2193,7 +2193,7 @@ function BMU.createTableDungeons()
 			end
 		end
 		
-		if BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease then
+		if BMU.savedVarsChar.dungeonFinder.sortByAcronym then
 			-- sort by acronym
 			table.sort(resultListGroupArenas, function(a, b)
 				return a.acronym < b.acronym
@@ -2202,7 +2202,7 @@ function BMU.createTableDungeons()
 			-- sort by release and name
 			table.sort(resultListGroupArenas, function(a, b)
 				if a.updateNum ~= b.updateNum then
-					return a.updateNum < b.updateNum
+					return (a.updateNum < b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseASC) or (a.updateNum > b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseDESC)
 				end
 				return a.zoneName < b.zoneName
 			end)
@@ -2228,7 +2228,7 @@ function BMU.createTableDungeons()
 			end
 		end
 		
-		if BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease then
+		if BMU.savedVarsChar.dungeonFinder.sortByAcronym then
 			-- sort by acronym
 			table.sort(resultListTrials, function(a, b)
 				return a.acronym < b.acronym
@@ -2237,7 +2237,7 @@ function BMU.createTableDungeons()
 			-- sort by release and name
 			table.sort(resultListTrials, function(a, b)
 				if a.updateNum ~= b.updateNum then
-					return a.updateNum < b.updateNum
+					return (a.updateNum < b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseASC) or (a.updateNum > b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseDESC)
 				end
 				return a.zoneName < b.zoneName
 			end)
@@ -2263,7 +2263,7 @@ function BMU.createTableDungeons()
 			end
 		end
 		
-		if BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease then
+		if BMU.savedVarsChar.dungeonFinder.sortByAcronym then
 			-- sort by acronym
 			table.sort(resultListGroupDungeons, function(a, b)
 				return a.acronym < b.acronym
@@ -2272,7 +2272,7 @@ function BMU.createTableDungeons()
 			-- sort by release and name
 			table.sort(resultListGroupDungeons, function(a, b)
 				if a.updateNum ~= b.updateNum then
-					return a.updateNum < b.updateNum
+					return (a.updateNum < b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseASC) or (a.updateNum > b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseDESC)
 				end
 				return a.zoneName < b.zoneName
 			end)

@@ -182,6 +182,8 @@ BMU.textures = {
 	dungeonDifficultyVeteran = "|t32:32:esoui/art/lfg/lfg_veterandungeon_up.dds|t",
 	noPlayerBtn = "/BeamMeUp/media/guildstore_sell_tabicon.dds",
 	noPlayerBtnOver = "/BeamMeUp/media/guildstore_sell_tabicon_over.dds",
+	arrowDown = "|t32:32:esoui/art/worldmap/mapnav_downarrow_up.dds|t",
+	arrowUp = "|t32:32:esoui/art/worldmap/mapnav_uparrow_up.dds|t",
 }
 
 -- Special textures for event days

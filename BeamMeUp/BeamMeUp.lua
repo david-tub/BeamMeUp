@@ -545,8 +545,10 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["surveyMapsNotificationSound"] = true,
 		["wayshrineTravelAutoConfirm"] = false,
 		["currentZoneAlwaysTop"] = false,
+		["currentViewedZoneAlwaysTop"] = false,
 		["hideOwnHouses"] = false,
 		["showOfflineReminder"] = true,
+		["MapChangeRefresh"] = false,
 		["lastPortedZones"] = {},
 		["initialTimeStamp"] = GetTimeStamp(),
 		["showTeleportAnimation"] = true,
@@ -630,7 +632,12 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	
 	WORLD_MAP_SCENE:RegisterCallback("StateChange", BMU.WorldMapStateChanged)
     GAMEPAD_WORLD_MAP_SCENE:RegisterCallback("StateChange", BMU.WorldMapStateChanged)
-	
+	CALLBACK_MANAGER:RegisterCallback("OnWorldMapChanged", function(wasNavigateIn) 
+			if (BMU.savedVarsAcc.MapChangeRefresh) then
+				BMU.createTable({index=0})
+			end
+	end)
+
 	ZO_PreHookHandler(ZO_WorldMapZoneStoryTopLevel_Keyboard, "OnShow", BMU.onZoneGuideShow)
 		
 	EVENT_MANAGER:RegisterForEvent(appName, EVENT_GAME_CAMERA_UI_MODE_CHANGED, BMU.cameraModeChanged)

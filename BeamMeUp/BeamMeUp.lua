@@ -190,12 +190,9 @@ function BMU.onWorldMapStateChanged(oldState, newState)
 end
 
 
--- if the player changes the currently viewed world map
--- callback to refresh the main list if option enabled
+-- callback to refresh the list if the player changes the current displayed map/zone
 function BMU.onWorldMapChanged(wasNavigateIn)
-	if BMU.savedVarsAcc.currentViewedZoneAlwaysTop then
-		BMU.createTable({index=0})
-	end
+	BMU.refreshListAuto()
 end
 
 

@@ -372,8 +372,8 @@ local function SetupOptionsMenu(index) --index == Addon name
 		 },
 		 {
               type = "checkbox",
-              name = SI.get(SI.SI_TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP),
-              tooltip = SI.get(SI.SI_TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["currentViewedZoneAlwaysTop"]) .. "]",
+              name = SI.get(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP),
+              tooltip = SI.get(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["currentViewedZoneAlwaysTop"]) .. "]",
               getFunc = function() return BMU.savedVarsAcc.currentViewedZoneAlwaysTop end,
               setFunc = function(value) BMU.savedVarsAcc.currentViewedZoneAlwaysTop = value end,
 			  default = BMU.DefaultsAccount["currentViewedZoneAlwaysTop"],
@@ -386,15 +386,6 @@ local function SetupOptionsMenu(index) --index == Addon name
               getFunc = function() return BMU.savedVarsAcc.formatZoneName end,
               setFunc = function(value) BMU.savedVarsAcc.formatZoneName = value end,
 			  default = BMU.DefaultsAccount["formatZoneName"],
-			  submenu = "rec",
-         },
-		 {
-              type = "checkbox",
-              name = SI.get(SI.SI_TELE_SETTINGS_REFRESH_MAP_CHANGE),
-              tooltip = SI.get(SI.SI_TELE_SETTINGS_REFRESH_MAP_CHANGE_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["MapChangeRefresh"]) .. "]",
-              getFunc = function() return BMU.savedVarsAcc.MapChangeRefresh end,
-              setFunc = function(value) BMU.savedVarsAcc.MapChangeRefresh = value end,
-			  default = BMU.DefaultsAccount["MapChangeRefresh"],
 			  submenu = "rec",
          },
 		 {

@@ -181,12 +181,21 @@ end
 
 
 -- solves incompatibility issue to Votan's Minimap
-function BMU.WorldMapStateChanged(oldState, newState)
+function BMU.onWorldMapStateChanged(oldState, newState)
     if (newState == SCENE_SHOWING) then
         BMU.onMapShow()
     elseif (newState == SCENE_HIDING) then
         BMU.onMapHide()
     end
+end
+
+
+-- if the player changes the currently viewed world map
+-- callback to refresh the main list if option enabled
+function BMU.onWorldMapChanged(wasNavigateIn)
+	if BMU.savedVarsAcc.currentViewedZoneAlwaysTop then
+		BMU.createTable({index=0})
+	end
 end
 
 
@@ -548,7 +557,6 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["currentViewedZoneAlwaysTop"] = false,
 		["hideOwnHouses"] = false,
 		["showOfflineReminder"] = true,
-		["MapChangeRefresh"] = false,
 		["lastPortedZones"] = {},
 		["initialTimeStamp"] = GetTimeStamp(),
 		["showTeleportAnimation"] = true,
@@ -630,13 +638,10 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	EVENT_MANAGER:RegisterForEvent(appName, EVENT_ACTION_LAYER_PUSHED, BMU.PortalHandlerLayerPushed)
     EVENT_MANAGER:RegisterForEvent(appName, EVENT_ACTION_LAYER_POPPED, BMU.PortalHandlerLayerPopped)
 	
-	WORLD_MAP_SCENE:RegisterCallback("StateChange", BMU.WorldMapStateChanged)
-    GAMEPAD_WORLD_MAP_SCENE:RegisterCallback("StateChange", BMU.WorldMapStateChanged)
-	CALLBACK_MANAGER:RegisterCallback("OnWorldMapChanged", function(wasNavigateIn) 
-			if (BMU.savedVarsAcc.MapChangeRefresh) then
-				BMU.createTable({index=0})
-			end
-	end)
+	WORLD_MAP_SCENE:RegisterCallback("StateChange", BMU.onWorldMapStateChanged)
+    GAMEPAD_WORLD_MAP_SCENE:RegisterCallback("StateChange", BMU.onWorldMapStateChanged)
+
+	CALLBACK_MANAGER:RegisterCallback("OnWorldMapChanged", BMU.onWorldMapChanged)
 
 	ZO_PreHookHandler(ZO_WorldMapZoneStoryTopLevel_Keyboard, "OnShow", BMU.onZoneGuideShow)
 		

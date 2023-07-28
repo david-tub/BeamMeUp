@@ -173,6 +173,8 @@ mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT, "Karten-Ping")
 mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT_TOOLTIP, "Zeigt einen Karten-Ping (Sammelpunkt) am Zielort auf der Karte an, wenn du auf Gruppenmitglieder oder bestimmte Zonen (Dungeons, Häuser etc.) klickst. Die Bibliothek LibMapPing muss installiert sein. Bedenke auch: Wenn du der Gruppenleiter bist, sind deine Pings (Sammelpunkt) für alle Gruppenmitglieder sichtbar.")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS, "Zeige Regionen ohne Schnellreise-Möglichkeit")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP, "Zeige Regionen bzw. Oberflächen-Maps in der Hauptliste an, auch wenn es keine Schnellreise-Möglichkeit gibt (kein Spieler oder Haus zu dem/das du reisen kannst).")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Aktuell angezeigte Zone immer oben anzeigen")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Aktuell angezeigte Zone (geöffnete Karte) immer an oberster Stelle der Liste anzeigen.")
 
 
 -----------------------------------------------------------------------------

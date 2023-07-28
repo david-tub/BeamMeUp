@@ -770,23 +770,30 @@ function BMU.addInfo_2(e)
 		
 	--set prio
 	if BMU.savedVarsAcc.currentViewedZoneAlwaysTop and (BMU.getParentZoneId(e.zoneId) == GetZoneId(GetCurrentMapZoneIndex()) or e.zoneId == GetZoneId(GetCurrentMapZoneIndex())) then
+		-- current viewed zone + subzones
 		e.prio = 0
-		e.textColorDisplayName = "gold"
-		e.textColorZoneName = "gold"
+		e.textColorDisplayName = "teal"
+		e.textColorZoneName = "teal"
 	elseif BMU.savedVarsAcc.currentZoneAlwaysTop and e.playersZone then
+		-- current zone (players location)
 		e.prio = 1
 	elseif e.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP and e.isLeader then
+		-- group leader
 		e.prio = 2
-	elseif e.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP and (e.category == 4 or e.category == 5 or e.category == 6) then -- group member is in 4 men Group Dungeons | 12 men Raids (Trials) | Group Zones
+	elseif e.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP and (e.category == 4 or e.category == 5 or e.category == 6) then
+		-- group member is in 4 men Group Dungeons | 12 men Raids (Trials) | Group Zones
 		e.prio = 3
 	elseif BMU.isFavoritePlayer(e.displayName) and BMU.isFavoriteZone(e.zoneId) then
+		-- favorite player + favorite zone
 		e.prio = 4
 		e.textColorDisplayName = "gold"
 		e.textColorZoneName = "gold"
 	elseif BMU.isFavoritePlayer(e.displayName) then
+		-- favorite player
 		e.prio = 5
 		e.textColorDisplayName = "gold"
 	elseif BMU.isFavoriteZone(e.zoneId) then
+		-- favorite zone
 		e.prio = 6
 		e.textColorZoneName = "gold"
 	else
@@ -1657,7 +1664,7 @@ function BMU.questIsRelated(portalPlayers, slotIndex)
 	local questRepeatType = GetJournalQuestRepeatType(slotIndex)
 	
 	if tracked then
-		questName =  BMU.colorizeText(questName, "gold")
+		questName = BMU.colorizeText(questName, "gold")
 	elseif questRepeatType == 1 or questRepeatType == 2 then
 	-- color repeatable quests (1,2: repeatable quest | 0: not repeatable)
 		questName = BMU.colorizeText(questName, "teal")

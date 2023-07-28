@@ -173,6 +173,8 @@ mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT, "Znacznik mapy")
 mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT_TOOLTIP, "Pokazuje znacznik mapy (punkt zbiórki) jako cel na mapie kiedy klikniesz na członka grupy lub konkretną lokację (lochy, domy, itd.). Biblioteka LibMapPing musi być zainstalowana. Pamiętaj również, że jeśli jesteś liderem grupy Twoje zaznaczenia (punkty zbiórki) są widoczne dla wszystkich członków grupy.")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS, "Pokaż mapy bez graczy i domów")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP, "Pokazuje mapy w głównej liście nawet jeśli nie ma w niej gracza ani domu do którego możesz podróżować. Nadal masz możliwość podróżować za złoto jeżeli odkryto co najmniej jedną kapliczkę na tej mapie.")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Show currently displayed zone always on top")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Show currently displayed zone (opened world map) always on top of the list.")
 
 
 -----------------------------------------------------------------------------

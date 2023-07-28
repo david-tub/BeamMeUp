@@ -173,6 +173,8 @@ mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT, "マップピン")
 mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT_TOOLTIP, "グループメンバーや特定のゾーン(ダンジョン、家など)をクリックすると、マップ上の目的地にピン(再集結地点)を表示します。'LibMapPing'というライブラリがインストールされている必要があります。また覚えておいてほしいのは、あなたがグループリーダーの場合、あなたのピン(再集結地点)はグループメンバー全員に見えるということです。")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS, "プレイヤーや家のないゾーンを表示")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP, "ファストトラベルできるプレーヤーや家がない場合でも、メインリストにゾーンを表示します。そのゾーンで少なくとも1つの旅の祠を発見していれば、ゴールドを払って移動する選択肢はまだ残っています。")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Show currently displayed zone always on top")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Show currently displayed zone (opened world map) always on top of the list.")
 
 
 -----------------------------------------------------------------------------

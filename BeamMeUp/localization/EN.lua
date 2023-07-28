@@ -157,10 +157,6 @@ mkstr(SI.TELE_SETTINGS_AUTO_CONFIRM_WAYSHRINE_TRAVEL, "Auto confirm wayshrine tr
 mkstr(SI.TELE_SETTINGS_AUTO_CONFIRM_WAYSHRINE_TRAVEL_TOOLTIP, "Disable the confirmation dialog when you teleport to other wayshrines.")
 mkstr(SI.TELE_SETTINGS_CURRENT_ZONE_ALWAYS_TOP, "Show current zone always on top")
 mkstr(SI.TELE_SETTINGS_CURRENT_ZONE_ALWAYS_TOP_TOOLTIP, "Show current zone always on top of the list.")
-mkstr(SI.SI_TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Show current opened zone always on top")
-mkstr(SI.SI_TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Show current opened zone always on top of the list.")
-mkstr(SI.SI_TELE_SETTINGS_REFRESH_MAP_CHANGE, "Refresh on Map Change")
-mkstr(SI.SI_TELE_SETTINGS_REFRESH_MAP_CHANGE_TOOLTIP, "Automatically refreshes, when the viewed zone changes on the map.")
 mkstr(SI.TELE_SETTINGS_HIDE_OWN_HOUSES, "Hide OWN Houses")
 mkstr(SI.TELE_SETTINGS_HIDE_OWN_HOUSES_TOOLTIP, "Hide your own houses (teleport outside) in the main list.")
 mkstr(SI.TELE_SETTINGS_HEADER_STATS, "Statistics")
@@ -177,6 +173,8 @@ mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT, "Map ping")
 mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT_TOOLTIP, "Display a map ping (rally point) on the destination on the map when you click on group members or specific zones (dungeons, houses etc.). The library LibMapPing must be installed. Also remember: If you are the group leader, your pings (rally points) are visible for all group members.")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS, "Show zones without players or houses")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP, "Display zones in the main list even if there are no players or houses you can travel to. You still have the option to travel for gold if you have discovered at least one wayshrine in the zone.")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Show currently displayed zone always on top")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Show currently displayed zone (opened world map) always on top of the list.")
 
 
 -----------------------------------------------------------------------------

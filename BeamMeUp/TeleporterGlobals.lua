@@ -280,14 +280,16 @@ BMU.isCurrentlyRequestingGuildData = false
 BMU.blacklist = {}
 BMU.blacklistForSlashPorting = {}
 
--- categories of blacklists:
-
 -- different unaccessable zones (Thieves Den, Dark Brotherhood Sanctuary)
 BMU.blacklistOthers = {821, 826}
+
+-- other zones only for groups (the specific player has to be in the same group) (Group Delves/Dungeons in Craglorn)
+BMU.blacklistGroupZones = {890, 893, 895, 897, 899, 904, 906, 908, 907, 913, 909, 914, 915, 916}
 
 -- all Outlaws Refuges
 BMU.blacklistRefuges = {746, 747, 748, 479, 750, 751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761, 780, 837, 971, 982, 1028, 1088, 1178, 1252, 1293, 1319, 1367, 1412}
 
+--------
 
 -- just Cyrodiil
 BMU.blacklistCyro = {181}
@@ -298,6 +300,7 @@ BMU.blacklistImpCity = {584, 551, 643}
 -- Battlegrounds -- order -> http://en.uesp.net/wiki/Online:Battlegrounds
 BMU.blacklistBattlegrounds = {509, 511, 510, 508, 513, 512, 514, 517, 518}
 
+--------
 
 -- 4 men Group Dungeons -- order -> http://en.uesp.net/wiki/Online:Veteran_Dungeons
 BMU.blacklistGroupDungeons = {380, 935, 126, 931, 176, 681, 1055, 131, 1052, 31, 22, 38, 1009, 144, 936, 130, 932, 1010, 146, 933, 63, 930, 449, 64, 148, 848, 843, 283, 934, 11, 973, 974, 688, 678, 1080, 1081, 1122, 1123, 1152, 1153, 1201, 1197, 1228, 1229, 1267, 1268, 1301, 1302, 1360, 1361, 1389, 1390}
@@ -311,8 +314,7 @@ BMU.blacklistSoloArenas = {677, 1227}
 -- Group Arenas -- https://en.uesp.net/wiki/Online:Arenas (Dragonstar, BlackRose Prison)
 BMU.blacklistGroupArenas = {635, 1082}
 
--- other zones only for groups (the specific player has to be in the same group) (Group Delves/Dungeons in Craglorn)
-BMU.blacklistGroupZones = {890, 893, 895, 897, 899, 904, 906, 908, 907, 913, 909, 914, 915, 916}
+--------
 
 -- Houses
 BMU.blacklistHouses = {940, 942, 941, 939, 938, 937, 859, 858, 878, 868, 869, 873, 860, 861, 877, 852, 853, 881, 867, 866, 874, 863, 862, 876, 871, 870, 872, 864, 865, 875, 855, 854, 880, 856, 857, 879, 944, 943, 945, 882, 883, 994, 995, 997, 996, 1005, 1008, 1007, 1006, 1042, 1043, 1044, 1045, 1059, 1060, 1061, 1063, 1108, 1109, 1064, 1125, 1126, 1128, 1129, 1130, 1154, 1155, 1192, 1193, 1199, 1200, 1218, 1219, 1220, 1233, 1234, 1264, 1265, 1270, 1271, 1275, 1276, 1277, 1307, 1342, 1343, 1306, 1345, 1363, 1364, 1432, 1433, 1434, 1435, 1437, 1468}

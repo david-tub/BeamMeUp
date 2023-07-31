@@ -173,7 +173,7 @@ mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT, "Map ping")
 mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT_TOOLTIP, "Display a map ping (rally point) on the destination on the map when you click on group members or specific zones (dungeons, houses etc.). The library LibMapPing must be installed. Also remember: If you are the group leader, your pings (rally points) are visible for all group members.")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS, "Show zones without players or houses")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP, "Display zones in the main list even if there are no players or houses you can travel to. You still have the option to travel for gold if you have discovered at least one wayshrine in the zone.")
-mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Show currently displayed zone and subzones always on top")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Show displayed zone & subzones always on top")
 mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Show currently displayed zone and subzones (opened world map) always on top of the list.")
 
 

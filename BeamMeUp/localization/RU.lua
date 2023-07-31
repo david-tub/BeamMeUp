@@ -173,7 +173,7 @@ mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT, "Отметка на карте")
 mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT_TOOLTIP, "Отметка на карте (точка сбора), при нажатии на члена группы или определенную зону (подземелья, дома и т. д.). Должна быть установлена библиотека LibMapPing. Также помните: если вы лидер группы, ваши отметки (точки сбора) видны всем участникам группы.")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS, "Показать регионы без игроков и домов")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP, "Отображать регионы в основном списке, даже если нет игроков или домов, в которые вы можете отправиться. У вас все еще есть возможность путешествовать за золото, если вы открыли хотя бы одно дорожное святилище в регионе.")
-mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Show currently displayed zone and subzones always on top")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Show displayed zone & subzones always on top")
 mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Show currently displayed zone and subzones (opened world map) always on top of the list.")
 
 

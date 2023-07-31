@@ -569,6 +569,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["favoriteListPlayers"] = {},
 		["lastofflineReminder"] = 1632859025, -- just a timestamp (2021/09/28)
 		["favoriteDungeon"] = 0, -- zone_id of the favorite dungeon
+		["houseCustomSorting"] = {},
 	}
 	
 	BMU.DefaultsCharacter = {

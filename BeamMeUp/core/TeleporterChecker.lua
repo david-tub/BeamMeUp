@@ -1862,6 +1862,12 @@ function BMU.createTableHouses()
 		if a.prio ~= b.prio then
 			return a.prio < b.prio
 		end
+		-- custom sorting
+		local cSortingA = BMU.savedVarsServ.houseCustomSorting[a.houseId] or -99
+		local cSortingB = BMU.savedVarsServ.houseCustomSorting[b.houseId] or -99
+		if cSortingA ~= cSortingB then
+			return cSortingA > cSortingB
+		end
 		-- name
 		return a.zoneName < b.zoneName
 	end)

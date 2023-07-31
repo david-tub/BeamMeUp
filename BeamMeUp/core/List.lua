@@ -1816,9 +1816,11 @@ function BMU.clickOnZoneName(button, record)
 		-- start generating context menus
 		ClearMenu()
 		
-		-- renaming of own houses + setting of primary residence + toggel nick names
 		if inOwnHouseTab then
+			
+			-- rename own houses
 			AddCustomMenuItem(SI.get(SI.TELE_UI_RENAME_HOUSE_NICKNAME), function() ZO_CollectionsBook.ShowRenameDialog(record.collectibleId) end)
+			
 			-- make primary residence
 			if record.prio ~= 1 then
 				-- prio = 1 -> is primary house
@@ -1830,6 +1832,30 @@ function BMU.clickOnZoneName(button, record)
 					end, 500)
 				 end)
 			end
+			
+			-- custom sorting
+			-- divider
+			AddCustomMenuItem("-", function() end)
+			-- button to increase sorting ("move up")
+			AddCustomMenuItem(BMU.textures.arrowUp, function()
+				if BMU.savedVarsServ.houseCustomSorting[record.houseId] then
+					BMU.savedVarsServ.houseCustomSorting[record.houseId] = BMU.savedVarsServ.houseCustomSorting[record.houseId] + 1
+				else
+					BMU.savedVarsServ.houseCustomSorting[record.houseId] = 1
+				end
+				BMU.createTableHouses()
+			end)
+			-- current position
+			AddCustomMenuItem("   " .. (BMU.savedVarsServ.houseCustomSorting[record.houseId] or "-"), function() end)
+			-- -- button to decrease sorting ("move down")
+			AddCustomMenuItem(BMU.textures.arrowDown, function()
+				if BMU.savedVarsServ.houseCustomSorting[record.houseId] then
+					BMU.savedVarsServ.houseCustomSorting[record.houseId] = BMU.savedVarsServ.houseCustomSorting[record.houseId] - 1
+				else
+					BMU.savedVarsServ.houseCustomSorting[record.houseId] = 0
+				end
+				BMU.createTableHouses()
+			end)
 		end
 		
 		-- show quest marker

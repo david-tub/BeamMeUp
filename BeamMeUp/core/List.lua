@@ -1665,7 +1665,12 @@ end
 
 
 -- refresh in depending of current state
-function BMU.refreshListAuto()
+function BMU.refreshListAuto(mapChanged)
+	-- return if window is hidden
+	if BMU.win.Main_Control:IsHidden() then
+		return
+	end
+
 	local inputString = ""
 	if BMU.state == 2 then
 		-- catch input string (player)
@@ -1675,8 +1680,8 @@ function BMU.refreshListAuto()
 		inputString = BMU.win.Searcher_Zone:GetText()
 	end
 	
-	if BMU.state == 11 or BMU.state == 13 or BMU.state == 14 then
-		-- if list of own houses (11) or guilds (13) or Dungeon Finder (14) dont auto refresh
+	if BMU.state == 11 or BMU.state == 13 or BMU.state == 14 or (BMU.state == 9 and mapChanged) then
+		-- if list of own houses (11) or guilds (13) or Dungeon Finder (14) or (related quests (9) and trigger from map change) dont auto refresh
 		return
 	elseif BMU.state == 12 then
 		BMU.createTablePTF()

@@ -192,7 +192,7 @@ end
 
 -- callback to refresh the list if the player changes the current displayed map/zone
 function BMU.onWorldMapChanged(wasNavigateIn)
-	BMU.refreshListAuto()
+	BMU.refreshListAuto(true)
 end
 
 

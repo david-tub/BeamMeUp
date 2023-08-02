@@ -1060,6 +1060,19 @@ function BMU.shuffle_table(tbl)
 end
 
 
+-- find lowest number in a table
+function BMU.getLowestNumber(tab)
+	local low = math.huge
+	local index
+	for i, v in pairs(tab) do
+		if v < low then
+			low = v
+			index = i
+		end
+	end
+	return low
+end
+
 
 -- checks if "only one entry per zone" is enabled
 -- increments counter according to case

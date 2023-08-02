@@ -1833,29 +1833,55 @@ function BMU.clickOnZoneName(button, record)
 				 end)
 			end
 			
-			-- custom sorting
-			-- divider
-			AddCustomMenuItem("-", function() end)
-			-- button to increase sorting ("move up")
-			AddCustomMenuItem(BMU.textures.arrowUp, function()
+			-- custom sorting (not for primary residence which is always on top)
+			if record.prio ~= 1 then
+				-- divider
+				AddCustomMenuItem("-", function() end)
+				-- button to increase sorting ("move up")
+				AddCustomMenuItem(BMU.textures.arrowUp, function()
+					
+					if not BMU.savedVarsServ.houseCustomSorting[record.houseId] then
+						if next(BMU.savedVarsServ.houseCustomSorting) == nil then
+							-- table is empty, just set start value
+							BMU.savedVarsServ.houseCustomSorting[record.houseId] = 99
+						else
+							-- first time: set the entry at the end of the list
+							BMU.savedVarsServ.houseCustomSorting[record.houseId] = BMU.getLowestNumber(BMU.savedVarsServ.houseCustomSorting) - 1
+						end
+					else
+						local currentValue = BMU.savedVarsServ.houseCustomSorting[record.houseId]
+						local houseIdOfPre = BMU.has_value(BMU.savedVarsServ.houseCustomSorting, currentValue + 1)
+						if houseIdOfPre then
+							-- predecessor exists: switch positions
+							BMU.savedVarsServ.houseCustomSorting[record.houseId] = currentValue + 1
+							BMU.savedVarsServ.houseCustomSorting[houseIdOfPre] = currentValue
+						end
+					end
+					BMU.createTableHouses()
+				
+				end)
+				
+				-- current position
+				-- AddCustomMenuItem("   " .. (BMU.savedVarsServ.houseCustomSorting[record.houseId] or "-"), function() end)
+				
+				-- button to decrease sorting ("move down")
+				-- show only if the entry is already in order
 				if BMU.savedVarsServ.houseCustomSorting[record.houseId] then
-					BMU.savedVarsServ.houseCustomSorting[record.houseId] = BMU.savedVarsServ.houseCustomSorting[record.houseId] + 1
-				else
-					BMU.savedVarsServ.houseCustomSorting[record.houseId] = 1
+					AddCustomMenuItem(BMU.textures.arrowDown, function()
+
+						local currentValue = BMU.savedVarsServ.houseCustomSorting[record.houseId]
+						local houseIdOfSuc = BMU.has_value(BMU.savedVarsServ.houseCustomSorting, currentValue - 1)
+						if houseIdOfSuc then
+							-- successor exists: switch positions
+							BMU.savedVarsServ.houseCustomSorting[record.houseId] = currentValue - 1
+							BMU.savedVarsServ.houseCustomSorting[houseIdOfSuc] = currentValue
+						end
+						BMU.createTableHouses()
+
+					end)
 				end
-				BMU.createTableHouses()
-			end)
-			-- current position
-			AddCustomMenuItem("   " .. (BMU.savedVarsServ.houseCustomSorting[record.houseId] or "-"), function() end)
-			-- -- button to decrease sorting ("move down")
-			AddCustomMenuItem(BMU.textures.arrowDown, function()
-				if BMU.savedVarsServ.houseCustomSorting[record.houseId] then
-					BMU.savedVarsServ.houseCustomSorting[record.houseId] = BMU.savedVarsServ.houseCustomSorting[record.houseId] - 1
-				else
-					BMU.savedVarsServ.houseCustomSorting[record.houseId] = 0
-				end
-				BMU.createTableHouses()
-			end)
+
+			end
 		end
 		
 		-- show quest marker

@@ -769,7 +769,8 @@ function BMU.addInfo_2(e)
 	end	
 		
 	--set prio
-	if BMU.savedVarsAcc.currentViewedZoneAlwaysTop and (BMU.getParentZoneId(e.zoneId) == GetZoneId(GetCurrentMapZoneIndex()) or e.zoneId == GetZoneId(GetCurrentMapZoneIndex())) then
+	local currentZoneId = GetZoneId(GetCurrentMapZoneIndex())
+	if BMU.savedVarsAcc.currentViewedZoneAlwaysTop and (BMU.getParentZoneId(e.zoneId) == currentZoneId or e.zoneId == currentZoneId or e.zoneId == BMU.getParentZoneId(currentZoneId)) then
 		-- current viewed zone + subzones
 		e.prio = 0
 		e.textColorDisplayName = "teal"

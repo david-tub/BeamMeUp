@@ -53,6 +53,7 @@ BMU_GuildData = {
             611168,			-- "Hermaeus Mora Army"			|triquetra Discord-Name Ingame?
             527788,			-- "Akatosh Knights"			|likezed Discord-Name Ingame?
             782574,			-- "Die reisenden Schatten"		|LaicosVK Discord-Name Ingame?
+            695302,         -- "Song of Sun and Moon"       |@Eris221 Discord eryss
         },
         ["NA Megaserver"] = {
             698893,			-- "The Descendants"			|@ravenzwind

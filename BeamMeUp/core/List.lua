@@ -1428,7 +1428,7 @@ function ListView:update()
 					list.portalToPlayerTex:SetHidden(true)
 				end
 				
-			elseif message.isDungeon and CanLeaveCurrentLocationViaTeleport() and CanJumpToPlayerInZone(message.zoneId) then
+			elseif message.isDungeon and CanLeaveCurrentLocationViaTeleport() and (CanJumpToPlayerInZone(message.zoneId) or select(2, CanJumpToPlayerInZone(message.zoneId)) == JUMP_TO_PLAYER_RESULT_SOLO_ZONE) then -- CanJumpToPlayerInZone is false for solo arenas -> check reason value
 				-- Dungeon Finder -> use nodeIndecies instead of travel to zoneId
 				list.portalToPlayerTex:SetHidden(false)
 				list.portalToPlayerTex:SetTexture(texture_normal)
@@ -1665,7 +1665,12 @@ end
 
 
 -- refresh in depending of current state
-function BMU.refreshListAuto()
+function BMU.refreshListAuto(mapChanged)
+	-- return if window is hidden
+	if BMU.win.Main_Control:IsHidden() then
+		return
+	end
+
 	local inputString = ""
 	if BMU.state == 2 then
 		-- catch input string (player)
@@ -1675,8 +1680,8 @@ function BMU.refreshListAuto()
 		inputString = BMU.win.Searcher_Zone:GetText()
 	end
 	
-	if BMU.state == 11 or BMU.state == 13 or BMU.state == 14 then
-		-- if list of own houses (11) or guilds (13) or Dungeon Finder (14) dont auto refresh
+	if BMU.state == 11 or BMU.state == 13 or BMU.state == 14 or (BMU.state == 9 and mapChanged) then
+		-- if list of own houses (11) or guilds (13) or Dungeon Finder (14) or (related quests (9) and trigger from map change) dont auto refresh
 		return
 	elseif BMU.state == 12 then
 		BMU.createTablePTF()
@@ -1816,9 +1821,11 @@ function BMU.clickOnZoneName(button, record)
 		-- start generating context menus
 		ClearMenu()
 		
-		-- renaming of own houses + setting of primary residence + toggel nick names
 		if inOwnHouseTab then
+			
+			-- rename own houses
 			AddCustomMenuItem(SI.get(SI.TELE_UI_RENAME_HOUSE_NICKNAME), function() ZO_CollectionsBook.ShowRenameDialog(record.collectibleId) end)
+			
 			-- make primary residence
 			if record.prio ~= 1 then
 				-- prio = 1 -> is primary house
@@ -1829,6 +1836,56 @@ function BMU.clickOnZoneName(button, record)
 						BMU.createTableHouses()
 					end, 500)
 				 end)
+			end
+			
+			-- custom sorting (not for primary residence which is always on top)
+			if record.prio ~= 1 then
+				-- divider
+				AddCustomMenuItem("-", function() end)
+				-- button to increase sorting ("move up")
+				AddCustomMenuItem(BMU.textures.arrowUp, function()
+					
+					if not BMU.savedVarsServ.houseCustomSorting[record.houseId] then
+						if next(BMU.savedVarsServ.houseCustomSorting) == nil then
+							-- table is empty, just set start value
+							BMU.savedVarsServ.houseCustomSorting[record.houseId] = 99
+						else
+							-- first time: set the entry at the end of the list
+							BMU.savedVarsServ.houseCustomSorting[record.houseId] = BMU.getLowestNumber(BMU.savedVarsServ.houseCustomSorting) - 1
+						end
+					else
+						local currentValue = BMU.savedVarsServ.houseCustomSorting[record.houseId]
+						local houseIdOfPre = BMU.has_value(BMU.savedVarsServ.houseCustomSorting, currentValue + 1)
+						if houseIdOfPre then
+							-- predecessor exists: switch positions
+							BMU.savedVarsServ.houseCustomSorting[record.houseId] = currentValue + 1
+							BMU.savedVarsServ.houseCustomSorting[houseIdOfPre] = currentValue
+						end
+					end
+					BMU.createTableHouses()
+				
+				end)
+				
+				-- current position
+				-- AddCustomMenuItem("   " .. (BMU.savedVarsServ.houseCustomSorting[record.houseId] or "-"), function() end)
+				
+				-- button to decrease sorting ("move down")
+				-- show only if the entry is already in order
+				if BMU.savedVarsServ.houseCustomSorting[record.houseId] then
+					AddCustomMenuItem(BMU.textures.arrowDown, function()
+
+						local currentValue = BMU.savedVarsServ.houseCustomSorting[record.houseId]
+						local houseIdOfSuc = BMU.has_value(BMU.savedVarsServ.houseCustomSorting, currentValue - 1)
+						if houseIdOfSuc then
+							-- successor exists: switch positions
+							BMU.savedVarsServ.houseCustomSorting[record.houseId] = currentValue - 1
+							BMU.savedVarsServ.houseCustomSorting[houseIdOfSuc] = currentValue
+						end
+						BMU.createTableHouses()
+
+					end)
+				end
+
 			end
 		end
 		

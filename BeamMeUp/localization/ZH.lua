@@ -173,6 +173,8 @@ mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT, "集合点")
 mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT_TOOLTIP, "当您点击队伍成员或特殊区域（例如副本、房屋）时，在地图中的目的地上显示一个集合点 。需要LibMapPing库支持。注意: 如果您是队伍队长，你的集合点将对队伍成员可见。")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS, "显示无玩家或房屋的区域")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP, "即使地图没有玩家或者房屋，也会在主列表中显示。你可以使用金币来传送到已发现的神龛。")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Show displayed zone & subzones always on top")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Show currently displayed zone and subzones (opened world map) always on top of the list.")
 
 
 -----------------------------------------------------------------------------

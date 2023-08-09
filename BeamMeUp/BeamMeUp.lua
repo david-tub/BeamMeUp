@@ -181,12 +181,18 @@ end
 
 
 -- solves incompatibility issue to Votan's Minimap
-function BMU.WorldMapStateChanged(oldState, newState)
+function BMU.onWorldMapStateChanged(oldState, newState)
     if (newState == SCENE_SHOWING) then
         BMU.onMapShow()
     elseif (newState == SCENE_HIDING) then
         BMU.onMapHide()
     end
+end
+
+
+-- callback to refresh the list if the player changes the current displayed map/zone
+function BMU.onWorldMapChanged(wasNavigateIn)
+	BMU.refreshListAuto(true)
 end
 
 
@@ -545,6 +551,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["surveyMapsNotificationSound"] = true,
 		["wayshrineTravelAutoConfirm"] = false,
 		["currentZoneAlwaysTop"] = false,
+		["currentViewedZoneAlwaysTop"] = false,
 		["hideOwnHouses"] = false,
 		["showOfflineReminder"] = true,
 		["lastPortedZones"] = {},
@@ -562,6 +569,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["favoriteListPlayers"] = {},
 		["lastofflineReminder"] = 1632859025, -- just a timestamp (2021/09/28)
 		["favoriteDungeon"] = 0, -- zone_id of the favorite dungeon
+		["houseCustomSorting"] = {},
 	}
 	
 	BMU.DefaultsCharacter = {
@@ -573,7 +581,9 @@ local function OnAddOnLoaded(eventCode, addOnName)
 			["showGroupArenas"] = true,
 			["showDungeons"] = true,
 			["showTrials"] = true,
-			["toggleSortByAcronymRelease"] = false,
+			["sortByReleaseASC"] = true,
+			["sortByReleaseDESC"] = false,
+			["sortByAcronym"] = false,
 			["toggleShowAcronymUpdateName"] = false,
 			["toggleShowZoneNameDungeonName"] = false,
 		},
@@ -628,9 +638,11 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	EVENT_MANAGER:RegisterForEvent(appName, EVENT_ACTION_LAYER_PUSHED, BMU.PortalHandlerLayerPushed)
     EVENT_MANAGER:RegisterForEvent(appName, EVENT_ACTION_LAYER_POPPED, BMU.PortalHandlerLayerPopped)
 	
-	WORLD_MAP_SCENE:RegisterCallback("StateChange", BMU.WorldMapStateChanged)
-    GAMEPAD_WORLD_MAP_SCENE:RegisterCallback("StateChange", BMU.WorldMapStateChanged)
-	
+	WORLD_MAP_SCENE:RegisterCallback("StateChange", BMU.onWorldMapStateChanged)
+    GAMEPAD_WORLD_MAP_SCENE:RegisterCallback("StateChange", BMU.onWorldMapStateChanged)
+
+	CALLBACK_MANAGER:RegisterCallback("OnWorldMapChanged", BMU.onWorldMapChanged)
+
 	ZO_PreHookHandler(ZO_WorldMapZoneStoryTopLevel_Keyboard, "OnShow", BMU.onZoneGuideShow)
 		
 	EVENT_MANAGER:RegisterForEvent(appName, EVENT_GAME_CAMERA_UI_MODE_CHANGED, BMU.cameraModeChanged)

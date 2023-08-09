@@ -372,6 +372,15 @@ local function SetupOptionsMenu(index) --index == Addon name
 		 },
 		 {
               type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP),
+              tooltip = SI.get(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["currentViewedZoneAlwaysTop"]) .. "]",
+              getFunc = function() return BMU.savedVarsAcc.currentViewedZoneAlwaysTop end,
+              setFunc = function(value) BMU.savedVarsAcc.currentViewedZoneAlwaysTop = value end,
+			  default = BMU.DefaultsAccount["currentViewedZoneAlwaysTop"],
+			  submenu = "rec",
+		 },
+		 {
+              type = "checkbox",
               name = SI.get(SI.TELE_SETTINGS_FORMAT_ZONE_NAME),
               tooltip = SI.get(SI.TELE_SETTINGS_FORMAT_ZONE_NAME_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["formatZoneName"]) .. "]",
               getFunc = function() return BMU.savedVarsAcc.formatZoneName end,
@@ -1927,19 +1936,44 @@ local function SetupUI()
 		)
 
 		-- sorting (release or acronym)
+		-- checkbox does not rely behave like a toogle in this case, enforce 3 possible statuses
 		AddCustomSubMenuItem(GetString(SI_GAMEPAD_SORT_OPTION),
 			{
+				-- sort by release: from old (top of list) to new
 				{
-					label = SI.get(SI.TELE_UI_TOGGLE_SORT_RELEASE),
-					callback = function() BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease = not BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease BMU.clearInputFields() BMU.createTableDungeons() end,
+					label = SI.get(SI.TELE_UI_TOGGLE_SORT_RELEASE) .. BMU.textures.arrowUp,
+					callback = function()
+						BMU.savedVarsChar.dungeonFinder.sortByReleaseASC = true
+						BMU.savedVarsChar.dungeonFinder.sortByReleaseDESC = false
+						BMU.savedVarsChar.dungeonFinder.sortByAcronym = false
+						BMU.clearInputFields()
+						BMU.createTableDungeons() end,
 					itemType = MENU_ADD_OPTION_CHECKBOX,
-					checked = function() return not BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease end,
+					checked = function() return BMU.savedVarsChar.dungeonFinder.sortByReleaseASC end,
 				},
+				-- sort by release: from new (top of list) to old
+				{
+					label = SI.get(SI.TELE_UI_TOGGLE_SORT_RELEASE) .. BMU.textures.arrowDown,
+					callback = function()
+						BMU.savedVarsChar.dungeonFinder.sortByReleaseDESC = true
+						BMU.savedVarsChar.dungeonFinder.sortByReleaseASC = false
+						BMU.savedVarsChar.dungeonFinder.sortByAcronym = false
+						BMU.clearInputFields()
+						BMU.createTableDungeons() end,
+					itemType = MENU_ADD_OPTION_CHECKBOX,
+					checked = function() return BMU.savedVarsChar.dungeonFinder.sortByReleaseDESC end,
+				},
+				-- sort by acronym
 				{
 					label = SI.get(SI.TELE_UI_TOGGLE_SORT_ACRONYM),
-					callback = function() BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease = not BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease BMU.clearInputFields() BMU.createTableDungeons() end,
+					callback = function()
+						BMU.savedVarsChar.dungeonFinder.sortByAcronym = true
+						BMU.savedVarsChar.dungeonFinder.sortByReleaseASC = false
+						BMU.savedVarsChar.dungeonFinder.sortByReleaseDESC = false
+						BMU.clearInputFields()
+						BMU.createTableDungeons() end,
 					itemType = MENU_ADD_OPTION_CHECKBOX,
-					checked = function() return BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease end,
+					checked = function() return BMU.savedVarsChar.dungeonFinder.sortByAcronym end,
 				},
 			}, nil, nil, nil, 5
 		)

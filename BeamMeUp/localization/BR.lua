@@ -173,6 +173,8 @@ mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT, "Mapa Ping")
 mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT_TOOLTIP, "Exibe um ponto no mapa (ponto de encontro) no destino quando você clicar em membros do grupo ou zonas específicas (masmorras, casas etc.). A biblioteca LibMapPing deve estar instalada. Lembre-se também: Se você é o líder do grupo, seus locais (pontos de rally) são visíveis para todos os membros do grupo.")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS, "Mostrar zonas sem jogadores ou casas")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP, "Exibir zonas na lista principal, mesmo que não haja jogadores ou casas para as quais você possa viajar. Você ainda tem a opção de viajar vom custo de ouro se tiver descoberto pelo menos um santuário na zona.")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Show displayed zone & subzones always on top")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Show currently displayed zone and subzones (opened world map) always on top of the list.")
 
 
 -----------------------------------------------------------------------------

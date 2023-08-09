@@ -3,20 +3,6 @@ local portalPlayers = {}
 local TeleportAllPlayersTable = {}
 local allZoneIds = {} -- stores the number of hits of a zoneId at index (allzoneIds[zoneId] = 1) | to know which zoneId is already added | to count the number of port options/alternatives
 
--- removes all duplicates (displayName) and return cleared table
-local function removeDuplicates(tbl)
-    local playername = {}
-    local newTable = {}
-    for index, record in ipairs(tbl) do
-        if playername[record.displayName] == nil then
-            playername[record.displayName] = 1
-            table.insert(newTable, record)
-        end
-    end
-    return newTable
-end
-
-
 -- format zone name and removes articles (if enabled)
 function BMU.formatName(unformatted, flag)
 
@@ -31,7 +17,6 @@ function BMU.formatName(unformatted, flag)
 		formatted = zo_strformat("<<C:1>>", unformatted)
 	else
 		-- remove all articles
-		
 		if BMU.lang == "en" then
 			if "The " == string.sub(unformatted, 1, 4) then
 				-- remove "The " in the beginning
@@ -769,24 +754,36 @@ function BMU.addInfo_2(e)
 	end	
 		
 	--set prio
-	if BMU.savedVarsAcc.currentZoneAlwaysTop and e.playersZone then
+	local currentZoneId = GetZoneId(GetCurrentMapZoneIndex())
+	if BMU.savedVarsAcc.currentViewedZoneAlwaysTop and (BMU.getParentZoneId(e.zoneId) == currentZoneId or e.zoneId == currentZoneId or e.zoneId == BMU.getParentZoneId(currentZoneId)) then
+		-- current viewed zone + subzones
 		e.prio = 0
-	elseif e.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP and e.isLeader then
+		e.textColorDisplayName = "teal"
+		e.textColorZoneName = "teal"
+	elseif BMU.savedVarsAcc.currentZoneAlwaysTop and e.playersZone then
+		-- current zone (players location)
 		e.prio = 1
-	elseif e.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP and (e.category == 4 or e.category == 5 or e.category == 6) then -- group member is in 4 men Group Dungeons | 12 men Raids (Trials) | Group Zones
+	elseif e.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP and e.isLeader then
+		-- group leader
 		e.prio = 2
-	elseif BMU.isFavoritePlayer(e.displayName) and BMU.isFavoriteZone(e.zoneId) then
+	elseif e.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP and (e.category == 4 or e.category == 5 or e.category == 6) then
+		-- group member is in 4 men Group Dungeons | 12 men Raids (Trials) | Group Zones
 		e.prio = 3
+	elseif BMU.isFavoritePlayer(e.displayName) and BMU.isFavoriteZone(e.zoneId) then
+		-- favorite player + favorite zone
+		e.prio = 4
 		e.textColorDisplayName = "gold"
 		e.textColorZoneName = "gold"
 	elseif BMU.isFavoritePlayer(e.displayName) then
-		e.prio = 4
+		-- favorite player
+		e.prio = 5
 		e.textColorDisplayName = "gold"
 	elseif BMU.isFavoriteZone(e.zoneId) then
-		e.prio = 5
+		-- favorite zone
+		e.prio = 6
 		e.textColorZoneName = "gold"
 	else
-		e.prio = 6
+		e.prio = 7
 	end
 	
 	return e
@@ -1048,6 +1045,19 @@ function BMU.shuffle_table(tbl)
 	return tbl
 end
 
+
+-- find lowest number in a table
+function BMU.getLowestNumber(tab)
+	local low = math.huge
+	local index
+	for i, v in pairs(tab) do
+		if v < low then
+			low = v
+			index = i
+		end
+	end
+	return low
+end
 
 
 -- checks if "only one entry per zone" is enabled
@@ -1653,7 +1663,7 @@ function BMU.questIsRelated(portalPlayers, slotIndex)
 	local questRepeatType = GetJournalQuestRepeatType(slotIndex)
 	
 	if tracked then
-		questName =  BMU.colorizeText(questName, "gold")
+		questName = BMU.colorizeText(questName, "gold")
 	elseif questRepeatType == 1 or questRepeatType == 2 then
 	-- color repeatable quests (1,2: repeatable quest | 0: not repeatable)
 		questName = BMU.colorizeText(questName, "teal")
@@ -1850,6 +1860,12 @@ function BMU.createTableHouses()
 		-- prio
 		if a.prio ~= b.prio then
 			return a.prio < b.prio
+		end
+		-- custom sorting
+		local cSortingA = BMU.savedVarsServ.houseCustomSorting[a.houseId] or -99
+		local cSortingB = BMU.savedVarsServ.houseCustomSorting[b.houseId] or -99
+		if cSortingA ~= cSortingB then
+			return cSortingA > cSortingB
 		end
 		-- name
 		return a.zoneName < b.zoneName
@@ -2147,7 +2163,7 @@ function BMU.createTableDungeons()
 			end
 		end
 		
-		if BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease then
+		if BMU.savedVarsChar.dungeonFinder.sortByAcronym then
 			-- sort by acronym
 			table.sort(resultListArenas, function(a, b)
 				return a.acronym < b.acronym
@@ -2156,7 +2172,7 @@ function BMU.createTableDungeons()
 			-- sort by release and name
 			table.sort(resultListArenas, function(a, b)
 				if a.updateNum ~= b.updateNum then
-					return a.updateNum < b.updateNum
+					return (a.updateNum < b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseASC) or (a.updateNum > b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseDESC)
 				end
 				return a.zoneName < b.zoneName
 			end)
@@ -2182,7 +2198,7 @@ function BMU.createTableDungeons()
 			end
 		end
 		
-		if BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease then
+		if BMU.savedVarsChar.dungeonFinder.sortByAcronym then
 			-- sort by acronym
 			table.sort(resultListGroupArenas, function(a, b)
 				return a.acronym < b.acronym
@@ -2191,7 +2207,7 @@ function BMU.createTableDungeons()
 			-- sort by release and name
 			table.sort(resultListGroupArenas, function(a, b)
 				if a.updateNum ~= b.updateNum then
-					return a.updateNum < b.updateNum
+					return (a.updateNum < b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseASC) or (a.updateNum > b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseDESC)
 				end
 				return a.zoneName < b.zoneName
 			end)
@@ -2217,7 +2233,7 @@ function BMU.createTableDungeons()
 			end
 		end
 		
-		if BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease then
+		if BMU.savedVarsChar.dungeonFinder.sortByAcronym then
 			-- sort by acronym
 			table.sort(resultListTrials, function(a, b)
 				return a.acronym < b.acronym
@@ -2226,7 +2242,7 @@ function BMU.createTableDungeons()
 			-- sort by release and name
 			table.sort(resultListTrials, function(a, b)
 				if a.updateNum ~= b.updateNum then
-					return a.updateNum < b.updateNum
+					return (a.updateNum < b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseASC) or (a.updateNum > b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseDESC)
 				end
 				return a.zoneName < b.zoneName
 			end)
@@ -2252,7 +2268,7 @@ function BMU.createTableDungeons()
 			end
 		end
 		
-		if BMU.savedVarsChar.dungeonFinder.toggleSortByAcronymRelease then
+		if BMU.savedVarsChar.dungeonFinder.sortByAcronym then
 			-- sort by acronym
 			table.sort(resultListGroupDungeons, function(a, b)
 				return a.acronym < b.acronym
@@ -2261,7 +2277,7 @@ function BMU.createTableDungeons()
 			-- sort by release and name
 			table.sort(resultListGroupDungeons, function(a, b)
 				if a.updateNum ~= b.updateNum then
-					return a.updateNum < b.updateNum
+					return (a.updateNum < b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseASC) or (a.updateNum > b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseDESC)
 				end
 				return a.zoneName < b.zoneName
 			end)

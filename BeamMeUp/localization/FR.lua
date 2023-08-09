@@ -173,6 +173,8 @@ mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT, "Signe de carte")
 mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT_TOOLTIP, "Affiche un signe sur la carte (point de ralliement) à la destination sur la carte quand vous cliquez sur des membres du groupe ou des zones spécifiques (donjons, maisons, etc.). La librairie LibMapPing doit être installée. De plus, rappelez-vous : si vous êtes le chef de groupe, vos signes (points de ralliement) sont visibles pour tous les membres du groupe.")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS, "Montrer les zones sans joueur ni maison")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP, "Montre les zones de la liste principale, même si il n'y a ni joueur ni maison vers lesquels vous puissiez voyager. Vous avez toujours la possibilité de voyager contre de l'or si vous avez découvert au moins un oratoire dans la zone.")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Show displayed zone & subzones always on top")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Show currently displayed zone and subzones (opened world map) always on top of the list.")
 
 
 -----------------------------------------------------------------------------

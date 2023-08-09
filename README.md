@@ -62,3 +62,60 @@ Special zones such as the group zones in Craglorn, PVP zones and solo zones are 
 ### Updating partner guild IDs
 Partner guilds are foreign guilds that are not managed by the BMU developers. The list of partner guilds allows especially new players to easily find a beginner-friendly guild with free fast travel options.
 The IDs of the guilds per server and correspoding comments are stored in `GuildData.lua` (you can get the guild ID by copying the guild chat link out from the game).
+
+
+***
+***
+***
+
+
+## Component/Files Overview
+The implementation is distributed over several files. Even if there is not always a strict separation, this is the basic structure:
+
+
+### BeamMeUp.txt
+- manifest file with addon name, version, dependencies etc.
+
+### BeamMeUp.lua
+- start of the addon
+- initialization of the savedVars and other variables
+- event registration/handling and keybind callbacks
+- UI behavior
+
+### TeleporterGlobals.lua
+- loading of dependencies (addons)
+- initialization of global variables and constants
+- zone data
+
+### GuildData.lua
+- guild data (server specific guild houses, official guilds, partner guilds)
+
+### core/List.lua
+- everything regarding the display of the list and interaction
+- buttton/click callbacks and further frontend behavior (e.g. context menus)
+- helper functions
+
+### core/TeleAppUI.lua
+- initialization of the UI elements
+- button creation and callbacks (that are not belong to the list)
+- generation of the addon settings menu (with LAM)
+- admin helper functions
+
+### core/TeleporterChecker.lua
+- everything regarding the generation of the results / list records
+- data acquisition and combination, filtering etc.
+- basicaly all core features
+
+### core/TeleSlashCommands.lua
+- initialization of the chat commands
+- everything regarding the chat command intepretation/handling
+- developer commands
+
+### bindings/bindings.lua and bindings.xml
+- technical registration of the keybinds
+
+### core/SI.lua and localization files
+- *SI.lua* defines the text varibales (just a legacy)
+- the localization files provide translation for the text varibales (defined in *SI.lua*)
+- *EN.lua* is always loaded to ensure text in any case
+- to make it easier for translators, new strings are copied to all localization files

@@ -3,20 +3,6 @@ local portalPlayers = {}
 local TeleportAllPlayersTable = {}
 local allZoneIds = {} -- stores the number of hits of a zoneId at index (allzoneIds[zoneId] = 1) | to know which zoneId is already added | to count the number of port options/alternatives
 
--- removes all duplicates (displayName) and return cleared table
-local function removeDuplicates(tbl)
-    local playername = {}
-    local newTable = {}
-    for index, record in ipairs(tbl) do
-        if playername[record.displayName] == nil then
-            playername[record.displayName] = 1
-            table.insert(newTable, record)
-        end
-    end
-    return newTable
-end
-
-
 -- format zone name and removes articles (if enabled)
 function BMU.formatName(unformatted, flag)
 
@@ -31,7 +17,6 @@ function BMU.formatName(unformatted, flag)
 		formatted = zo_strformat("<<C:1>>", unformatted)
 	else
 		-- remove all articles
-		
 		if BMU.lang == "en" then
 			if "The " == string.sub(unformatted, 1, 4) then
 				-- remove "The " in the beginning

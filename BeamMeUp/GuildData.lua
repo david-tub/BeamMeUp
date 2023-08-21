@@ -75,6 +75,7 @@ BMU_GuildData = {
             197803,			-- "Celestial Rift"				|@Shiseida Discord-Name Ingame noch rausfinden gilde aktuell nicht gelistet
             869871,			-- "Allegiance of Asgard"		|@joyousdeath Discord-Name Joy<3
             781641,			-- "Pride of Ebon"				|@LilMuffin Discord-Name Ingame noch raufinden
+            465947,         -- "The Way Of The Sword"       |@Izahym discord: aze_the_killer
         },
     }
 

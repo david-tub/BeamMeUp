@@ -361,7 +361,6 @@ end
 function BMU.initializeCategoryMap()
 	BMU.CategoryMap = {}
 	-- go over each category list and add to hash map
-	-- 1 = Delves, 2 = Public Dungeons, 3 = Houses, 4 = 4 men Group Dungeons, 5 = 12 men Raids (Trails), 6 = Group Zones (Dragonstar, Group Dungeons in Craglorn)
 	
 	-- Delves
 	for index, value in pairs(BMU.getAllDelves()) do

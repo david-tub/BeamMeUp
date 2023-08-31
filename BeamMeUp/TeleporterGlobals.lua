@@ -329,16 +329,23 @@ BMU.whitelistGroupMembers = BMU.mergeTables(BMU.blacklistGroupArenas, BMU.blackl
 
 -- List of all Overland-Zones incl. their delves and public dungeons
 -- http://en.uesp.net/wiki/Online:Delves   http://en.uesp.net/wiki/Online:Public_Dungeons
+-- additional the assignment of the public dungeons to their group event achievements (skill point)
 BMU.overlandDelvesPublicDungeons = {
 	-- Greenshade
 	[108] = {
 		delves = {575, 576, 577, 578, 579, 580},
 		publicDungeons = {137},
+		publicDungeonsAchievements = {
+			[137] = 9999,
+		}
 	},
 	-- Auridon
 	[381] = {
 		delves = {396, 397, 398, 399, 400, 401},
 		publicDungeons = {486},
+		publicDungeonsAchievements = {
+			[486] = 9999,
+		}
 	},
 	-- Malabal Tor
 	[58] = {

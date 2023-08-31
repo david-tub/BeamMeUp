@@ -1164,6 +1164,80 @@ function ListView:update()
 
 
 			--------- zone tooltip (and zone name)  and handler for map opening ---------
+			
+			-- Second language for zone names
+			-- if second language is selected & entry is a real zone & zoneNameSecondLanguage exists
+			if BMU.savedVarsAcc.secondLanguage ~= 1 and message.zoneNameClickable == true and message.zoneNameSecondLanguage ~= nil then
+				if #tooltipTextZone > 0 then
+					-- add separator
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				end
+				-- add zone name
+				table.insert(tooltipTextZone, message.zoneNameSecondLanguage)
+			end
+			------------------
+			
+			-- Parent zone name
+			-- if zone is no overland zone -> show parent map
+			if message.category ~= 9 and message.parentZoneName and not message.houseTooltip then
+				if #tooltipTextZone > 0 then
+					-- add separator
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				end
+				-- add zone name
+				table.insert(tooltipTextZone, message.parentZoneName)
+			end
+			------------------
+
+			-- house tooltip
+			if message.houseTooltip then
+				if #tooltipTextZone > 0 then
+					-- add separator
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				end
+				-- add house infos
+				for _, v in pairs(message.houseTooltip) do
+					table.insert(tooltipTextZone, v)
+				end
+			end
+			------------------
+
+			-- wayshrine and skyshard discovery info
+			if message.zoneNameClickable == true and (message.zoneWayhsrineDiscoveryInfo ~= nil or message.zoneSkyshardDiscoveryInfo ~= nil) then
+				if #tooltipTextZone > 0 then
+					-- add separator
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				end
+				if message.zoneSkyshardDiscoveryInfo ~= nil then
+					table.insert(tooltipTextZone, message.zoneSkyshardDiscoveryInfo)
+				end
+				if message.zoneWayhsrineDiscoveryInfo ~= nil then
+					table.insert(tooltipTextZone, message.zoneWayhsrineDiscoveryInfo)
+				end
+			end
+			------------------
+
+			-- public dungeon achievement info (group event / skill point)
+			if message.zoneNameClickable == true and message.publicDungeonAchiementInfo then
+				if #tooltipTextZone > 0 then
+					-- add separator
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				end
+				table.insert(tooltipTextZone, message.publicDungeonAchiementInfo)
+			end
+			------------------
+
+			-- Set Collection information
+			if message.setCollectionProgress then
+				if #tooltipTextZone > 0 then
+					-- add separator
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				end
+				-- add set collection info
+				table.insert(tooltipTextZone, message.setCollectionProgress)
+			end
+			------------------
+			
 			-- if search for related items and info not already added
 			if message.relatedItems ~= nil and #message.relatedItems > 0 then
 				-- ensure to add the total number only once
@@ -1188,10 +1262,13 @@ function ListView:update()
 				end
 				
 				-- copy item names to tooltipTextZone
-				for index, item in ipairs(message.relatedItems) do
+				if #tooltipTextZone > 0 then
+					-- add separator
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				end
+				for _, item in ipairs(message.relatedItems) do
 					table.insert(tooltipTextZone, item.itemTooltip)
 				end
-				
 				
 			-- if search for related quests
 			elseif message.relatedQuests ~= nil and #message.relatedQuests > 0 then
@@ -1201,75 +1278,17 @@ function ListView:update()
 					message.zoneName = message.zoneName .. " (" .. message.countRelatedQuests .. ")"
 					message.addedTotalQuests = true
 				end
-				-- copy "message.relatedQuests" to "tooltipTextZone" (Attention: "=" will set pointer!)
-				ZO_DeepTableCopy(message.relatedQuests, tooltipTextZone)
-			end
-			
-			
-			-- Set Collection information
-			if message.setCollectionProgress then
+
+				-- copy quest names to tooltipTextZone
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table.insert(tooltipTextZone, 1, BMU.textures.tooltipSeperator)
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
 				end
-				-- add set collection info
-				table.insert(tooltipTextZone, 1, message.setCollectionProgress)
-			end
-			------------------
-			
-			
-			-- wayshrine and skyshard discovery info
-			if message.zoneNameClickable == true and (message.zoneWayhsrineDiscoveryInfo ~= nil or message.zoneSkyshardDiscoveryInfo ~= nil) then
-				if #tooltipTextZone > 0 then
-					-- add separator
-					table.insert(tooltipTextZone, 1, BMU.textures.tooltipSeperator)
-				end
-				if message.zoneSkyshardDiscoveryInfo ~= nil then
-					table.insert(tooltipTextZone, 1, message.zoneSkyshardDiscoveryInfo)
-				end
-				if message.zoneWayhsrineDiscoveryInfo ~= nil then
-					table.insert(tooltipTextZone, 1, message.zoneWayhsrineDiscoveryInfo)
+				for _, questName in ipairs(message.relatedQuests) do
+					table.insert(tooltipTextZone, questName)
 				end
 			end
 			------------------
-
-
-			-- public dungeon achievement info (group event / skill point)
-			if message.zoneNameClickable == true and message.publicDungeonAchiementInfo then
-				if #tooltipTextZone > 0 then
-					-- add separator
-					table.insert(tooltipTextZone, 1, BMU.textures.tooltipSeperator)
-				end
-				table.insert(tooltipTextZone, 1, message.publicDungeonAchiementInfo)
-			end
-			------------------
-
-			
-			-- Parent zone name
-			-- if zone is no overland zone -> show parent map
-			if message.category ~= 9 and message.parentZoneName and not message.houseTooltip then
-				if #tooltipTextZone > 0 then
-					-- add separator
-					table.insert(tooltipTextZone, 1, BMU.textures.tooltipSeperator)
-				end
-				-- add zone name
-				table.insert(tooltipTextZone, 1, message.parentZoneName)
-			end
-			------------------
-
-
-			-- Second language for zone names
-			-- if second language is selected & entry is a real zone & zoneNameSecondLanguage exists
-			if BMU.savedVarsAcc.secondLanguage ~= 1 and message.zoneNameClickable == true and message.zoneNameSecondLanguage ~= nil then
-				if #tooltipTextZone > 0 then
-					-- add separator
-					table.insert(tooltipTextZone, 1, BMU.textures.tooltipSeperator)
-				end
-				-- add zone name
-				table.insert(tooltipTextZone, 1, message.zoneNameSecondLanguage)
-			end
-			------------------
-
 			
 			-- Info if player is in same instance
 			if message.groupMemberSameInstance ~= nil then
@@ -1286,25 +1305,15 @@ function ListView:update()
 			end
 			------------------
 			
-			
-			-- house tooltip
-			if message.houseTooltip then
-				if #tooltipTextZone > 0 then
-					-- add separator
-					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
-				end
-				-- add house infos
-				for _, v in pairs(message.houseTooltip) do
-					table.insert(tooltipTextZone, v)
-				end
-			end
-			------------------
 
 			-- guild tooltip
 			if message.guildTooltip then
 				ZO_DeepTableCopy(message.guildTooltip, tooltipTextZone)
 			end
+			------------------
+			
 
+			------------------------------------
 			-- Zone Name Column Tooltip & Button Controls
 			if message.zoneNameClickable or #tooltipTextZone > 0 then
 				-- set handler for map opening

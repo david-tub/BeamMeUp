@@ -727,9 +727,9 @@ function BMU.addInfo_2(e)
 	-- add skyshard discovery info (for zone tooltip)
 	e.zoneSkyshardDiscoveryInfo, e.zoneSkyshardDiscovered, e.zoneSkyshardTotal = BMU.getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_SKYSHARDS)
 	-- add public dungeon completeness info (for zone tooltip)
-	e.zonePublicDungeonDiscoveryInfo, e.zonePublicDungeonDiscovered, e.zonePublicDungeonTotal = BMU.getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_PUBLIC_DUNGEONS)
+	-- e.zonePublicDungeonDiscoveryInfo, e.zonePublicDungeonDiscovered, e.zonePublicDungeonTotal = BMU.getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_PUBLIC_DUNGEONS)
 	-- add delve completeness info (for zone tooltip)
-	e.zoneDelveDiscoveryInfo, e.zoneDelveDiscovered, e.zoneDelveTotal = BMU.getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_DELVES)
+	-- e.zoneDelveDiscoveryInfo, e.zoneDelveDiscovered, e.zoneDelveTotal = BMU.getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_DELVES)
 	
 	-- categorize zone
 	e.category = BMU.categorizeZone(e.zoneId)
@@ -738,31 +738,13 @@ function BMU.addInfo_2(e)
 	-- get parent map index and zoneId (for map opening)
 	e.mapIndex = BMU.getMapIndex(e.zoneId)
 	
-	-- check specific delve and public dungeon for completeness
-	if e.category == 1 or e.category == 2 then
-		-- use formatted name and fix "--" bug
-		local zoneNameToTest = BMU.formatName(e.zoneNameUnformatted, true)
-		local zoneNameToTest = string.gsub(zoneNameToTest, "-", "--")
-
-		local completionType = ZONE_COMPLETION_TYPE_DELVES
-		if e.category == 2 then
-			completionType = ZONE_COMPLETION_TYPE_PUBLIC_DUNGEONS
-		end
-
-		-- TODO: RENAME
-		e.completeness = BMU.colorizeText("NOT COMPLETE", "red")
-
-		local countTotal = GetNumZoneActivitiesForZoneCompletionType(e.parentZoneId, completionType)
-		for activityIndex = 1, countTotal do
-			local activityName = BMU.formatName(GetZoneStoryActivityNameByActivityIndex(e.parentZoneId, completionType, activityIndex), true)
-			if IsZoneStoryActivityComplete(e.parentZoneId, completionType, activityIndex) and string.match(string.lower(activityName), string.lower(zoneNameToTest)) then
-				-- TODO: RENAME
-				e.completeness = BMU.colorizeText("COMPLETE", "green")
-			else
-				-- TODO: REMOVE
-				-- d("ZG: " .. activityName .. " <-> " .. zoneNameToTest)
-			end
-		end
+	-- check public dungeon achievement / skill point
+	if e.category == 9 then
+		-- overland zone --> show completion of all public dungeons in the zone
+		e.publicDungeonAchiementInfo = BMU.createPublicDungeonAchiementInfo(e.zoneId)
+	elseif e.category == 2 then
+		-- specific public dungeon --> show completion of itself
+		e.publicDungeonAchiementInfo = BMU.createPublicDungeonAchiementInfo(e.parentZoneId, e.zoneId)
 	end
 
 	-- add set collection information
@@ -817,6 +799,49 @@ function BMU.addInfo_2(e)
 	end
 	
 	return e
+end
+
+
+-- create tooltip text info about public dungeon achievement completion (group event / skill point)
+function BMU.createPublicDungeonAchiementInfo(overlandZoneId, onlyPublicDungeonZoneId)
+	local info = {}
+	if BMU.overlandDelvesPublicDungeons[overlandZoneId] and BMU.overlandDelvesPublicDungeons[overlandZoneId].publicDungeonsAchievements then
+		-- only for a specific public dungeon
+		if onlyPublicDungeonZoneId then
+			local publicDungeonAchvText = BMU.getColorizedPublicDungeonAchievementText(overlandZoneId, onlyPublicDungeonZoneId)
+			if publicDungeonAchvText then
+				table.insert(info, publicDungeonAchvText)
+			end
+
+		-- for all public dungeons of the zone
+		else
+			for publicDungeonZoneId, _ in pairs(BMU.overlandDelvesPublicDungeons[overlandZoneId].publicDungeonsAchievements) do
+				local publicDungeonAchvText = BMU.getColorizedPublicDungeonAchievementText(overlandZoneId, publicDungeonZoneId)
+				if publicDungeonAchvText then
+					table.insert(info, publicDungeonAchvText)
+				end
+			end
+		end
+
+		-- add header and return info
+		if #info > 0 then
+			table.insert(info, 1, GetString(SI_LEVEL_UP_REWARDS_SKILL_POINT_TOOLTIP_HEADER)..":")
+			return info
+		end
+	end
+end
+
+-- generate colorized text for a specific public dungeon (group event / skill point)
+function BMU.getColorizedPublicDungeonAchievementText(overlandZoneId, publicDungeonZoneId)
+	local achievmentId = BMU.overlandDelvesPublicDungeons[overlandZoneId].publicDungeonsAchievements[publicDungeonZoneId]
+	if achievmentId then
+		local name, _, _, _, completed, _, _ = GetAchievementInfo(achievmentId)
+		if completed then
+			return BMU.colorizeText(BMU.formatName(GetZoneNameById(publicDungeonZoneId)), "green")
+		else
+			return BMU.colorizeText(BMU.formatName(GetZoneNameById(publicDungeonZoneId)), "red")
+		end
+	end
 end
 
 

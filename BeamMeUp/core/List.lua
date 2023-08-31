@@ -1218,18 +1218,11 @@ function ListView:update()
 			------------------
 			
 			
-			-- wayhsrine and skyshard discovery info
-			if message.zoneNameClickable == true and (message.zoneWayhsrineDiscoveryInfo ~= nil or message.zoneSkyshardDiscoveryInfo ~= nil or message.zonePublicDungeonDiscoveryInfo ~= nil or message.zoneDelveDiscoveryInfo ~= nil) then
+			-- wayshrine and skyshard discovery info
+			if message.zoneNameClickable == true and (message.zoneWayhsrineDiscoveryInfo ~= nil or message.zoneSkyshardDiscoveryInfo ~= nil) then
 				if #tooltipTextZone > 0 then
 					-- add separator
 					table.insert(tooltipTextZone, 1, BMU.textures.tooltipSeperator)
-				end
--- add discovery infos
-				if message.zoneDelveDiscoveryInfo ~= nil then
-					table.insert(tooltipTextZone, 1, message.zoneDelveDiscoveryInfo)
-				end
-				if message.zonePublicDungeonDiscoveryInfo ~= nil then
-					table.insert(tooltipTextZone, 1, message.zonePublicDungeonDiscoveryInfo)
 				end
 				if message.zoneSkyshardDiscoveryInfo ~= nil then
 					table.insert(tooltipTextZone, 1, message.zoneSkyshardDiscoveryInfo)
@@ -1241,13 +1234,13 @@ function ListView:update()
 			------------------
 
 
-			-- completeness info
-			if message.zoneNameClickable == true and message.completeness ~= nil then
+			-- public dungeon achievement info (group event / skill point)
+			if message.zoneNameClickable == true and message.publicDungeonAchiementInfo then
 				if #tooltipTextZone > 0 then
 					-- add separator
 					table.insert(tooltipTextZone, 1, BMU.textures.tooltipSeperator)
 				end
-				table.insert(tooltipTextZone, 1, message.completeness)
+				table.insert(tooltipTextZone, 1, message.publicDungeonAchiementInfo)
 			end
 			------------------
 

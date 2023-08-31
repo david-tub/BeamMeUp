@@ -1224,7 +1224,7 @@ function ListView:update()
 					-- add separator
 					table.insert(tooltipTextZone, 1, BMU.textures.tooltipSeperator)
 				end
-				-- add discovery infos
+-- add discovery infos
 				if message.zoneDelveDiscoveryInfo ~= nil then
 					table.insert(tooltipTextZone, 1, message.zoneDelveDiscoveryInfo)
 				end
@@ -2538,8 +2538,14 @@ function BMU:tooltipTextEnter(control, text)
         InformationTooltip:SetHidden(false)
 		-- if text is table of strings -> add for each a separate line
 		if type(text) == "table" then
-			for i, line in ipairs(text) do
-				InformationTooltip:AddLine(line)
+			for _, line in ipairs(text) do
+				if type(line) == "table" then
+					for _, line2 in ipairs(line) do
+						InformationTooltip:AddLine(line2)
+					end
+				else
+					InformationTooltip:AddLine(line)
+				end
 			end
 		else
 			InformationTooltip:AddLine(text)

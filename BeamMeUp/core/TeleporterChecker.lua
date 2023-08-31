@@ -726,15 +726,45 @@ function BMU.addInfo_2(e)
 	e.zoneWayhsrineDiscoveryInfo, e.zoneWayshrineDiscovered, e.zoneWayshrineTotal = BMU.getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_WAYSHRINES)
 	-- add skyshard discovery info (for zone tooltip)
 	e.zoneSkyshardDiscoveryInfo, e.zoneSkyshardDiscovered, e.zoneSkyshardTotal = BMU.getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_SKYSHARDS)
-		
+	-- add public dungeon completeness info (for zone tooltip)
+	e.zonePublicDungeonDiscoveryInfo, e.zonePublicDungeonDiscovered, e.zonePublicDungeonTotal = BMU.getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_PUBLIC_DUNGEONS)
+	-- add delve completeness info (for zone tooltip)
+	e.zoneDelveDiscoveryInfo, e.zoneDelveDiscovered, e.zoneDelveTotal = BMU.getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_DELVES)
+	
 	-- categorize zone
 	e.category = BMU.categorizeZone(e.zoneId)
-	
-	-- get parent map index and zoneId (for map opening)
-	e.mapIndex = BMU.getMapIndex(e.zoneId)
 	e.parentZoneId = BMU.getParentZoneId(e.zoneId)
 	e.parentZoneName = BMU.formatName(GetZoneNameById(e.parentZoneId))
+	-- get parent map index and zoneId (for map opening)
+	e.mapIndex = BMU.getMapIndex(e.zoneId)
 	
+	-- check specific delve and public dungeon for completeness
+	if e.category == 1 or e.category == 2 then
+		-- use formatted name and fix "--" bug
+		local zoneNameToTest = BMU.formatName(e.zoneNameUnformatted, true)
+		local zoneNameToTest = string.gsub(zoneNameToTest, "-", "--")
+
+		local completionType = ZONE_COMPLETION_TYPE_DELVES
+		if e.category == 2 then
+			completionType = ZONE_COMPLETION_TYPE_PUBLIC_DUNGEONS
+		end
+
+		-- TODO: RENAME
+		e.completeness = BMU.colorizeText("NOT COMPLETE", "red")
+
+		local countTotal = GetNumZoneActivitiesForZoneCompletionType(e.parentZoneId, completionType)
+		for activityIndex = 1, countTotal do
+			local activityName = BMU.formatName(GetZoneStoryActivityNameByActivityIndex(e.parentZoneId, completionType, activityIndex), true)
+			if IsZoneStoryActivityComplete(e.parentZoneId, completionType, activityIndex) and string.match(string.lower(activityName), string.lower(zoneNameToTest)) then
+				-- TODO: RENAME
+				e.completeness = BMU.colorizeText("COMPLETE", "green")
+			else
+				-- TODO: REMOVE
+				-- d("ZG: " .. activityName .. " <-> " .. zoneNameToTest)
+			end
+		end
+	end
+
 	-- add set collection information
 	e.setCollectionProgress = BMU.getSetCollectionProgressString(e.zoneId, e.category, e.parentZoneId)
 	
@@ -2468,8 +2498,15 @@ function BMU.getZoneGuideDiscoveryInfo(zoneId, completionType)
 	
 	if completionType == ZONE_COMPLETION_TYPE_WAYSHRINES then
 		infoString = GetString(SI_ZONECOMPLETIONTYPE4) .. ": " .. infoString
+	
 	elseif completionType == ZONE_COMPLETION_TYPE_SKYSHARDS then
 		infoString = GetString(SI_ZONECOMPLETIONTYPE7) .. ": " .. infoString
+	
+	elseif completionType == ZONE_COMPLETION_TYPE_PUBLIC_DUNGEONS then
+		infoString = GetString(SI_ZONECOMPLETIONTYPE13) .. ": " .. infoString
+	
+	elseif completionType == ZONE_COMPLETION_TYPE_DELVES then
+		infoString = GetString(SI_ZONECOMPLETIONTYPE5) .. ": " .. infoString
 	end
 	
 	return infoString, numCompletedActivities, totalActivities

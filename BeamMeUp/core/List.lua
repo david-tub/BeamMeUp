@@ -1219,12 +1219,18 @@ function ListView:update()
 			
 			
 			-- wayhsrine and skyshard discovery info
-			if message.zoneNameClickable == true and (message.zoneWayhsrineDiscoveryInfo ~= nil or message.zoneSkyshardDiscoveryInfo ~= nil) then
+			if message.zoneNameClickable == true and (message.zoneWayhsrineDiscoveryInfo ~= nil or message.zoneSkyshardDiscoveryInfo ~= nil or message.zonePublicDungeonDiscoveryInfo ~= nil or message.zoneDelveDiscoveryInfo ~= nil) then
 				if #tooltipTextZone > 0 then
 					-- add separator
 					table.insert(tooltipTextZone, 1, BMU.textures.tooltipSeperator)
 				end
-				-- add discovery info
+				-- add discovery infos
+				if message.zoneDelveDiscoveryInfo ~= nil then
+					table.insert(tooltipTextZone, 1, message.zoneDelveDiscoveryInfo)
+				end
+				if message.zonePublicDungeonDiscoveryInfo ~= nil then
+					table.insert(tooltipTextZone, 1, message.zonePublicDungeonDiscoveryInfo)
+				end
 				if message.zoneSkyshardDiscoveryInfo ~= nil then
 					table.insert(tooltipTextZone, 1, message.zoneSkyshardDiscoveryInfo)
 				end
@@ -1233,8 +1239,19 @@ function ListView:update()
 				end
 			end
 			------------------
-			
 
+
+			-- completeness info
+			if message.zoneNameClickable == true and message.completeness ~= nil then
+				if #tooltipTextZone > 0 then
+					-- add separator
+					table.insert(tooltipTextZone, 1, BMU.textures.tooltipSeperator)
+				end
+				table.insert(tooltipTextZone, 1, message.completeness)
+			end
+			------------------
+
+			
 			-- Parent zone name
 			-- if zone is no overland zone -> show parent map
 			if message.category ~= 9 and message.parentZoneName and not message.houseTooltip then

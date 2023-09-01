@@ -336,7 +336,7 @@ BMU.overlandDelvesPublicDungeons = {
 		delves = {575, 576, 577, 578, 579, 580},
 		publicDungeons = {137},
 		publicDungeonsAchievements = {
-			[137] = 9999,
+			[137] = 445,		--Rulanyil's Fall
 		}
 	},
 	-- Auridon
@@ -344,78 +344,120 @@ BMU.overlandDelvesPublicDungeons = {
 		delves = {396, 397, 398, 399, 400, 401},
 		publicDungeons = {486},
 		publicDungeonsAchievements = {
-			[486] = 9999,
+			[486] = 468,		--Toothmaul Gully
 		}
 	},
 	-- Malabal Tor
 	[58] = {
 		delves = {468, 469, 470, 471, 472, 473},
 		publicDungeons = {138},
+		publicDungeonsAchievements = {
+			[138] = 460,		--Crimson Cove
+		}
 	},
 	-- Grahtwood
 	[383] = {
 		delves = {444, 447, 442, 475, 477, 478},
 		publicDungeons = {124},
+		publicDungeonsAchievements = {
+			[124] = 470,		--Root Sunder Ruins
+		}
 	},
 	-- Reaper's March
 	[382] = {
 		delves = {462, 463, 464, 465, 466, 467},
 		publicDungeons = {487},
+		publicDungeonsAchievements = {
+			[487] = 469,		--The Vile Manse
+		}
 	},
 	-- Alik'r Desert
 	[104] = {
 		delves = {327, 328, 329, 330, 331, 332},
 		publicDungeons = {308},
+		publicDungeonsAchievements = {
+			[308] = 707,		--Lost City of the Na-Totambu
+		}
 	},
 	-- Stormhaven
 	[19] = {
 		delves = {315, 316, 317, 318, 319, 320},
 		publicDungeons = {142},
+		publicDungeonsAchievements = {
+			[142] = 714,		--Bonesnap Ruins
+		}
 	},
 	-- Rivenspire
 	[20] = {
 		delves = {321, 322, 323, 324, 325, 326},
 		publicDungeons = {162},
+		publicDungeonsAchievements = {
+			[162] = 713,		--Obsidian Scar
+		}
 	},
 	-- Bangkorai
 	[92] = {
 		delves = {333, 334, 335, 336, 337, 338},
 		publicDungeons = {169},
+		publicDungeonsAchievements = {
+			[169] = 708,		--Razak's Wheel
+		}
 	},
 	-- Glenumbra
 	[3] = {
 		delves = {309, 310, 311, 312, 313, 314},
 		publicDungeons = {284},
+		publicDungeonsAchievements = {
+			[284] = 380,		--Bad Man's Hallows
+		}
 	},
 	-- Shadowfen
 	[117] = {
 		delves = {270, 271, 272, 273, 274, 275},
 		publicDungeons = {134},
+		publicDungeonsAchievements = {
+			[134] = 372,		--Sanguine's Demesne
+		}
 	},
 	-- The Rift
 	[103] = {
 		delves = {413, 485, 484, 481, 482, 480},
 		publicDungeons = {341},
+		publicDungeonsAchievements = {
+			[341] = 371,		--The Lion's Den
+		}
 	},
 	-- Stonefalls
 	[41] = {
 		delves = {296, 290, 287, 288, 291, 289},
 		publicDungeons = {216},
+		publicDungeonsAchievements = {
+			[216] = 379,		--Crow's Wood
+		}
 	},
 	-- Eastmarch
 	[101] = {
 		delves = {359, 360, 361, 362, 363, 364},
 		publicDungeons = {339},
+		publicDungeonsAchievements = {
+			[339] = 381,		--Hall of the Dead
+		}
 	},
 	-- Deshaan
 	[57] = {
 		delves = {405, 406, 407, 408, 409, 410},
 		publicDungeons = {306},
+		publicDungeonsAchievements = {
+			[306] = 388,		--Forgotten Crypts
+		}
 	},
 	-- Coldharbour
 	[347] = {
 		delves = {417, 418, 419, 420, 421, 422},
 		publicDungeons = {557},
+		publicDungeonsAchievements = {
+			[557] = 874,		--Village of the Lost
+		}
 	},
 	-- Craglorn
 	[888] = {
@@ -426,6 +468,10 @@ BMU.overlandDelvesPublicDungeons = {
 	[684] = {
 		delves = {694, 693, 689, 691, 692, 697},
 		publicDungeons = {705, 706},
+		publicDungeonsAchievements = {
+			[705] = 1235,		--Rkindaleft
+			[706] = 1238,		--Old Orsinium
+		}
 	},
 	-- Hew's Bane
 	[816] = {
@@ -441,6 +487,10 @@ BMU.overlandDelvesPublicDungeons = {
 	[849] = {
 		delves = {961, 921, 922, 923, 924, 925},
 		publicDungeons = {919, 918},
+		publicDungeonsAchievements = {
+			[919] = 1855,		--Forgotten Wastes
+			[918] = 1846,		--Nchuleftingth
+		}
 	},
 	-- The Clockwork City
 	[980] = {
@@ -456,6 +506,10 @@ BMU.overlandDelvesPublicDungeons = {
 	[1011] = {
 		delves = {1016, 1017, 1015, 1018, 1014, 1019},
 		publicDungeons = {1020, 1021},
+		publicDungeonsAchievements = {
+			[1020] = 2096,		--Karnwasten
+			[1021] = 2095,		--Sunhold
+		}
 	},
 	-- Artaeum
 	[1027] = {
@@ -496,6 +550,10 @@ BMU.overlandDelvesPublicDungeons = {
 	[1086] = {
 		delves = {1091, 1092, 1094, 1095, 1096, 1119},
 		publicDungeons = {1089, 1090},
+		publicDungeonsAchievements = {
+			[1089] = 2444,		--Rimmen Necropolis
+			[1090] = 2445,		--Orcrest
+		}
 	},
 	-- Southern Elsweyr
 	[1133] = {
@@ -506,11 +564,17 @@ BMU.overlandDelvesPublicDungeons = {
 	[1160] = {
 		delves = {1166, 1167, 1168, 1170},
 		publicDungeons = {1186},
+		publicDungeonsAchievements = {
+			[1186] = 2714,		--Labyrinthian
+		}
 	},
 	-- Blackreach: Greymoor Caverns
 	[1161] = {
 		delves = {1165, 1169},
 		publicDungeons = {1187},
+		publicDungeonsAchievements = {
+			[1187] = 2715,		-- Nchuthnkarst
+		}
 	},
 	-- Reach
 	[1207] = {
@@ -526,6 +590,10 @@ BMU.overlandDelvesPublicDungeons = {
 	[1261] = {
 		delves = {1253, 1254, 1255, 1256, 1257, 1258},
 		publicDungeons = {1259, 1260},
+		publicDungeonsAchievements = {
+			[1259] = 2995,		--Zenithar's Abbey
+			[1260] = 2994,		--The Silent Halls
+		}
 	},
 	-- Deadlands
 	[1286] = {
@@ -546,6 +614,10 @@ BMU.overlandDelvesPublicDungeons = {
 	[1318] = {
 		delves = {1331, 1332, 1333, 1334, 1335, 1336},
 		publicDungeons = {1337, 1338},
+		publicDungeonsAchievements = {
+			[1337] = 3283,		--Spire of the Crimson Coin
+			[1338] = 3281,		--Ghost Haven Bay
+		}
 	},
 	-- Galen and Y'ffelon
 	[1383] = {
@@ -554,13 +626,19 @@ BMU.overlandDelvesPublicDungeons = {
 	},
 	-- Telvanni Peninsula
 	[1414] = {
-    	delves = {1396, 1397, 1398},
-    	publicDungeons = {1415},
+    		delves = {1396, 1397, 1398},
+    		publicDungeons = {1415},
+		publicDungeonsAchievements = {
+			[1415] = 3658,		--Gorne
+		}
   	},
   	-- Apocrypha
   	[1413] = {
-    	delves = {1399, 1400, 1401},
-    	publicDungeons = {1416},
+    		delves = {1399, 1400, 1401},
+    		publicDungeons = {1416},
+		publicDungeonsAchievements = {
+			[1416] = 3657,		--The Underweave
+		}
   },
 	}
 			

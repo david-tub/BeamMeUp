@@ -825,6 +825,7 @@ function BMU.createPublicDungeonAchiementInfo(overlandZoneId, onlyPublicDungeonZ
 
 		-- add header and return info
 		if #info > 0 then
+			-- TODO: Consider to add "(group events)" at the end -> but then we need correct manual translation (same as in the achievements)
 			table.insert(info, 1, GetString(SI_LEVEL_UP_REWARDS_SKILL_POINT_TOOLTIP_HEADER)..":")
 			return info
 		end
@@ -837,9 +838,9 @@ function BMU.getColorizedPublicDungeonAchievementText(overlandZoneId, publicDung
 	if achievmentId then
 		local name, _, _, _, completed, _, _ = GetAchievementInfo(achievmentId)
 		if completed then
-			return BMU.colorizeText(BMU.formatName(GetZoneNameById(publicDungeonZoneId)), "green")
+			return BMU.textures.acceptGreen .. "  " .. BMU.colorizeText(BMU.formatName(GetZoneNameById(publicDungeonZoneId)), "green")
 		else
-			return BMU.colorizeText(BMU.formatName(GetZoneNameById(publicDungeonZoneId)), "red")
+			return BMU.textures.declineRed .. "  " .. BMU.colorizeText(BMU.formatName(GetZoneNameById(publicDungeonZoneId)), "red")
 		end
 	end
 end

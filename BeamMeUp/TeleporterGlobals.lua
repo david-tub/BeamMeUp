@@ -184,6 +184,8 @@ BMU.textures = {
 	noPlayerBtnOver = "/BeamMeUp/media/guildstore_sell_tabicon_over.dds",
 	arrowDown = "|t32:32:esoui/art/worldmap/mapnav_downarrow_up.dds|t",
 	arrowUp = "|t32:32:esoui/art/worldmap/mapnav_uparrow_up.dds|t",
+	acceptGreen = "|t16:16:esoui/art/interaction/accept.dds|t",
+	declineRed = "|t16:16:esoui/art/interaction/goodbye.dds|t",
 }
 
 -- Special textures for event days

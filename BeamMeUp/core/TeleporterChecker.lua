@@ -836,7 +836,8 @@ end
 function BMU.getColorizedPublicDungeonAchievementText(overlandZoneId, publicDungeonZoneId)
 	local achievmentId = BMU.overlandDelvesPublicDungeons[overlandZoneId].publicDungeonsAchievements[publicDungeonZoneId]
 	if achievmentId then
-		local name, _, _, _, completed, _, _ = GetAchievementInfo(achievmentId)
+		-- local name, _, _, _, completed, _, _ = GetAchievementInfo(achievmentId)
+		local completed = IsAchievementComplete(achievmentId)
 		if completed then
 			return BMU.textures.acceptGreen .. "  " .. BMU.colorizeText(BMU.formatName(GetZoneNameById(publicDungeonZoneId)), "green")
 		else

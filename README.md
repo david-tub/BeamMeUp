@@ -32,6 +32,7 @@ This guide will help developers to maintain the addon for further game updates.
 - Update `BMU.overlandDelvesPublicDungeons`
     - zoneId of the overland zone as index
     - zoneId of the corresponding delves and public dungeons
+    - achievementId of the group event (skill point) for each public dungeon
 - Update `BMU.treasureAndSurveyMaps` (if the new overland zone contains treasure & survey maps or clues)
     - zoneId of the overland zone as index
     - itemId of the corresponding survey map (by type), treasure map or clue

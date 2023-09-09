@@ -29,6 +29,7 @@ mkstr(SI.TELE_UI_UNRELATED_ITEMS, "他のゾーンの地図")
 mkstr(SI.TELE_UI_UNRELATED_QUESTS, "他のゾーンのクエスト")
 mkstr(SI.TELE_UI_SAME_INSTANCE, "同一インスタンス")
 mkstr(SI.TELE_UI_DIFFERENT_INSTANCE, "別インスタンス")
+mkstr(SI.TELE_UI_GROUP_EVENT, "Group Event")
 ---------
 --------- Menu
 mkstr(SI.TELE_UI_FAVORITE_PLAYER, "プレイヤーのお気に入り")

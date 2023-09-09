@@ -29,6 +29,7 @@ mkstr(SI.TELE_UI_UNRELATED_ITEMS, "Mappe in altre Zone")
 mkstr(SI.TELE_UI_UNRELATED_QUESTS, "Missioni in altre Zone")
 mkstr(SI.TELE_UI_SAME_INSTANCE, "Stessa Istanza")
 mkstr(SI.TELE_UI_DIFFERENT_INSTANCE, "Differente Istanza")
+mkstr(SI.TELE_UI_GROUP_EVENT, "Evento di gruppo")
 ---------
 --------- Menu
 mkstr(SI.TELE_UI_FAVORITE_PLAYER, "Giocatore Preferito")

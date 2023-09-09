@@ -825,8 +825,7 @@ function BMU.createPublicDungeonAchiementInfo(overlandZoneId, onlyPublicDungeonZ
 
 		-- add header and return info
 		if #info > 0 then
-			-- TODO: Consider to add "(group events)" at the end -> but then we need correct manual translation (same as in the achievements)
-			table.insert(info, 1, GetString(SI_LEVEL_UP_REWARDS_SKILL_POINT_TOOLTIP_HEADER)..":")
+			table.insert(info, 1, GetString(SI_LEVEL_UP_REWARDS_SKILL_POINT_TOOLTIP_HEADER) .. " (" .. SI.get(SI.TELE_UI_GROUP_EVENT) .. "):")
 			return info
 		end
 	end

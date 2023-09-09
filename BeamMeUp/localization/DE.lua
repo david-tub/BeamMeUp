@@ -29,6 +29,7 @@ mkstr(SI.TELE_UI_UNRELATED_ITEMS, "Karten in anderen Gebieten")
 mkstr(SI.TELE_UI_UNRELATED_QUESTS, "Quests in anderen Gebieten")
 mkstr(SI.TELE_UI_SAME_INSTANCE, "Gleiche Instanz")
 mkstr(SI.TELE_UI_DIFFERENT_INSTANCE, "Andere Instanz")
+mkstr(SI.TELE_UI_GROUP_EVENT, "Gruppenwagnis")
 ---------
 --------- Menu
 mkstr(SI.TELE_UI_FAVORITE_PLAYER, "Spieler-Favorit")

@@ -29,6 +29,7 @@ mkstr(SI.TELE_UI_UNRELATED_ITEMS, "Другие карты сокровищ.")
 mkstr(SI.TELE_UI_UNRELATED_QUESTS, "Квесты в других зонах")
 mkstr(SI.TELE_UI_SAME_INSTANCE, "Тот же инстанс")
 mkstr(SI.TELE_UI_DIFFERENT_INSTANCE, "Разные инстансы")
+mkstr(SI.TELE_UI_GROUP_EVENT, "Групповое событие")
 ---------
 --------- Menu
 mkstr(SI.TELE_UI_FAVORITE_PLAYER, "Избранный игрок")

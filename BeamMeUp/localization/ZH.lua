@@ -29,6 +29,7 @@ mkstr(SI.TELE_UI_UNRELATED_ITEMS, "其他区域地图")
 mkstr(SI.TELE_UI_UNRELATED_QUESTS, "其他区域任务")
 mkstr(SI.TELE_UI_SAME_INSTANCE, "相同情况")
 mkstr(SI.TELE_UI_DIFFERENT_INSTANCE, "不同情况")
+mkstr(SI.TELE_UI_GROUP_EVENT, "组队事件")
 ---------
 --------- Menu
 mkstr(SI.TELE_UI_FAVORITE_PLAYER, "已关注玩家")

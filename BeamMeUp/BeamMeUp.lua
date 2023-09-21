@@ -339,6 +339,7 @@ function BMU.initializeBlacklist()
 		BMU.joinBlacklist(BMU.blacklistRaids)
 		BMU.joinBlacklist(BMU.blacklistGroupZones)
 		BMU.joinBlacklist(BMU.blacklistGroupArenas)
+		BMU.joinBlacklist(BMU.blacklistEndlessDungeons)
 	end
 	
 	-- hide Houses
@@ -362,6 +363,11 @@ function BMU.initializeCategoryMap()
 	BMU.CategoryMap = {}
 	-- go over each category list and add to hash map
 	
+	-- Endless Dungeons
+	for index, value in pairs(BMU.blacklistEndlessDungeons) do
+		BMU.CategoryMap[value] = 0
+	end
+
 	-- Delves
 	for index, value in pairs(BMU.getAllDelves()) do
 		BMU.CategoryMap[value] = 1
@@ -580,6 +586,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 			["showGroupArenas"] = true,
 			["showDungeons"] = true,
 			["showTrials"] = true,
+			["showEndlessDungeons"] = true,
 			["sortByReleaseASC"] = true,
 			["sortByReleaseDESC"] = false,
 			["sortByAcronym"] = false,

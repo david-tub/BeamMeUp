@@ -1909,6 +1909,12 @@ local function SetupUI()
 		AddCustomSubMenuItem(GetString(SI_GAMEPAD_BANK_FILTER_HEADER),
 			{
 				{
+					label = SI.get(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS),
+					callback = function() BMU.savedVarsChar.dungeonFinder.showEndlessDungeons = not BMU.savedVarsChar.dungeonFinder.showEndlessDungeons BMU.createTableDungeons() end,
+					itemType = MENU_ADD_OPTION_CHECKBOX,
+					checked = function() return BMU.savedVarsChar.dungeonFinder.showEndlessDungeons end,
+				},
+				{
 					label = SI.get(SI.TELE_UI_TOGGLE_ARENAS),
 					callback = function() BMU.savedVarsChar.dungeonFinder.showArenas = not BMU.savedVarsChar.dungeonFinder.showArenas BMU.createTableDungeons() end,
 					itemType = MENU_ADD_OPTION_CHECKBOX,

@@ -778,8 +778,8 @@ function BMU.addInfo_2(e)
 	elseif e.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP and e.isLeader then
 		-- group leader
 		e.prio = 2
-	elseif e.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP and (e.category == 4 or e.category == 5 or e.category == 6) then
-		-- group member is in 4 men Group Dungeons | 12 men Raids (Trials) | Group Zones
+	elseif e.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP and (e.category == 4 or e.category == 5 or e.category == 6 or e.category == 7 or e.category == 0) then
+		-- group member is in 4 men Group Dungeons | 12 men Raids (Trials) | Group Zones | Group Arenas | Endless Dungeons
 		e.prio = 3
 	elseif BMU.isFavoritePlayer(e.displayName) and BMU.isFavoriteZone(e.zoneId) then
 		-- favorite player + favorite zone
@@ -2202,10 +2202,46 @@ end
 function BMU.createTableDungeons()
 	-- change global state to 14, to have the correct tab active
 	BMU.changeState(14)
+	local resultListEndlessDungeons = {}
 	local resultListArenas = {}
 	local resultListGroupArenas = {}
 	local resultListTrials = {}
 	local resultListGroupDungeons = {}
+
+	if BMU.savedVarsChar.dungeonFinder.showEndlessDungeons then
+		for _, zoneId in ipairs(BMU.blacklistEndlessDungeons) do
+			local entry = BMU.createDungeonRecord(zoneId)
+			if entry then
+				if BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName then
+					-- show zone name instead of instance name
+					entry.zoneName = entry.parentZoneName
+				end
+				table.insert(resultListEndlessDungeons, entry)
+			end
+		end
+		
+		if BMU.savedVarsChar.dungeonFinder.sortByAcronym then
+			-- sort by acronym
+			table.sort(resultListEndlessDungeons, function(a, b)
+				return a.acronym < b.acronym
+			end)
+		else
+			-- sort by release and name
+			table.sort(resultListEndlessDungeons, function(a, b)
+				if a.updateNum ~= b.updateNum then
+					return (a.updateNum < b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseASC) or (a.updateNum > b.updateNum and BMU.savedVarsChar.dungeonFinder.sortByReleaseDESC)
+				end
+				return a.zoneName < b.zoneName
+			end)
+		end
+		
+		-- add headline
+		local entry = BMU.createBlankRecord()
+		entry.zoneName = "-- " .. string.upper(SI.get(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS)) .. " --"
+		entry.textColorZoneName = "gray"
+		table.insert(resultListEndlessDungeons, 1, entry)
+	end
+
 
 	if BMU.savedVarsChar.dungeonFinder.showArenas then		
 		for _, zoneId in ipairs(BMU.blacklistSoloArenas) do
@@ -2348,6 +2384,7 @@ function BMU.createTableDungeons()
 	
 	-- merge all lists together
 	local resultList = {}
+	for _, v in pairs(resultListEndlessDungeons) do table.insert(resultList, v) end
 	for _, v in pairs(resultListArenas) do table.insert(resultList, v) end
 	for _, v in pairs(resultListGroupArenas) do table.insert(resultList, v) end
 	for _, v in pairs(resultListTrials) do table.insert(resultList, v) end

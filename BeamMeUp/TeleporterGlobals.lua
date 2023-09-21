@@ -166,6 +166,8 @@ BMU.textures = {
 	groupDungeonBtnOver = "/BeamMeUp/media/poi_groupinstance_complete_over.dds",
 	raidDungeonBtn = "/BeamMeUp/media/poi_raiddungeon_complete.dds",
 	raidDungeonBtnOver = "/BeamMeUp/media/poi_raiddungeon_complete_over.dds",
+	endlessDungeonBtn = "/BeamMeUp/media/poi_endlessdungeon_complete.dds",
+	endlessDungeonBtnOver = "/BeamMeUp/media/poi_endlessdungeon_complete_over.dds",
 	groupZonesBtn = "/BeamMeUp/media/poi_groupdelve_complete.dds",
 	groupZonesBtnOver = "/BeamMeUp/media/poi_groupdelve_complete_over.dds",
 	groupLeaderBtn = "/BeamMeUp/media/lfg_leader_icon.dds",
@@ -316,6 +318,9 @@ BMU.blacklistSoloArenas = {677, 1227}
 -- Group Arenas -- https://en.uesp.net/wiki/Online:Arenas (Dragonstar, BlackRose Prison)
 BMU.blacklistGroupArenas = {635, 1082}
 
+-- Endless Dungeons -- Endless Archive
+BMU.blacklistEndlessDungeons = {1436}
+
 --------
 
 -- Houses
@@ -326,7 +331,7 @@ BMU.blacklistHouses = {940, 942, 941, 939, 938, 937, 859, 858, 878, 868, 869, 87
 ----------------------------------------- Whitelists
 
 -- special Whitelist just for group members: Group Arenas, Group Dungeons in Craglorn, 4 men Group Dungeons, 12 men Group Dungeons
-BMU.whitelistGroupMembers = BMU.mergeTables(BMU.blacklistGroupArenas, BMU.blacklistGroupZones, BMU.blacklistGroupDungeons, BMU.blacklistRaids)
+BMU.whitelistGroupMembers = BMU.mergeTables(BMU.blacklistGroupArenas, BMU.blacklistGroupZones, BMU.blacklistGroupDungeons, BMU.blacklistRaids, BMU.blacklistEndlessDungeons)
 									
 
 -- List of all Overland-Zones incl. their delves and public dungeons
@@ -648,6 +653,16 @@ BMU.overlandDelvesPublicDungeons = {
 -- maps nodeIndicies with specific/selected zoneIds
 -- structure: [<zone_id of the instance>] = {<node_index>, <abbreviation>, <is DLC>, <DLC name>, <update>, <release date>}
 BMU.nodeIndexMap = {
+	-- ENDLESS DUNGEONS
+	-- Endless Archive
+	[1436] = {
+		nodeIndex = 550,
+		abbreviation = "EA",
+		isBaseGame = true,
+		updateNum = 40,
+		releaseDate = "2023/10"
+	},
+
 	-- SOLO ARENAS
 	-- Maelstrom Arena
 	[677] = {

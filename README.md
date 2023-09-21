@@ -43,8 +43,8 @@ This guide will help developers to maintain the addon for further game updates.
 - Update `BMU.blacklistHouses`
     - zoneId of the house (not the parent zone)
 
-#### New instance (group dungeon, trial and arena)
-- Update `BMU.blacklistGroupDungeons` or `BMU.blacklistRaids` or `BMU.blacklistSoloArenas` or `BMU.blacklistGroupArenas`
+#### New instance (group dungeon, trial, arena and endless dungeon)
+- Update `BMU.blacklistGroupDungeons` or `BMU.blacklistRaids` or `BMU.blacklistSoloArenas` or `BMU.blacklistGroupArenas` or `BMU.blacklistEndlessDungeons`
     - zoneId of the instance
 - Update `BMU.nodeIndexMap`
     - zoneId of the instance as index

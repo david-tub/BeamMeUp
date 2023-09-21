@@ -1370,9 +1370,13 @@ function ListView:update()
 			local texture_over = BMU.textures.wayshrineBtnOver
 			-- overland zones have category == 9
 			
-			if message.category ~= nil and message.category ~= 0 then
+			if message.category ~= nil then
 				-- set category texture
-				if message.category == 1 then
+				if message.category == 0 then
+					-- set endless dungeon texture
+					texture_normal = BMU.textures.endlessDungeonBtn
+					texture_over = BMU.textures.endlessDungeonBtnOver
+				elseif message.category == 1 then
 					-- set Delve texture
 					texture_normal = BMU.textures.delvesBtn
 					texture_over = BMU.textures.delvesBtnOver

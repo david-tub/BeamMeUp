@@ -192,6 +192,7 @@ mkstr(SI.TELE_KEYBINDING_CURRENT_ZONE, "传送到当前区域")
 mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "传送主房屋外部")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "竞技场/试炼/副本")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "传送到聚焦任务")
+mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Port to any zone")
 
 
 -----------------------------------------------------------------------------

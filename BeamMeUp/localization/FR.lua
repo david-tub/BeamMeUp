@@ -192,6 +192,7 @@ mkstr(SI.TELE_KEYBINDING_CURRENT_ZONE, "Voyage dans la zone actuelle")
 mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "Se téléporter à l'extérieur de la résidence principale")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "Arènes / Épreuves / Donjons")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "Voyage vers la quête courante")
+mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Port to any zone")
 
 
 -----------------------------------------------------------------------------

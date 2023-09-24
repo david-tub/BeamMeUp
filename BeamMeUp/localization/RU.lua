@@ -192,6 +192,7 @@ mkstr(SI.TELE_KEYBINDING_CURRENT_ZONE, "Перемещение в текущее
 mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "Перемещение ко входу основного дома")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "Арены / Испытания / Подземелья")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "Перeмещение на выбранный квест")
+mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Port to any zone")
 
 
 -----------------------------------------------------------------------------

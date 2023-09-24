@@ -192,6 +192,7 @@ mkstr(SI.TELE_KEYBINDING_CURRENT_ZONE, "Podróżuj do obecnej strefy")
 mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "Podróż na zewnątrz Głównej Rezydencji")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "Areny / Triale / Lochy")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "Podróż do śledzonego zadania")
+mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Port to any zone")
 
 
 -----------------------------------------------------------------------------

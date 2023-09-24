@@ -192,6 +192,7 @@ mkstr(SI.TELE_KEYBINDING_CURRENT_ZONE, "Schnellreise ins aktuelle Gebiet")
 mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "Schnellreise vor den Hauptwohnsitz")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "Arenen / Prüfungen / Verliese")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "Schnellreise zur verfolgten Quest")
+mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Schnellreise in beliebiges Gebiet")
 
 
 -----------------------------------------------------------------------------

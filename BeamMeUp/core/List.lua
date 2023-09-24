@@ -2505,6 +2505,18 @@ function BMU.portToTrackedQuestZone()
 end
 
 
+-- to get to the next wayshrine without preference travel to any available zone/player (first entry from main list)
+function BMU.portToAnyZone()
+	local resultTable = BMU.createTable({index=0, dontDisplay=true})
+	local entry = resultTable[1]
+	
+	if entry.displayName ~= nil and entry.displayName ~= "" then
+		-- usual entry with player or house
+		BMU.PortalToPlayer(entry.displayName, entry.sourceIndexLeading, entry.zoneName, entry.zoneId, entry.category, true, true, true)
+	end
+end
+
+
 -- set flag when an error occurred while starting port process
 function BMU.socialErrorWhilePorting(eventCode, errorCode)
 	if errorCode == nil then errorCode = 0 end

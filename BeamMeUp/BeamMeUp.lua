@@ -47,6 +47,12 @@ function BMU.PortalHandlerKeyPress(index, favorite)
 		return
 	end
 	
+	-- Port to any available zone (first entry from main list)
+	if index == 20 then
+		BMU.portToAnyZone()
+		return
+	end
+
 	-- Port into own Primary Residence
 	if index == 13 then
 		BMU.portToOwnHouse(true, nil, false, nil)

@@ -46,6 +46,10 @@
 			<Action name="BMU_TRACKED_QUEST">
 				<Down>BMU.PortalHandlerKeyPress(19)</Down>
 			</Action>
+
+			<Action name="BMU_ANY_ZONE">
+				<Down>BMU.PortalHandlerKeyPress(20)</Down>
+			</Action>
 			
 			<Action name="BMU_PRIMARY_RESIDENCE">
 				<Down>BMU.PortalHandlerKeyPress(13)</Down>

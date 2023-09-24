@@ -615,7 +615,7 @@ function BMU.isZoneOverlandZone(zoneId)
 		zoneId = GetZoneId(zoneIndex)
 	end
 	
-	if BMU.categorizeZone(zoneId) == 9 then
+	if BMU.categorizeZone(zoneId) == TELEPORTER_ZONE_CATEGORY_OVERLAND then
 		return true
 	else
 		return false
@@ -1179,7 +1179,7 @@ function ListView:update()
 			
 			-- Parent zone name
 			-- if zone is no overland zone -> show parent map
-			if message.category ~= 9 and message.parentZoneName and not message.houseTooltip then
+			if message.category ~= TELEPORTER_ZONE_CATEGORY_OVERLAND and message.parentZoneName and not message.houseTooltip then
 				if #tooltipTextZone > 0 then
 					-- add separator
 					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
@@ -1368,43 +1368,42 @@ function ListView:update()
 			-- set wayshrine icon
 			local texture_normal = BMU.textures.wayshrineBtn
 			local texture_over = BMU.textures.wayshrineBtnOver
-			-- overland zones have category == 9
 			
-			if message.category ~= nil then
+			if message.category ~= nil and message.category ~= TELEPORTER_ZONE_CATEGORY_UNKNOWN then
 				-- set category texture
-				if message.category == 0 then
-					-- set endless dungeon texture
-					texture_normal = BMU.textures.endlessDungeonBtn
-					texture_over = BMU.textures.endlessDungeonBtnOver
-				elseif message.category == 1 then
+				if message.category == TELEPORTER_ZONE_CATEGORY_DELVE then
 					-- set Delve texture
 					texture_normal = BMU.textures.delvesBtn
 					texture_over = BMU.textures.delvesBtnOver
-				elseif message.category == 2 then
+				elseif message.category == TELEPORTER_ZONE_CATEGORY_PUBDUNGEON then
 					-- set Public Dungeon texture
 					texture_normal = BMU.textures.publicDungeonBtn
 					texture_over = BMU.textures.publicDungeonBtnOver
-				elseif message.category == 3 then
+				elseif message.category == TELEPORTER_ZONE_CATEGORY_HOUSE then
 					-- set House texture
 					texture_normal = BMU.textures.houseBtn
 					texture_over = BMU.textures.houseBtnOver
-				elseif message.category == 4 then
+				elseif message.category == TELEPORTER_ZONE_CATEGORY_GRPDUNGEON then
 					-- 4 men Group Dungeons
 					texture_normal = BMU.textures.groupDungeonBtn
 					texture_over = BMU.textures.groupDungeonBtnOver
-				elseif message.category == 5 then
+				elseif message.category == TELEPORTER_ZONE_CATEGORY_TRAIL then
 					-- 12 men Group Dungeons
 					texture_normal = BMU.textures.raidDungeonBtn
 					texture_over = BMU.textures.raidDungeonBtnOver
-				elseif message.category == 6 then
+				elseif message.category == TELEPORTER_ZONE_CATEGORY_ENDLESSD then
+					-- endless dungeon
+					texture_normal = BMU.textures.endlessDungeonBtn
+					texture_over = BMU.textures.endlessDungeonBtnOver
+				elseif message.category == TELEPORTER_ZONE_CATEGORY_GRPZONES then
 					-- Other Group Zones (Dungeons in Craglorn)
 					texture_normal = BMU.textures.groupZonesBtn
 					texture_over = BMU.textures.groupZonesBtnOver
-				elseif message.category == 7 then
+				elseif message.category == TELEPORTER_ZONE_CATEGORY_GRPARENA then
 					-- Group Arenas
 					texture_normal = BMU.textures.groupDungeonBtn
 					texture_over = BMU.textures.groupDungeonBtnOver
-				elseif message.category == 8 then
+				elseif message.category == TELEPORTER_ZONE_CATEGORY_SOLOARENA then
 					-- Solo Arenas
 					texture_normal = BMU.textures.soloArenaBtn
 					texture_over = BMU.textures.soloArenaBtnOver
@@ -1766,7 +1765,7 @@ function BMU.clickOnZoneName(button, record)
 		end
 		
 		------ display poi on map (in case of delve, dungeon etc.) ------
-		if record.parentZoneId ~= nil and (record.category ~= 9 or record.forceOutside) then			
+		if record.parentZoneId ~= nil and (record.category ~= TELEPORTER_ZONE_CATEGORY_OVERLAND or record.forceOutside) then			
 			local normalizedX
 			local normalizedZ
 			-- primary: use LibZone function
@@ -2298,7 +2297,7 @@ function BMU.updateStatistic(category, zoneId)
 	-- check for block flag and add manual port cost to statisticGold and also increase total counter
 	if not BMU.blockGold then
 		-- regard only Overland zones for gold statistics
-		if category == 9 then
+		if category == TELEPORTER_ZONE_CATEGORY_OVERLAND then
 			BMU.savedVarsAcc.savedGold = BMU.savedVarsAcc.savedGold + GetRecallCost()
 			self.control.statisticGold:SetText(SI.get(SI.TELE_UI_GOLD) .. " " .. BMU.formatGold(BMU.savedVarsAcc.savedGold))
 		end

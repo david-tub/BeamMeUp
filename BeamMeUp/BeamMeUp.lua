@@ -333,7 +333,7 @@ function BMU.initializeBlacklist()
 		BMU.joinBlacklist(BMU.blacklistBattlegrounds)
 	end
 
-	-- hide 4 men Dungeons, 12 men Raids, Group Zones
+	-- hide 4 men Dungeons, 12 men Raids, Group Zones, Group Arenas & Endless Dungeons
 	if BMU.savedVarsAcc.hideClosedDungeons then
 		BMU.joinBlacklist(BMU.blacklistGroupDungeons)
 		BMU.joinBlacklist(BMU.blacklistRaids)
@@ -363,54 +363,54 @@ function BMU.initializeCategoryMap()
 	BMU.CategoryMap = {}
 	-- go over each category list and add to hash map
 	
-	-- Endless Dungeons
-	for index, value in pairs(BMU.blacklistEndlessDungeons) do
-		BMU.CategoryMap[value] = 0
-	end
-
 	-- Delves
 	for index, value in pairs(BMU.getAllDelves()) do
-		BMU.CategoryMap[value] = 1
+		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_DELVE
 	end
 	
 	-- Public Dungeons
 	for index, value in pairs(BMU.getAllPublicDungeons()) do
-		BMU.CategoryMap[value] = 2
+		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_PUBDUNGEON
 	end
 
 	-- Houses
 	for index, value in pairs(BMU.blacklistHouses) do
-		BMU.CategoryMap[value] = 3
+		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_HOUSE
 	end
 	
 	-- 4 men Group Dungeons
 	for index, value in pairs(BMU.blacklistGroupDungeons) do
-		BMU.CategoryMap[value] = 4
+		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_GRPDUNGEON
 	end
 	
 	-- 12 men Raids (Trials)
 	for index, value in pairs(BMU.blacklistRaids) do
-		BMU.CategoryMap[value] = 5
+		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_TRAIL
+	end
+
+	-- Endless Dungeons
+	for index, value in pairs(BMU.blacklistEndlessDungeons) do
+		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_ENDLESSD
 	end
 	
 	-- Group Zones
 	for index, value in pairs(BMU.blacklistGroupZones) do
-		BMU.CategoryMap[value] = 6
+		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_GRPZONES
 	end
 	
 	-- Group Arenas
 	for index, value in pairs(BMU.blacklistGroupArenas) do
-		BMU.CategoryMap[value] = 7
+		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_GRPARENA
 	end
 	
 	-- Solo Arenas
 	for index, value in pairs(BMU.blacklistSoloArenas) do
-		BMU.CategoryMap[value] = 8
+		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_SOLOARENA
 	end
 	
 	-- Overland Zones
 	for parentZoneId, tableObject in pairs(BMU.overlandDelvesPublicDungeons) do
-		BMU.CategoryMap[parentZoneId] = 9
+		BMU.CategoryMap[parentZoneId] = TELEPORTER_ZONE_CATEGORY_OVERLAND
 	end
 end
 

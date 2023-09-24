@@ -2507,7 +2507,7 @@ end
 
 -- to get to the next wayshrine without preference travel to any available zone/player (first entry from main list)
 function BMU.portToAnyZone()
-	local resultTable = BMU.createTable({index=0, dontDisplay=true})
+	local resultTable = BMU.createTable({index=0, noOwnHouses=true, dontDisplay=true})
 	local entry = resultTable[1]
 	
 	if entry.displayName ~= nil and entry.displayName ~= "" then

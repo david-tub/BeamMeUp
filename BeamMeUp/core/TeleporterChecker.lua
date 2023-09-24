@@ -2236,10 +2236,12 @@ function BMU.createTableDungeons()
 		end
 		
 		-- add headline
-		local entry = BMU.createBlankRecord()
-		entry.zoneName = "-- " .. string.upper(SI.get(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS)) .. " --"
-		entry.textColorZoneName = "gray"
-		table.insert(resultListEndlessDungeons, 1, entry)
+		if #resultListEndlessDungeons > 0 then
+			local entry = BMU.createBlankRecord()
+			entry.zoneName = "-- " .. string.upper(SI.get(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS)) .. " --"
+			entry.textColorZoneName = "gray"
+			table.insert(resultListEndlessDungeons, 1, entry)
+		end
 	end
 
 
@@ -2271,10 +2273,12 @@ function BMU.createTableDungeons()
 		end
 		
 		-- add headline
-		local entry = BMU.createBlankRecord()
-		entry.zoneName = "-- " .. string.upper(SI.get(SI.TELE_UI_TOGGLE_ARENAS)) .. " --"
-		entry.textColorZoneName = "gray"
-		table.insert(resultListArenas, 1, entry)
+		if #resultListArenas > 0 then
+			local entry = BMU.createBlankRecord()
+			entry.zoneName = "-- " .. string.upper(SI.get(SI.TELE_UI_TOGGLE_ARENAS)) .. " --"
+			entry.textColorZoneName = "gray"
+			table.insert(resultListArenas, 1, entry)
+		end
 	end
 	
 	
@@ -2306,10 +2310,12 @@ function BMU.createTableDungeons()
 		end
 		
 		-- add headline
-		local entry = BMU.createBlankRecord()
-		entry.zoneName = "-- " .. string.upper(SI.get(SI.TELE_UI_TOGGLE_GROUP_ARENAS)) .. " --"
-		entry.textColorZoneName = "gray"
-		table.insert(resultListGroupArenas, 1, entry)
+		if #resultListGroupArenas > 0 then
+			local entry = BMU.createBlankRecord()
+			entry.zoneName = "-- " .. string.upper(SI.get(SI.TELE_UI_TOGGLE_GROUP_ARENAS)) .. " --"
+			entry.textColorZoneName = "gray"
+			table.insert(resultListGroupArenas, 1, entry)
+		end
 	end
 	
 	
@@ -2341,10 +2347,12 @@ function BMU.createTableDungeons()
 		end
 		
 		-- add headline
-		local entry = BMU.createBlankRecord()
-		entry.zoneName = "-- " .. string.upper(SI.get(SI.TELE_UI_TOGGLE_TRIALS)) .. " --"
-		entry.textColorZoneName = "gray"
-		table.insert(resultListTrials, 1, entry)
+		if #resultListTrials > 0 then
+			local entry = BMU.createBlankRecord()
+			entry.zoneName = "-- " .. string.upper(SI.get(SI.TELE_UI_TOGGLE_TRIALS)) .. " --"
+			entry.textColorZoneName = "gray"
+			table.insert(resultListTrials, 1, entry)
+		end
 	end
 
 
@@ -2376,10 +2384,12 @@ function BMU.createTableDungeons()
 		end
 		
 		-- add headline
-		local entry = BMU.createBlankRecord()
-		entry.zoneName = "-- " .. string.upper(SI.get(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS)) .. " --"
-		entry.textColorZoneName = "gray"
-		table.insert(resultListGroupDungeons, 1, entry)
+		if #resultListGroupDungeons > 0 then
+			local entry = BMU.createBlankRecord()
+			entry.zoneName = "-- " .. string.upper(SI.get(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS)) .. " --"
+			entry.textColorZoneName = "gray"
+			table.insert(resultListGroupDungeons, 1, entry)
+		end
 	end
 	
 	-- merge all lists together

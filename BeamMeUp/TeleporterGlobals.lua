@@ -1335,7 +1335,7 @@ BMU.treasureAndSurveyMaps = {
 		clothier = {57763},
 		jewelry = {139432},
 		treasure = {153645, 43649, 43650, 43651, 43652, 43653, 43654, 44941},
-		clue = {188204},
+		clue = {188204, 203826},
 	},
 	-- Alik'r Desert
 	[104] = {

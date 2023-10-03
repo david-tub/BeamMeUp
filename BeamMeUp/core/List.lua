@@ -2512,10 +2512,12 @@ function BMU.portToAnyZone()
 	for _, entry in pairs(resultTable) do
 		if not entry.zoneWithoutPlayer and entry.displayName ~= nil and entry.displayName ~= "" then
 			-- usual entry with player or house
-			BMU.PortalToPlayer(entry.displayName, entry.sourceIndexLeading, entry.zoneName, entry.zoneId, entry.category, true, true, true)
+			BMU.PortalToPlayer(entry.displayName, entry.sourceIndexLeading, entry.zoneName, entry.zoneId, entry.category, true, false, true)
 			return
 		end
 	end
+	-- no travel option found
+	BMU.printToChat(SI.get(SI.TELE_CHAT_NO_FAST_TRAVEL))
 end
 
 

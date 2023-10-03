@@ -29,6 +29,7 @@ mkstr(SI.TELE_UI_UNRELATED_ITEMS, "其他区域地图")
 mkstr(SI.TELE_UI_UNRELATED_QUESTS, "其他区域任务")
 mkstr(SI.TELE_UI_SAME_INSTANCE, "相同情况")
 mkstr(SI.TELE_UI_DIFFERENT_INSTANCE, "不同情况")
+mkstr(SI.TELE_UI_GROUP_EVENT, "组队事件")
 ---------
 --------- Menu
 mkstr(SI.TELE_UI_FAVORITE_PLAYER, "已关注玩家")
@@ -45,6 +46,7 @@ mkstr(SI.TELE_UI_VIEW_MAP_ITEM, "查看地图物品")
 mkstr(SI.TELE_UI_TOGGLE_ARENAS, "单人竞技场")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_ARENAS, "组队竞技场")
 mkstr(SI.TELE_UI_TOGGLE_TRIALS, "试炼")
+mkstr(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS, "Endless Dungeons")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS, "组队地下城")
 mkstr(SI.TELE_UI_TOGGLE_SORT_ACRONYM, "以首字母排序")
 mkstr(SI.TELE_UI_DAYS_LEFT, "%d 天剩余")
@@ -190,6 +192,7 @@ mkstr(SI.TELE_KEYBINDING_CURRENT_ZONE, "传送到当前区域")
 mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "传送主房屋外部")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "竞技场/试炼/副本")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "传送到聚焦任务")
+mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Port to any zone")
 
 
 -----------------------------------------------------------------------------

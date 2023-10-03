@@ -160,6 +160,7 @@ function BMU.sc_initializeSlashPorting()
 	BMU.sc_joinBlacklistForSlashPorting(BMU.blacklistRaids)
 	BMU.sc_joinBlacklistForSlashPorting(BMU.blacklistGroupZones)
 	BMU.sc_joinBlacklistForSlashPorting(BMU.blacklistGroupArenas)
+	BMU.sc_joinBlacklistForSlashPorting(BMU.blacklistEndlessDungeons)
 
 	-- initialize chat commands
 	-- check if zone name data is available in client language

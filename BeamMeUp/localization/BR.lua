@@ -29,6 +29,7 @@ mkstr(SI.TELE_UI_UNRELATED_ITEMS, "Mapas em outras zonas")
 mkstr(SI.TELE_UI_UNRELATED_QUESTS, "Missões em outras zonas")
 mkstr(SI.TELE_UI_SAME_INSTANCE, "Mesma Instância")
 mkstr(SI.TELE_UI_DIFFERENT_INSTANCE, "Instância Diferentes")
+mkstr(SI.TELE_UI_GROUP_EVENT, "Group Event")
 ---------
 --------- Menu
 mkstr(SI.TELE_UI_FAVORITE_PLAYER, "Jogador Favorito")
@@ -45,6 +46,7 @@ mkstr(SI.TELE_UI_VIEW_MAP_ITEM, "Exibir item do mapa")
 mkstr(SI.TELE_UI_TOGGLE_ARENAS, "Arenas Solo")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_ARENAS, "Arenas em Groupo")
 mkstr(SI.TELE_UI_TOGGLE_TRIALS, "Provações")
+mkstr(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS, "Endless Dungeons")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS, "Masmorras em Grupo")
 mkstr(SI.TELE_UI_TOGGLE_SORT_ACRONYM, "Classificar por acrônimo")
 mkstr(SI.TELE_UI_DAYS_LEFT, "%d dias restantes")
@@ -190,6 +192,7 @@ mkstr(SI.TELE_KEYBINDING_CURRENT_ZONE, "Viajar para a zona atual")
 mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "Viajar para fora da residência primária")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "Arenas / Provações / Masmorras")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "Trocar para missão escolhida")
+mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Port to any zone")
 
 
 -----------------------------------------------------------------------------

@@ -29,6 +29,7 @@ mkstr(SI.TELE_UI_UNRELATED_ITEMS, "Maps in other Zones")
 mkstr(SI.TELE_UI_UNRELATED_QUESTS, "Quests in other Zones")
 mkstr(SI.TELE_UI_SAME_INSTANCE, "Same Instance")
 mkstr(SI.TELE_UI_DIFFERENT_INSTANCE, "Different Instance")
+mkstr(SI.TELE_UI_GROUP_EVENT, "Group Event")
 ---------
 --------- Menu
 mkstr(SI.TELE_UI_FAVORITE_PLAYER, "Player Favorite")
@@ -45,6 +46,7 @@ mkstr(SI.TELE_UI_VIEW_MAP_ITEM, "View Map Item")
 mkstr(SI.TELE_UI_TOGGLE_ARENAS, "Solo Arenas")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_ARENAS, "Group Arenas")
 mkstr(SI.TELE_UI_TOGGLE_TRIALS, "Trials")
+mkstr(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS, "Endless Dungeons")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS, "Group Dungeons")
 mkstr(SI.TELE_UI_TOGGLE_SORT_ACRONYM, "Sort by Acronym")
 mkstr(SI.TELE_UI_DAYS_LEFT, "%d days left")
@@ -190,6 +192,7 @@ mkstr(SI.TELE_KEYBINDING_CURRENT_ZONE, "Port to current zone")
 mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "Port outside Primary Residence")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "Arenas / Trials / Dungeons")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "Port to focused quest")
+mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Port to any zone")
 
 
 -----------------------------------------------------------------------------

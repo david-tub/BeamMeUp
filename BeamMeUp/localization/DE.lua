@@ -29,6 +29,7 @@ mkstr(SI.TELE_UI_UNRELATED_ITEMS, "Karten in anderen Gebieten")
 mkstr(SI.TELE_UI_UNRELATED_QUESTS, "Quests in anderen Gebieten")
 mkstr(SI.TELE_UI_SAME_INSTANCE, "Gleiche Instanz")
 mkstr(SI.TELE_UI_DIFFERENT_INSTANCE, "Andere Instanz")
+mkstr(SI.TELE_UI_GROUP_EVENT, "Gruppenwagnis")
 ---------
 --------- Menu
 mkstr(SI.TELE_UI_FAVORITE_PLAYER, "Spieler-Favorit")
@@ -45,6 +46,7 @@ mkstr(SI.TELE_UI_VIEW_MAP_ITEM, "Kartenelement ansehen")
 mkstr(SI.TELE_UI_TOGGLE_ARENAS, "Solo-Arenen")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_ARENAS, "Gruppen-Arenen")
 mkstr(SI.TELE_UI_TOGGLE_TRIALS, "Prüfungen")
+mkstr(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS, "Endlose Verliese")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS, "Verliese")
 mkstr(SI.TELE_UI_TOGGLE_SORT_ACRONYM, "Nach Kürzel sortieren")
 mkstr(SI.TELE_UI_DAYS_LEFT, "%d Tage verbleibend")
@@ -190,6 +192,7 @@ mkstr(SI.TELE_KEYBINDING_CURRENT_ZONE, "Schnellreise ins aktuelle Gebiet")
 mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "Schnellreise vor den Hauptwohnsitz")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "Arenen / Prüfungen / Verliese")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "Schnellreise zur verfolgten Quest")
+mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Schnellreise in beliebiges Gebiet")
 
 
 -----------------------------------------------------------------------------

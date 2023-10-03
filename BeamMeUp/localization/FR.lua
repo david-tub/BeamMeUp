@@ -29,6 +29,7 @@ mkstr(SI.TELE_UI_UNRELATED_ITEMS      , "Carte dans d'autres zones"  )
 mkstr(SI.TELE_UI_UNRELATED_QUESTS     , "Quêtes dans d'autres zones" )
 mkstr(SI.TELE_UI_SAME_INSTANCE        , "Même instance"              )
 mkstr(SI.TELE_UI_DIFFERENT_INSTANCE   , "Instance différente"        )
+mkstr(SI.TELE_UI_GROUP_EVENT          , "Événement de groupe"        )
 ---------
 --------- Menu
 mkstr(SI.TELE_UI_FAVORITE_PLAYER         , "Joueurs favoris")
@@ -45,6 +46,7 @@ mkstr(SI.TELE_UI_VIEW_MAP_ITEM           , "Montrer la carte")
 mkstr(SI.TELE_UI_TOGGLE_ARENAS			 , "Arènes solo")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_ARENAS	 , "Arènes de groupe")
 mkstr(SI.TELE_UI_TOGGLE_TRIALS			 , "Épreuves")
+mkstr(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS , "Endless Dungeons")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS	 , "Donjons de groupe")
 mkstr(SI.TELE_UI_TOGGLE_SORT_ACRONYM	 , "Tri par acronyme")
 mkstr(SI.TELE_UI_DAYS_LEFT				 , "%d jours restants")
@@ -190,6 +192,7 @@ mkstr(SI.TELE_KEYBINDING_CURRENT_ZONE, "Voyage dans la zone actuelle")
 mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "Se téléporter à l'extérieur de la résidence principale")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "Arènes / Épreuves / Donjons")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "Voyage vers la quête courante")
+mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Port to any zone")
 
 
 -----------------------------------------------------------------------------

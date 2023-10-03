@@ -54,6 +54,7 @@ BMU_GuildData = {
             527788,			-- "Akatosh Knights"			|likezed Discord-Name Ingame?
             782574,			-- "Die reisenden Schatten"		|LaicosVK Discord-Name Ingame?
             695302,         -- "Song of Sun and Moon"       |@Eris221 Discord eryss
+            796460,         -- "Les Héros des Neuf Divins"  |@Edwin_theDark discord edwinthedark
         },
         ["NA Megaserver"] = {
             698893,			-- "The Descendants"			|@ravenzwind
@@ -74,6 +75,7 @@ BMU_GuildData = {
             197803,			-- "Celestial Rift"				|@Shiseida Discord-Name Ingame noch rausfinden gilde aktuell nicht gelistet
             869871,			-- "Allegiance of Asgard"		|@joyousdeath Discord-Name Joy<3
             781641,			-- "Pride of Ebon"				|@LilMuffin Discord-Name Ingame noch raufinden
+            465947,         -- "The Way Of The Sword"       |@Izahym discord: aze_the_killer
         },
     }
 

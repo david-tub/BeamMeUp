@@ -166,6 +166,8 @@ BMU.textures = {
 	groupDungeonBtnOver = "/BeamMeUp/media/poi_groupinstance_complete_over.dds",
 	raidDungeonBtn = "/BeamMeUp/media/poi_raiddungeon_complete.dds",
 	raidDungeonBtnOver = "/BeamMeUp/media/poi_raiddungeon_complete_over.dds",
+	endlessDungeonBtn = "/BeamMeUp/media/poi_endlessdungeon_complete.dds",
+	endlessDungeonBtnOver = "/BeamMeUp/media/poi_endlessdungeon_complete_over.dds",
 	groupZonesBtn = "/BeamMeUp/media/poi_groupdelve_complete.dds",
 	groupZonesBtnOver = "/BeamMeUp/media/poi_groupdelve_complete_over.dds",
 	groupLeaderBtn = "/BeamMeUp/media/lfg_leader_icon.dds",
@@ -184,6 +186,8 @@ BMU.textures = {
 	noPlayerBtnOver = "/BeamMeUp/media/guildstore_sell_tabicon_over.dds",
 	arrowDown = "|t32:32:esoui/art/worldmap/mapnav_downarrow_up.dds|t",
 	arrowUp = "|t32:32:esoui/art/worldmap/mapnav_uparrow_up.dds|t",
+	acceptGreen = "|t16:16:esoui/art/interaction/accept.dds|t",
+	declineRed = "|t16:16:esoui/art/interaction/goodbye.dds|t",
 }
 
 -- Special textures for event days
@@ -218,6 +222,19 @@ TELEPORTER_SOURCE_INDEX_GUILD2 = 4
 TELEPORTER_SOURCE_INDEX_GUILD3 = 5
 TELEPORTER_SOURCE_INDEX_GUILD4 = 6
 TELEPORTER_SOURCE_INDEX_GUILD5 = 7
+
+-- constant values for zone categorization
+TELEPORTER_ZONE_CATEGORY_UNKNOWN = 0
+TELEPORTER_ZONE_CATEGORY_DELVE = 1
+TELEPORTER_ZONE_CATEGORY_PUBDUNGEON = 2
+TELEPORTER_ZONE_CATEGORY_HOUSE = 3
+TELEPORTER_ZONE_CATEGORY_GRPDUNGEON = 4
+TELEPORTER_ZONE_CATEGORY_TRAIL = 5
+TELEPORTER_ZONE_CATEGORY_ENDLESSD = 6
+TELEPORTER_ZONE_CATEGORY_GRPZONES = 7
+TELEPORTER_ZONE_CATEGORY_GRPARENA = 8
+TELEPORTER_ZONE_CATEGORY_SOLOARENA = 9
+TELEPORTER_ZONE_CATEGORY_OVERLAND = 100
 
 -- flag and cache to check if quest data in journal changed
 BMU.questDataCache = {}
@@ -314,101 +331,153 @@ BMU.blacklistSoloArenas = {677, 1227}
 -- Group Arenas -- https://en.uesp.net/wiki/Online:Arenas (Dragonstar, BlackRose Prison)
 BMU.blacklistGroupArenas = {635, 1082}
 
+-- Endless Dungeons -- Endless Archive
+BMU.blacklistEndlessDungeons = {1436}
+
 --------
 
 -- Houses
-BMU.blacklistHouses = {940, 942, 941, 939, 938, 937, 859, 858, 878, 868, 869, 873, 860, 861, 877, 852, 853, 881, 867, 866, 874, 863, 862, 876, 871, 870, 872, 864, 865, 875, 855, 854, 880, 856, 857, 879, 944, 943, 945, 882, 883, 994, 995, 997, 996, 1005, 1008, 1007, 1006, 1042, 1043, 1044, 1045, 1059, 1060, 1061, 1063, 1108, 1109, 1064, 1125, 1126, 1128, 1129, 1130, 1154, 1155, 1192, 1193, 1199, 1200, 1218, 1219, 1220, 1233, 1234, 1264, 1265, 1270, 1271, 1275, 1276, 1277, 1307, 1342, 1343, 1306, 1345, 1363, 1364, 1432, 1433, 1434, 1435, 1437, 1468}
+BMU.blacklistHouses = {940, 942, 941, 939, 938, 937, 859, 858, 878, 868, 869, 873, 860, 861, 877, 852, 853, 881, 867, 866, 874, 863, 862, 876, 871, 870, 872, 864, 865, 875, 855, 854, 880, 856, 857, 879, 944, 943, 945, 882, 883, 994, 995, 997, 996, 1005, 1008, 1007, 1006, 1042, 1043, 1044, 1045, 1059, 1060, 1061, 1063, 1108, 1109, 1064, 1125, 1126, 1128, 1129, 1130, 1154, 1155, 1192, 1193, 1199, 1200, 1218, 1219, 1220, 1233, 1234, 1264, 1265, 1270, 1271, 1275, 1276, 1277, 1307, 1342, 1343, 1306, 1345, 1363, 1364, 1432, 1433, 1434, 1435, 1437, 1468, 1472, 1473}
 
 -----------------------------------------
 
 ----------------------------------------- Whitelists
 
 -- special Whitelist just for group members: Group Arenas, Group Dungeons in Craglorn, 4 men Group Dungeons, 12 men Group Dungeons
-BMU.whitelistGroupMembers = BMU.mergeTables(BMU.blacklistGroupArenas, BMU.blacklistGroupZones, BMU.blacklistGroupDungeons, BMU.blacklistRaids)
+BMU.whitelistGroupMembers = BMU.mergeTables(BMU.blacklistGroupArenas, BMU.blacklistGroupZones, BMU.blacklistGroupDungeons, BMU.blacklistRaids, BMU.blacklistEndlessDungeons)
 									
 
 -- List of all Overland-Zones incl. their delves and public dungeons
 -- http://en.uesp.net/wiki/Online:Delves   http://en.uesp.net/wiki/Online:Public_Dungeons
+-- additional the assignment of the public dungeons to their group event achievements (skill point)
 BMU.overlandDelvesPublicDungeons = {
 	-- Greenshade
 	[108] = {
 		delves = {575, 576, 577, 578, 579, 580},
 		publicDungeons = {137},
+		publicDungeonsAchievements = {
+			[137] = 445,		--Rulanyil's Fall
+		}
 	},
 	-- Auridon
 	[381] = {
 		delves = {396, 397, 398, 399, 400, 401},
 		publicDungeons = {486},
+		publicDungeonsAchievements = {
+			[486] = 468,		--Toothmaul Gully
+		}
 	},
 	-- Malabal Tor
 	[58] = {
 		delves = {468, 469, 470, 471, 472, 473},
 		publicDungeons = {138},
+		publicDungeonsAchievements = {
+			[138] = 460,		--Crimson Cove
+		}
 	},
 	-- Grahtwood
 	[383] = {
 		delves = {444, 447, 442, 475, 477, 478},
 		publicDungeons = {124},
+		publicDungeonsAchievements = {
+			[124] = 470,		--Root Sunder Ruins
+		}
 	},
 	-- Reaper's March
 	[382] = {
 		delves = {462, 463, 464, 465, 466, 467},
 		publicDungeons = {487},
+		publicDungeonsAchievements = {
+			[487] = 469,		--The Vile Manse
+		}
 	},
 	-- Alik'r Desert
 	[104] = {
 		delves = {327, 328, 329, 330, 331, 332},
 		publicDungeons = {308},
+		publicDungeonsAchievements = {
+			[308] = 707,		--Lost City of the Na-Totambu
+		}
 	},
 	-- Stormhaven
 	[19] = {
 		delves = {315, 316, 317, 318, 319, 320},
 		publicDungeons = {142},
+		publicDungeonsAchievements = {
+			[142] = 714,		--Bonesnap Ruins
+		}
 	},
 	-- Rivenspire
 	[20] = {
 		delves = {321, 322, 323, 324, 325, 326},
 		publicDungeons = {162},
+		publicDungeonsAchievements = {
+			[162] = 713,		--Obsidian Scar
+		}
 	},
 	-- Bangkorai
 	[92] = {
 		delves = {333, 334, 335, 336, 337, 338},
 		publicDungeons = {169},
+		publicDungeonsAchievements = {
+			[169] = 708,		--Razak's Wheel
+		}
 	},
 	-- Glenumbra
 	[3] = {
 		delves = {309, 310, 311, 312, 313, 314},
 		publicDungeons = {284},
+		publicDungeonsAchievements = {
+			[284] = 380,		--Bad Man's Hallows
+		}
 	},
 	-- Shadowfen
 	[117] = {
 		delves = {270, 271, 272, 273, 274, 275},
 		publicDungeons = {134},
+		publicDungeonsAchievements = {
+			[134] = 372,		--Sanguine's Demesne
+		}
 	},
 	-- The Rift
 	[103] = {
 		delves = {413, 485, 484, 481, 482, 480},
 		publicDungeons = {341},
+		publicDungeonsAchievements = {
+			[341] = 371,		--The Lion's Den
+		}
 	},
 	-- Stonefalls
 	[41] = {
 		delves = {296, 290, 287, 288, 291, 289},
 		publicDungeons = {216},
+		publicDungeonsAchievements = {
+			[216] = 379,		--Crow's Wood
+		}
 	},
 	-- Eastmarch
 	[101] = {
 		delves = {359, 360, 361, 362, 363, 364},
 		publicDungeons = {339},
+		publicDungeonsAchievements = {
+			[339] = 381,		--Hall of the Dead
+		}
 	},
 	-- Deshaan
 	[57] = {
 		delves = {405, 406, 407, 408, 409, 410},
 		publicDungeons = {306},
+		publicDungeonsAchievements = {
+			[306] = 388,		--Forgotten Crypts
+		}
 	},
 	-- Coldharbour
 	[347] = {
 		delves = {417, 418, 419, 420, 421, 422},
 		publicDungeons = {557},
+		publicDungeonsAchievements = {
+			[557] = 874,		--Village of the Lost
+		}
 	},
 	-- Craglorn
 	[888] = {
@@ -419,6 +488,10 @@ BMU.overlandDelvesPublicDungeons = {
 	[684] = {
 		delves = {694, 693, 689, 691, 692, 697},
 		publicDungeons = {705, 706},
+		publicDungeonsAchievements = {
+			[705] = 1235,		--Rkindaleft
+			[706] = 1238,		--Old Orsinium
+		}
 	},
 	-- Hew's Bane
 	[816] = {
@@ -434,6 +507,10 @@ BMU.overlandDelvesPublicDungeons = {
 	[849] = {
 		delves = {961, 921, 922, 923, 924, 925},
 		publicDungeons = {919, 918},
+		publicDungeonsAchievements = {
+			[919] = 1855,		--Forgotten Wastes
+			[918] = 1846,		--Nchuleftingth
+		}
 	},
 	-- The Clockwork City
 	[980] = {
@@ -449,6 +526,10 @@ BMU.overlandDelvesPublicDungeons = {
 	[1011] = {
 		delves = {1016, 1017, 1015, 1018, 1014, 1019},
 		publicDungeons = {1020, 1021},
+		publicDungeonsAchievements = {
+			[1020] = 2096,		--Karnwasten
+			[1021] = 2095,		--Sunhold
+		}
 	},
 	-- Artaeum
 	[1027] = {
@@ -489,6 +570,10 @@ BMU.overlandDelvesPublicDungeons = {
 	[1086] = {
 		delves = {1091, 1092, 1094, 1095, 1096, 1119},
 		publicDungeons = {1089, 1090},
+		publicDungeonsAchievements = {
+			[1089] = 2444,		--Rimmen Necropolis
+			[1090] = 2445,		--Orcrest
+		}
 	},
 	-- Southern Elsweyr
 	[1133] = {
@@ -499,11 +584,17 @@ BMU.overlandDelvesPublicDungeons = {
 	[1160] = {
 		delves = {1166, 1167, 1168, 1170},
 		publicDungeons = {1186},
+		publicDungeonsAchievements = {
+			[1186] = 2714,		--Labyrinthian
+		}
 	},
 	-- Blackreach: Greymoor Caverns
 	[1161] = {
 		delves = {1165, 1169},
 		publicDungeons = {1187},
+		publicDungeonsAchievements = {
+			[1187] = 2715,		-- Nchuthnkarst
+		}
 	},
 	-- Reach
 	[1207] = {
@@ -519,6 +610,10 @@ BMU.overlandDelvesPublicDungeons = {
 	[1261] = {
 		delves = {1253, 1254, 1255, 1256, 1257, 1258},
 		publicDungeons = {1259, 1260},
+		publicDungeonsAchievements = {
+			[1259] = 2995,		--Zenithar's Abbey
+			[1260] = 2994,		--The Silent Halls
+		}
 	},
 	-- Deadlands
 	[1286] = {
@@ -539,6 +634,10 @@ BMU.overlandDelvesPublicDungeons = {
 	[1318] = {
 		delves = {1331, 1332, 1333, 1334, 1335, 1336},
 		publicDungeons = {1337, 1338},
+		publicDungeonsAchievements = {
+			[1337] = 3283,		--Spire of the Crimson Coin
+			[1338] = 3281,		--Ghost Haven Bay
+		}
 	},
 	-- Galen and Y'ffelon
 	[1383] = {
@@ -547,13 +646,19 @@ BMU.overlandDelvesPublicDungeons = {
 	},
 	-- Telvanni Peninsula
 	[1414] = {
-    	delves = {1396, 1397, 1398},
-    	publicDungeons = {1415},
+    		delves = {1396, 1397, 1398},
+    		publicDungeons = {1415},
+		publicDungeonsAchievements = {
+			[1415] = 3658,		--Gorne
+		}
   	},
   	-- Apocrypha
   	[1413] = {
-    	delves = {1399, 1400, 1401},
-    	publicDungeons = {1416},
+    		delves = {1399, 1400, 1401},
+    		publicDungeons = {1416},
+		publicDungeonsAchievements = {
+			[1416] = 3657,		--The Underweave
+		}
   },
 	}
 			
@@ -561,6 +666,16 @@ BMU.overlandDelvesPublicDungeons = {
 -- maps nodeIndicies with specific/selected zoneIds
 -- structure: [<zone_id of the instance>] = {<node_index>, <abbreviation>, <is DLC>, <DLC name>, <update>, <release date>}
 BMU.nodeIndexMap = {
+	-- ENDLESS DUNGEONS
+	-- Endless Archive
+	[1436] = {
+		nodeIndex = 550,
+		abbreviation = "EA",
+		isBaseGame = true,
+		updateNum = 40,
+		releaseDate = "2023/10"
+	},
+
 	-- SOLO ARENAS
 	-- Maelstrom Arena
 	[677] = {
@@ -1220,7 +1335,7 @@ BMU.treasureAndSurveyMaps = {
 		clothier = {57763},
 		jewelry = {139432},
 		treasure = {153645, 43649, 43650, 43651, 43652, 43653, 43654, 44941},
-		clue = {188204},
+		clue = {188204, 203826},
 	},
 	-- Alik'r Desert
 	[104] = {
@@ -1295,7 +1410,7 @@ BMU.treasureAndSurveyMaps = {
 		clothier = {57765},
 		jewelry = {139433},
 		treasure = {43679, 43680, 43681, 43682, 43683, 43684, 44947, 194360},
-		clue = {187898},
+		clue = {187898,203825},
 	},
 	-- Stonefalls
 	[41] = {
@@ -1539,8 +1654,19 @@ end
 -----------------------------------------
 
 ----------------------------------------- Sorting/Grouping
-BMU.sortingByCategory = {[9] = 1, [2] = 2, [1] = 3, [0] = 4, [5] = 5, [4] = 6, [7] = 7, [6] = 8, [3] = 9, [8] = 10}
--- Overland, Public Dungeons, Delves, without Category, 12 men Dungeons, 4 men Dungeons, Group Arenas, Group Zones (Craglorn), Houses, Solo Arenas
+BMU.sortingByCategory = {
+	[TELEPORTER_ZONE_CATEGORY_OVERLAND] 	= 1,
+	[TELEPORTER_ZONE_CATEGORY_PUBDUNGEON] 	= 2,
+	[TELEPORTER_ZONE_CATEGORY_DELVE] 		= 3,
+	[TELEPORTER_ZONE_CATEGORY_UNKNOWN] 		= 4,
+	[TELEPORTER_ZONE_CATEGORY_TRAIL] 		= 5,
+	[TELEPORTER_ZONE_CATEGORY_GRPDUNGEON] 	= 6,
+	[TELEPORTER_ZONE_CATEGORY_GRPARENA] 	= 7,
+	[TELEPORTER_ZONE_CATEGORY_ENDLESSD] 	= 8,
+	[TELEPORTER_ZONE_CATEGORY_GRPZONES] 	= 9,
+	[TELEPORTER_ZONE_CATEGORY_HOUSE] 		= 10,
+	[TELEPORTER_ZONE_CATEGORY_SOLOARENA] 	= 11}
+
 -----------------------------------------
 
 ---- API FUNCTIONS FOR OTHER ADDONS ----

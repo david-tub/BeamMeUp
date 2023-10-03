@@ -29,6 +29,7 @@ mkstr(SI.TELE_UI_UNRELATED_ITEMS, "Другие карты сокровищ.")
 mkstr(SI.TELE_UI_UNRELATED_QUESTS, "Квесты в других зонах")
 mkstr(SI.TELE_UI_SAME_INSTANCE, "Тот же инстанс")
 mkstr(SI.TELE_UI_DIFFERENT_INSTANCE, "Разные инстансы")
+mkstr(SI.TELE_UI_GROUP_EVENT, "Групповое событие")
 ---------
 --------- Menu
 mkstr(SI.TELE_UI_FAVORITE_PLAYER, "Избранный игрок")
@@ -45,6 +46,7 @@ mkstr(SI.TELE_UI_VIEW_MAP_ITEM, "Показать свиток")
 mkstr(SI.TELE_UI_TOGGLE_ARENAS, "Одиночные арены")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_ARENAS, "Групповые арены")
 mkstr(SI.TELE_UI_TOGGLE_TRIALS, "Испытания")
+mkstr(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS, "Endless Dungeons")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS, "Групповые подземелья")
 mkstr(SI.TELE_UI_TOGGLE_SORT_ACRONYM, "Отсортировать по аббревиатуре")
 mkstr(SI.TELE_UI_DAYS_LEFT, "осталось %d дней")
@@ -190,6 +192,7 @@ mkstr(SI.TELE_KEYBINDING_CURRENT_ZONE, "Перемещение в текущее
 mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "Перемещение ко входу основного дома")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "Арены / Испытания / Подземелья")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "Перeмещение на выбранный квест")
+mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Port to any zone")
 
 
 -----------------------------------------------------------------------------

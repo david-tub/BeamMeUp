@@ -29,6 +29,7 @@ mkstr(SI.TELE_UI_UNRELATED_ITEMS, "他のゾーンの地図")
 mkstr(SI.TELE_UI_UNRELATED_QUESTS, "他のゾーンのクエスト")
 mkstr(SI.TELE_UI_SAME_INSTANCE, "同一インスタンス")
 mkstr(SI.TELE_UI_DIFFERENT_INSTANCE, "別インスタンス")
+mkstr(SI.TELE_UI_GROUP_EVENT, "Group Event")
 ---------
 --------- Menu
 mkstr(SI.TELE_UI_FAVORITE_PLAYER, "プレイヤーのお気に入り")
@@ -45,6 +46,7 @@ mkstr(SI.TELE_UI_VIEW_MAP_ITEM, "地図を表示")
 mkstr(SI.TELE_UI_TOGGLE_ARENAS, "ソロアリーナ")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_ARENAS, "グループアリーナ")
 mkstr(SI.TELE_UI_TOGGLE_TRIALS, "試練")
+mkstr(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS, "Endless Dungeons")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS, "グループダンジョン")
 mkstr(SI.TELE_UI_TOGGLE_SORT_ACRONYM, "頭文字で並び替え")
 mkstr(SI.TELE_UI_DAYS_LEFT, "残り日数 %d")
@@ -190,6 +192,7 @@ mkstr(SI.TELE_KEYBINDING_CURRENT_ZONE, "現在のゾーンにテレポート")
 mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "本邸の外へ移動")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "アリーナ / 試練 / ダンジョン")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "フォーカスしているクエストへの移動")
+mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Port to any zone")
 
 
 -----------------------------------------------------------------------------

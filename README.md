@@ -32,6 +32,7 @@ This guide will help developers to maintain the addon for further game updates.
 - Update `BMU.overlandDelvesPublicDungeons`
     - zoneId of the overland zone as index
     - zoneId of the corresponding delves and public dungeons
+    - achievementId of the group event (skill point) for each public dungeon
 - Update `BMU.treasureAndSurveyMaps` (if the new overland zone contains treasure & survey maps or clues)
     - zoneId of the overland zone as index
     - itemId of the corresponding survey map (by type), treasure map or clue
@@ -42,8 +43,8 @@ This guide will help developers to maintain the addon for further game updates.
 - Update `BMU.blacklistHouses`
     - zoneId of the house (not the parent zone)
 
-#### New instance (group dungeon, trial and arena)
-- Update `BMU.blacklistGroupDungeons` or `BMU.blacklistRaids` or `BMU.blacklistSoloArenas` or `BMU.blacklistGroupArenas`
+#### New instance (group dungeon, trial, arena and endless dungeon)
+- Update `BMU.blacklistGroupDungeons` or `BMU.blacklistRaids` or `BMU.blacklistSoloArenas` or `BMU.blacklistGroupArenas` or `BMU.blacklistEndlessDungeons`
     - zoneId of the instance
 - Update `BMU.nodeIndexMap`
     - zoneId of the instance as index

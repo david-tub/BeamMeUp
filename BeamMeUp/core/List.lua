@@ -615,7 +615,7 @@ function BMU.isZoneOverlandZone(zoneId)
 		zoneId = GetZoneId(zoneIndex)
 	end
 	
-	if BMU.categorizeZone(zoneId) == 9 then
+	if BMU.categorizeZone(zoneId) == TELEPORTER_ZONE_CATEGORY_OVERLAND then
 		return true
 	else
 		return false
@@ -1164,6 +1164,80 @@ function ListView:update()
 
 
 			--------- zone tooltip (and zone name)  and handler for map opening ---------
+			
+			-- Second language for zone names
+			-- if second language is selected & entry is a real zone & zoneNameSecondLanguage exists
+			if BMU.savedVarsAcc.secondLanguage ~= 1 and message.zoneNameClickable == true and message.zoneNameSecondLanguage ~= nil then
+				if #tooltipTextZone > 0 then
+					-- add separator
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				end
+				-- add zone name
+				table.insert(tooltipTextZone, message.zoneNameSecondLanguage)
+			end
+			------------------
+			
+			-- Parent zone name
+			-- if zone is no overland zone -> show parent map
+			if message.category ~= TELEPORTER_ZONE_CATEGORY_OVERLAND and message.parentZoneName and not message.houseTooltip then
+				if #tooltipTextZone > 0 then
+					-- add separator
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				end
+				-- add zone name
+				table.insert(tooltipTextZone, message.parentZoneName)
+			end
+			------------------
+
+			-- house tooltip
+			if message.houseTooltip then
+				if #tooltipTextZone > 0 then
+					-- add separator
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				end
+				-- add house infos
+				for _, v in pairs(message.houseTooltip) do
+					table.insert(tooltipTextZone, v)
+				end
+			end
+			------------------
+
+			-- wayshrine and skyshard discovery info
+			if message.zoneNameClickable == true and (message.zoneWayhsrineDiscoveryInfo ~= nil or message.zoneSkyshardDiscoveryInfo ~= nil) then
+				if #tooltipTextZone > 0 then
+					-- add separator
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				end
+				if message.zoneSkyshardDiscoveryInfo ~= nil then
+					table.insert(tooltipTextZone, message.zoneSkyshardDiscoveryInfo)
+				end
+				if message.zoneWayhsrineDiscoveryInfo ~= nil then
+					table.insert(tooltipTextZone, message.zoneWayhsrineDiscoveryInfo)
+				end
+			end
+			------------------
+
+			-- public dungeon achievement info (group event / skill point)
+			if message.zoneNameClickable == true and message.publicDungeonAchiementInfo then
+				if #tooltipTextZone > 0 then
+					-- add separator
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				end
+				table.insert(tooltipTextZone, message.publicDungeonAchiementInfo)
+			end
+			------------------
+
+			-- Set Collection information
+			if message.setCollectionProgress then
+				if #tooltipTextZone > 0 then
+					-- add separator
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				end
+				-- add set collection info
+				table.insert(tooltipTextZone, message.setCollectionProgress)
+			end
+			------------------
+			
 			-- if search for related items and info not already added
 			if message.relatedItems ~= nil and #message.relatedItems > 0 then
 				-- ensure to add the total number only once
@@ -1188,10 +1262,13 @@ function ListView:update()
 				end
 				
 				-- copy item names to tooltipTextZone
-				for index, item in ipairs(message.relatedItems) do
+				if #tooltipTextZone > 0 then
+					-- add separator
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				end
+				for _, item in ipairs(message.relatedItems) do
 					table.insert(tooltipTextZone, item.itemTooltip)
 				end
-				
 				
 			-- if search for related quests
 			elseif message.relatedQuests ~= nil and #message.relatedQuests > 0 then
@@ -1201,65 +1278,17 @@ function ListView:update()
 					message.zoneName = message.zoneName .. " (" .. message.countRelatedQuests .. ")"
 					message.addedTotalQuests = true
 				end
-				-- copy "message.relatedQuests" to "tooltipTextZone" (Attention: "=" will set pointer!)
-				ZO_DeepTableCopy(message.relatedQuests, tooltipTextZone)
-			end
-			
-			
-			-- Set Collection information
-			if message.setCollectionProgress then
+
+				-- copy quest names to tooltipTextZone
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table.insert(tooltipTextZone, 1, BMU.textures.tooltipSeperator)
+					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
 				end
-				-- add set collection info
-				table.insert(tooltipTextZone, 1, message.setCollectionProgress)
-			end
-			------------------
-			
-			
-			-- wayhsrine and skyshard discovery info
-			if message.zoneNameClickable == true and (message.zoneWayhsrineDiscoveryInfo ~= nil or message.zoneSkyshardDiscoveryInfo ~= nil) then
-				if #tooltipTextZone > 0 then
-					-- add separator
-					table.insert(tooltipTextZone, 1, BMU.textures.tooltipSeperator)
-				end
-				-- add discovery info
-				if message.zoneSkyshardDiscoveryInfo ~= nil then
-					table.insert(tooltipTextZone, 1, message.zoneSkyshardDiscoveryInfo)
-				end
-				if message.zoneWayhsrineDiscoveryInfo ~= nil then
-					table.insert(tooltipTextZone, 1, message.zoneWayhsrineDiscoveryInfo)
+				for _, questName in ipairs(message.relatedQuests) do
+					table.insert(tooltipTextZone, questName)
 				end
 			end
 			------------------
-			
-
-			-- Parent zone name
-			-- if zone is no overland zone -> show parent map
-			if message.category ~= 9 and message.parentZoneName and not message.houseTooltip then
-				if #tooltipTextZone > 0 then
-					-- add separator
-					table.insert(tooltipTextZone, 1, BMU.textures.tooltipSeperator)
-				end
-				-- add zone name
-				table.insert(tooltipTextZone, 1, message.parentZoneName)
-			end
-			------------------
-
-
-			-- Second language for zone names
-			-- if second language is selected & entry is a real zone & zoneNameSecondLanguage exists
-			if BMU.savedVarsAcc.secondLanguage ~= 1 and message.zoneNameClickable == true and message.zoneNameSecondLanguage ~= nil then
-				if #tooltipTextZone > 0 then
-					-- add separator
-					table.insert(tooltipTextZone, 1, BMU.textures.tooltipSeperator)
-				end
-				-- add zone name
-				table.insert(tooltipTextZone, 1, message.zoneNameSecondLanguage)
-			end
-			------------------
-
 			
 			-- Info if player is in same instance
 			if message.groupMemberSameInstance ~= nil then
@@ -1276,25 +1305,15 @@ function ListView:update()
 			end
 			------------------
 			
-			
-			-- house tooltip
-			if message.houseTooltip then
-				if #tooltipTextZone > 0 then
-					-- add separator
-					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
-				end
-				-- add house infos
-				for _, v in pairs(message.houseTooltip) do
-					table.insert(tooltipTextZone, v)
-				end
-			end
-			------------------
 
 			-- guild tooltip
 			if message.guildTooltip then
 				ZO_DeepTableCopy(message.guildTooltip, tooltipTextZone)
 			end
+			------------------
+			
 
+			------------------------------------
 			-- Zone Name Column Tooltip & Button Controls
 			if message.zoneNameClickable or #tooltipTextZone > 0 then
 				-- set handler for map opening
@@ -1349,39 +1368,42 @@ function ListView:update()
 			-- set wayshrine icon
 			local texture_normal = BMU.textures.wayshrineBtn
 			local texture_over = BMU.textures.wayshrineBtnOver
-			-- overland zones have category == 9
 			
-			if message.category ~= nil and message.category ~= 0 then
+			if message.category ~= nil and message.category ~= TELEPORTER_ZONE_CATEGORY_UNKNOWN then
 				-- set category texture
-				if message.category == 1 then
+				if message.category == TELEPORTER_ZONE_CATEGORY_DELVE then
 					-- set Delve texture
 					texture_normal = BMU.textures.delvesBtn
 					texture_over = BMU.textures.delvesBtnOver
-				elseif message.category == 2 then
+				elseif message.category == TELEPORTER_ZONE_CATEGORY_PUBDUNGEON then
 					-- set Public Dungeon texture
 					texture_normal = BMU.textures.publicDungeonBtn
 					texture_over = BMU.textures.publicDungeonBtnOver
-				elseif message.category == 3 then
+				elseif message.category == TELEPORTER_ZONE_CATEGORY_HOUSE then
 					-- set House texture
 					texture_normal = BMU.textures.houseBtn
 					texture_over = BMU.textures.houseBtnOver
-				elseif message.category == 4 then
+				elseif message.category == TELEPORTER_ZONE_CATEGORY_GRPDUNGEON then
 					-- 4 men Group Dungeons
 					texture_normal = BMU.textures.groupDungeonBtn
 					texture_over = BMU.textures.groupDungeonBtnOver
-				elseif message.category == 5 then
+				elseif message.category == TELEPORTER_ZONE_CATEGORY_TRAIL then
 					-- 12 men Group Dungeons
 					texture_normal = BMU.textures.raidDungeonBtn
 					texture_over = BMU.textures.raidDungeonBtnOver
-				elseif message.category == 6 then
+				elseif message.category == TELEPORTER_ZONE_CATEGORY_ENDLESSD then
+					-- endless dungeon
+					texture_normal = BMU.textures.endlessDungeonBtn
+					texture_over = BMU.textures.endlessDungeonBtnOver
+				elseif message.category == TELEPORTER_ZONE_CATEGORY_GRPZONES then
 					-- Other Group Zones (Dungeons in Craglorn)
 					texture_normal = BMU.textures.groupZonesBtn
 					texture_over = BMU.textures.groupZonesBtnOver
-				elseif message.category == 7 then
+				elseif message.category == TELEPORTER_ZONE_CATEGORY_GRPARENA then
 					-- Group Arenas
 					texture_normal = BMU.textures.groupDungeonBtn
 					texture_over = BMU.textures.groupDungeonBtnOver
-				elseif message.category == 8 then
+				elseif message.category == TELEPORTER_ZONE_CATEGORY_SOLOARENA then
 					-- Solo Arenas
 					texture_normal = BMU.textures.soloArenaBtn
 					texture_over = BMU.textures.soloArenaBtnOver
@@ -1743,7 +1765,7 @@ function BMU.clickOnZoneName(button, record)
 		end
 		
 		------ display poi on map (in case of delve, dungeon etc.) ------
-		if record.parentZoneId ~= nil and (record.category ~= 9 or record.forceOutside) then			
+		if record.parentZoneId ~= nil and (record.category ~= TELEPORTER_ZONE_CATEGORY_OVERLAND or record.forceOutside) then			
 			local normalizedX
 			local normalizedZ
 			-- primary: use LibZone function
@@ -2275,7 +2297,7 @@ function BMU.updateStatistic(category, zoneId)
 	-- check for block flag and add manual port cost to statisticGold and also increase total counter
 	if not BMU.blockGold then
 		-- regard only Overland zones for gold statistics
-		if category == 9 then
+		if category == TELEPORTER_ZONE_CATEGORY_OVERLAND then
 			BMU.savedVarsAcc.savedGold = BMU.savedVarsAcc.savedGold + GetRecallCost()
 			self.control.statisticGold:SetText(SI.get(SI.TELE_UI_GOLD) .. " " .. BMU.formatGold(BMU.savedVarsAcc.savedGold))
 		end
@@ -2483,6 +2505,22 @@ function BMU.portToTrackedQuestZone()
 end
 
 
+-- to get to the next wayshrine without preference travel to any available zone/player (first entry from main list)
+function BMU.portToAnyZone()
+	local resultTable = BMU.createTable({index=0, noOwnHouses=true, dontDisplay=true})
+	
+	for _, entry in pairs(resultTable) do
+		if not entry.zoneWithoutPlayer and entry.displayName ~= nil and entry.displayName ~= "" then
+			-- usual entry with player or house
+			BMU.PortalToPlayer(entry.displayName, entry.sourceIndexLeading, entry.zoneName, entry.zoneId, entry.category, true, false, true)
+			return
+		end
+	end
+	-- no travel option found
+	BMU.printToChat(SI.get(SI.TELE_CHAT_NO_FAST_TRAVEL))
+end
+
+
 -- set flag when an error occurred while starting port process
 function BMU.socialErrorWhilePorting(eventCode, errorCode)
 	if errorCode == nil then errorCode = 0 end
@@ -2521,8 +2559,14 @@ function BMU:tooltipTextEnter(control, text)
         InformationTooltip:SetHidden(false)
 		-- if text is table of strings -> add for each a separate line
 		if type(text) == "table" then
-			for i, line in ipairs(text) do
-				InformationTooltip:AddLine(line)
+			for _, line in ipairs(text) do
+				if type(line) == "table" then
+					for _, line2 in ipairs(line) do
+						InformationTooltip:AddLine(line2)
+					end
+				else
+					InformationTooltip:AddLine(line)
+				end
 			end
 		else
 			InformationTooltip:AddLine(text)

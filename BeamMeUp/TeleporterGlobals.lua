@@ -1410,7 +1410,7 @@ BMU.treasureAndSurveyMaps = {
 		clothier = {57765},
 		jewelry = {139433},
 		treasure = {43679, 43680, 43681, 43682, 43683, 43684, 44947, 194360},
-		clue = {187898},
+		clue = {187898,203825},
 	},
 	-- Stonefalls
 	[41] = {

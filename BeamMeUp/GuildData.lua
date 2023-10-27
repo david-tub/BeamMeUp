@@ -76,7 +76,7 @@ BMU_GuildData = {
             869871,			-- "Allegiance of Asgard"		|@joyousdeath Discord-Name Joy<3
             781641,			-- "Pride of Ebon"				|@LilMuffin Discord-Name Ingame noch raufinden
             465947,         -- "The Way Of The Sword"       |@Izahym discord: aze_the_killer
-            820013,         -- "Hodor's Trading Post"       |@Orabel333 discord: @Orabel33
+            820013,         -- "Hodor's Trading Post"       |@Orabel33 discord: @Orabel33
         },
     }
 

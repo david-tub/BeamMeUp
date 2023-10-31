@@ -40,6 +40,12 @@ function BMU.activateSlashCommands()
 	-- add chat command for porting to current zone seperately
 	BMU.registerChatCommand("/bmutp/current_zone", function(option) BMU.portToCurrentZone() end, "Port to current zone")
 
+	-- switch player status
+	BMU.registerChatCommand("/bmu/misc/on", function(option) SelectPlayerStatus(PLAYER_STATUS_ONLINE) end, "Status: online")
+	BMU.registerChatCommand("/bmu/misc/off", function(option) SelectPlayerStatus(PLAYER_STATUS_OFFLINE) end, "Status: offline")
+	BMU.registerChatCommand("/bmu/misc/afk", function(option) SelectPlayerStatus(PLAYER_STATUS_AWAY) end, "Status: away")
+	BMU.registerChatCommand("/bmu/misc/dnd", function(option) SelectPlayerStatus(PLAYER_STATUS_DO_NOT_DISTURB) end, "Status: dont disturb")
+
 	-- Starting custom group vote
 	BMU.registerChatCommand("/bmu/vote/custom_vote_unanimous", function(option) BMU.sc_customVoteUnanimous(option) end, "Custom vote (100%)")
 	BMU.registerChatCommand("/bmu/vote/custom_vote_supermajority", function(option) BMU.sc_customVoteSupermajority(option) end, "Custom vote (>=60%)")

@@ -599,7 +599,10 @@ local function OnAddOnLoaded(eventCode, addOnName)
 			["toggleShowAcronymUpdateName"] = false,
 			["toggleShowZoneNameDungeonName"] = false,
 		},
-		["displayLeads"] = true,
+		["displayAntiquityLeads"] = { -- "displayLeads" was already used in the past (boolean)
+			["srcyable"] = true,
+			["scried"] = true,
+		},
 		["displayMaps"] = {
 			["treasure"] = true,
 			["alchemist"] = true,

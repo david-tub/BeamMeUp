@@ -2344,6 +2344,7 @@ function BMU.handleChatLinkClick(rawLink, mouseButton, linkText, linkStyle, link
 			if player ~= nil and houseId ~= nil then
 				-- try to port to the house of the player
 				BMU.printToChat(SI.get(SI.TELE_CHAT_SHARING_FOLLOW_LINK))
+				CancelCast()
 				JumpToSpecificHouse(player, houseId)
 			end
 			return true

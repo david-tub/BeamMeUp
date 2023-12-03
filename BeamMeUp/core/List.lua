@@ -1613,6 +1613,7 @@ function BMU.clickOnTeleportToPTFHouseButton(textureControl, button, message)
 		end
 		
 		-- port to house anyway
+		CancelCast()
 		if message.displayName == GetDisplayName() or message.displayName == nil or zo_strtrim(message.displayName) == "" then
 			-- own house
 			BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(GetZoneNameById(message.zoneId), false))
@@ -2445,6 +2446,7 @@ function BMU.portToOwnHouse(primary, houseId, jumpOutside, parentZoneName)
 	end
 	
 	-- start port process
+	CancelCast()
 	RequestJumpToHouse(houseId, jumpOutside)
 	
 	-- close UI if enabled
@@ -2468,6 +2470,7 @@ function BMU.portToBMUGuildHouse()
 		if BMU.savedVarsAcc.showTeleportAnimation then
 			BMU.showTeleportAnimation()
 		end
+		CancelCast()
 		JumpToSpecificHouse(displayName, houseId)
 		BMU.printToChat("Porting to BMU guild house (" .. displayName .. ")")
 		if BMU.savedVarsAcc.closeOnPorting then

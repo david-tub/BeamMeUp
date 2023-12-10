@@ -1267,30 +1267,36 @@ function BMU.syncWithItems(portalPlayers)
 		end
 	end
 	
-	if BMU.savedVarsChar.displayLeads then
+	if BMU.savedVarsChar.displayAntiquityLeads.scried or BMU.savedVarsChar.displayAntiquityLeads.srcyable then
 		-- seperately: go over all leads and add them to "portalPlayers" and "unrelatedItemsRecords"
 		local antiquityId = GetNextAntiquityId()
 		while antiquityId do
 			if DoesAntiquityHaveLead(antiquityId) then
-				-- check if lead can be matched to an entry in portalPlayers table
-				local isRelated, updatedRecord, recordIndex = BMU.leadIsRelated(portalPlayers, antiquityId)
-				if isRelated then
-					-- lead is related and connected to an entry in portalPlayers table
-					-- update record in portalPlayers
-					portalPlayers[recordIndex] = updatedRecord
-				else
-					local zoneId = GetAntiquityZoneId(antiquityId)
-					-- lead cannot be assigned to an entry in portalPlayers table
-					-- check if a record for the zone already exists
-					local record = unrelatedItemsRecords[zoneId]
-					if not record then
-						-- create new record
-						record = BMU.createClickableZoneRecord(zoneId)
+				local zoneId = GetAntiquityZoneId(antiquityId)
+
+				if (BMU.savedVarsChar.displayAntiquityLeads.scried and MeetsAntiquityRequirementsForScrying(antiquityId, zoneId) == ANTIQUITY_SCRYING_RESULT_MAX_PROGRESS)
+					or
+					(BMU.savedVarsChar.displayAntiquityLeads.srcyable and MeetsAntiquityRequirementsForScrying(antiquityId, zoneId) == ANTIQUITY_SCRYING_RESULT_SUCCESS)
+				then
+					-- check if lead can be matched to an entry in portalPlayers table
+					local isRelated, updatedRecord, recordIndex = BMU.leadIsRelated(portalPlayers, antiquityId)
+					if isRelated then
+						-- lead is related and connected to an entry in portalPlayers table
+						-- update record in portalPlayers
+						portalPlayers[recordIndex] = updatedRecord
+					else
+						-- lead cannot be assigned to an entry in portalPlayers table
+						-- check if a record for the zone already exists
+						local record = unrelatedItemsRecords[zoneId]
+						if not record then
+							-- create new record
+							record = BMU.createClickableZoneRecord(zoneId)
+						end
+						-- add lead to the record
+						record = BMU.addLeadInformation(record, antiquityId)
+						-- save record
+						unrelatedItemsRecords[zoneId] = record
 					end
-					-- add lead to the record
-					record = BMU.addLeadInformation(record, antiquityId)
-					-- save record
-					unrelatedItemsRecords[zoneId] = record
 				end
 			end
 			antiquityId = GetNextAntiquityId(antiquityId)

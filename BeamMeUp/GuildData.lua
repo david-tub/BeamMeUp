@@ -55,6 +55,7 @@ BMU_GuildData = {
             782574,			-- "Die reisenden Schatten"		|LaicosVK Discord-Name Ingame?
             695302,         -- "Song of Sun and Moon"       |@Eris221 Discord eryss
             796460,         -- "Les Héros des Neuf Divins"  |@Edwin_theDark discord edwinthedark
+            790978,         -- "Song of Dawn and Dusk"      |@Eryss discord eryss.
         },
         ["NA Megaserver"] = {
             698893,			-- "The Descendants"			|@ravenzwind
@@ -76,6 +77,8 @@ BMU_GuildData = {
             869871,			-- "Allegiance of Asgard"		|@joyousdeath Discord-Name Joy<3
             781641,			-- "Pride of Ebon"				|@LilMuffin Discord-Name Ingame noch raufinden
             465947,         -- "The Way Of The Sword"       |@Izahym discord: aze_the_killer
+            820013,         -- "Hodor's Trading Post"       |@Orabel33 discord: Orabel33
+            415209,         -- "Benevolent Adventurers"     |@Sixnco discord: sixnco
         },
     }
 

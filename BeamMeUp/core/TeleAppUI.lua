@@ -1672,8 +1672,12 @@ local function SetupUI()
 		-- show filter menu
 		ClearMenu()
 		-- Leads
-		local menuIndex = AddCustomMenuItem(GetString(SI_ANTIQUITY_LEAD_TOOLTIP_TAG), function() BMU.savedVarsChar.displayLeads = not BMU.savedVarsChar.displayLeads BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
-		if BMU.savedVarsChar.displayLeads then
+		local menuIndex = AddCustomMenuItem(GetString(SI_ANTIQUITY_SUBHEADING_ACTIVE_LEADS), function() BMU.savedVarsChar.displayAntiquityLeads.scried = not BMU.savedVarsChar.displayAntiquityLeads.scried BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
+		if BMU.savedVarsChar.displayAntiquityLeads.scried then
+			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+		end
+		local menuIndex = AddCustomMenuItem(GetString(SI_ANTIQUITY_SCRYABLE) .. " " .. GetString(SI_ANTIQUITY_LEAD_TOOLTIP_TAG), function() BMU.savedVarsChar.displayAntiquityLeads.srcyable = not BMU.savedVarsChar.displayAntiquityLeads.srcyable BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
+		if BMU.savedVarsChar.displayAntiquityLeads.srcyable then
 			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 		end
 		-- Clues
@@ -1782,7 +1786,7 @@ local function SetupUI()
 	-- set tooltip accordingly to the selected filter
 	local tooltip = ""
 
-	if BMU.savedVarsChar.displayLeads then
+	if BMU.savedVarsChar.displayAntiquityLeads.scried or BMU.savedVarsChar.displayAntiquityLeads.srcyable then
 		tooltip = GetString(SI_ANTIQUITY_LEAD_TOOLTIP_TAG)
 	end
 	if BMU.savedVarsChar.displayMaps.clue then
@@ -2344,6 +2348,7 @@ function BMU.handleChatLinkClick(rawLink, mouseButton, linkText, linkStyle, link
 			if player ~= nil and houseId ~= nil then
 				-- try to port to the house of the player
 				BMU.printToChat(SI.get(SI.TELE_CHAT_SHARING_FOLLOW_LINK))
+				CancelCast()
 				JumpToSpecificHouse(player, houseId)
 			end
 			return true

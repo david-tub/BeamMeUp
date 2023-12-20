@@ -2344,7 +2344,7 @@ function BMU.formatGold(number)
 	elseif number >= 1000 then
 		return BMU.round((number/1000), 1) .. " " .. SI.get(SI.TELE_UI_GOLD_ABBR)
 	else
-		return number
+		return tostring(number)
 	end
 end
 

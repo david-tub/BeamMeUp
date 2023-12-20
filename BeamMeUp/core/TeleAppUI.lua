@@ -867,7 +867,8 @@ local function SetupOptionsMenu(index) --index == Addon name
          },
 	     {
               type = "description",
-              text = BMU.formatGold(BMU.savedVarsAcc.totalPortCounter),
+			-- NOTE: "text" parameter must always be string since LAM2 do not handle integer values correctly 
+              text = tostring(BMU.formatGold(BMU.savedVarsAcc.totalPortCounter)),
 			  width = "half",
 			  submenu = "stats",
          },
@@ -879,7 +880,7 @@ local function SetupOptionsMenu(index) --index == Addon name
          },
 	     {
               type = "description",
-              text = BMU.formatGold(BMU.savedVarsAcc.savedGold),
+              text = tostring(BMU.formatGold(BMU.savedVarsAcc.savedGold)),
 			  width = "half",
 			  submenu = "stats",
          },

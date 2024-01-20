@@ -1673,11 +1673,11 @@ local function SetupUI()
 		-- show filter menu
 		ClearMenu()
 		-- Leads
-		local menuIndex = AddCustomMenuItem(GetString(SI_ANTIQUITY_SUBHEADING_ACTIVE_LEADS), function() BMU.savedVarsChar.displayAntiquityLeads.scried = not BMU.savedVarsChar.displayAntiquityLeads.scried BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
+		local menuIndex = AddCustomMenuItem(GetString(SI_GAMEPAD_VENDOR_ANTIQUITY_LEAD_GROUP_HEADER) .. ": " .. GetString(SI_ANTIQUITY_SUBHEADING_IN_PROGRESS), function() BMU.savedVarsChar.displayAntiquityLeads.scried = not BMU.savedVarsChar.displayAntiquityLeads.scried BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.displayAntiquityLeads.scried then
 			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 		end
-		local menuIndex = AddCustomMenuItem(GetString(SI_ANTIQUITY_SCRYABLE) .. " " .. GetString(SI_ANTIQUITY_LEAD_TOOLTIP_TAG), function() BMU.savedVarsChar.displayAntiquityLeads.srcyable = not BMU.savedVarsChar.displayAntiquityLeads.srcyable BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
+		local menuIndex = AddCustomMenuItem(GetString(SI_GAMEPAD_VENDOR_ANTIQUITY_LEAD_GROUP_HEADER) .. ": " .. GetString(SI_ANTIQUITY_SCRYABLE), function() BMU.savedVarsChar.displayAntiquityLeads.srcyable = not BMU.savedVarsChar.displayAntiquityLeads.srcyable BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.displayAntiquityLeads.srcyable then
 			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 		end

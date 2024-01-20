@@ -2489,6 +2489,14 @@ function BMU.portToCurrentZone()
 end
 
 
+function BMU.portToParentZone()
+	local playersZoneId = GetZoneId(GetUnitZoneIndex("player"))
+	local parentZoneId = BMU.getParentZoneId(playersZoneId)
+	-- if parent zone cant be determined the current zone is used
+	BMU.sc_porting(parentZoneId)
+end
+
+
 -- identifies the currently tracked/focused quest and start the port
 function BMU.portToTrackedQuestZone()
 	for slotIndex = 1, GetNumJournalQuests() do

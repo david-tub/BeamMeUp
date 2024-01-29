@@ -1270,6 +1270,24 @@ BMU.nodeIndexMap = {
 		updateNum = 37,
 		releaseDate = "2023/03"
 	},
+	--[[ Oathsworn Pit
+	[????] = {
+		nodeIndex = ???,
+		abbreviation = "OP",
+		isDLC = true,
+		updateName = "Scions of Ithelia",
+		updateNum = 41,
+		releaseDate = "2024/03"
+	},
+	-- Bedlam Veil
+	[????] = {
+		nodeIndex = ???,
+		abbreviation = "BV",
+		isDLC = true,
+		updateName = "Scions of Ithelia",
+		updateNum = 41,
+		releaseDate = "2024/03"
+	},]]
 }
 
 

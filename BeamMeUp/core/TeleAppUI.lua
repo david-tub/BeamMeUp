@@ -150,7 +150,8 @@ local function SetupOptionsMenu(index) --index == Addon name
               getFunc = function() return BMU.savedVarsAcc.numberLines end,
               setFunc = function(value) BMU.savedVarsAcc.numberLines = value
 							teleporterWin.Main_Control:SetHeight(BMU.calculateListHeight())
-							teleporterWin.Main_Control.bd:SetHeight(BMU.calculateListHeight() + 280*BMU.savedVarsAcc.Scale)
+							-- add also current height of the counter panel
+							teleporterWin.Main_Control.bd:SetHeight(BMU.calculateListHeight() + 280*BMU.savedVarsAcc.Scale + select(2, BMU.counterPanel:GetTextDimensions()))
 				end,
 			  default = BMU.DefaultsAccount["numberLines"],
 			  submenu = "ui",
@@ -1003,6 +1004,75 @@ function BMU.getStringIsInstalledLibrary(addonName)
 	return ""
 end
 
+-- update content and position of the counter panel
+-- display the sum of each related item type without any filter consideration
+function BMU.updateRelatedItemsCounterPanel()
+
+	local function isTreasureMap(itemName, specializedItemType)
+		return (specializedItemType == SPECIALIZED_ITEMTYPE_TROPHY_TREASURE_MAP or string.match(string.lower(itemName), string.lower(SI.get(SI.CONSTANT_TREASURE_MAP))))
+	end
+
+	local counter_table = {
+		["alchemist"] = 0,
+		["enchanter"] = 0,
+		["woodworker"] = 0,
+		["blacksmith"] = 0,
+		["clothier"] = 0,
+		["jewelry"] = 0,
+		["treasure"] = 0,
+		["leads"] = 0,
+	}
+
+	-- count treasure and survey maps
+	local bags = {BAG_BACKPACK, BAG_BANK, BAG_SUBSCRIBER_BANK}
+	-- go over all bags and bank
+	for _, bagId in ipairs(bags) do
+		local lastSlot = GetBagSize(bagId)
+		for slotIndex = 0, lastSlot, 1 do
+			local itemName = GetItemName(bagId, slotIndex)
+			local itemType, specializedItemType = GetItemType(bagId, slotIndex)
+			local itemId = GetItemId(bagId, slotIndex)
+			local _, itemCount, _, _, _, _, _, _ = GetItemInfo(bagId, slotIndex)
+
+			if isTreasureMap(itemName, specializedItemType) then
+				-- item is treaure map
+				counter_table["treasure"] = counter_table["treasure"] + itemCount
+			else
+				local subType, itemZoneId = BMU.getDataMapInfo(itemId)
+				-- check if item is known from internal data table -> survey map
+				if subType and counter_table[subType] ~= nil then
+					counter_table[subType] = counter_table[subType] + itemCount
+				end
+			end
+		end
+	end
+
+	-- count leads
+	local antiquityId = GetNextAntiquityId()
+	while antiquityId do
+		if DoesAntiquityHaveLead(antiquityId) then
+			counter_table["leads"] = counter_table["leads"] + 1
+		end
+		antiquityId = GetNextAntiquityId(antiquityId)
+	end
+	
+	-- order values for string format
+	local list_counters = {counter_table["alchemist"], counter_table["enchanter"], counter_table["woodworker"], counter_table["blacksmith"], counter_table["clothier"], counter_table["jewelry"], counter_table["treasure"], counter_table["leads"]}
+	local text = string.format("|t<dim>:<dim>:esoui/art/icons/ability_alchemy_001.dds|t: %d   |t<dim>:<dim>:esoui/art/icons/ability_enchanter_001b.dds|t: %d   " ..
+	"|t<dim>:<dim>:esoui/art/icons/ability_tradecraft_003.dds|t: %d   |t<dim>:<dim>:esoui/art/icons/ability_smith_001.dds|t: %d   " ..
+	"|t<dim>:<dim>:esoui/art/icons/ability_tradecraft_002.dds|t: %d   |t<dim>:<dim>:esoui/art/icons/passive_jewelerengraver.dds|t: %d   " ..
+	"|t<dim>:<dim>:esoui/art/icons/housing_vrd_duc_chest002.dds|t: %d   |t<dim>:<dim>:esoui/art/treeicons/journal_tabicon_antiquities_up.dds|t: %d", unpack(list_counters))
+	
+	-- scale the icons accordingly to the scale level
+	text = string.gsub(text, "<dim>", tostring(25*BMU.savedVarsAcc.Scale))
+	
+	BMU.counterPanel:SetText(text)
+
+	-- update position (number of lines may have changed)
+	BMU.counterPanel:ClearAnchors()
+	BMU.counterPanel:SetAnchor(TOP, BMU.win.Main_Control, TOP, 1*BMU.savedVarsAcc.Scale, (90*BMU.savedVarsAcc.Scale)+((BMU.savedVarsAcc.numberLines*40)*BMU.savedVarsAcc.Scale))
+end
+
 
 local function SetupUI()
 	-----------------------------------------------
@@ -1827,6 +1897,9 @@ local function SetupUI()
 	end
   end)
 
+  -- Create counter panel that displays the counter for each type
+  BMU.counterPanel = WINDOW_MANAGER:CreateControl(nil, BMU.win.Main_Control, CT_LABEL)
+  BMU.counterPanel:SetFont(BMU.font1)
 
   ---------------------------------------------------------------------------------------------------------------
   -- Only current zone
@@ -2212,11 +2285,14 @@ function BMU.changeState(index)
 	if teleporterWin.guildTexture then
 		teleporterWin.guildTexture:SetTexture(BMU.textures.guildBtn)
 	end
+	-- hide counter panel for related items tab
+	BMU.counterPanel:SetHidden(true)
 	
 	-- check new state
 	if index == 4 then
 		-- related Items
 		teleporterWin.Main_Control.ItemTexture:SetTexture(BMU.textures.relatedItemsBtnOver)
+		BMU.counterPanel:SetHidden(false)
 	elseif index == 1 then
 		-- current zone
 		teleporterWin.Main_Control.OnlyYourzoneTexture:SetTexture(BMU.textures.currentZoneBtnOver)

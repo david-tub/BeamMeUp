@@ -622,6 +622,10 @@ function BMU.createTable(args)
 		return portalPlayers
 	else
 		TeleporterList:add_messages(portalPlayers, dontResetSlider)
+		if index == 4 then
+			-- update counter panel for related items
+			BMU.updateRelatedItemsCounterPanel()
+		end
 	end
 end
 

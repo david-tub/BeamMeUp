@@ -150,7 +150,8 @@ local function SetupOptionsMenu(index) --index == Addon name
               getFunc = function() return BMU.savedVarsAcc.numberLines end,
               setFunc = function(value) BMU.savedVarsAcc.numberLines = value
 							teleporterWin.Main_Control:SetHeight(BMU.calculateListHeight())
-							teleporterWin.Main_Control.bd:SetHeight(BMU.calculateListHeight() + 280*BMU.savedVarsAcc.Scale)
+							-- add also current height of the counter panel
+							teleporterWin.Main_Control.bd:SetHeight(BMU.calculateListHeight() + 280*BMU.savedVarsAcc.Scale + select(2, BMU.counterPanel:GetTextDimensions()))
 				end,
 			  default = BMU.DefaultsAccount["numberLines"],
 			  submenu = "ui",
@@ -867,7 +868,8 @@ local function SetupOptionsMenu(index) --index == Addon name
          },
 	     {
               type = "description",
-              text = BMU.formatGold(BMU.savedVarsAcc.totalPortCounter),
+			-- NOTE: "text" parameter must always be string since LAM2 do not handle integer values correctly 
+              text = tostring(BMU.formatGold(BMU.savedVarsAcc.totalPortCounter)),
 			  width = "half",
 			  submenu = "stats",
          },
@@ -879,7 +881,7 @@ local function SetupOptionsMenu(index) --index == Addon name
          },
 	     {
               type = "description",
-              text = BMU.formatGold(BMU.savedVarsAcc.savedGold),
+              text = tostring(BMU.formatGold(BMU.savedVarsAcc.savedGold)),
 			  width = "half",
 			  submenu = "stats",
          },
@@ -1000,6 +1002,64 @@ function BMU.getStringIsInstalledLibrary(addonName)
 	
 	-- return empty string if addonName cant bne matched
 	return ""
+end
+
+-- update content and position of the counter panel
+-- display the sum of each related item type without any filter consideration
+function BMU.updateRelatedItemsCounterPanel()
+	local counter_table = {
+		["alchemist"] = 0,
+		["enchanter"] = 0,
+		["woodworker"] = 0,
+		["blacksmith"] = 0,
+		["clothier"] = 0,
+		["jewelry"] = 0,
+		["treasure"] = 0,
+		["leads"] = 0,
+	}
+
+	-- count treasure and survey maps
+	local bags = {BAG_BACKPACK, BAG_BANK, BAG_SUBSCRIBER_BANK}
+	-- go over all bags and bank
+	for _, bagId in ipairs(bags) do
+		local lastSlot = GetBagSize(bagId)
+		for slotIndex = 0, lastSlot, 1 do
+			local itemName = GetItemName(bagId, slotIndex)
+			local itemType, specializedItemType = GetItemType(bagId, slotIndex)
+			local itemId = GetItemId(bagId, slotIndex)
+			local _, itemCount, _, _, _, _, _, _ = GetItemInfo(bagId, slotIndex)
+			local subType, itemZoneId = BMU.getDataMapInfo(itemId)
+				
+			-- check if item is known from internal data table
+			if subType and counter_table[subType] ~= nil then
+				counter_table[subType] = counter_table[subType] + itemCount
+			end
+		end
+	end
+
+	-- count leads
+	local antiquityId = GetNextAntiquityId()
+	while antiquityId do
+		if DoesAntiquityHaveLead(antiquityId) then
+			counter_table["leads"] = counter_table["leads"] + 1
+		end
+		antiquityId = GetNextAntiquityId(antiquityId)
+	end
+	
+	local list_counters = {counter_table["alchemist"], counter_table["enchanter"], counter_table["woodworker"], counter_table["blacksmith"], counter_table["clothier"], counter_table["jewelry"], counter_table["treasure"], counter_table["leads"]}
+	local text = string.format("|t<dim>:<dim>:esoui/art/icons/servicemappins/servicepin_alchemy.dds|t: %d   |t<dim>:<dim>:esoui/art/icons/servicemappins/servicepin_enchanting.dds|t: %d   " ..
+	"|t<dim>:<dim>:esoui/art/icons/servicemappins/servicepin_woodworking.dds|t: %d   |t<dim>:<dim>:esoui/art/icons/servicemappins/servicepin_smithy.dds|t: %d   " ..
+	"|t<dim>:<dim>:esoui/art/icons/servicemappins/servicepin_clothier.dds|t: %d   |t<dim>:<dim>:esoui/art/icons/servicemappins/servicepin_jewelrycrafting.dds|t: %d   " ..
+	"|t<dim>:<dim>:esoui/art/icons/servicemappins/servicepin_bank.dds|t: %d   |t<dim>:<dim>:esoui/art/icons/servicemappins/servicepin_antiquities.dds|t: %d", unpack(list_counters))
+	
+	-- scale the icons accordingly to the scale level
+	text = string.gsub(text, "<dim>", tostring(28*BMU.savedVarsAcc.Scale))
+	
+	BMU.counterPanel:SetText(text)
+
+	-- update position (number of lines may have changed)
+	BMU.counterPanel:ClearAnchors()
+	BMU.counterPanel:SetAnchor(TOP, BMU.win.Main_Control, TOP, 1*BMU.savedVarsAcc.Scale, (90*BMU.savedVarsAcc.Scale)+((BMU.savedVarsAcc.numberLines*40)*BMU.savedVarsAcc.Scale))
 end
 
 
@@ -1672,11 +1732,11 @@ local function SetupUI()
 		-- show filter menu
 		ClearMenu()
 		-- Leads
-		local menuIndex = AddCustomMenuItem(GetString(SI_ANTIQUITY_SUBHEADING_ACTIVE_LEADS), function() BMU.savedVarsChar.displayAntiquityLeads.scried = not BMU.savedVarsChar.displayAntiquityLeads.scried BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
+		local menuIndex = AddCustomMenuItem(GetString(SI_GAMEPAD_VENDOR_ANTIQUITY_LEAD_GROUP_HEADER) .. ": " .. GetString(SI_ANTIQUITY_SUBHEADING_IN_PROGRESS), function() BMU.savedVarsChar.displayAntiquityLeads.scried = not BMU.savedVarsChar.displayAntiquityLeads.scried BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.displayAntiquityLeads.scried then
 			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 		end
-		local menuIndex = AddCustomMenuItem(GetString(SI_ANTIQUITY_SCRYABLE) .. " " .. GetString(SI_ANTIQUITY_LEAD_TOOLTIP_TAG), function() BMU.savedVarsChar.displayAntiquityLeads.srcyable = not BMU.savedVarsChar.displayAntiquityLeads.srcyable BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
+		local menuIndex = AddCustomMenuItem(GetString(SI_GAMEPAD_VENDOR_ANTIQUITY_LEAD_GROUP_HEADER) .. ": " .. GetString(SI_ANTIQUITY_SCRYABLE), function() BMU.savedVarsChar.displayAntiquityLeads.srcyable = not BMU.savedVarsChar.displayAntiquityLeads.srcyable BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.displayAntiquityLeads.srcyable then
 			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 		end
@@ -1769,12 +1829,20 @@ local function SetupUI()
 		)
 		
 		-- divider
-		AddCustomMenuItem("-", function() end)
+		AddCustomMenuItem("-", function() end, nil, nil, nil, nil, 5)
 		
-		menuIndex = AddCustomMenuItem(GetString(SI_CRAFTING_INCLUDE_BANKED), function() BMU.savedVarsChar.scanBankForMaps = not BMU.savedVarsChar.scanBankForMaps BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 4)
+		-- include bank items
+		menuIndex = AddCustomMenuItem(GetString(SI_CRAFTING_INCLUDE_BANKED), function() BMU.savedVarsChar.scanBankForMaps = not BMU.savedVarsChar.scanBankForMaps BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.scanBankForMaps then
 			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 		end
+
+		-- enable/disable counter panel
+		menuIndex = AddCustomMenuItem(GetString(SI_ENDLESS_DUNGEON_BUFF_TRACKER_SWITCH_TO_SUMMARY_KEYBIND), function() BMU.savedVarsChar.displayCounterPanel = not BMU.savedVarsChar.displayCounterPanel BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
+		if BMU.savedVarsChar.displayCounterPanel then
+			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+		end	
+		
 		ShowMenu()
 	else
 		BMU.createTable({index=4})
@@ -1826,6 +1894,10 @@ local function SetupUI()
 	end
   end)
 
+  -- Create counter panel that displays the counter for each type
+  BMU.counterPanel = WINDOW_MANAGER:CreateControl(nil, BMU.win.Main_Control, CT_LABEL)
+  BMU.counterPanel:SetFont(BMU.font1)
+  BMU.counterPanel:SetHidden(true)
 
   ---------------------------------------------------------------------------------------------------------------
   -- Only current zone
@@ -2211,11 +2283,16 @@ function BMU.changeState(index)
 	if teleporterWin.guildTexture then
 		teleporterWin.guildTexture:SetTexture(BMU.textures.guildBtn)
 	end
+	-- hide counter panel for related items tab
+	BMU.counterPanel:SetHidden(true)
 	
 	-- check new state
 	if index == 4 then
 		-- related Items
 		teleporterWin.Main_Control.ItemTexture:SetTexture(BMU.textures.relatedItemsBtnOver)
+		if BMU.savedVarsChar.displayCounterPanel then
+			BMU.counterPanel:SetHidden(false)
+		end
 	elseif index == 1 then
 		-- current zone
 		teleporterWin.Main_Control.OnlyYourzoneTexture:SetTexture(BMU.textures.currentZoneBtnOver)

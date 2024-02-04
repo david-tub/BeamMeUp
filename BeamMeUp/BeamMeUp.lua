@@ -613,6 +613,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 			["jewelry"] = true,
 			["clue"] = true,
 		},
+		["displayCounterPanel"] = true,
 		["houseNickNames"] = false,
 		["ptfHouseZoneNames"] = false,
 	}

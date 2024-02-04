@@ -1,10 +1,10 @@
 ## Title: |cd5b526BeamMeUp|r - Teleporter
 ## Description: Free fast travel to available players from your friend list, guilds and group.
 ## Author: DeadSoon, Gamer1986PAN
-## APIVersion: 101040
+## APIVersion: 101040 101041
 ## SavedVariables: BeamMeUp_SV
-## Version: 3.5.2
-## AddOnVersion: 352
+## Version: 3.5.3
+## AddOnVersion: 353
 ## IsLibrary: false
 ## DependsOn: LibAddonMenu-2.0 LibCustomMenu LibZone
 ## OptionalDependsOn: LibSlashCommander LibSets LibMapPing PortToFriendsHouse BanditsUserInterface MorrowindStyleUI

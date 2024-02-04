@@ -622,6 +622,10 @@ function BMU.createTable(args)
 		return portalPlayers
 	else
 		TeleporterList:add_messages(portalPlayers, dontResetSlider)
+		if index == 4 and BMU.savedVarsChar.displayCounterPanel then
+			-- update counter panel for related items
+			BMU.updateRelatedItemsCounterPanel()
+		end
 	end
 end
 
@@ -1273,10 +1277,12 @@ function BMU.syncWithItems(portalPlayers)
 		while antiquityId do
 			if DoesAntiquityHaveLead(antiquityId) then
 				local zoneId = GetAntiquityZoneId(antiquityId)
-
-				if (BMU.savedVarsChar.displayAntiquityLeads.scried and MeetsAntiquityRequirementsForScrying(antiquityId, zoneId) == ANTIQUITY_SCRYING_RESULT_MAX_PROGRESS)
+				local achievedGoals = GetNumGoalsAchievedForAntiquity(antiquityId)
+					-- leads that are already scried (at least one "achieved goal" in lead scry progress)
+				if (BMU.savedVarsChar.displayAntiquityLeads.scried and achievedGoals > 0)
 					or
-					(BMU.savedVarsChar.displayAntiquityLeads.srcyable and MeetsAntiquityRequirementsForScrying(antiquityId, zoneId) == ANTIQUITY_SCRYING_RESULT_SUCCESS)
+					-- leads that are are scryable (no progress)
+					(BMU.savedVarsChar.displayAntiquityLeads.srcyable and achievedGoals == 0)
 				then
 					-- check if lead can be matched to an entry in portalPlayers table
 					local isRelated, updatedRecord, recordIndex = BMU.leadIsRelated(portalPlayers, antiquityId)

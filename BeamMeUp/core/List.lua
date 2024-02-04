@@ -2344,7 +2344,7 @@ function BMU.formatGold(number)
 	elseif number >= 1000 then
 		return BMU.round((number/1000), 1) .. " " .. SI.get(SI.TELE_UI_GOLD_ABBR)
 	else
-		return number
+		return tostring(number)
 	end
 end
 
@@ -2486,6 +2486,14 @@ end
 function BMU.portToCurrentZone()
 	local playersZoneId = GetZoneId(GetUnitZoneIndex("player"))
 	BMU.sc_porting(playersZoneId)
+end
+
+
+function BMU.portToParentZone()
+	local playersZoneId = GetZoneId(GetUnitZoneIndex("player"))
+	local parentZoneId = BMU.getParentZoneId(playersZoneId)
+	-- if parent zone cant be determined the current zone is used
+	BMU.sc_porting(parentZoneId)
 end
 
 

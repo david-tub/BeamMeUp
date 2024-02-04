@@ -56,6 +56,7 @@ BMU_GuildData = {
             695302,         -- "Song of Sun and Moon"       |@Eris221 Discord eryss
             796460,         -- "Les Héros des Neuf Divins"  |@Edwin_theDark discord edwinthedark
             790978,         -- "Song of Dawn and Dusk"      |@Eryss discord eryss.
+            786092,         -- "Nightingale UA"             |Contact: @rain_brd     Leader: @ruslanUA Discord:Rain(Михайло) rain_ua
         },
         ["NA Megaserver"] = {
             698893,			-- "The Descendants"			|@ravenzwind

@@ -37,8 +37,10 @@ function BMU.activateSlashCommands()
 	BMU.registerChatCommand("/bmutp/house", function(option) BMU.portToOwnHouse(true, nil, false, nil) end, "Port into primary residence")
 	-- Port outside own primary residence
 	BMU.registerChatCommand("/bmutp/house_out", function(option) BMU.portToOwnHouse(true, nil, true, nil) end, "Port outside primary residence")
-	-- add chat command for porting to current zone seperately
+	-- Port to current zone
 	BMU.registerChatCommand("/bmutp/current_zone", function(option) BMU.portToCurrentZone() end, "Port to current zone")
+	-- Port to parent zone
+	BMU.registerChatCommand("/bmutp/parent_zone", function(option) BMU.portToParentZone() end, "Port to parent zone")
 
 	-- switch player status
 	BMU.registerChatCommand("/bmu/misc/on", function(option) SelectPlayerStatus(PLAYER_STATUS_ONLINE) end, "Status: online")

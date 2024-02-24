@@ -80,6 +80,10 @@ BMU_GuildData = {
             465947,         -- "The Way Of The Sword"       |@Izahym discord: aze_the_killer
             820013,         -- "Hodor's Trading Post"       |@Orabel33 discord: Orabel33
             415209,         -- "Benevolent Adventurers"     |@Sixnco discord: sixnco
+            837571,         -- "A Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
+            276637,         -- "B Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
+            902797,         -- "C Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
+            229811,         -- "T Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
         },
     }
 

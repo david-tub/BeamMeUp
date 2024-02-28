@@ -1088,7 +1088,7 @@ local function SetupUI()
 	-- Button on Chat Window
 	if BMU.savedVarsAcc.chatButton then
 		-- Texture
-		BMU.chatButtonTex = wm:CreateControl(nil, ZO_ChatWindow, CT_TEXTURE)
+		BMU.chatButtonTex = wm:CreateControl("Teleporter_CHAT_MENU_BUTTON", ZO_ChatWindow, CT_TEXTURE)
 		BMU.chatButtonTex:SetDimensions(33, 33)
 		BMU.chatButtonTex:SetAnchor(TOPRIGHT, ZO_ChatWindow, TOPRIGHT, -40 - BMU.savedVarsAcc.chatButtonHorizontalOffset, 6)
 		BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtn)

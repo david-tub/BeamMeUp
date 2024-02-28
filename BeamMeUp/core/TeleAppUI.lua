@@ -124,6 +124,29 @@ local function SetupOptionsMenu(index) --index == Addon name
          },
 	     {
               type = "description",
+			  title = "LibSlashCommander",
+              text = BMU.getStringIsInstalledLibrary("lsc"),
+			  width = "half",
+			  submenu = "deps",
+         },
+		 {
+              type = "button",
+              name = "Open addon website",
+			  func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info1508-LibSlashCommander.html") end,
+			  width = "half",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
+              text = "Get comprehensive auto-completion, color coding and short description for chat commands.",
+			  submenu = "deps",
+         },
+		 {
+              type = "divider",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
               title = "|cFF00FFIsJusta|r Beam Me Up Gamepad Plugin",
 			  text = BMU.getStringIsInstalledLibrary("gamepad"),
 			  width = "half",
@@ -985,6 +1008,15 @@ function BMU.getStringIsInstalledLibrary(addonName)
 	-- LibMapPing
 	if string.lower(addonName) == "libmapping" then
 		if BMU.LibMapPing then
+			return stringInstalled
+		else
+			return stringNotInstalled
+		end
+	end
+
+	-- LibSlashCommander
+	if string.lower(addonName) == "lsc" then
+		if BMU.LSC then
 			return stringInstalled
 		else
 			return stringNotInstalled

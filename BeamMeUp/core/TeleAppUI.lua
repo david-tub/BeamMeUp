@@ -147,6 +147,29 @@ local function SetupOptionsMenu(index) --index == Addon name
          },
 	     {
               type = "description",
+			  title = "LibChatMenuButton",
+              text = BMU.getStringIsInstalledLibrary("lcmb"),
+			  width = "half",
+			  submenu = "deps",
+         },
+		 {
+              type = "button",
+              name = "Open addon website",
+			  func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info3805-LibChatMenuButton.html") end,
+			  width = "half",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
+              text = "Leave the positioning of the BMU chat button to an external library. Support the concept of libraries. But you will lose the option to set an individual offset.",
+			  submenu = "deps",
+         },
+		 {
+              type = "divider",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
               title = "|cFF00FFIsJusta|r Beam Me Up Gamepad Plugin",
 			  text = BMU.getStringIsInstalledLibrary("gamepad"),
 			  width = "half",
@@ -1022,6 +1045,15 @@ function BMU.getStringIsInstalledLibrary(addonName)
 			return stringNotInstalled
 		end
 	end
+
+	-- LibChatMenuButton
+	if string.lower(addonName) == "lcmb" then
+		if BMU.LCMB then
+			return stringInstalled
+		else
+			return stringNotInstalled
+		end
+	end
 	
 	-- GamePadMode "IsJustaBmuGamepadPlugin"
 	if string.lower(addonName) == "gamepad" then
@@ -1119,27 +1151,35 @@ local function SetupUI()
 	
 	-- Button on Chat Window
 	if BMU.savedVarsAcc.chatButton then
-		-- Texture
-		BMU.chatButtonTex = wm:CreateControl("Teleporter_CHAT_MENU_BUTTON", ZO_ChatWindow, CT_TEXTURE)
-		BMU.chatButtonTex:SetDimensions(33, 33)
-		BMU.chatButtonTex:SetAnchor(TOPRIGHT, ZO_ChatWindow, TOPRIGHT, -40 - BMU.savedVarsAcc.chatButtonHorizontalOffset, 6)
-		BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtn)
-		BMU.chatButtonTex:SetMouseEnabled(true)
-		BMU.chatButtonTex:SetDrawLayer(2)
-		--Handlers
-		BMU.chatButtonTex:SetHandler("OnMouseUp", function()
-			BMU.OpenTeleporter(true)
-		end)
-		
-		BMU.chatButtonTex:SetHandler("OnMouseEnter", function(self)
-			BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtnOver)
-			BMU:tooltipTextEnter(BMU.chatButtonTex, appName)
-		end)
-	  
-		BMU.chatButtonTex:SetHandler("OnMouseExit", function(self)
+		if BMU.LCMB then
+			-- LibChatMenuButton is enabled
+			-- register chat button via library
+			-- NOTE: Since BMU.chatButtonTex is not defined, the option for the offset is disabled automatically (positioning is handled by the lib)
+			BMU.chatButtonLCMB = BMU.LCMB.addChatButton("BMUChatButton", {BMU.textures.wayshrineBtn, BMU.textures.wayshrineBtnOver}, appName, function() BMU.OpenTeleporter(true) end)
+		else
+			-- do it the old way
+			-- Texture
+			BMU.chatButtonTex = wm:CreateControl("Teleporter_CHAT_MENU_BUTTON", ZO_ChatWindow, CT_TEXTURE)
+			BMU.chatButtonTex:SetDimensions(33, 33)
+			BMU.chatButtonTex:SetAnchor(TOPRIGHT, ZO_ChatWindow, TOPRIGHT, -40 - BMU.savedVarsAcc.chatButtonHorizontalOffset, 6)
 			BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtn)
-			BMU:tooltipTextEnter(BMU.chatButtonTex)
-		end)
+			BMU.chatButtonTex:SetMouseEnabled(true)
+			BMU.chatButtonTex:SetDrawLayer(2)
+			--Handlers
+			BMU.chatButtonTex:SetHandler("OnMouseUp", function()
+				BMU.OpenTeleporter(true)
+			end)
+			
+			BMU.chatButtonTex:SetHandler("OnMouseEnter", function(self)
+				BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtnOver)
+				BMU:tooltipTextEnter(BMU.chatButtonTex, appName)
+			end)
+		
+			BMU.chatButtonTex:SetHandler("OnMouseExit", function(self)
+				BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtn)
+				BMU:tooltipTextEnter(BMU.chatButtonTex)
+			end)
+		end
 	end
 	
 	-----------------------------------------------

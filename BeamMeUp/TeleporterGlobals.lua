@@ -70,6 +70,10 @@ if BMU.LibMapPing == nil and LibStub then
 	BMU.LibMapPing = LibStub('LibMapPing', true)
 end
 
+BMU.LCMB = LibChatMenuButton
+if BMU.LCMB == nil and LibStub then
+	BMU.LCMB = LibStub('LibChatMenuButton', true)
+end
 
 -------------VERY FIRST FUNCTIONS---------
 function BMU.mergeTables(t, ...)

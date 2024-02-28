@@ -7,7 +7,7 @@
 ## AddOnVersion: 354
 ## IsLibrary: false
 ## DependsOn: LibAddonMenu-2.0 LibCustomMenu LibZone
-## OptionalDependsOn: LibSlashCommander LibSets LibMapPing PortToFriendsHouse BanditsUserInterface MorrowindStyleUI
+## OptionalDependsOn: LibSlashCommander LibSets LibMapPing LibChatMenuButton PortToFriendsHouse BanditsUserInterface MorrowindStyleUI
 
 
 ## Globals / data sets

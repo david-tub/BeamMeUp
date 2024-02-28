@@ -211,6 +211,7 @@ mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_LOOP_OPTION, "Zapętlone odblokowywanie map..."
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION1, "losowo")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION2, "wg. ilości nieodkrytych kapliczek")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION3, "wg. ilości graczy")
+mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION4, "by zone name")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_CHAT_LOG_OPTION, "Umieść wyniki w oknie chatu")
 -- AUTO UNLOCK: Refuse Dialogs
 mkstr(SI.TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE, "Odblokowanie jest niemożliwe")

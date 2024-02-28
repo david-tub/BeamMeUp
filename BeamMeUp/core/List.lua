@@ -381,6 +381,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType, isChatLogging)
 						record = {}
 						record.zoneId = overlandZoneId
 						record.numPlayers = #resultList
+						record.zoneName = resultList[1].zoneName
 						if numWayshrinesDiscovered == 0 then
 							record.ratioWayshrines = 0 -- zones with no discovered wayhsrines get "highest prio" independent of the total number
 						else
@@ -401,6 +402,11 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType, isChatLogging)
 			-- sort by number of players (where are less players (to prevent unecessary loops))
 			table.sort(cleanZoneList, function(a, b)
 				return a.numPlayers < b.numPlayers
+			end)
+		elseif loopType == "zonenames" then
+			-- sort by zone name in alphabetical order
+			table.sort(cleanZoneList, function(a, b)
+				return a.zoneName < b.zoneName
 			end)
 		end
 		zoneRecordList = cleanZoneList
@@ -467,6 +473,10 @@ function BMU.showDialogAutoUnlock(zoneId)
 		entry3 = BMU.customDialog_dropdownControl:CreateItemEntry(SI.get(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION3), function() end)
 		entry3.key = "players"
 		BMU.customDialog_dropdownControl:AddItem(entry3)
+
+		entry4 = BMU.customDialog_dropdownControl:CreateItemEntry(SI.get(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION4), function() end)
+		entry4.key = "zonenames"
+		BMU.customDialog_dropdownControl:AddItem(entry4)
 		--
 		
 		-- create checkbox control

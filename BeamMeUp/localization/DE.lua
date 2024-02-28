@@ -211,6 +211,7 @@ mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_LOOP_OPTION, "Dauerschleife über die Zonen ...
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION1, "zufällig")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION2, "nach Verhältnis der unentdeckten Wegschreine")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION3, "nach Anzahl der Spieler")
+mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION4, "nach Zonennamen")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_CHAT_LOG_OPTION, "Ergebnisse im Chat ausgeben")
 -- AUTO UNLOCK: Refuse Dialogs
 mkstr(SI.TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE, "Wegschrein-Freischaltung ist nicht möglich")

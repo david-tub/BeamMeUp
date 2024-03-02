@@ -796,7 +796,9 @@ function BMU.addInfo_2(e)
 		e.textColorDisplayName = "gold"
 	elseif BMU.isFavoriteZone(e.zoneId) then
 		-- favorite zone
-		e.prio = 6
+		-- set sub-prio by slot number
+		local favSlot = BMU.isFavoriteZone(e.zoneId)
+		e.prio = 6 + (0.01 * favSlot)
 		e.textColorZoneName = "gold"
 	else
 		e.prio = 7

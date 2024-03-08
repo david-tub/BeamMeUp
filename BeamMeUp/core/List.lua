@@ -2263,8 +2263,26 @@ end
 -- 
 
 
+-- checks if specific zone is a favorite
+function BMU.isFavoriteZone(zoneId)
+	return BMU.has_value(BMU.savedVarsServ.favoriteListZones, zoneId)
+end
+
+-- checks if specific player is a favorite
+function BMU.isFavoritePlayer(displayName)
+	return BMU.has_value(BMU.savedVarsServ.favoriteListPlayers, displayName)
+end
+
+
 -- save the new favorite zone
 function BMU.addFavoriteZone(position, zoneId, zoneName)
+		-- if zone is already favorite -> swap positions
+			-- prevents that you can set the same zone to multiple slots
+			-- allows to swap the slot with existing favorites
+		oldPos = BMU.isFavoriteZone(zoneId)
+		if oldPos then
+			BMU.savedVarsServ.favoriteListZones[oldPos] = BMU.savedVarsServ.favoriteListZones[position]
+		end
 		BMU.savedVarsServ.favoriteListZones[position] = zoneId
 		BMU.printToChat(SI.get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. position .. ": " .. zoneName)
 		BMU.refreshListAuto()
@@ -2272,10 +2290,18 @@ end
 
 -- save the new favorite player
 function BMU.addFavoritePlayer(position, displayName)
+		-- if player is already favorite -> swap positions
+			-- prevents that you can set the same player to multiple slots
+			-- allows to swap the slot with existing favorites
+		oldPos = BMU.isFavoritePlayer(displayName)
+		if oldPos then
+			BMU.savedVarsServ.favoriteListPlayers[oldPos] = BMU.savedVarsServ.favoriteListPlayers[position]
+		end
 		BMU.savedVarsServ.favoriteListPlayers[position] = displayName
 		BMU.printToChat(SI.get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. position .. ": " .. displayName)
 		BMU.refreshListAuto()
 end
+
 
 -- remove favorite zone
 function BMU.removeFavoriteZone(zoneId)

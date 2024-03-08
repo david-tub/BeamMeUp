@@ -1775,18 +1775,6 @@ function BMU.createNoResultsInfo()
 end
 
 
--- checks if specific zone is a favorite
-function BMU.isFavoriteZone(zoneId)
-	return BMU.has_value(BMU.savedVarsServ.favoriteListZones, zoneId)
-end
-
-
--- checks if specific player is a favorite
-function BMU.isFavoritePlayer(displayName)
-	return BMU.has_value(BMU.savedVarsServ.favoriteListPlayers, displayName)
-end
-
-
 -- removes an existing entry (already added zoneId) from table (TeleportAllPlayersTable) if it is not a player favorite or group member
 function BMU.removeExistingEntry(zoneId)
 	for index, record in pairs(TeleportAllPlayersTable) do

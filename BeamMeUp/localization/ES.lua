@@ -46,17 +46,17 @@ mkstr(SI.TELE_UI_VIEW_MAP_ITEM, "Ver articulo del Mapa")
 mkstr(SI.TELE_UI_TOGGLE_ARENAS, "Solo Arenas")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_ARENAS, "Grupo Arenas")
 mkstr(SI.TELE_UI_TOGGLE_TRIALS, "Pruebas")
-mkstr(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS, "Endless Dungeons")
+mkstr(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS, "Mazmorra Infinita")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS, "Grupo Mazmorras")
 mkstr(SI.TELE_UI_TOGGLE_SORT_ACRONYM, "Ordenar por acronimo")
 mkstr(SI.TELE_UI_DAYS_LEFT, "%d dias restantes")
-mkstr(SI.TELE_UI_TOGGLE_UPDATE_NAME, "Show update name")
+mkstr(SI.TELE_UI_TOGGLE_UPDATE_NAME, "Mostrar nombre de la actualización")
 mkstr(SI.TELE_UI_UNLOCK_WAYSHRINES, "Descubrimiento automatico de ermitas")
 mkstr(SI.TELE_UI_SUBMENU_FAVORITES, "Favoritos")
-mkstr(SI.TELE_UI_TOOGLE_ZONE_NAME, "Show zone name")
-mkstr(SI.TELE_UI_TOGGLE_SORT_RELEASE, "Sort by release")
-mkstr(SI.TELE_UI_TOGGLE_ACRONYM, "Show acronym")
-mkstr(SI.TELE_UI_TOOGLE_DUNGEON_NAME, "Show instance name")
+mkstr(SI.TELE_UI_TOOGLE_ZONE_NAME, "Mostrar nombre de la zona")
+mkstr(SI.TELE_UI_TOGGLE_SORT_RELEASE, "Ordenar por fecha de lanzamiento")
+mkstr(SI.TELE_UI_TOGGLE_ACRONYM, "Mostrar acrónimos")
+mkstr(SI.TELE_UI_TOOGLE_DUNGEON_NAME, "Mostrar nombre de la instancia")
 
 
 
@@ -175,8 +175,8 @@ mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT, "Ping en mapa")
 mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT_TOOLTIP, "Muestre un ping de mapa (punto de reunión) en el destino en el mapa cuando haga clic en miembros del grupo o zonas específicas (mazmorras, casas, etc.). La biblioteca LibMapPing debe estar instalada. Recuerde también: si usted es el líder del grupo, sus pings (puntos de reunión) son visibles para todos los miembros del grupo.")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS, "Muesta zonas sin jugadores o casas")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP, "Desplegar zonas en la lista principal incluso sin jugadores ni casas a las cuales transportarse.  Usted aun tiene la opcion de transportarse con oro si ha descubierto al menos una Ermita en la zona.")
-mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Show displayed zone & subzones always on top")
-mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Show currently displayed zone and subzones (opened world map) always on top of the list.")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Mostrar zonas y subzonas siempre en la parte superior")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Mostrar la zona actual y subzonas (mapa mundial abierto) siempre en la parte superior de la lista.")
 
 
 -----------------------------------------------------------------------------
@@ -192,7 +192,7 @@ mkstr(SI.TELE_KEYBINDING_CURRENT_ZONE, "Transportar a zona actual")
 mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "Transporta afuera de residencia primaria")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "Arenas / Pruebass / Mazmorras")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "Transportar a mision enfocada")
-mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Port to any zone")
+mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Teleportarse a cualquier zona")
 
 
 -----------------------------------------------------------------------------
@@ -211,7 +211,7 @@ mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_LOOP_OPTION, "Recorriendo zonas ...")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION1, "mezclar aleatoriamente")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION2, "por proporción de Ermitas sin descubrir")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION3, "por numero de Jugadores")
-mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION4, "by zone name")
+mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION4, "por nombre de zona")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_CHAT_LOG_OPTION, "Colocar resultados en el Chat")
 -- AUTO UNLOCK: Refuse Dialogs
 mkstr(SI.TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE, "Desbloquear no es posible")

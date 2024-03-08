@@ -46,17 +46,17 @@ mkstr(SI.TELE_UI_VIEW_MAP_ITEM           , "Montrer la carte")
 mkstr(SI.TELE_UI_TOGGLE_ARENAS			 , "Arènes solo")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_ARENAS	 , "Arènes de groupe")
 mkstr(SI.TELE_UI_TOGGLE_TRIALS			 , "Épreuves")
-mkstr(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS , "Endless Dungeons")
+mkstr(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS , "Donjons infinis")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS	 , "Donjons de groupe")
 mkstr(SI.TELE_UI_TOGGLE_SORT_ACRONYM	 , "Tri par acronyme")
 mkstr(SI.TELE_UI_DAYS_LEFT				 , "%d jours restants")
-mkstr(SI.TELE_UI_TOGGLE_UPDATE_NAME      , "Show update name")
+mkstr(SI.TELE_UI_TOGGLE_UPDATE_NAME      , "Afficher le nom de la mise à jour")
 mkstr(SI.TELE_UI_UNLOCK_WAYSHRINES		 , "Découverte automatique des oratoires")
 mkstr(SI.TELE_UI_SUBMENU_FAVORITES       , "Favoris")
-mkstr(SI.TELE_UI_TOOGLE_ZONE_NAME		 , "Show zone name")
-mkstr(SI.TELE_UI_TOGGLE_SORT_RELEASE     , "Sort by release")
-mkstr(SI.TELE_UI_TOGGLE_ACRONYM          , "Show acronym")
-mkstr(SI.TELE_UI_TOOGLE_DUNGEON_NAME     , "Show instance name")
+mkstr(SI.TELE_UI_TOOGLE_ZONE_NAME		 , "Afficher le nom de la zone")
+mkstr(SI.TELE_UI_TOGGLE_SORT_RELEASE     , "Trier par édition")
+mkstr(SI.TELE_UI_TOGGLE_ACRONYM          , "Afficher les acronymes")
+mkstr(SI.TELE_UI_TOOGLE_DUNGEON_NAME     , "Afficher le nom de l'instance")
 
 
 
@@ -175,8 +175,8 @@ mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT, "Signe de carte")
 mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT_TOOLTIP, "Affiche un signe sur la carte (point de ralliement) à la destination sur la carte quand vous cliquez sur des membres du groupe ou des zones spécifiques (donjons, maisons, etc.). La librairie LibMapPing doit être installée. De plus, rappelez-vous : si vous êtes le chef de groupe, vos signes (points de ralliement) sont visibles pour tous les membres du groupe.")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS, "Montrer les zones sans joueur ni maison")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP, "Montre les zones de la liste principale, même si il n'y a ni joueur ni maison vers lesquels vous puissiez voyager. Vous avez toujours la possibilité de voyager contre de l'or si vous avez découvert au moins un oratoire dans la zone.")
-mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Show displayed zone & subzones always on top")
-mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Show currently displayed zone and subzones (opened world map) always on top of the list.")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Afficher les zones et sous-zones en premier")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Affiche les zones et les sous-zones actuellement affichées (carte du monde ouverte) toujours en début de liste.")
 
 
 -----------------------------------------------------------------------------
@@ -192,7 +192,7 @@ mkstr(SI.TELE_KEYBINDING_CURRENT_ZONE, "Voyage dans la zone actuelle")
 mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "Se téléporter à l'extérieur de la résidence principale")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "Arènes / Épreuves / Donjons")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "Voyage vers la quête courante")
-mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Port to any zone")
+mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Téléportation vers zone aléatoire")
 
 
 -----------------------------------------------------------------------------
@@ -211,7 +211,7 @@ mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_LOOP_OPTION, "Parcours des zones ...")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION1, "Ordre aléatoire")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION2, "Par taux d'oratoires inconnus")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION3, "Par nombre de joueurs")
-mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION4, "by zone name")
+mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION4, "par nom de zone")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_CHAT_LOG_OPTION, "Résultats dans le tchat")
 -- AUTO UNLOCK: Refuse Dialogs
 mkstr(SI.TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE, "La découverte n'est pas possible")

@@ -1955,33 +1955,31 @@ function BMU.clickOnZoneName(button, record)
 			end
 		end
 		
-		-- favorites menu (showing in all lists except dungeon and own house tab)
-		local entries_favorites = {}
-		
+		-- zone favorite options (showing in all tabs except dungeon and own house tab)
 		if not inDungeonTab and not inOwnHouseTab then
-			-- generate menu entries favorites
+
 			if BMU.isFavoriteZone(record.zoneId) then
-				entries_favorites = {
-					{
-						label = SI.get(SI.TELE_UI_REMOVE_FAVORITE_ZONE),
-						callback = function(state) BMU.removeFavoriteZone(record.zoneId) end,
-					}
-				}
+				-- remove zone favorite
+				AddCustomMenuItem(GetString(SI_COLLECTIBLE_ACTION_REMOVE_FAVORITE), function() BMU.removeFavoriteZone(record.zoneId) end)
 			else
-				-- number of favorites displayed in the context menu
+				-- favorite list
+				local entries_favorites = {}
+				
 				for i=1, BMU.var.numFavoriteZones, 1 do
 					local favName = ""
 					if BMU.savedVarsServ.favoriteListZones[i] ~= nil then
 						favName = BMU.formatName(GetZoneNameById(BMU.savedVarsServ.favoriteListZones[i]), BMU.savedVarsAcc.formatZoneName)
 					end
 					local entry = {
-						label = SI.get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. tostring(i) .. ": " .. favName,
+						label = tostring(i) .. ": " .. favName,
 						callback = function(state) BMU.addFavoriteZone(i, record.zoneId, record.zoneName) end,
 					}			
 					table.insert(entries_favorites, entry)
 				end
+
+				AddCustomSubMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
 			end
-			AddCustomSubMenuItem(SI.get(SI.TELE_UI_SUBMENU_FAVORITES), entries_favorites)
+
 		end
 		
 		-- unlocking wayshrines menu (showing in all lists except dungeon and own house tab)
@@ -2009,7 +2007,7 @@ function BMU.clickOnZoneName(button, record)
 		-- favorite a dungeon
 		if inDungeonTab then
 			if BMU.savedVarsServ.favoriteDungeon == record.zoneId then
-				AddCustomMenuItem(SI.get(SI.TELE_UI_REMOVE_FAVORITE_ZONE), function() BMU.savedVarsServ.favoriteDungeon = 0 BMU.createTableDungeons() end)
+				AddCustomMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), function() BMU.savedVarsServ.favoriteDungeon = 0 BMU.createTableDungeons() end)
 			else
 				AddCustomMenuItem(SI.get(SI.TELE_UI_FAVORITE_ZONE), function() BMU.savedVarsServ.favoriteDungeon = record.zoneId BMU.createTableDungeons() end)
 			end
@@ -2186,30 +2184,28 @@ function BMU.clickOnPlayerName(button, record)
 			end
 		end
 		
-		-- generate menu entries favorites
-		local entries_favorites = {}
+		-- player favorite options
 		if BMU.isFavoritePlayer(record.displayName) then
-			entries_favorites = {
-				{
-					label = SI.get(SI.TELE_UI_REMOVE_FAVORITE_PLAYER),
-					callback = function(state) BMU.removeFavoritePlayer(record.displayName) end,
-				}
-			}
+			-- remove player favorite
+			AddCustomMenuItem(GetString(SI_COLLECTIBLE_ACTION_REMOVE_FAVORITE), function() BMU.removeFavoritePlayer(record.displayName) end)
 		else
-			-- number of favorites displayed in the context menu
+			-- favorite list
+			local entries_favorites = {}
+
 			for i=1, BMU.var.numFavoritePlayers, 1 do
 				local favName = ""
 				if BMU.savedVarsServ.favoriteListPlayers[i] ~= nil then
 					favName = BMU.savedVarsServ.favoriteListPlayers[i]
 				end
 				local entry = {
-					label = SI.get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. tostring(i) .. ": " .. favName,
+					label = tostring(i) .. ": " .. favName,
 					callback = function(state) BMU.addFavoritePlayer(i, record.displayName) end,
 				}			
 				table.insert(entries_favorites, entry)
 			end
+			
+			AddCustomSubMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
 		end
-		AddCustomSubMenuItem(SI.get(SI.TELE_UI_SUBMENU_FAVORITES), entries_favorites)
 		
 		-- add submenu group
 		if #entries_group > 0 then

@@ -1155,7 +1155,7 @@ local function SetupUI()
 			-- LibChatMenuButton is enabled
 			-- register chat button via library
 			-- NOTE: Since BMU.chatButtonTex is not defined, the option for the offset is disabled automatically (positioning is handled by the lib)
-			BMU.chatButtonLCMB = BMU.LCMB.addChatButton("BMUChatButton", {BMU.textures.wayshrineBtn, BMU.textures.wayshrineBtnOver}, appName, function() BMU.OpenTeleporter(true) end)
+			BMU.chatButtonLCMB = BMU.LCMB.addChatButton("!!!BMUChatButton", {BMU.textures.wayshrineBtn, BMU.textures.wayshrineBtnOver}, appName, function() BMU.OpenTeleporter(true) end)
 		else
 			-- do it the old way
 			-- Texture

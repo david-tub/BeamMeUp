@@ -1132,23 +1132,31 @@ function ListView:update()
 			--------- player tooltip ---------
 			if message.displayName ~= "" and message.championRank then
 				list.ColumnPlayerNameTex:SetHidden(false)
+				
 				-- set level text for player tooltip
 				if message.championRank >= 1 then
 					tooltipTextLevel = "CP " .. message.championRank
 				else
 					tooltipTextLevel = message.level
-				end
-				
-				
+				end	
 				tooltipTextPlayer = {message.characterName, tooltipTextLevel, message.allianceName}
+				
+				----
 				-- add source text
-				-- add separator
 				table.insert(tooltipTextPlayer, BMU.textures.tooltipSeperator)
 				for _, sourceText in pairs(message.sourcesText) do
 					table.insert(tooltipTextPlayer, sourceText)
 				end
-				
-			
+
+				----
+				-- add favorite player text
+				favSlot = BMU.isFavoritePlayer(message.displayName)
+				if favSlot then
+					table.insert(tooltipTextPlayer, BMU.textures.tooltipSeperator)
+					table.insert(tooltipTextPlayer, BMU.colorizeText(SI.get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. tostring(favSlot), "gold"))
+				end
+
+
 				if 	#tooltipTextPlayer > 0 then
 					-- show tooltip handler
 					list.ColumnPlayerNameTex:SetHandler("OnMouseEnter", function(self)
@@ -1312,6 +1320,14 @@ function ListView:update()
 				else
 					table.insert(tooltipTextZone, BMU.colorizeText(SI.get(SI.TELE_UI_DIFFERENT_INSTANCE), "red"))
 				end
+			end
+			------------------
+
+			-- Info if zone is favorite
+			favSlot = BMU.isFavoriteZone(message.zoneId)
+			if favSlot then
+				table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				table.insert(tooltipTextZone, BMU.colorizeText(SI.get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. tostring(favSlot), "gold"))
 			end
 			------------------
 			

@@ -1138,7 +1138,7 @@ function ListView:update()
 					tooltipTextLevel = "CP " .. message.championRank
 				else
 					tooltipTextLevel = message.level
-				end	
+				end
 				tooltipTextPlayer = {message.characterName, tooltipTextLevel, message.allianceName}
 				
 				----
@@ -1977,24 +1977,23 @@ function BMU.clickOnZoneName(button, record)
 			if BMU.isFavoriteZone(record.zoneId) then
 				-- remove zone favorite
 				AddCustomMenuItem(GetString(SI_COLLECTIBLE_ACTION_REMOVE_FAVORITE), function() BMU.removeFavoriteZone(record.zoneId) end)
-			else
-				-- favorite list
-				local entries_favorites = {}
-				
-				for i=1, BMU.var.numFavoriteZones, 1 do
-					local favName = ""
-					if BMU.savedVarsServ.favoriteListZones[i] ~= nil then
-						favName = BMU.formatName(GetZoneNameById(BMU.savedVarsServ.favoriteListZones[i]), BMU.savedVarsAcc.formatZoneName)
-					end
-					local entry = {
-						label = tostring(i) .. ": " .. favName,
-						callback = function(state) BMU.addFavoriteZone(i, record.zoneId, record.zoneName) end,
-					}			
-					table.insert(entries_favorites, entry)
-				end
-
-				AddCustomSubMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
 			end
+			-- favorite list
+			local entries_favorites = {}
+			
+			for i=1, BMU.var.numFavoriteZones, 1 do
+				local favName = ""
+				if BMU.savedVarsServ.favoriteListZones[i] ~= nil then
+					favName = BMU.formatName(GetZoneNameById(BMU.savedVarsServ.favoriteListZones[i]), BMU.savedVarsAcc.formatZoneName)
+				end
+				local entry = {
+					label = tostring(i) .. ": " .. favName,
+					callback = function(state) BMU.addFavoriteZone(i, record.zoneId, record.zoneName) end,
+				}			
+				table.insert(entries_favorites, entry)
+			end
+
+			AddCustomSubMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
 
 		end
 		
@@ -2204,24 +2203,24 @@ function BMU.clickOnPlayerName(button, record)
 		if BMU.isFavoritePlayer(record.displayName) then
 			-- remove player favorite
 			AddCustomMenuItem(GetString(SI_COLLECTIBLE_ACTION_REMOVE_FAVORITE), function() BMU.removeFavoritePlayer(record.displayName) end)
-		else
-			-- favorite list
-			local entries_favorites = {}
-
-			for i=1, BMU.var.numFavoritePlayers, 1 do
-				local favName = ""
-				if BMU.savedVarsServ.favoriteListPlayers[i] ~= nil then
-					favName = BMU.savedVarsServ.favoriteListPlayers[i]
-				end
-				local entry = {
-					label = tostring(i) .. ": " .. favName,
-					callback = function(state) BMU.addFavoritePlayer(i, record.displayName) end,
-				}			
-				table.insert(entries_favorites, entry)
-			end
-			
-			AddCustomSubMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
 		end
+		-- favorite list
+		local entries_favorites = {}
+
+		for i=1, BMU.var.numFavoritePlayers, 1 do
+			local favName = ""
+			if BMU.savedVarsServ.favoriteListPlayers[i] ~= nil then
+				favName = BMU.savedVarsServ.favoriteListPlayers[i]
+			end
+			local entry = {
+				label = tostring(i) .. ": " .. favName,
+				callback = function(state) BMU.addFavoritePlayer(i, record.displayName) end,
+			}			
+			table.insert(entries_favorites, entry)
+		end
+
+		AddCustomSubMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
+		
 		
 		-- add submenu group
 		if #entries_group > 0 then

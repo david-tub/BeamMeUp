@@ -34,8 +34,6 @@ mkstr(SI.TELE_UI_GROUP_EVENT, "组队事件")
 --------- Menu
 mkstr(SI.TELE_UI_FAVORITE_PLAYER, "已关注玩家")
 mkstr(SI.TELE_UI_FAVORITE_ZONE, "区域收藏夹")
-mkstr(SI.TELE_UI_REMOVE_FAVORITE_PLAYER, "移除玩家关注")
-mkstr(SI.TELE_UI_REMOVE_FAVORITE_ZONE, "移除区域收藏")
 mkstr(SI.TELE_UI_VOTE_TO_LEADER, "投票队长")
 mkstr(SI.TELE_UI_RESET_COUNTER_ZONE, "重置计数器")
 mkstr(SI.TELE_UI_INVITE_BMU_GUILD, "邀请到BeamMeUp公会")
@@ -52,12 +50,11 @@ mkstr(SI.TELE_UI_TOGGLE_SORT_ACRONYM, "以首字母排序")
 mkstr(SI.TELE_UI_DAYS_LEFT, "%d 天剩余")
 mkstr(SI.TELE_UI_TOGGLE_UPDATE_NAME, "Show update name")
 mkstr(SI.TELE_UI_UNLOCK_WAYSHRINES, "自动发现指路祭坛")
-mkstr(SI.TELE_UI_SUBMENU_FAVORITES, "收藏夹")
 mkstr(SI.TELE_UI_TOOGLE_ZONE_NAME, "Show zone name")
 mkstr(SI.TELE_UI_TOGGLE_SORT_RELEASE, "Sort by release")
 mkstr(SI.TELE_UI_TOGGLE_ACRONYM, "Show acronym")
 mkstr(SI.TELE_UI_TOOGLE_DUNGEON_NAME, "Show instance name")
- 
+
  
  
 -----------------------------------------------------------------------------
@@ -211,6 +208,7 @@ mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_LOOP_OPTION, "区域循环中…")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION1, "随机传送")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION2, "按未发现数量")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION3, "按玩家数量")
+mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION4, "by zone name")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_CHAT_LOG_OPTION, "在聊天框中输出结果")
 -- AUTO UNLOCK: Refuse Dialogs
 mkstr(SI.TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE, "无法解锁")

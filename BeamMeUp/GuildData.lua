@@ -56,7 +56,8 @@ BMU_GuildData = {
             695302,         -- "Song of Sun and Moon"       |@Eris221 Discord eryss
             796460,         -- "Les Héros des Neuf Divins"  |@Edwin_theDark discord edwinthedark
             790978,         -- "Song of Dawn and Dusk"      |@Eryss discord eryss.
-            786092,         -- "Nightingale UA"             |Contact: @rain_brd     Leader: @ruslanUA Discord:Rain(Михайло) rain_ua
+            786092,         -- "Nightingale UA"             |@rain_brd     Leader: @ruslanUA Discord:Rain(Михайло) rain_ua
+            790008,         -- "TARDIS Tamriel"             |@sapiens_o_0 Discord:sapiens_o0
         },
         ["NA Megaserver"] = {
             698893,			-- "The Descendants"			|@ravenzwind
@@ -80,6 +81,10 @@ BMU_GuildData = {
             465947,         -- "The Way Of The Sword"       |@Izahym discord: aze_the_killer
             820013,         -- "Hodor's Trading Post"       |@Orabel33 discord: Orabel33
             415209,         -- "Benevolent Adventurers"     |@Sixnco discord: sixnco
+            837571,         -- "A Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
+            276637,         -- "B Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
+            902797,         -- "C Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
+            229811,         -- "T Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
         },
     }
 

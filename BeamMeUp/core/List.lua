@@ -381,6 +381,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType, isChatLogging)
 						record = {}
 						record.zoneId = overlandZoneId
 						record.numPlayers = #resultList
+						record.zoneName = resultList[1].zoneName
 						if numWayshrinesDiscovered == 0 then
 							record.ratioWayshrines = 0 -- zones with no discovered wayhsrines get "highest prio" independent of the total number
 						else
@@ -401,6 +402,11 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType, isChatLogging)
 			-- sort by number of players (where are less players (to prevent unecessary loops))
 			table.sort(cleanZoneList, function(a, b)
 				return a.numPlayers < b.numPlayers
+			end)
+		elseif loopType == "zonenames" then
+			-- sort by zone name in alphabetical order
+			table.sort(cleanZoneList, function(a, b)
+				return a.zoneName < b.zoneName
 			end)
 		end
 		zoneRecordList = cleanZoneList
@@ -467,6 +473,10 @@ function BMU.showDialogAutoUnlock(zoneId)
 		entry3 = BMU.customDialog_dropdownControl:CreateItemEntry(SI.get(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION3), function() end)
 		entry3.key = "players"
 		BMU.customDialog_dropdownControl:AddItem(entry3)
+
+		entry4 = BMU.customDialog_dropdownControl:CreateItemEntry(SI.get(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION4), function() end)
+		entry4.key = "zonenames"
+		BMU.customDialog_dropdownControl:AddItem(entry4)
 		--
 		
 		-- create checkbox control
@@ -1122,23 +1132,31 @@ function ListView:update()
 			--------- player tooltip ---------
 			if message.displayName ~= "" and message.championRank then
 				list.ColumnPlayerNameTex:SetHidden(false)
+				
 				-- set level text for player tooltip
 				if message.championRank >= 1 then
 					tooltipTextLevel = "CP " .. message.championRank
 				else
 					tooltipTextLevel = message.level
 				end
-				
-				
 				tooltipTextPlayer = {message.characterName, tooltipTextLevel, message.allianceName}
+				
+				----
 				-- add source text
-				-- add separator
 				table.insert(tooltipTextPlayer, BMU.textures.tooltipSeperator)
 				for _, sourceText in pairs(message.sourcesText) do
 					table.insert(tooltipTextPlayer, sourceText)
 				end
-				
-			
+
+				----
+				-- add favorite player text
+				favSlot = BMU.isFavoritePlayer(message.displayName)
+				if favSlot then
+					table.insert(tooltipTextPlayer, BMU.textures.tooltipSeperator)
+					table.insert(tooltipTextPlayer, BMU.colorizeText(SI.get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. tostring(favSlot), "gold"))
+				end
+
+
 				if 	#tooltipTextPlayer > 0 then
 					-- show tooltip handler
 					list.ColumnPlayerNameTex:SetHandler("OnMouseEnter", function(self)
@@ -1302,6 +1320,14 @@ function ListView:update()
 				else
 					table.insert(tooltipTextZone, BMU.colorizeText(SI.get(SI.TELE_UI_DIFFERENT_INSTANCE), "red"))
 				end
+			end
+			------------------
+
+			-- Info if zone is favorite
+			favSlot = BMU.isFavoriteZone(message.zoneId)
+			if favSlot then
+				table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
+				table.insert(tooltipTextZone, BMU.colorizeText(SI.get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. tostring(favSlot), "gold"))
 			end
 			------------------
 			
@@ -1945,33 +1971,30 @@ function BMU.clickOnZoneName(button, record)
 			end
 		end
 		
-		-- favorites menu (showing in all lists except dungeon and own house tab)
-		local entries_favorites = {}
-		
+		-- zone favorite options (showing in all tabs except dungeon and own house tab)
 		if not inDungeonTab and not inOwnHouseTab then
-			-- generate menu entries favorites
+
 			if BMU.isFavoriteZone(record.zoneId) then
-				entries_favorites = {
-					{
-						label = SI.get(SI.TELE_UI_REMOVE_FAVORITE_ZONE),
-						callback = function(state) BMU.removeFavoriteZone(record.zoneId) end,
-					}
-				}
-			else
-				-- number of favorites displayed in the context menu
-				for i=1, BMU.var.numFavoriteZones, 1 do
-					local favName = ""
-					if BMU.savedVarsServ.favoriteListZones[i] ~= nil then
-						favName = BMU.formatName(GetZoneNameById(BMU.savedVarsServ.favoriteListZones[i]), BMU.savedVarsAcc.formatZoneName)
-					end
-					local entry = {
-						label = SI.get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. tostring(i) .. ": " .. favName,
-						callback = function(state) BMU.addFavoriteZone(i, record.zoneId, record.zoneName) end,
-					}			
-					table.insert(entries_favorites, entry)
-				end
+				-- remove zone favorite
+				AddCustomMenuItem(GetString(SI_COLLECTIBLE_ACTION_REMOVE_FAVORITE), function() BMU.removeFavoriteZone(record.zoneId) end)
 			end
-			AddCustomSubMenuItem(SI.get(SI.TELE_UI_SUBMENU_FAVORITES), entries_favorites)
+			-- favorite list
+			local entries_favorites = {}
+			
+			for i=1, BMU.var.numFavoriteZones, 1 do
+				local favName = ""
+				if BMU.savedVarsServ.favoriteListZones[i] ~= nil then
+					favName = BMU.formatName(GetZoneNameById(BMU.savedVarsServ.favoriteListZones[i]), BMU.savedVarsAcc.formatZoneName)
+				end
+				local entry = {
+					label = tostring(i) .. ": " .. favName,
+					callback = function(state) BMU.addFavoriteZone(i, record.zoneId, record.zoneName) end,
+				}			
+				table.insert(entries_favorites, entry)
+			end
+
+			AddCustomSubMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
+
 		end
 		
 		-- unlocking wayshrines menu (showing in all lists except dungeon and own house tab)
@@ -1999,7 +2022,7 @@ function BMU.clickOnZoneName(button, record)
 		-- favorite a dungeon
 		if inDungeonTab then
 			if BMU.savedVarsServ.favoriteDungeon == record.zoneId then
-				AddCustomMenuItem(SI.get(SI.TELE_UI_REMOVE_FAVORITE_ZONE), function() BMU.savedVarsServ.favoriteDungeon = 0 BMU.createTableDungeons() end)
+				AddCustomMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), function() BMU.savedVarsServ.favoriteDungeon = 0 BMU.createTableDungeons() end)
 			else
 				AddCustomMenuItem(SI.get(SI.TELE_UI_FAVORITE_ZONE), function() BMU.savedVarsServ.favoriteDungeon = record.zoneId BMU.createTableDungeons() end)
 			end
@@ -2176,30 +2199,28 @@ function BMU.clickOnPlayerName(button, record)
 			end
 		end
 		
-		-- generate menu entries favorites
-		local entries_favorites = {}
+		-- player favorite options
 		if BMU.isFavoritePlayer(record.displayName) then
-			entries_favorites = {
-				{
-					label = SI.get(SI.TELE_UI_REMOVE_FAVORITE_PLAYER),
-					callback = function(state) BMU.removeFavoritePlayer(record.displayName) end,
-				}
-			}
-		else
-			-- number of favorites displayed in the context menu
-			for i=1, BMU.var.numFavoritePlayers, 1 do
-				local favName = ""
-				if BMU.savedVarsServ.favoriteListPlayers[i] ~= nil then
-					favName = BMU.savedVarsServ.favoriteListPlayers[i]
-				end
-				local entry = {
-					label = SI.get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. tostring(i) .. ": " .. favName,
-					callback = function(state) BMU.addFavoritePlayer(i, record.displayName) end,
-				}			
-				table.insert(entries_favorites, entry)
-			end
+			-- remove player favorite
+			AddCustomMenuItem(GetString(SI_COLLECTIBLE_ACTION_REMOVE_FAVORITE), function() BMU.removeFavoritePlayer(record.displayName) end)
 		end
-		AddCustomSubMenuItem(SI.get(SI.TELE_UI_SUBMENU_FAVORITES), entries_favorites)
+		-- favorite list
+		local entries_favorites = {}
+
+		for i=1, BMU.var.numFavoritePlayers, 1 do
+			local favName = ""
+			if BMU.savedVarsServ.favoriteListPlayers[i] ~= nil then
+				favName = BMU.savedVarsServ.favoriteListPlayers[i]
+			end
+			local entry = {
+				label = tostring(i) .. ": " .. favName,
+				callback = function(state) BMU.addFavoritePlayer(i, record.displayName) end,
+			}			
+			table.insert(entries_favorites, entry)
+		end
+
+		AddCustomSubMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
+		
 		
 		-- add submenu group
 		if #entries_group > 0 then
@@ -2257,8 +2278,26 @@ end
 -- 
 
 
+-- checks if specific zone is a favorite
+function BMU.isFavoriteZone(zoneId)
+	return BMU.has_value(BMU.savedVarsServ.favoriteListZones, zoneId)
+end
+
+-- checks if specific player is a favorite
+function BMU.isFavoritePlayer(displayName)
+	return BMU.has_value(BMU.savedVarsServ.favoriteListPlayers, displayName)
+end
+
+
 -- save the new favorite zone
 function BMU.addFavoriteZone(position, zoneId, zoneName)
+		-- if zone is already favorite -> swap positions
+			-- prevents that you can set the same zone to multiple slots
+			-- allows to swap the slot with existing favorites
+		oldPos = BMU.isFavoriteZone(zoneId)
+		if oldPos then
+			BMU.savedVarsServ.favoriteListZones[oldPos] = BMU.savedVarsServ.favoriteListZones[position]
+		end
 		BMU.savedVarsServ.favoriteListZones[position] = zoneId
 		BMU.printToChat(SI.get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. position .. ": " .. zoneName)
 		BMU.refreshListAuto()
@@ -2266,10 +2305,18 @@ end
 
 -- save the new favorite player
 function BMU.addFavoritePlayer(position, displayName)
+		-- if player is already favorite -> swap positions
+			-- prevents that you can set the same player to multiple slots
+			-- allows to swap the slot with existing favorites
+		oldPos = BMU.isFavoritePlayer(displayName)
+		if oldPos then
+			BMU.savedVarsServ.favoriteListPlayers[oldPos] = BMU.savedVarsServ.favoriteListPlayers[position]
+		end
 		BMU.savedVarsServ.favoriteListPlayers[position] = displayName
 		BMU.printToChat(SI.get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. position .. ": " .. displayName)
 		BMU.refreshListAuto()
 end
+
 
 -- remove favorite zone
 function BMU.removeFavoriteZone(zoneId)

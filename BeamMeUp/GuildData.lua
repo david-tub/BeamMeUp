@@ -85,6 +85,7 @@ BMU_GuildData = {
             276637,         -- "B Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
             902797,         -- "C Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
             229811,         -- "T Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
+            927751,         -- "nUber"                      |@Furyous discord: alberthoffpauir
         },
     }
 

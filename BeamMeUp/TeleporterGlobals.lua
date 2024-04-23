@@ -1668,7 +1668,7 @@ BMU.treasureAndSurveyMaps = {
 		clothier = {207991},
 		jewelry = {207993},
 		treasure = {207964, 207965, 207966, 207967, 207968, 207969, 206535, 206536, 206537},
-		clue = {207971, 207972}, --currently not sure with 207972 but came with Gold Road and the text matches
+		clue = {207971, 207972},
 	},
 }
 

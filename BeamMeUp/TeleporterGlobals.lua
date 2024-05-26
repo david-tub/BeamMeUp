@@ -252,6 +252,10 @@ BMU.dropdownSecLangValues = {1, 2, 3, 4, 5, 6, 7}
 BMU.dropdownSortChoices = {"zone name", "zone category > zone name", "most used zone > zone name", "most used zone > zone category > zone name", "number of players > zone name", "undiscovered wayshrines > zone category > zone name", "undiscovered skyshards > zone category > zone name", "last used zone > zone name", "last used zone > zone category > zone name", "missing set items > zone category > zone name (LibSets must be installed)", "zone category (zones without free options at the end) > zone name"}
 BMU.dropdownSortValues = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 
+-- default zone tab (values represent the "index" value which is handed over to createTable() function)
+BMU.dropdownDefaultTabChoices = {string.format("|t32:32:%s|t", BMU.textures.refreshBtn), string.format("|t32:32:%s|t", BMU.textures.questBtn), string.format("|t32:32:%s|t", BMU.textures.relatedItemsBtn), string.format("|t32:32:%s|t", BMU.textures.currentZoneBtn), string.format("|t32:32:%s|t", BMU.textures.delvesBtn)}
+BMU.dropdownDefaultTabValues = {0, 9, 4, 1, 5}
+
 -- prioritization of the sources
 BMU.dropdownPrioSourceChoices = {"Friends"}
 BMU.dropdownPrioSourceValues = {TELEPORTER_SOURCE_INDEX_FRIEND}

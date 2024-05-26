@@ -174,6 +174,8 @@ mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS, "プレイヤーや家のな�
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP, "ファストトラベルできるプレーヤーや家がない場合でも、メインリストにゾーンを表示します。そのゾーンで少なくとも1つの旅の祠を発見していれば、ゴールドを払って移動する選択肢はまだ残っています。")
 mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "表示されているゾーンとサブゾーンを常に先頭に表示")
 mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "現在表示されているゾーンとサブゾーン (開いているワールドマップ) を常にリストの先頭に表示します。")
+mkstr(SI.TELE_SETTINGS_DEFAULT_TAB, "Default list")
+mkstr(SI.TELE_SETTINGS_DEFAULT_TAB_TOOLTIP, "The list that is displayed by default when opening BeamMeUp.")
 
 
 -----------------------------------------------------------------------------

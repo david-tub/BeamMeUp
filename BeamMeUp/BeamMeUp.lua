@@ -261,8 +261,9 @@ function BMU.OpenTeleporter(refresh)
     BMU.win.Main_Control:SetHidden(false) -- show main window
 	BMU.initializeBlacklist()
 	if BMU.savedVarsAcc.autoRefresh and refresh then
+		-- reset input and load default tab
 		BMU.clearInputFields()
-		BMU.createTable({index=0})
+		BMU.createTable({index=BMU.savedVarsChar.defaultTab})
 	end
 	
 	-- start auto refresh
@@ -595,6 +596,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	}
 	
 	BMU.DefaultsCharacter = {
+		["defaultTab"] = 0,
 		["sorting"] = 2,
 		["scanBankForMaps"] = true,
 		["showAllDelves"] = false,

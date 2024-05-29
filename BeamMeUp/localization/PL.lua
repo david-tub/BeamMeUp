@@ -29,7 +29,7 @@ mkstr(SI.TELE_UI_UNRELATED_ITEMS, "Mapy w innej strefie")
 mkstr(SI.TELE_UI_UNRELATED_QUESTS, "Zadania w innej strefie")
 mkstr(SI.TELE_UI_SAME_INSTANCE, "Tożsama lokalizacja")
 mkstr(SI.TELE_UI_DIFFERENT_INSTANCE, "Inna lokalizacja")
-mkstr(SI.TELE_UI_GROUP_EVENT, "Group Event")
+mkstr(SI.TELE_UI_GROUP_EVENT, "Grupowe wydarzenie")
 ---------
 --------- Menu
 mkstr(SI.TELE_UI_FAVORITE_PLAYER, "Ulubiony gracz")
@@ -44,16 +44,16 @@ mkstr(SI.TELE_UI_VIEW_MAP_ITEM, "Pokaż przedmiot - mapa")
 mkstr(SI.TELE_UI_TOGGLE_ARENAS, "Areny Jednoosobowe")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_ARENAS, "Areny Grupowe")
 mkstr(SI.TELE_UI_TOGGLE_TRIALS, "Triale")
-mkstr(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS, "Endless Dungeons")
+mkstr(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS, "Nieskończone lochy")
 mkstr(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS, "Lochy")
 mkstr(SI.TELE_UI_TOGGLE_SORT_ACRONYM, "Sortuj wg. skrótu")
 mkstr(SI.TELE_UI_DAYS_LEFT, "Pozostało %d dni")
-mkstr(SI.TELE_UI_TOGGLE_UPDATE_NAME, "Show update name")
+mkstr(SI.TELE_UI_TOGGLE_UPDATE_NAME, "Pokaż nazwę aktualizacji")
 mkstr(SI.TELE_UI_UNLOCK_WAYSHRINES, "Automatyczne odkrywanie kapliczek")
-mkstr(SI.TELE_UI_TOOGLE_ZONE_NAME, "Show zone name")
-mkstr(SI.TELE_UI_TOGGLE_SORT_RELEASE, "Sort by release")
-mkstr(SI.TELE_UI_TOGGLE_ACRONYM, "Show acronym")
-mkstr(SI.TELE_UI_TOOGLE_DUNGEON_NAME, "Show instance name")
+mkstr(SI.TELE_UI_TOOGLE_ZONE_NAME, "Pokaż nazwę strefy")
+mkstr(SI.TELE_UI_TOGGLE_SORT_RELEASE, "Sortuj wg. daty wydania")
+mkstr(SI.TELE_UI_TOGGLE_ACRONYM, "Pokaż akronim")
+mkstr(SI.TELE_UI_TOOGLE_DUNGEON_NAME, "Pokaż pełną nazwę")
 
 
 
@@ -172,8 +172,10 @@ mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT, "Znacznik mapy")
 mkstr(SI.TELE_SETTINGS_USE_RALLY_POINT_TOOLTIP, "Pokazuje znacznik mapy (punkt zbiórki) jako cel na mapie kiedy klikniesz na członka grupy lub konkretną lokację (lochy, domy, itd.). Biblioteka LibMapPing musi być zainstalowana. Pamiętaj również, że jeśli jesteś liderem grupy Twoje zaznaczenia (punkty zbiórki) są widoczne dla wszystkich członków grupy.")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS, "Pokaż mapy bez graczy i domów")
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP, "Pokazuje mapy w głównej liście nawet jeśli nie ma w niej gracza ani domu do którego możesz podróżować. Nadal masz możliwość podróżować za złoto jeżeli odkryto co najmniej jedną kapliczkę na tej mapie.")
-mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Show displayed zone & subzones always on top")
-mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Show currently displayed zone and subzones (opened world map) always on top of the list.")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Wyświetlana strefa i podstrefy zawsze na górze")
+mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Pokaż aktualnie wyświetlaną na mapie świata strefę oraz jej podstrefy zawsze na górze listy.")
+mkstr(SI.TELE_SETTINGS_DEFAULT_TAB, "Default list")
+mkstr(SI.TELE_SETTINGS_DEFAULT_TAB_TOOLTIP, "The list that is displayed by default when opening BeamMeUp.")
 
 
 -----------------------------------------------------------------------------
@@ -189,7 +191,7 @@ mkstr(SI.TELE_KEYBINDING_CURRENT_ZONE, "Podróżuj do obecnej strefy")
 mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "Podróż na zewnątrz Głównej Rezydencji")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "Areny / Triale / Lochy")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "Podróż do śledzonego zadania")
-mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Port to any zone")
+mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Losowy teleport")
 
 
 -----------------------------------------------------------------------------
@@ -208,7 +210,7 @@ mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_LOOP_OPTION, "Zapętlone odblokowywanie map..."
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION1, "losowo")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION2, "wg. ilości nieodkrytych kapliczek")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION3, "wg. ilości graczy")
-mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION4, "by zone name")
+mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION4, "wg. nazwy strefy")
 mkstr(SI.TELE_DIALOG_AUTO_UNLOCK_CHAT_LOG_OPTION, "Umieść wyniki w oknie chatu")
 -- AUTO UNLOCK: Refuse Dialogs
 mkstr(SI.TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE, "Odblokowanie jest niemożliwe")

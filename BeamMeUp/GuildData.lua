@@ -77,7 +77,6 @@ BMU_GuildData = {
             401657,			-- "Zions of Chaos"				|@Shinigami Discord-Name Ingame @WrathofShinigami
             197803,			-- "Celestial Rift"				|@Shiseida Discord-Name Ingame noch rausfinden gilde aktuell nicht gelistet
             869871,			-- "Allegiance of Asgard"		|@joyousdeath Discord-Name Joy<3
-            781641,			-- "Pride of Ebon"				|@LilMuffin Discord-Name Ingame noch raufinden
             465947,         -- "The Way Of The Sword"       |@Izahym discord: aze_the_killer
             820013,         -- "Hodor's Trading Post"       |@Orabel33 discord: Orabel33
             415209,         -- "Benevolent Adventurers"     |@Sixnco discord: sixnco
@@ -85,6 +84,9 @@ BMU_GuildData = {
             276637,         -- "B Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
             902797,         -- "C Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
             229811,         -- "T Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
+            927751,         -- "nUber"                      |@Furyous discord: alberthoffpauir
+            927611,         -- "O Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
+            930593,         -- "Cradlecrush Cohorts"        |@bluberrygamingyt (main account)/@b3rryV2 (guild leader account), discord: bluberrygaming
         },
     }
 

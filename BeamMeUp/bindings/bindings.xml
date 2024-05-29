@@ -25,6 +25,11 @@
 			<Action name="BMU_TOGGLE_MAIN_DUNGEON_FINDER">
 				<Down>BMU.PortalHandlerKeyPress(6)</Down>
 			</Action>
+
+			<Action name="BMU_TOGGLE_OWN_HOUSES">
+				<Down>BMU.PortalHandlerKeyPress(7)</Down>
+			</Action>
+			
 			
 			<Action name="BMU_WAYSHRINE_UNLOCK">
 				<Down>BMU.PortalHandlerKeyPress(10)</Down>

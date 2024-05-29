@@ -174,6 +174,8 @@ mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS, "Zeige Regionen ohne Schnellr
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP, "Zeige Regionen bzw. Oberflächen-Maps in der Hauptliste an, auch wenn es keine Schnellreise-Möglichkeit gibt (kein Spieler oder Haus zu dem/das du reisen kannst).")
 mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Angezeigte Zone & Unterzonen immer oben anzeigen")
 mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Aktuell angezeigte Zone und Unterzonen (geöffnete Karte) immer an oberster Stelle der Liste anzeigen.")
+mkstr(SI.TELE_SETTINGS_DEFAULT_TAB, "Standardliste")
+mkstr(SI.TELE_SETTINGS_DEFAULT_TAB_TOOLTIP, "Die Liste, die standardmäßig beim Öffnen von BeamMeUp angezeigt wird.")
 
 
 -----------------------------------------------------------------------------

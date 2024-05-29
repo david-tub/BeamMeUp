@@ -252,6 +252,10 @@ BMU.dropdownSecLangValues = {1, 2, 3, 4, 5, 6, 7}
 BMU.dropdownSortChoices = {"zone name", "zone category > zone name", "most used zone > zone name", "most used zone > zone category > zone name", "number of players > zone name", "undiscovered wayshrines > zone category > zone name", "undiscovered skyshards > zone category > zone name", "last used zone > zone name", "last used zone > zone category > zone name", "missing set items > zone category > zone name (LibSets must be installed)", "zone category (zones without free options at the end) > zone name"}
 BMU.dropdownSortValues = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 
+-- default zone tab (values represent the "index" value which is handed over to createTable() function)
+BMU.dropdownDefaultTabChoices = {string.format("|t32:32:%s|t", BMU.textures.refreshBtn), string.format("|t32:32:%s|t", BMU.textures.questBtn), string.format("|t32:32:%s|t", BMU.textures.relatedItemsBtn), string.format("|t32:32:%s|t", BMU.textures.currentZoneBtn), string.format("|t32:32:%s|t", BMU.textures.delvesBtn)}
+BMU.dropdownDefaultTabValues = {0, 9, 4, 1, 5}
+
 -- prioritization of the sources
 BMU.dropdownPrioSourceChoices = {"Friends"}
 BMU.dropdownPrioSourceValues = {TELEPORTER_SOURCE_INDEX_FRIEND}
@@ -308,7 +312,7 @@ BMU.blacklistOthers = {821, 826}
 BMU.blacklistGroupZones = {890, 893, 895, 897, 899, 904, 906, 908, 907, 913, 909, 914, 915, 916}
 
 -- all Outlaws Refuges
-BMU.blacklistRefuges = {746, 747, 748, 479, 750, 751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761, 780, 837, 971, 982, 1028, 1088, 1178, 1252, 1293, 1319, 1367, 1412}
+BMU.blacklistRefuges = {746, 747, 748, 479, 750, 751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761, 780, 837, 971, 982, 1028, 1088, 1178, 1252, 1293, 1319, 1367, 1412, 1465}
 
 --------
 
@@ -327,7 +331,7 @@ BMU.blacklistBattlegrounds = {509, 511, 510, 508, 513, 512, 514, 517, 518}
 BMU.blacklistGroupDungeons = {380, 935, 126, 931, 176, 681, 1055, 131, 1052, 31, 22, 38, 1009, 144, 936, 130, 932, 1010, 146, 933, 63, 930, 449, 64, 148, 848, 843, 283, 934, 11, 973, 974, 688, 678, 1080, 1081, 1122, 1123, 1152, 1153, 1201, 1197, 1228, 1229, 1267, 1268, 1301, 1302, 1360, 1361, 1389, 1390, 1470, 1471}
 
 -- 12 men Raids (Trials) -- order -> http://en.uesp.net/wiki/Online:Trials
-BMU.blacklistRaids = {1000, 638, 636, 639, 725, 1051, 975, 1121, 1196, 1263, 1344, 1427}
+BMU.blacklistRaids = {1000, 638, 636, 639, 725, 1051, 975, 1121, 1196, 1263, 1344, 1427, 1478}
 
 -- Solo Arenas -- https://en.uesp.net/wiki/Online:Arenas (Maelstrom Arena, Vateshran Hollows)
 BMU.blacklistSoloArenas = {677, 1227}
@@ -341,7 +345,7 @@ BMU.blacklistEndlessDungeons = {1436}
 --------
 
 -- Houses
-BMU.blacklistHouses = {940, 942, 941, 939, 938, 937, 859, 858, 878, 868, 869, 873, 860, 861, 877, 852, 853, 881, 867, 866, 874, 863, 862, 876, 871, 870, 872, 864, 865, 875, 855, 854, 880, 856, 857, 879, 944, 943, 945, 882, 883, 994, 995, 997, 996, 1005, 1008, 1007, 1006, 1042, 1043, 1044, 1045, 1059, 1060, 1061, 1063, 1108, 1109, 1064, 1125, 1126, 1128, 1129, 1130, 1154, 1155, 1192, 1193, 1199, 1200, 1218, 1219, 1220, 1233, 1234, 1264, 1265, 1270, 1271, 1275, 1276, 1277, 1307, 1342, 1343, 1306, 1345, 1363, 1364, 1432, 1433, 1434, 1435, 1437, 1468, 1472, 1473, 1438, 1479}
+BMU.blacklistHouses = {940, 942, 941, 939, 938, 937, 859, 858, 878, 868, 869, 873, 860, 861, 877, 852, 853, 881, 867, 866, 874, 863, 862, 876, 871, 870, 872, 864, 865, 875, 855, 854, 880, 856, 857, 879, 944, 943, 945, 882, 883, 994, 995, 997, 996, 1005, 1008, 1007, 1006, 1042, 1043, 1044, 1045, 1059, 1060, 1061, 1063, 1108, 1109, 1064, 1125, 1126, 1128, 1129, 1130, 1154, 1155, 1192, 1193, 1199, 1200, 1218, 1219, 1220, 1233, 1234, 1264, 1265, 1270, 1271, 1275, 1276, 1277, 1307, 1342, 1343, 1306, 1345, 1363, 1364, 1432, 1433, 1434, 1435, 1437, 1468, 1472, 1473, 1438, 1479, 1487, 1491, 1492}
 
 -----------------------------------------
 
@@ -663,7 +667,16 @@ BMU.overlandDelvesPublicDungeons = {
 		publicDungeonsAchievements = {
 			[1416] = 3657,		--The Underweave
 		}
-  },
+  	},
+	-- West Weald
+  	[1443] = {
+    		delves = {1444, 1445, 1446, 1447, 1448, 1449},
+    		publicDungeons = {1466, 1467},
+		publicDungeonsAchievements = {
+			[1466] = 4000,		--Leftwheal Trading Post
+			[1467] = 4002,		--Silorn
+		}
+	},
 	}
 			
 
@@ -824,6 +837,15 @@ BMU.nodeIndexMap = {
 		updateName = GetString(SI_CHAPTER7),
 		updateNum = 38,
 		releaseDate = "2023/06"
+	},
+	-- Lucent Citadel
+	[1478] = {
+		nodeIndex = 568,
+		abbreviation = "LC",
+		isChapter = true,
+		updateName = GetString(SI_CHAPTER8),
+		updateNum = 42,
+		releaseDate = "2024/06"
 	},
 
 	-- GROUP DUNGEONS
@@ -1634,13 +1656,24 @@ BMU.treasureAndSurveyMaps = {
 		treasure = {196201, 196202, 198087, 198098, 198099, 198100},
 		clue = {197842},
   	},
-    -- Apocrypha
+	-- Apocrypha
   	[1413] = {
 		alchemist = {198288},
 		enchanter = {198289},
 		clothier = {198290},
 		treasure = {196203, 198101, 198102},
   	},
+	-- West Weald
+	[1443] = {
+		alchemist = {207989},
+		enchanter = {207992},
+		woodworker = {166456},
+		blacksmith = {207990},
+		clothier = {207991},
+		jewelry = {207993},
+		treasure = {207964, 207965, 207966, 207967, 207968, 207969, 206535, 206536, 206537},
+		clue = {207971, 207972},
+	},
 }
 
 

@@ -174,6 +174,8 @@ mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS, "Montrer les zones sans joueu
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP, "Montre les zones de la liste principale, même si il n'y a ni joueur ni maison vers lesquels vous puissiez voyager. Vous avez toujours la possibilité de voyager contre de l'or si vous avez découvert au moins un oratoire dans la zone.")
 mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Afficher les zones et sous-zones en premier")
 mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Affiche les zones et les sous-zones actuellement affichées (carte du monde ouverte) toujours en début de liste.")
+mkstr(SI.TELE_SETTINGS_DEFAULT_TAB, "Default list")
+mkstr(SI.TELE_SETTINGS_DEFAULT_TAB_TOOLTIP, "The list that is displayed by default when opening BeamMeUp.")
 
 
 -----------------------------------------------------------------------------

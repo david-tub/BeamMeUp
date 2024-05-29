@@ -174,6 +174,8 @@ mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS, "Muesta zonas sin jugadores o
 mkstr(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP, "Desplegar zonas en la lista principal incluso sin jugadores ni casas a las cuales transportarse.  Usted aun tiene la opcion de transportarse con oro si ha descubierto al menos una Ermita en la zona.")
 mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Mostrar zonas y subzonas siempre en la parte superior")
 mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Mostrar la zona actual y subzonas (mapa mundial abierto) siempre en la parte superior de la lista.")
+mkstr(SI.TELE_SETTINGS_DEFAULT_TAB, "Default list")
+mkstr(SI.TELE_SETTINGS_DEFAULT_TAB_TOOLTIP, "The list that is displayed by default when opening BeamMeUp.")
 
 
 -----------------------------------------------------------------------------

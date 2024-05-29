@@ -127,6 +127,9 @@ function BMU.PortalHandlerKeyPress(index, favorite)
 		if index == 6 then
 			-- dungeon finder
 			BMU.createTableDungeons()
+		elseif index == 7 then
+			-- own houses
+			BMU.createTableHouses()
 		else
 			BMU.createTable({index=index})
 		end
@@ -135,9 +138,17 @@ function BMU.PortalHandlerKeyPress(index, favorite)
 		if index == 11 then -- Refresh list
 			BMU.refreshListAuto()
 		else
-			if index ~= BMU.state then
-				-- index is different -> switch tab
-				BMU.createTable({index=index})
+			if index ~= BMU.state and BMU.state ~= 14 and BMU.state ~= 11 then
+				-- index is different -> switch tab but bypass the special states (14 = Dungeon Finder, 11 = Own Houses)
+				if index == 6 then
+					-- dungeon finder
+					BMU.createTableDungeons()
+				elseif index == 7 then
+					-- own houses
+					BMU.createTableHouses()
+				else
+					BMU.createTable({index=index})
+				end
 			else
 				-- same index -> hide UI
 				BMU.HideTeleporter()
@@ -250,8 +261,9 @@ function BMU.OpenTeleporter(refresh)
     BMU.win.Main_Control:SetHidden(false) -- show main window
 	BMU.initializeBlacklist()
 	if BMU.savedVarsAcc.autoRefresh and refresh then
+		-- reset input and load default tab
 		BMU.clearInputFields()
-		BMU.createTable({index=0})
+		BMU.createTable({index=BMU.savedVarsChar.defaultTab})
 	end
 	
 	-- start auto refresh
@@ -584,6 +596,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	}
 	
 	BMU.DefaultsCharacter = {
+		["defaultTab"] = 0,
 		["sorting"] = 2,
 		["scanBankForMaps"] = true,
 		["showAllDelves"] = false,

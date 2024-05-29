@@ -2123,13 +2123,19 @@ function BMU.createTableGuilds(repeatFlag)
 				local prefixMembers = GetString("SI_GUILDMETADATAATTRIBUTE", GUILD_META_DATA_ATTRIBUTE_SIZE) .. ": "
 				local prefixLanguage = GetString("SI_GUILDMETADATAATTRIBUTE", GUILD_META_DATA_ATTRIBUTE_LANGUAGES) .. ": "
 				local guildSizeText = guildData.size .. "/500"
+				local guildTraderText = guildData.guildTraderText
+				if guildTraderText and #guildTraderText > 1 then
+					guildTraderText = GetString(SI_GUILD_TRADER_OWNERSHIP_HEADER) .. ": " .. guildTraderText
+				else
+					guildTraderText = nil
+				end
 				entry.hideButton = false
 				-- hide button and change text color if guild almost full
 				if guildData.size >= 495 then
 					entry.hideButton = true
 					guildSizeText = BMU.colorizeText(guildSizeText, "red")
 				end
-				entry.guildTooltip = {guildData.headerMessage, BMU.textures.tooltipSeperator, prefixMembers .. guildSizeText, prefixLanguage .. GetString("SI_GUILDLANGUAGEATTRIBUTEVALUE", guildData.language)}
+				entry.guildTooltip = {guildData.headerMessage, BMU.textures.tooltipSeperator, prefixMembers .. guildSizeText, prefixLanguage .. GetString("SI_GUILDLANGUAGEATTRIBUTEVALUE", guildData.language), guildTraderText}
 				entry.zoneName = GetString("SI_GUILDLANGUAGEATTRIBUTEVALUE", guildData.language) .. " || " .. guildSizeText
 				table.insert(resultList, entry)
 			end
@@ -2161,13 +2167,19 @@ function BMU.createTableGuilds(repeatFlag)
 				local prefixMembers = GetString("SI_GUILDMETADATAATTRIBUTE", GUILD_META_DATA_ATTRIBUTE_SIZE) .. ": "
 				local prefixLanguage = GetString("SI_GUILDMETADATAATTRIBUTE", GUILD_META_DATA_ATTRIBUTE_LANGUAGES) .. ": "
 				local guildSizeText = guildData.size .. "/500"
+				local guildTraderText = guildData.guildTraderText
+				if guildTraderText and #guildTraderText > 1 then
+					guildTraderText = GetString(SI_GUILD_TRADER_OWNERSHIP_HEADER) .. ": " .. guildTraderText
+				else
+					guildTraderText = nil
+				end
 				entry.prio = 1
 				-- change text color if guild almost full and reduce prio
 				if guildData.size >= 495 then
 					entry.prio = 2
 					guildSizeText = BMU.colorizeText(guildSizeText, "red")
 				end
-				entry.guildTooltip = {guildData.headerMessage, BMU.textures.tooltipSeperator, prefixMembers .. guildSizeText, prefixLanguage .. GetString("SI_GUILDLANGUAGEATTRIBUTEVALUE", guildData.language)}
+				entry.guildTooltip = {guildData.headerMessage, BMU.textures.tooltipSeperator, prefixMembers .. guildSizeText, prefixLanguage .. GetString("SI_GUILDLANGUAGEATTRIBUTEVALUE", guildData.language), guildTraderText}
 				entry.zoneName = GetString("SI_GUILDLANGUAGEATTRIBUTEVALUE", guildData.language) .. " || " .. guildSizeText
 				table.insert(tempList, entry)
 			end

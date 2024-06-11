@@ -383,52 +383,52 @@ function BMU.initializeCategoryMap()
 	
 	-- Delves
 	for index, value in pairs(BMU.getAllDelves()) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_DELVE
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_DELVE
 	end
 	
 	-- Public Dungeons
 	for index, value in pairs(BMU.getAllPublicDungeons()) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_PUBDUNGEON
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_PUBDUNGEON
 	end
 
 	-- Houses
 	for index, value in pairs(BMU.blacklistHouses) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_HOUSE
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_HOUSE
 	end
 	
 	-- 4 men Group Dungeons
 	for index, value in pairs(BMU.blacklistGroupDungeons) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_GRPDUNGEON
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_GRPDUNGEON
 	end
 	
 	-- 12 men Raids (Trials)
 	for index, value in pairs(BMU.blacklistRaids) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_TRAIL
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_TRAIL
 	end
 
 	-- Endless Dungeons
 	for index, value in pairs(BMU.blacklistEndlessDungeons) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_ENDLESSD
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_ENDLESSD
 	end
 	
 	-- Group Zones
 	for index, value in pairs(BMU.blacklistGroupZones) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_GRPZONES
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_GRPZONES
 	end
 	
 	-- Group Arenas
 	for index, value in pairs(BMU.blacklistGroupArenas) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_GRPARENA
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_GRPARENA
 	end
 	
 	-- Solo Arenas
 	for index, value in pairs(BMU.blacklistSoloArenas) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_SOLOARENA
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_SOLOARENA
 	end
 	
 	-- Overland Zones
 	for parentZoneId, tableObject in pairs(BMU.overlandDelvesPublicDungeons) do
-		BMU.CategoryMap[parentZoneId] = TELEPORTER_ZONE_CATEGORY_OVERLAND
+		BMU.CategoryMap[parentZoneId] = BMU.ZONE_CATEGORY_OVERLAND
 	end
 end
 
@@ -587,7 +587,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
     }
     
 	BMU.DefaultsServer = {
-		["prioritizationSource"] = {TELEPORTER_SOURCE_INDEX_FRIEND, TELEPORTER_SOURCE_INDEX_GUILD1, TELEPORTER_SOURCE_INDEX_GUILD2, TELEPORTER_SOURCE_INDEX_GUILD3, TELEPORTER_SOURCE_INDEX_GUILD4, TELEPORTER_SOURCE_INDEX_GUILD5}, -- default: friends - guild1 - guild2 - guild3 - guild4 - guild5
+		["prioritizationSource"] = {BMU.SOURCE_INDEX_FRIEND, BMU.SOURCE_INDEX_GUILD1, BMU.SOURCE_INDEX_GUILD2, BMU.SOURCE_INDEX_GUILD3, BMU.SOURCE_INDEX_GUILD4, BMU.SOURCE_INDEX_GUILD5}, -- default: friends - guild1 - guild2 - guild3 - guild4 - guild5
 		["favoriteListZones"] = {},
 		["favoriteListPlayers"] = {},
 		["lastofflineReminder"] = 1632859025, -- just a timestamp (2021/09/28)

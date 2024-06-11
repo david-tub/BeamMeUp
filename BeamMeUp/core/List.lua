@@ -378,7 +378,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType, isChatLogging)
 				if #resultList > 0 and resultList[1] and resultList[1].displayName ~= "" then
 					local numWayshrines, numWayshrinesDiscovered = BMU.getZoneWayshrineCompletion(overlandZoneId)
 					if numWayshrinesDiscovered < numWayshrines then
-						record = {}
+						local record = {}
 						record.zoneId = overlandZoneId
 						record.numPlayers = #resultList
 						record.zoneName = resultList[1].zoneName
@@ -444,7 +444,7 @@ function BMU.showDialogAutoUnlock(zoneId)
 	-- use player's zone if no specific zoneId is given
 	local zoneId = zoneId or GetZoneId(GetUnitZoneIndex("player"))
 	
-	-- approach: create seperate control and anchor it to the defualt dialog control (ZO_Dialog1Text) (used by many dialogs)
+	-- approach: create seperate control and anchor it to the default dialog control (ZO_Dialog1Text) (used by many dialogs)
 	-- via the dialog's update function we can interact (show, hide etc.) with the control
 	local controlName = "BMU_CustomDialogControl"
 	local sectionControl = GetControl(controlName)
@@ -462,19 +462,19 @@ function BMU.showDialogAutoUnlock(zoneId)
 		BMU.customDialog_dropdownControl = ZO_ComboBox_ObjectFromContainer(BMU.customDialog_comboBox)
 		BMU.customDialog_dropdownControl:SetSortsItems(false)
 		-- add items
-		entry1 = BMU.customDialog_dropdownControl:CreateItemEntry(SI.get(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION1), function() end)
+		local entry1 = BMU.customDialog_dropdownControl:CreateItemEntry(SI.get(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION1), function() end)
 		entry1.key = "suffle"
 		BMU.customDialog_dropdownControl:AddItem(entry1)
 		
-		entry2 = BMU.customDialog_dropdownControl:CreateItemEntry(SI.get(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION2), function() end)
+		local entry2 = BMU.customDialog_dropdownControl:CreateItemEntry(SI.get(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION2), function() end)
 		entry2.key = "wayshrines"
 		BMU.customDialog_dropdownControl:AddItem(entry2)
 		
-		entry3 = BMU.customDialog_dropdownControl:CreateItemEntry(SI.get(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION3), function() end)
+		local entry3 = BMU.customDialog_dropdownControl:CreateItemEntry(SI.get(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION3), function() end)
 		entry3.key = "players"
 		BMU.customDialog_dropdownControl:AddItem(entry3)
 
-		entry4 = BMU.customDialog_dropdownControl:CreateItemEntry(SI.get(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION4), function() end)
+		local entry4 = BMU.customDialog_dropdownControl:CreateItemEntry(SI.get(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION4), function() end)
 		entry4.key = "zonenames"
 		BMU.customDialog_dropdownControl:AddItem(entry4)
 		--
@@ -482,16 +482,15 @@ function BMU.showDialogAutoUnlock(zoneId)
 		-- create checkbox control
 		BMU.customDialog_checkboxControl = CreateControlFromVirtual("BMU_CustomCheckboxControl", BMU.customDialogSection, "ZO_CheckButton")
 		BMU.customDialog_checkboxControl:SetAnchor(BOTTOMLEFT, BMU.customDialogSection, BOTTOMLEFT, 0, 0)
-		-- TODO: localize text
+
 		ZO_CheckButton_SetLabelText(BMU.customDialog_checkboxControl, SI.get(SI.TELE_DIALOG_AUTO_UNLOCK_CHAT_LOG_OPTION))
 		--ZO_CheckButton_SetTooltipText(BMU.customDialog_checkboxControl, "check to enable the log")
+		
+		BMU.customDialog_dropdownControl:SelectItem(entry1, true)
 	end
-	
-	BMU.customDialog_dropdownControl:SelectItem(entry1, true)
 	
 	ZO_CheckButton_SetCheckState(BMU.customDialog_checkboxControl, BMU.savedVarsAcc.autoUnlockChatLogging)
 	
-
 
 	local globalDialogName
 	local dialogReference
@@ -625,7 +624,7 @@ function BMU.isZoneOverlandZone(zoneId)
 		zoneId = GetZoneId(zoneIndex)
 	end
 	
-	if BMU.categorizeZone(zoneId) == TELEPORTER_ZONE_CATEGORY_OVERLAND then
+	if BMU.categorizeZone(zoneId) == BMU.ZONE_CATEGORY_OVERLAND then
 		return true
 	else
 		return false
@@ -670,13 +669,13 @@ function BMU.PortalToPlayer(displayName, sourceIndex, zoneName, zoneId, zoneCate
 		if printToChat then
 			BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. displayName .. " - " .. zoneName)
 		end
-		if sourceIndex == TELEPORTER_SOURCE_INDEX_GROUP then
+		if sourceIndex == BMU.SOURCE_INDEX_GROUP then
 			if displayName == GetUnitDisplayName(GetGroupLeaderUnitTag()) then
 				JumpToGroupLeader()
 			else
 				JumpToGroupMember(displayName)
 			end
-		elseif sourceIndex == TELEPORTER_SOURCE_INDEX_FRIEND then
+		elseif sourceIndex == BMU.SOURCE_INDEX_FRIEND then
 			JumpToFriend(displayName)
 		else
 			-- sourceIndex > 3  -> guild 1-5
@@ -1150,7 +1149,7 @@ function ListView:update()
 
 				----
 				-- add favorite player text
-				favSlot = BMU.isFavoritePlayer(message.displayName)
+				local favSlot = BMU.isFavoritePlayer(message.displayName)
 				if favSlot then
 					table.insert(tooltipTextPlayer, BMU.textures.tooltipSeperator)
 					table.insert(tooltipTextPlayer, BMU.colorizeText(SI.get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. tostring(favSlot), "gold"))
@@ -1197,7 +1196,7 @@ function ListView:update()
 			
 			-- Parent zone name
 			-- if zone is no overland zone -> show parent map
-			if message.category ~= TELEPORTER_ZONE_CATEGORY_OVERLAND and message.parentZoneName and not message.houseTooltip then
+			if message.category ~= BMU.ZONE_CATEGORY_OVERLAND and message.parentZoneName and not message.houseTooltip then
 				if #tooltipTextZone > 0 then
 					-- add separator
 					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
@@ -1324,7 +1323,7 @@ function ListView:update()
 			------------------
 
 			-- Info if zone is favorite
-			favSlot = BMU.isFavoriteZone(message.zoneId)
+			local favSlot = BMU.isFavoriteZone(message.zoneId)
 			if favSlot then
 				table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)
 				table.insert(tooltipTextZone, BMU.colorizeText(SI.get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. tostring(favSlot), "gold"))
@@ -1395,41 +1394,41 @@ function ListView:update()
 			local texture_normal = BMU.textures.wayshrineBtn
 			local texture_over = BMU.textures.wayshrineBtnOver
 			
-			if message.category ~= nil and message.category ~= TELEPORTER_ZONE_CATEGORY_UNKNOWN then
+			if message.category ~= nil and message.category ~= BMU.ZONE_CATEGORY_UNKNOWN then
 				-- set category texture
-				if message.category == TELEPORTER_ZONE_CATEGORY_DELVE then
+				if message.category == BMU.ZONE_CATEGORY_DELVE then
 					-- set Delve texture
 					texture_normal = BMU.textures.delvesBtn
 					texture_over = BMU.textures.delvesBtnOver
-				elseif message.category == TELEPORTER_ZONE_CATEGORY_PUBDUNGEON then
+				elseif message.category == BMU.ZONE_CATEGORY_PUBDUNGEON then
 					-- set Public Dungeon texture
 					texture_normal = BMU.textures.publicDungeonBtn
 					texture_over = BMU.textures.publicDungeonBtnOver
-				elseif message.category == TELEPORTER_ZONE_CATEGORY_HOUSE then
+				elseif message.category == BMU.ZONE_CATEGORY_HOUSE then
 					-- set House texture
 					texture_normal = BMU.textures.houseBtn
 					texture_over = BMU.textures.houseBtnOver
-				elseif message.category == TELEPORTER_ZONE_CATEGORY_GRPDUNGEON then
+				elseif message.category == BMU.ZONE_CATEGORY_GRPDUNGEON then
 					-- 4 men Group Dungeons
 					texture_normal = BMU.textures.groupDungeonBtn
 					texture_over = BMU.textures.groupDungeonBtnOver
-				elseif message.category == TELEPORTER_ZONE_CATEGORY_TRAIL then
+				elseif message.category == BMU.ZONE_CATEGORY_TRAIL then
 					-- 12 men Group Dungeons
 					texture_normal = BMU.textures.raidDungeonBtn
 					texture_over = BMU.textures.raidDungeonBtnOver
-				elseif message.category == TELEPORTER_ZONE_CATEGORY_ENDLESSD then
+				elseif message.category == BMU.ZONE_CATEGORY_ENDLESSD then
 					-- endless dungeon
 					texture_normal = BMU.textures.endlessDungeonBtn
 					texture_over = BMU.textures.endlessDungeonBtnOver
-				elseif message.category == TELEPORTER_ZONE_CATEGORY_GRPZONES then
+				elseif message.category == BMU.ZONE_CATEGORY_GRPZONES then
 					-- Other Group Zones (Dungeons in Craglorn)
 					texture_normal = BMU.textures.groupZonesBtn
 					texture_over = BMU.textures.groupZonesBtnOver
-				elseif message.category == TELEPORTER_ZONE_CATEGORY_GRPARENA then
+				elseif message.category == BMU.ZONE_CATEGORY_GRPARENA then
 					-- Group Arenas
 					texture_normal = BMU.textures.groupDungeonBtn
 					texture_over = BMU.textures.groupDungeonBtnOver
-				elseif message.category == TELEPORTER_ZONE_CATEGORY_SOLOARENA then
+				elseif message.category == BMU.ZONE_CATEGORY_SOLOARENA then
 					-- Solo Arenas
 					texture_normal = BMU.textures.soloArenaBtn
 					texture_over = BMU.textures.soloArenaBtnOver
@@ -1442,7 +1441,7 @@ function ListView:update()
 			end
 			
 			-- check for Group Leader
-			if message.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP and message.isLeader then
+			if message.sourceIndexLeading == BMU.SOURCE_INDEX_GROUP and message.isLeader then
 				-- set Group Leader texture
 				texture_normal = BMU.textures.groupLeaderBtn
 				texture_over = BMU.textures.groupLeaderBtnOver
@@ -1792,7 +1791,7 @@ function BMU.clickOnZoneName(button, record)
 		end
 		
 		------ display poi on map (in case of delve, dungeon etc.) ------
-		if record.parentZoneId ~= nil and (record.category ~= TELEPORTER_ZONE_CATEGORY_OVERLAND or record.forceOutside) then			
+		if record.parentZoneId ~= nil and (record.category ~= BMU.ZONE_CATEGORY_OVERLAND or record.forceOutside) then			
 			local normalizedX
 			local normalizedZ
 			-- primary: use LibZone function
@@ -2234,11 +2233,11 @@ function BMU.clickOnPlayerName(button, record)
 		local entries_filter = {
 				{
 					label = BMU.colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_GROUP_MEMBERS), "orange"),
-					callback = function(state) BMU.createTable({index=7, filterSourceIndex=TELEPORTER_SOURCE_INDEX_GROUP}) end,
+					callback = function(state) BMU.createTable({index=7, filterSourceIndex=BMU.SOURCE_INDEX_GROUP}) end,
 				},
 				{
 					label = BMU.colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_FRIENDS), "green"),
-					callback = function(state) BMU.createTable({index=7, filterSourceIndex=TELEPORTER_SOURCE_INDEX_FRIEND}) end,
+					callback = function(state) BMU.createTable({index=7, filterSourceIndex=BMU.SOURCE_INDEX_FRIEND}) end,
 				},
 			}
 			
@@ -2294,7 +2293,7 @@ function BMU.addFavoriteZone(position, zoneId, zoneName)
 		-- if zone is already favorite -> swap positions
 			-- prevents that you can set the same zone to multiple slots
 			-- allows to swap the slot with existing favorites
-		oldPos = BMU.isFavoriteZone(zoneId)
+		local oldPos = BMU.isFavoriteZone(zoneId)
 		if oldPos then
 			BMU.savedVarsServ.favoriteListZones[oldPos] = BMU.savedVarsServ.favoriteListZones[position]
 		end
@@ -2308,7 +2307,7 @@ function BMU.addFavoritePlayer(position, displayName)
 		-- if player is already favorite -> swap positions
 			-- prevents that you can set the same player to multiple slots
 			-- allows to swap the slot with existing favorites
-		oldPos = BMU.isFavoritePlayer(displayName)
+		local oldPos = BMU.isFavoritePlayer(displayName)
 		if oldPos then
 			BMU.savedVarsServ.favoriteListPlayers[oldPos] = BMU.savedVarsServ.favoriteListPlayers[position]
 		end
@@ -2345,7 +2344,7 @@ function BMU.updateStatistic(category, zoneId)
 	-- check for block flag and add manual port cost to statisticGold and also increase total counter
 	if not BMU.blockGold then
 		-- regard only Overland zones for gold statistics
-		if category == TELEPORTER_ZONE_CATEGORY_OVERLAND then
+		if category == BMU.ZONE_CATEGORY_OVERLAND then
 			BMU.savedVarsAcc.savedGold = BMU.savedVarsAcc.savedGold + GetRecallCost()
 			self.control.statisticGold:SetText(SI.get(SI.TELE_UI_GOLD) .. " " .. BMU.formatGold(BMU.savedVarsAcc.savedGold))
 		end
@@ -2589,7 +2588,7 @@ end
 -- makes intelligent decision whether to try to port to another player or not
 function BMU.decideTryAgainPorting(errorCode, zoneId, displayName, sourceIndex, updateSavedGold)
 	-- don't try to port again when: other errors (e.g. solo zone); player is group member; player is favorite; search by player name
-	if (errorCode ~= SOCIAL_RESULT_NO_LOCATION and errorCode ~= SOCIAL_RESULT_CHARACTER_NOT_FOUND) or sourceIndex == TELEPORTER_SOURCE_INDEX_GROUP or BMU.isFavoritePlayer(displayName) or BMU.state == 2 then
+	if (errorCode ~= SOCIAL_RESULT_NO_LOCATION and errorCode ~= SOCIAL_RESULT_CHARACTER_NOT_FOUND) or sourceIndex == BMU.SOURCE_INDEX_GROUP or BMU.isFavoritePlayer(displayName) or BMU.state == 2 then
 		return -- do nothing
 	else
 		-- try to find another player in the zone

@@ -1,4 +1,4 @@
-BMU_GuildData = {
+BMU_GUILD_DATA = {
 
     -- guild houses
     guildHouses = {

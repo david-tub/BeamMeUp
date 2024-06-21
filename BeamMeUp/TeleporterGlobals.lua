@@ -221,11 +221,13 @@ end
 -- constant values for the source
 BMU.SOURCE_INDEX_GROUP = 1
 BMU.SOURCE_INDEX_FRIEND = 2
-BMU.SOURCE_INDEX_GUILD1 = 3
-BMU.SOURCE_INDEX_GUILD2 = 4
-BMU.SOURCE_INDEX_GUILD3 = 5
-BMU.SOURCE_INDEX_GUILD4 = 6
-BMU.SOURCE_INDEX_GUILD5 = 7
+BMU.SOURCE_INDEX_GUILD = {
+	[1] = 3,
+	[2] = 4,
+	[3] = 5,
+	[4] = 6,
+	[5] = 7,
+}
 
 -- constant values for zone categorization
 BMU.ZONE_CATEGORY_UNKNOWN = 0
@@ -261,7 +263,7 @@ BMU.dropdownPrioSourceChoices = {"Friends"}
 BMU.dropdownPrioSourceValues = {BMU.SOURCE_INDEX_FRIEND}
 for i = 1, GetNumGuilds() do
 	table.insert(BMU.dropdownPrioSourceChoices, GetGuildName(GetGuildId(i)))
-	table.insert(BMU.dropdownPrioSourceValues, _G["TELEPORTER_SOURCE_INDEX_GUILD" .. tostring(i)])
+	table.insert(BMU.dropdownPrioSourceValues, BMU.SOURCE_INDEX_GUILD[i])
 end
 
 -- flag to toggle debug mode

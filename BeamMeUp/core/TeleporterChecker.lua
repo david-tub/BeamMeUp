@@ -246,7 +246,7 @@ function BMU.createTable(args)
 				-- save displayName
 				consideredPlayers[e.displayName] = true
 				-- do some formating stuff
-				e = BMU.addInfo_1(e, currentZoneId, playersZoneId, _G["TELEPORTER_SOURCE_INDEX_GUILD" .. tostring(i)])
+				e = BMU.addInfo_1(e, currentZoneId, playersZoneId, BMU.SOURCE_INDEX_GUILD[i])
 				
 				-- second big filter level
 				if BMU.filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filterSourceIndex) then
@@ -699,7 +699,7 @@ function BMU.addInfo_1(e, currentZoneId, playersZoneId, sourceIndexLeading)
 		for i = 1, numGuilds do
 			local guildId = GetGuildId(i)
 			if GetGuildMemberIndexFromDisplayName(guildId, e.displayName) ~= nil then
-				table.insert(e.sources, _G["TELEPORTER_SOURCE_INDEX_GUILD" .. tostring(i)])
+				table.insert(e.sources, BMU.SOURCE_INDEX_GUILD[i])
 				table.insert(e.sourcesText, BMU.colorizeText(GetGuildName(guildId), "white"))
 			end
 		end

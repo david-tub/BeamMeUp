@@ -563,7 +563,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
     }
     
 	BMU.DefaultsServer = {
-		["prioritizationSource"] = {BMU.SOURCE_INDEX_FRIEND, BMU.SOURCE_INDEX_GUILD1, BMU.SOURCE_INDEX_GUILD2, BMU.SOURCE_INDEX_GUILD3, BMU.SOURCE_INDEX_GUILD4, BMU.SOURCE_INDEX_GUILD5}, -- default: friends - guild1 - guild2 - guild3 - guild4 - guild5
+		["prioritizationSource"] = {BMU.SOURCE_INDEX_FRIEND, BMU.SOURCE_INDEX_GUILD[1], BMU.SOURCE_INDEX_GUILD[2], BMU.SOURCE_INDEX_GUILD[3], BMU.SOURCE_INDEX_GUILD[4], BMU.SOURCE_INDEX_GUILD[5]}, -- default: friends - guild1 - guild2 - guild3 - guild4 - guild5
 		["favoriteListZones"] = {},
 		["favoriteListPlayers"] = {},
 		["lastofflineReminder"] = 1632859025, -- just a timestamp (2021/09/28)

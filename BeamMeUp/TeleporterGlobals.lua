@@ -269,9 +269,6 @@ BMU.debugMode = 0
 
 -- game language of the client
 BMU.lang = GetCVar("language.2")
-
--- flag to save the current display state (by this the UI display again after opening menus)
-BMU.displayComeback = false
 	
 -- flag to block multiple addition of gold
 BMU.blockGold = false

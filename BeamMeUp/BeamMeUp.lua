@@ -213,30 +213,6 @@ function BMU.onWorldMapChanged(wasNavigateIn)
 end
 
 
-function BMU.PortalHandlerLayerPushed(eventCode, layerIndex, activeLayerIndex)
-	if layerIndex ~= 7 then -- 7 -> Mouse Camera Mode changed, dont know, why this event triggers Layer-Pushed event
-		if not SCENE_MANAGER:IsShowing("worldMap") then
-		
-			-- user opens menu like inventory etc.
-			if BMU.savedVarsAcc.windowStay and not BMU.win.Main_Control:IsHidden() then
-				BMU.displayComeback = true
-			end
-			
-			BMU.HideTeleporter()			
-		end
-	end
-end
-
-
-function BMU.PortalHandlerLayerPopped()
-	if BMU.displayComeback == true then
-		BMU.OpenTeleporter(true)
-		BMU.displayComeback = false
-	end
-end
-
-
-
 function BMU.OpenTeleporter(refresh)
 	-- show notification (in case)
 	BMU.showNotification()
@@ -663,9 +639,6 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	BMU.TeleporterSetupUI(addOnName)
 	
     EVENT_MANAGER:RegisterForEvent(appName, EVENT_PLAYER_ACTIVATED, PlayerInitAndReady)
-	
-	EVENT_MANAGER:RegisterForEvent(appName, EVENT_ACTION_LAYER_PUSHED, BMU.PortalHandlerLayerPushed)
-    EVENT_MANAGER:RegisterForEvent(appName, EVENT_ACTION_LAYER_POPPED, BMU.PortalHandlerLayerPopped)
 	
 	WORLD_MAP_SCENE:RegisterCallback("StateChange", BMU.onWorldMapStateChanged)
     GAMEPAD_WORLD_MAP_SCENE:RegisterCallback("StateChange", BMU.onWorldMapStateChanged)

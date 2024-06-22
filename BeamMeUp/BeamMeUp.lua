@@ -213,30 +213,6 @@ function BMU.onWorldMapChanged(wasNavigateIn)
 end
 
 
-function BMU.PortalHandlerLayerPushed(eventCode, layerIndex, activeLayerIndex)
-	if layerIndex ~= 7 then -- 7 -> Mouse Camera Mode changed, dont know, why this event triggers Layer-Pushed event
-		if not SCENE_MANAGER:IsShowing("worldMap") then
-		
-			-- user opens menu like inventory etc.
-			if BMU.savedVarsAcc.windowStay and not BMU.win.Main_Control:IsHidden() then
-				BMU.displayComeback = true
-			end
-			
-			BMU.HideTeleporter()			
-		end
-	end
-end
-
-
-function BMU.PortalHandlerLayerPopped()
-	if BMU.displayComeback == true then
-		BMU.OpenTeleporter(true)
-		BMU.displayComeback = false
-	end
-end
-
-
-
 function BMU.OpenTeleporter(refresh)
 	-- show notification (in case)
 	BMU.showNotification()
@@ -383,52 +359,52 @@ function BMU.initializeCategoryMap()
 	
 	-- Delves
 	for index, value in pairs(BMU.getAllDelves()) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_DELVE
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_DELVE
 	end
 	
 	-- Public Dungeons
 	for index, value in pairs(BMU.getAllPublicDungeons()) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_PUBDUNGEON
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_PUBDUNGEON
 	end
 
 	-- Houses
 	for index, value in pairs(BMU.blacklistHouses) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_HOUSE
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_HOUSE
 	end
 	
 	-- 4 men Group Dungeons
 	for index, value in pairs(BMU.blacklistGroupDungeons) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_GRPDUNGEON
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_GRPDUNGEON
 	end
 	
 	-- 12 men Raids (Trials)
 	for index, value in pairs(BMU.blacklistRaids) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_TRAIL
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_TRAIL
 	end
 
 	-- Endless Dungeons
 	for index, value in pairs(BMU.blacklistEndlessDungeons) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_ENDLESSD
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_ENDLESSD
 	end
 	
 	-- Group Zones
 	for index, value in pairs(BMU.blacklistGroupZones) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_GRPZONES
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_GRPZONES
 	end
 	
 	-- Group Arenas
 	for index, value in pairs(BMU.blacklistGroupArenas) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_GRPARENA
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_GRPARENA
 	end
 	
 	-- Solo Arenas
 	for index, value in pairs(BMU.blacklistSoloArenas) do
-		BMU.CategoryMap[value] = TELEPORTER_ZONE_CATEGORY_SOLOARENA
+		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_SOLOARENA
 	end
 	
 	-- Overland Zones
 	for parentZoneId, tableObject in pairs(BMU.overlandDelvesPublicDungeons) do
-		BMU.CategoryMap[parentZoneId] = TELEPORTER_ZONE_CATEGORY_OVERLAND
+		BMU.CategoryMap[parentZoneId] = BMU.ZONE_CATEGORY_OVERLAND
 	end
 end
 
@@ -587,7 +563,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
     }
     
 	BMU.DefaultsServer = {
-		["prioritizationSource"] = {TELEPORTER_SOURCE_INDEX_FRIEND, TELEPORTER_SOURCE_INDEX_GUILD1, TELEPORTER_SOURCE_INDEX_GUILD2, TELEPORTER_SOURCE_INDEX_GUILD3, TELEPORTER_SOURCE_INDEX_GUILD4, TELEPORTER_SOURCE_INDEX_GUILD5}, -- default: friends - guild1 - guild2 - guild3 - guild4 - guild5
+		["prioritizationSource"] = {BMU.SOURCE_INDEX_FRIEND, BMU.SOURCE_INDEX_GUILD[1], BMU.SOURCE_INDEX_GUILD[2], BMU.SOURCE_INDEX_GUILD[3], BMU.SOURCE_INDEX_GUILD[4], BMU.SOURCE_INDEX_GUILD[5]}, -- default: friends - guild1 - guild2 - guild3 - guild4 - guild5
 		["favoriteListZones"] = {},
 		["favoriteListPlayers"] = {},
 		["lastofflineReminder"] = 1632859025, -- just a timestamp (2021/09/28)
@@ -663,9 +639,6 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	BMU.TeleporterSetupUI(addOnName)
 	
     EVENT_MANAGER:RegisterForEvent(appName, EVENT_PLAYER_ACTIVATED, PlayerInitAndReady)
-	
-	EVENT_MANAGER:RegisterForEvent(appName, EVENT_ACTION_LAYER_PUSHED, BMU.PortalHandlerLayerPushed)
-    EVENT_MANAGER:RegisterForEvent(appName, EVENT_ACTION_LAYER_POPPED, BMU.PortalHandlerLayerPopped)
 	
 	WORLD_MAP_SCENE:RegisterCallback("StateChange", BMU.onWorldMapStateChanged)
     GAMEPAD_WORLD_MAP_SCENE:RegisterCallback("StateChange", BMU.onWorldMapStateChanged)

@@ -188,7 +188,7 @@ function BMU.createTable(args)
 				-- save displayName
 				consideredPlayers[e.displayName] = true
 				-- add bunch of information to the record
-				e = BMU.addInfo_1(e, currentZoneId, playersZoneId, TELEPORTER_SOURCE_INDEX_GROUP)
+				e = BMU.addInfo_1(e, currentZoneId, playersZoneId, BMU.SOURCE_INDEX_GROUP)
 				
 				-- second big filter level
 				if BMU.filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filterSourceIndex) then
@@ -216,7 +216,7 @@ function BMU.createTable(args)
 			-- save displayName
 			consideredPlayers[e.displayName] = true
 			-- do some formating stuff
-			e = BMU.addInfo_1(e, currentZoneId, playersZoneId, TELEPORTER_SOURCE_INDEX_FRIEND)		
+			e = BMU.addInfo_1(e, currentZoneId, playersZoneId, BMU.SOURCE_INDEX_FRIEND)		
 			
 			-- second big filter level
 			if BMU.filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filterSourceIndex) then
@@ -246,7 +246,7 @@ function BMU.createTable(args)
 				-- save displayName
 				consideredPlayers[e.displayName] = true
 				-- do some formating stuff
-				e = BMU.addInfo_1(e, currentZoneId, playersZoneId, _G["TELEPORTER_SOURCE_INDEX_GUILD" .. tostring(i)])
+				e = BMU.addInfo_1(e, currentZoneId, playersZoneId, BMU.SOURCE_INDEX_GUILD[i])
 				
 				-- second big filter level
 				if BMU.filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filterSourceIndex) then
@@ -621,7 +621,7 @@ function BMU.createTable(args)
 	if dontDisplay == true then
 		return portalPlayers
 	else
-		TeleporterList:add_messages(portalPlayers, dontResetSlider)
+		BMU.TeleporterList:add_messages(portalPlayers, dontResetSlider)
 		if index == 4 and BMU.savedVarsChar.displayCounterPanel then
 			-- update counter panel for related items
 			BMU.updateRelatedItemsCounterPanel()
@@ -683,14 +683,14 @@ function BMU.addInfo_1(e, currentZoneId, playersZoneId, sourceIndexLeading)
 		e.sourceIndexLeading = sourceIndexLeading -- first source where the player was found
 		
 		-- is in Group?
-		if sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP then
-			table.insert(e.sources, TELEPORTER_SOURCE_INDEX_GROUP)
+		if sourceIndexLeading == BMU.SOURCE_INDEX_GROUP then
+			table.insert(e.sources, BMU.SOURCE_INDEX_GROUP)
 			table.insert(e.sourcesText, BMU.colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_GROUP_MEMBERS), "orange"))
 		end
 		
 		-- is Friend?
-		if sourceIndexLeading == TELEPORTER_SOURCE_INDEX_FRIEND or IsFriend(e.displayName) then
-			table.insert(e.sources, TELEPORTER_SOURCE_INDEX_FRIEND)
+		if sourceIndexLeading == BMU.SOURCE_INDEX_FRIEND or IsFriend(e.displayName) then
+			table.insert(e.sources, BMU.SOURCE_INDEX_FRIEND)
 			table.insert(e.sourcesText, BMU.colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_FRIENDS), "green"))
 		end
 		
@@ -699,7 +699,7 @@ function BMU.addInfo_1(e, currentZoneId, playersZoneId, sourceIndexLeading)
 		for i = 1, numGuilds do
 			local guildId = GetGuildId(i)
 			if GetGuildMemberIndexFromDisplayName(guildId, e.displayName) ~= nil then
-				table.insert(e.sources, _G["TELEPORTER_SOURCE_INDEX_GUILD" .. tostring(i)])
+				table.insert(e.sources, BMU.SOURCE_INDEX_GUILD[i])
 				table.insert(e.sourcesText, BMU.colorizeText(GetGuildName(guildId), "white"))
 			end
 		end
@@ -743,10 +743,10 @@ function BMU.addInfo_2(e)
 	e.mapIndex = BMU.getMapIndex(e.zoneId)
 	
 	-- check public dungeon achievement / skill point
-	if e.category == TELEPORTER_ZONE_CATEGORY_OVERLAND then
+	if e.category == BMU.ZONE_CATEGORY_OVERLAND then
 		-- overland zone --> show completion of all public dungeons in the zone
 		e.publicDungeonAchiementInfo = BMU.createPublicDungeonAchiementInfo(e.zoneId)
-	elseif e.category == TELEPORTER_ZONE_CATEGORY_PUBDUNGEON then
+	elseif e.category == BMU.ZONE_CATEGORY_PUBDUNGEON then
 		-- specific public dungeon --> show completion of itself
 		e.publicDungeonAchiementInfo = BMU.createPublicDungeonAchiementInfo(e.parentZoneId, e.zoneId)
 	end
@@ -755,13 +755,13 @@ function BMU.addInfo_2(e)
 	e.setCollectionProgress = BMU.getSetCollectionProgressString(e.zoneId, e.category, e.parentZoneId)
 	
 	-- set colors
-	if e.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP then
+	if e.sourceIndexLeading == BMU.SOURCE_INDEX_GROUP then
 		e.textColorDisplayName = "orange"
 		e.textColorZoneName = "orange"
 	elseif e.playersZone then
 		e.textColorDisplayName = "blue"
 		e.textColorZoneName = "blue"
-	elseif e.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_FRIEND then
+	elseif e.sourceIndexLeading == BMU.SOURCE_INDEX_FRIEND then
 		e.textColorDisplayName = "green"
 		e.textColorZoneName = "green"
 	else
@@ -779,10 +779,10 @@ function BMU.addInfo_2(e)
 	elseif BMU.savedVarsAcc.currentZoneAlwaysTop and e.playersZone then
 		-- current zone (players location)
 		e.prio = 1
-	elseif e.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP and e.isLeader then
+	elseif e.sourceIndexLeading == BMU.SOURCE_INDEX_GROUP and e.isLeader then
 		-- group leader
 		e.prio = 2
-	elseif e.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP and (e.category == TELEPORTER_ZONE_CATEGORY_GRPDUNGEON or e.category == TELEPORTER_ZONE_CATEGORY_TRAIL or e.category == TELEPORTER_ZONE_CATEGORY_GRPZONES or e.category == TELEPORTER_ZONE_CATEGORY_GRPARENA or e.category == TELEPORTER_ZONE_CATEGORY_ENDLESSD) then
+	elseif e.sourceIndexLeading == BMU.SOURCE_INDEX_GROUP and (e.category == BMU.ZONE_CATEGORY_GRPDUNGEON or e.category == BMU.ZONE_CATEGORY_TRAIL or e.category == BMU.ZONE_CATEGORY_GRPZONES or e.category == BMU.ZONE_CATEGORY_GRPARENA or e.category == BMU.ZONE_CATEGORY_ENDLESSD) then
 		-- group member is in 4 men Group Dungeons | 12 men Raids (Trials) | Group Zones | Group Arenas | Endless Dungeons
 		e.prio = 3
 	elseif BMU.isFavoritePlayer(e.displayName) and BMU.isFavoriteZone(e.zoneId) then
@@ -844,9 +844,9 @@ function BMU.getColorizedPublicDungeonAchievementText(overlandZoneId, publicDung
 		-- local name, _, _, _, completed, _, _ = GetAchievementInfo(achievmentId)
 		local completed = IsAchievementComplete(achievmentId)
 		if completed then
-			return BMU.textures.acceptGreen .. "  " .. BMU.colorizeText(BMU.formatName(GetZoneNameById(publicDungeonZoneId)), "green")
+			return BMU.textures.acceptGreen .. "  " .. BMU.formatName(GetZoneNameById(publicDungeonZoneId))
 		else
-			return BMU.textures.declineRed .. "  " .. BMU.colorizeText(BMU.formatName(GetZoneNameById(publicDungeonZoneId)), "red")
+			return BMU.textures.declineRed .. "  " .. BMU.formatName(GetZoneNameById(publicDungeonZoneId))
 		end
 	end
 end
@@ -883,7 +883,7 @@ function BMU.getNumSetCollectionProgressPieces(zoneId, category, parentZoneId)
 			workingZoneId = zoneId
 		end
 		
-		if not (numUnlocked and numTotal) and (category == TELEPORTER_ZONE_CATEGORY_DELVE or category == TELEPORTER_ZONE_CATEGORY_PUBDUNGEON) and parentZoneId then
+		if not (numUnlocked and numTotal) and (category == BMU.ZONE_CATEGORY_DELVE or category == BMU.ZONE_CATEGORY_PUBDUNGEON) and parentZoneId then
 			-- catch possible exceptions | pcall returns false if function call fails, otherwise true
 			if pcall(function() BMU.LibSets.GetNumItemSetCollectionZoneUnlockedPieces(parentZoneId) end) then
 				numUnlocked, numTotal = BMU.LibSets.GetNumItemSetCollectionZoneUnlockedPieces(parentZoneId)
@@ -941,7 +941,7 @@ function BMU.filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filt
 	if index == 1 then
 		-- only add records of the current (displayed) zone (and ensure that a record without player (dark red) is only added if there is no other record -> see BMU.checkOnceOnly())
 		-- OR if displayed zone is not overland and zone is parent of current zone (e.g. to see the parent overland zone in the list if the player is in a delve)
-		if (e.currentZone and BMU.checkOnceOnly(false, e)) or (BMU.categorizeZone(currentZoneId) ~= TELEPORTER_ZONE_CATEGORY_OVERLAND and e.zoneId == BMU.getParentZoneId(currentZoneId) and BMU.checkOnceOnly(true, e)) then
+		if (e.currentZone and BMU.checkOnceOnly(false, e)) or (BMU.categorizeZone(currentZoneId) ~= BMU.ZONE_CATEGORY_OVERLAND and e.zoneId == BMU.getParentZoneId(currentZoneId) and BMU.checkOnceOnly(true, e)) then
 			return true
 		end
 		
@@ -969,7 +969,7 @@ function BMU.filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filt
 			-- add all delves and public dungeons
 			-- zone is delve or public dungeon + not blacklisted + add only once to list
 			local zoneCategory = BMU.categorizeZone(e.zoneId)
-			if (zoneCategory == TELEPORTER_ZONE_CATEGORY_DELVE or zoneCategory == TELEPORTER_ZONE_CATEGORY_PUBDUNGEON) and not BMU.isBlacklisted(e.zoneId, e.sourceIndexLeading, false) and BMU.checkOnceOnly(BMU.savedVarsAcc.zoneOnceOnly, e) then
+			if (zoneCategory == BMU.ZONE_CATEGORY_DELVE or zoneCategory == BMU.ZONE_CATEGORY_PUBDUNGEON) and not BMU.isBlacklisted(e.zoneId, e.sourceIndexLeading, false) and BMU.checkOnceOnly(BMU.savedVarsAcc.zoneOnceOnly, e) then
 				return true
 			end
 		else
@@ -1017,7 +1017,7 @@ function BMU.isBlacklisted(zoneId, sourceIndex, onlyMaps)
 			return false
 		else
 			-- seperate filtering, if group member (whitelisting)
-			if sourceIndex == TELEPORTER_SOURCE_INDEX_GROUP then
+			if sourceIndex == BMU.SOURCE_INDEX_GROUP then
 				--return true
 				return not BMU.isWhitelisted(BMU.whitelistGroupMembers, zoneId, false)
 			end
@@ -1035,7 +1035,7 @@ function BMU.isBlacklisted(zoneId, sourceIndex, onlyMaps)
 
 	if BMU.blacklist[zoneId] then
 		-- separate filtering, if group member (whitelisting)
-		if sourceIndex == TELEPORTER_SOURCE_INDEX_GROUP then
+		if sourceIndex == BMU.SOURCE_INDEX_GROUP then
 			--return true
 			return not BMU.isWhitelisted(BMU.whitelistGroupMembers, zoneId, false)
 		end
@@ -1189,7 +1189,7 @@ function BMU.categorizeZone(zoneId)
 	if value ~= nil then
 		return value									-- category index
 	else
-		return TELEPORTER_ZONE_CATEGORY_UNKNOWN			-- category index (unknown)
+		return BMU.ZONE_CATEGORY_UNKNOWN			-- category index (unknown)
 	end
 end
 
@@ -1353,7 +1353,7 @@ function BMU.itemIsRelated(portalPlayers, bagId, slotIndex, itemZoneId)
 	-- go over all records in portalPlayers
 	for index, record in ipairs(portalPlayers) do
 		-- only check overland maps & Cyrodiil
-		if record.category == TELEPORTER_ZONE_CATEGORY_OVERLAND or record.zoneId == 181 then
+		if record.category == BMU.ZONE_CATEGORY_OVERLAND or record.zoneId == 181 then
 			-- try to match with zone
 			if record.zoneId == itemZoneId then
 				return true, BMU.addItemInformation(record, bagId, slotIndex), index
@@ -1369,7 +1369,7 @@ function BMU.leadIsRelated(portalPlayers, antiquityId)
 	-- go over all records in portalPlayers
 	for index, record in ipairs(portalPlayers) do
 		-- only check overland maps
-		if record.category == TELEPORTER_ZONE_CATEGORY_OVERLAND then
+		if record.category == BMU.ZONE_CATEGORY_OVERLAND then
 			-- try to match lead with zone
 			if GetAntiquityZoneId(antiquityId) == record.zoneId then
 				return true, BMU.addLeadInformation(record, antiquityId), index
@@ -1628,7 +1628,6 @@ function BMU.createUnrelatedQuestsRecords(unRelatedQuests)
 		if questZoneId ~= 0 then
 			-- get exact quest location
 			questZoneId = BMU.findExactQuestLocation(slotIndex)
-			questZoneName =  BMU.formatName(GetZoneNameById(questZoneId), BMU.savedVarsAcc.formatZoneName)
 		end
 		local questRepeatType = GetJournalQuestRepeatType(slotIndex)
 		
@@ -1728,7 +1727,6 @@ function BMU.questIsRelated(portalPlayers, slotIndex)
 	if questZoneId ~= 0 then
 		-- get exact quest location
 		questZoneId = BMU.findExactQuestLocation(slotIndex)
-		questZoneName =  BMU.formatName(GetZoneNameById(questZoneId), BMU.savedVarsAcc.formatZoneName)
 	end
 	local questRepeatType = GetJournalQuestRepeatType(slotIndex)
 	
@@ -1778,7 +1776,7 @@ end
 -- removes an existing entry (already added zoneId) from table (TeleportAllPlayersTable) if it is not a player favorite or group member
 function BMU.removeExistingEntry(zoneId)
 	for index, record in pairs(TeleportAllPlayersTable) do
-		if record.zoneId == zoneId and not BMU.isFavoritePlayer(record.displayName) and record.sourceIndexLeading ~= TELEPORTER_SOURCE_INDEX_GROUP then
+		if record.zoneId == zoneId and not BMU.isFavoritePlayer(record.displayName) and record.sourceIndexLeading ~= BMU.SOURCE_INDEX_GROUP then
 			table.remove(TeleportAllPlayersTable, index)
 		end
 	end
@@ -1803,10 +1801,10 @@ function BMU.decidePrioDisplay(record1, record2)
 		return true
 	elseif record2.isLeader and not record1.isLeader then
 		return false
-	elseif record1.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP and record2.sourceIndexLeading ~= TELEPORTER_SOURCE_INDEX_GROUP then
+	elseif record1.sourceIndexLeading == BMU.SOURCE_INDEX_GROUP and record2.sourceIndexLeading ~= BMU.SOURCE_INDEX_GROUP then
 		-- group is always comes first
 		return true
-	elseif record1.sourceIndexLeading ~= TELEPORTER_SOURCE_INDEX_GROUP and record2.sourceIndexLeading == TELEPORTER_SOURCE_INDEX_GROUP then
+	elseif record1.sourceIndexLeading ~= BMU.SOURCE_INDEX_GROUP and record2.sourceIndexLeading == BMU.SOURCE_INDEX_GROUP then
 		-- group is always comes first
 		return false
 	elseif BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, record1.sourceIndexLeading) < BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, record2.sourceIndexLeading) then
@@ -1934,7 +1932,7 @@ function BMU.createTableHouses()
 		table.insert(resultList, BMU.createNoResultsInfo())
 	end
 	
-	TeleporterList:add_messages(resultList)
+	BMU.TeleporterList:add_messages(resultList)
 end
 
 
@@ -2022,7 +2020,7 @@ function BMU.createTablePTF()
 	
 	table.insert(resultList, openPTF)
 	
-	TeleporterList:add_messages(resultList)
+	BMU.TeleporterList:add_messages(resultList)
 end
 
 
@@ -2202,7 +2200,7 @@ function BMU.createTableGuilds(repeatFlag)
 	-- add partner guild list to final list
 	for _, v in pairs(tempList) do table.insert(resultList, v) end
 	
-	TeleporterList:add_messages(resultList)
+	BMU.TeleporterList:add_messages(resultList)
 	
 	if not success then
 		-- try again
@@ -2419,7 +2417,7 @@ function BMU.createTableDungeons()
 		table.insert(resultList, BMU.createNoResultsInfo())
 	end
 	
-	TeleporterList:add_messages(resultList)
+	BMU.TeleporterList:add_messages(resultList)
 end
 
 

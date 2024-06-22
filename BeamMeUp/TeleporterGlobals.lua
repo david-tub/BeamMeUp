@@ -27,9 +27,9 @@ BMU.var = {
 	colGray		 = "8c8c8c", -- light gray for placeholder
   },
   
-  BMUGuilds = BMU_GuildData.officialGuilds,
-  partnerGuilds = BMU_GuildData.partnerGuilds,
-  guildHouse = BMU_GuildData.guildHouses,
+  BMUGuilds = BMU_GUILD_DATA.officialGuilds,
+  partnerGuilds = BMU_GUILD_DATA.partnerGuilds,
+  guildHouse = BMU_GUILD_DATA.guildHouses,
 
   numFavoriteZones = 10,
   numFavoritePlayers = 5,
@@ -219,26 +219,28 @@ elseif (ld.month == 12 and ld.day >= 29) or (ld.month == 1 and ld.day == 1) or (
 end
 
 -- constant values for the source
-TELEPORTER_SOURCE_INDEX_GROUP = 1
-TELEPORTER_SOURCE_INDEX_FRIEND = 2
-TELEPORTER_SOURCE_INDEX_GUILD1 = 3
-TELEPORTER_SOURCE_INDEX_GUILD2 = 4
-TELEPORTER_SOURCE_INDEX_GUILD3 = 5
-TELEPORTER_SOURCE_INDEX_GUILD4 = 6
-TELEPORTER_SOURCE_INDEX_GUILD5 = 7
+BMU.SOURCE_INDEX_GROUP = 1
+BMU.SOURCE_INDEX_FRIEND = 2
+BMU.SOURCE_INDEX_GUILD = {
+	[1] = 3,
+	[2] = 4,
+	[3] = 5,
+	[4] = 6,
+	[5] = 7,
+}
 
 -- constant values for zone categorization
-TELEPORTER_ZONE_CATEGORY_UNKNOWN = 0
-TELEPORTER_ZONE_CATEGORY_DELVE = 1
-TELEPORTER_ZONE_CATEGORY_PUBDUNGEON = 2
-TELEPORTER_ZONE_CATEGORY_HOUSE = 3
-TELEPORTER_ZONE_CATEGORY_GRPDUNGEON = 4
-TELEPORTER_ZONE_CATEGORY_TRAIL = 5
-TELEPORTER_ZONE_CATEGORY_ENDLESSD = 6
-TELEPORTER_ZONE_CATEGORY_GRPZONES = 7
-TELEPORTER_ZONE_CATEGORY_GRPARENA = 8
-TELEPORTER_ZONE_CATEGORY_SOLOARENA = 9
-TELEPORTER_ZONE_CATEGORY_OVERLAND = 100
+BMU.ZONE_CATEGORY_UNKNOWN = 0
+BMU.ZONE_CATEGORY_DELVE = 1
+BMU.ZONE_CATEGORY_PUBDUNGEON = 2
+BMU.ZONE_CATEGORY_HOUSE = 3
+BMU.ZONE_CATEGORY_GRPDUNGEON = 4
+BMU.ZONE_CATEGORY_TRAIL = 5
+BMU.ZONE_CATEGORY_ENDLESSD = 6
+BMU.ZONE_CATEGORY_GRPZONES = 7
+BMU.ZONE_CATEGORY_GRPARENA = 8
+BMU.ZONE_CATEGORY_SOLOARENA = 9
+BMU.ZONE_CATEGORY_OVERLAND = 100
 
 -- flag and cache to check if quest data in journal changed
 BMU.questDataCache = {}
@@ -258,10 +260,10 @@ BMU.dropdownDefaultTabValues = {0, 9, 4, 1, 5}
 
 -- prioritization of the sources
 BMU.dropdownPrioSourceChoices = {"Friends"}
-BMU.dropdownPrioSourceValues = {TELEPORTER_SOURCE_INDEX_FRIEND}
+BMU.dropdownPrioSourceValues = {BMU.SOURCE_INDEX_FRIEND}
 for i = 1, GetNumGuilds() do
 	table.insert(BMU.dropdownPrioSourceChoices, GetGuildName(GetGuildId(i)))
-	table.insert(BMU.dropdownPrioSourceValues, _G["TELEPORTER_SOURCE_INDEX_GUILD" .. tostring(i)])
+	table.insert(BMU.dropdownPrioSourceValues, BMU.SOURCE_INDEX_GUILD[i])
 end
 
 -- flag to toggle debug mode
@@ -269,9 +271,6 @@ BMU.debugMode = 0
 
 -- game language of the client
 BMU.lang = GetCVar("language.2")
-
--- flag to save the current display state (by this the UI display again after opening menus)
-BMU.displayComeback = false
 	
 -- flag to block multiple addition of gold
 BMU.blockGold = false
@@ -1710,17 +1709,17 @@ end
 
 ----------------------------------------- Sorting/Grouping
 BMU.sortingByCategory = {
-	[TELEPORTER_ZONE_CATEGORY_OVERLAND] 	= 1,
-	[TELEPORTER_ZONE_CATEGORY_PUBDUNGEON] 	= 2,
-	[TELEPORTER_ZONE_CATEGORY_DELVE] 		= 3,
-	[TELEPORTER_ZONE_CATEGORY_UNKNOWN] 		= 4,
-	[TELEPORTER_ZONE_CATEGORY_TRAIL] 		= 5,
-	[TELEPORTER_ZONE_CATEGORY_GRPDUNGEON] 	= 6,
-	[TELEPORTER_ZONE_CATEGORY_GRPARENA] 	= 7,
-	[TELEPORTER_ZONE_CATEGORY_ENDLESSD] 	= 8,
-	[TELEPORTER_ZONE_CATEGORY_GRPZONES] 	= 9,
-	[TELEPORTER_ZONE_CATEGORY_HOUSE] 		= 10,
-	[TELEPORTER_ZONE_CATEGORY_SOLOARENA] 	= 11}
+	[BMU.ZONE_CATEGORY_OVERLAND] 	= 1,
+	[BMU.ZONE_CATEGORY_PUBDUNGEON] 	= 2,
+	[BMU.ZONE_CATEGORY_DELVE] 		= 3,
+	[BMU.ZONE_CATEGORY_UNKNOWN] 		= 4,
+	[BMU.ZONE_CATEGORY_TRAIL] 		= 5,
+	[BMU.ZONE_CATEGORY_GRPDUNGEON] 	= 6,
+	[BMU.ZONE_CATEGORY_GRPARENA] 	= 7,
+	[BMU.ZONE_CATEGORY_ENDLESSD] 	= 8,
+	[BMU.ZONE_CATEGORY_GRPZONES] 	= 9,
+	[BMU.ZONE_CATEGORY_HOUSE] 		= 10,
+	[BMU.ZONE_CATEGORY_SOLOARENA] 	= 11}
 
 -----------------------------------------
 

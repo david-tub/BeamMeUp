@@ -1234,7 +1234,7 @@ local function SetupUI()
   teleporterWin.appTitle:SetAnchor(CENTER, teleporterWin.Main_Control, TOP, nil, -62*BMU.savedVarsAcc.Scale)
   
   ----- This is where we create the list element for TeleUnicorn/ List
-  TeleporterList = BMU.ListView.new(teleporterWin.Main_Control,  {
+  BMU.TeleporterList = BMU.ListView.new(teleporterWin.Main_Control,  {
     width = 750*BMU.savedVarsAcc.Scale,
     height = 500*BMU.savedVarsAcc.Scale,
   })
@@ -2455,7 +2455,8 @@ function BMU.showDialogCustom(dialogName, dialogInfoObject)
 	local globalDialogName = BMU.var.appName .. dialogName
 	
 	ESO_Dialogs[globalDialogName] = dialogInfo
-	dialogReference = ZO_Dialogs_ShowDialog(globalDialogName)
+	local dialogReference = ZO_Dialogs_ShowDialog(globalDialogName)
+	
 	return globalDialogName, dialogReference
 end
 

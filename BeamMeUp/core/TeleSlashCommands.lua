@@ -253,7 +253,7 @@ function BMU.sc_compareAllGuilds()
 			local guildName = GetGuildName(guildId)
 			local totalGuildMembers = GetNumGuildMembers(guildId)
 			for playerIndex = 1, totalGuildMembers do
-				displayName, _, _, _, secsSinceLogoff = GetGuildMemberInfo(guildId, playerIndex)
+				local displayName, _, _, _, secsSinceLogoff = GetGuildMemberInfo(guildId, playerIndex)
 				local index = BMU.sc_hasObjectName(completePlayerList, displayName)
 				if index then
 					-- entry exists already

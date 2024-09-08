@@ -54,6 +54,7 @@ mkstr(SI.TELE_UI_TOOGLE_ZONE_NAME, "ゾーン名を表示")
 mkstr(SI.TELE_UI_TOGGLE_SORT_RELEASE, "リリース順に並べ替え")
 mkstr(SI.TELE_UI_TOGGLE_ACRONYM, "略称を表示")
 mkstr(SI.TELE_UI_TOOGLE_DUNGEON_NAME, "インスタンス名を表示")
+mkstr(SI.TELE_UI_TRAVEL_PARENT_ZONE, "Port to parent zone")
 
 
 

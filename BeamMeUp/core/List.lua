@@ -2028,7 +2028,7 @@ function BMU.clickOnZoneName(button, record)
 		end
 
 		-- travel to parent zone
-		AddCustomMenuItem("Port to parent zone", function()
+		AddCustomMenuItem(SI.get(SI.TELE_UI_TRAVEL_PARENT_ZONE), function()
 			BMU.portToParentZone(record.zoneId)
 			-- close UI if enabled
 			if BMU.savedVarsAcc.closeOnPorting then

@@ -54,6 +54,7 @@ mkstr(SI.TELE_UI_TOOGLE_ZONE_NAME, "Показать название зоны")
 mkstr(SI.TELE_UI_TOGGLE_SORT_RELEASE, "Сортировать по дате выпуска")
 mkstr(SI.TELE_UI_TOGGLE_ACRONYM, "Показать аббревиатуру")
 mkstr(SI.TELE_UI_TOOGLE_DUNGEON_NAME, "Показать название инстанса")
+mkstr(SI.TELE_UI_TRAVEL_PARENT_ZONE, "Port to parent zone")
 
 
 

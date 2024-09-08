@@ -1933,7 +1933,7 @@ function BMU.clickOnZoneName(button, record)
 
 					end)
 				end
-
+				AddCustomMenuItem("-", function() end)
 			end
 		end
 		
@@ -2026,6 +2026,18 @@ function BMU.clickOnZoneName(button, record)
 				AddCustomMenuItem(SI.get(SI.TELE_UI_FAVORITE_ZONE), function() BMU.savedVarsServ.favoriteDungeon = record.zoneId BMU.createTableDungeons() end)
 			end
 		end
+
+		-- travel to parent zone
+		AddCustomMenuItem(SI.get(SI.TELE_UI_TRAVEL_PARENT_ZONE), function()
+			BMU.portToParentZone(record.zoneId)
+			-- close UI if enabled
+			if BMU.savedVarsAcc.closeOnPorting then
+				-- hide world map if open
+				SCENE_MANAGER:Hide("worldMap")
+				-- hide UI if open
+				BMU.HideTeleporter()
+			end
+		end)
 		
 		ShowMenu()
 	end
@@ -2535,9 +2547,9 @@ function BMU.portToCurrentZone()
 end
 
 
-function BMU.portToParentZone()
-	local playersZoneId = GetZoneId(GetUnitZoneIndex("player"))
-	local parentZoneId = BMU.getParentZoneId(playersZoneId)
+function BMU.portToParentZone(zoneId)
+	local startZoneId = zoneId or GetZoneId(GetUnitZoneIndex("player"))
+	local parentZoneId = BMU.getParentZoneId(startZoneId)
 	-- if parent zone cant be determined the current zone is used
 	BMU.sc_porting(parentZoneId)
 end

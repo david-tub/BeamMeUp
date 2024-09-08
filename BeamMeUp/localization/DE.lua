@@ -54,6 +54,7 @@ mkstr(SI.TELE_UI_TOOGLE_ZONE_NAME, "Zeige Zonen Name")
 mkstr(SI.TELE_UI_TOGGLE_SORT_RELEASE, "Nach Erscheinung sortieren")
 mkstr(SI.TELE_UI_TOGGLE_ACRONYM, "Zeige Kürzel")
 mkstr(SI.TELE_UI_TOOGLE_DUNGEON_NAME, "Zeige Instanz Name")
+mkstr(SI.TELE_UI_TRAVEL_PARENT_ZONE, "Schnellreise in die Eltern-Zone")
 
 
 

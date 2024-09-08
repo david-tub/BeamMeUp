@@ -309,8 +309,8 @@ function BMU.createTable(args)
 			e = BMU.addInfo_1(e, currentZoneId, playersZoneId, "")
 			if BMU.filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filterSourceIndex) then
 				e = BMU.addInfo_2(e)
-				e.textColorDisplayName = "dred"
-				e.textColorZoneName = "dred"
+				e.textColorDisplayName = "red"
+				e.textColorZoneName = "red"
 				table.insert(TeleportAllPlayersTable, e)
 			end
 		end
@@ -1483,8 +1483,8 @@ function BMU.createClickableZoneRecord(zoneId, currentZoneId, playersZondeId, so
 	record.zoneName = BMU.formatName(GetZoneNameById(zoneId), BMU.savedVarsAcc.formatZoneName)
 	record = BMU.addInfo_1(record, currentZoneId, playersZondeId, sourceIndex)
 	record = BMU.addInfo_2(record)
-	record.textColorDisplayName = "dred"
-	record.textColorZoneName = "dred"
+	record.textColorDisplayName = "red"
+	record.textColorZoneName = "red"
 	return record
 end
 
@@ -1651,7 +1651,7 @@ function BMU.createUnrelatedQuestsRecords(unRelatedQuests)
 					record.textColorZoneName = "gold"
 				else
 					record.prio = 3
-					record.textColorZoneName = "dred"
+					record.textColorZoneName = "red"
 				end
 				record.countRelatedQuests = 1
 				-- add quest name

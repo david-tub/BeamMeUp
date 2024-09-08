@@ -378,7 +378,7 @@ local function SetupOptionsMenu(index) --index == Addon name
               getFunc = function() return BMU.savedVarsChar.sorting end,
 			  setFunc = function(value) BMU.savedVarsChar.sorting = value end,
 			  default = BMU.DefaultsCharacter["sorting"],
-			  warning = BMU.colorizeText(SI.get(SI.TELE_SETTINGS_INFO_CHARACTER_DEPENDING), "dred"),
+			  warning = BMU.colorizeText(SI.get(SI.TELE_SETTINGS_INFO_CHARACTER_DEPENDING), "red"),
 			  submenu = "rec",
         },
 		{
@@ -390,7 +390,7 @@ local function SetupOptionsMenu(index) --index == Addon name
 			getFunc = function() return BMU.savedVarsChar.defaultTab end,
 			setFunc = function(value) BMU.savedVarsChar.defaultTab = value end,
 			default = BMU.DefaultsCharacter["defaultTab"],
-			warning = BMU.colorizeText(SI.get(SI.TELE_SETTINGS_INFO_CHARACTER_DEPENDING), "dred"),
+			warning = BMU.colorizeText(SI.get(SI.TELE_SETTINGS_INFO_CHARACTER_DEPENDING), "red"),
 			disabled = function() return not BMU.savedVarsAcc.autoRefresh end,
 			submenu = "rec",
 		 },

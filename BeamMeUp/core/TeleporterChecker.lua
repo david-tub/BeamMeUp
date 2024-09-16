@@ -2211,9 +2211,11 @@ end
 
 
 -- create table of Dungeons, Trials, Arenas depending on the settings
-function BMU.createTableDungeons()
+function BMU.createTableDungeons(args)
 	-- change global state to 14, to have the correct tab active
 	BMU.changeState(14)
+	local inputString = (args and args.inputString) or nil
+
 	local resultListEndlessDungeons = {}
 	local resultListArenas = {}
 	local resultListGroupArenas = {}
@@ -2406,12 +2408,19 @@ function BMU.createTableDungeons()
 	
 	-- merge all lists together
 	local resultList = {}
-	for _, v in pairs(resultListEndlessDungeons) do table.insert(resultList, v) end
-	for _, v in pairs(resultListArenas) do table.insert(resultList, v) end
-	for _, v in pairs(resultListGroupArenas) do table.insert(resultList, v) end
-	for _, v in pairs(resultListTrials) do table.insert(resultList, v) end
-	for _, v in pairs(resultListGroupDungeons) do table.insert(resultList, v) end
-	
+	if inputString and inputString ~= "" then
+		for _, v in pairs(resultListEndlessDungeons) do if string.find(v.zoneName:lower(), inputString:lower()) then table.insert(resultList, v) end end
+		for _, v in pairs(resultListArenas) do if string.find(v.zoneName:lower(), inputString:lower()) then table.insert(resultList, v) end end
+		for _, v in pairs(resultListGroupArenas) do if string.find(v.zoneName:lower(), inputString:lower()) then table.insert(resultList, v) end end
+		for _, v in pairs(resultListTrials) do if string.find(v.zoneName:lower(), inputString:lower()) then table.insert(resultList, v) end end
+		for _, v in pairs(resultListGroupDungeons) do if string.find(v.zoneName:lower(), inputString:lower()) then table.insert(resultList, v) end end		
+	else
+		for _, v in pairs(resultListEndlessDungeons) do table.insert(resultList, v) end
+		for _, v in pairs(resultListArenas) do table.insert(resultList, v) end
+		for _, v in pairs(resultListGroupArenas) do table.insert(resultList, v) end
+		for _, v in pairs(resultListTrials) do table.insert(resultList, v) end
+		for _, v in pairs(resultListGroupDungeons) do table.insert(resultList, v) end
+	end
 	-- add no results info if player disabled all categories
 	if #resultList == 0 then
 		table.insert(resultList, BMU.createNoResultsInfo())

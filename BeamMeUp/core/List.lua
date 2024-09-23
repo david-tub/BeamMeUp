@@ -1885,6 +1885,9 @@ function BMU.clickOnZoneName(button, record)
 					end, 500)
 				 end)
 			end
+
+			-- paste link to chat
+			AddCustomMenuItem(GetString(SI_HOUSING_LINK_IN_CHAT), function() ZO_HousingBook_LinkHouseInChat(record.houseId, GetDisplayName()) end)
 			
 			-- custom sorting (not for primary residence which is always on top)
 			if record.prio ~= 1 then

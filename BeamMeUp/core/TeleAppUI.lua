@@ -1572,7 +1572,11 @@ local function SetupUI()
 			teleporterWin.Searcher_Player:SetText("")
 			-- show player placeholder
 			teleporterWin.Searcher_Player.Placeholder:SetHidden(false)
-			BMU.createTable({index=3, inputString=teleporterWin.Searcher_Zone:GetText()})
+			if BMU.state == 14 then
+				BMU.createTableDungeons({inputString=teleporterWin.Searcher_Zone:GetText()})
+			else
+				BMU.createTable({index=3, inputString=teleporterWin.Searcher_Zone:GetText()})
+			end
 		end
 	end)
 	
@@ -2371,6 +2375,8 @@ function BMU.changeState(index)
 	-- hide counter panel for related items tab
 	BMU.counterPanel:SetHidden(true)
 	
+	teleporterWin.Searcher_Player:SetHidden(false)
+
 	-- check new state
 	if index == 4 then
 		-- related Items
@@ -2404,6 +2410,7 @@ function BMU.changeState(index)
 	elseif index == 14 then
 		-- dungeon finder
 		teleporterWin.Main_Control.DungeonTexture:SetTexture(BMU.textures.soloArenaBtnOver)
+		teleporterWin.Searcher_Player:SetHidden(true)
 	end
 	
 	BMU.state = index

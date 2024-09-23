@@ -88,6 +88,7 @@ BMU_GUILD_DATA = {
             927611,         -- "O Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
             930593,         -- "Cradlecrush Cohorts"        |@bluberrygamingyt (main account)/@b3rryV2 (guild leader account), discord: bluberrygaming
             932947,         -- "Chances Are We're High"     |@GYATT discord: atomic.gyatt
+            705143,         -- "TheDarkOnes"                |@james brent discord: jamesbrent
         },
     }
 

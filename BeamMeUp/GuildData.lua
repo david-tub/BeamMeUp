@@ -58,6 +58,7 @@ BMU_GUILD_DATA = {
             790978,         -- "Song of Dawn and Dusk"      |@Eryss discord eryss.
             786092,         -- "Nightingale UA"             |@rain_brd     Leader: @ruslanUA Discord:Rain(Михайло) rain_ua
             790008,         -- "TARDIS Tamriel"             |@sapiens_o_0 Discord:sapiens_o0
+            830490,         -- "Akatosh Legion I"           |@Qbi  Discord @likezed
         },
         ["NA Megaserver"] = {
             698893,			-- "The Descendants"			|@ravenzwind
@@ -86,8 +87,10 @@ BMU_GUILD_DATA = {
             229811,         -- "T Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
             927751,         -- "nUber"                      |@Furyous discord: alberthoffpauir
             927611,         -- "O Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
-            930593,         -- "Cradlecrush Cohorts"        |@bluberrygamingyt (main account)/@b3rryV2 (guild leader account), discord: bluberrygaming
+            930593,         -- "TSC Holdings"               |@bluberrygamingyt (main account)/@b3rryV2 (guild leader account), discord: bluberrygaming
             932947,         -- "Chances Are We're High"     |@GYATT discord: atomic.gyatt
+            705143,         -- "TheDarkOnes"                |@james brent discord: jamesbrent
+            761629,         -- "The Chill Syndicate"        |@bluberrygamingyt
         },
     }
 

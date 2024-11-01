@@ -58,7 +58,8 @@ BMU_GUILD_DATA = {
             790978,         -- "Song of Dawn and Dusk"      |@Eryss discord eryss.
             786092,         -- "Nightingale UA"             |@rain_brd     Leader: @ruslanUA Discord:Rain(Михайло) rain_ua
             790008,         -- "TARDIS Tamriel"             |@sapiens_o_0 Discord:sapiens_o0
-            830490,         -- "Akatosh Legion I"           |@Qbi  Discord @likezed
+            830490,         -- "Akatosh Legion I"           |@Qbi  Discord likezed
+            832098,         -- "Only Fun"                   |@RIVVV Discord panolirandom
         },
         ["NA Megaserver"] = {
             698893,			-- "The Descendants"			|@ravenzwind

@@ -12,8 +12,11 @@ ZO_CreateStringId("SI_BINDING_NAME_BMU_TOGGLE_OWN_HOUSES", SI.get(SI.TELE_UI_BTN
 ZO_CreateStringId("SI_BINDING_NAME_BMU_WAYSHRINE_UNLOCK", SI.get(SI.TELE_KEYBINDING_WAYSHRINE_UNLOCK))
 ZO_CreateStringId("SI_BINDING_NAME_BMU_REFRESH", SI.get(SI.TELE_KEYBINDING_REFRESH))
 
-for i=1, 5, 1 do
+for i=1, 8, 1 do
     ZO_CreateStringId("SI_BINDING_NAME_BMU_FAVORITE_ZONE_" .. tostring(i), SI.get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. tostring(i))
+end
+
+for i=1, 5, 1 do
     ZO_CreateStringId("SI_BINDING_NAME_BMU_FAVORITE_PLAYER_" .. tostring(i), SI.get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. tostring(i))
 end
 

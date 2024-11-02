@@ -88,6 +88,18 @@
 			<Action name="BMU_FAVORITE_ZONE_5">
 				<Down>BMU.PortalHandlerKeyPress(15, 5)</Down>
 			</Action>
+
+			<Action name="BMU_FAVORITE_ZONE_6">
+				<Down>BMU.PortalHandlerKeyPress(15, 6)</Down>
+			</Action>
+
+			<Action name="BMU_FAVORITE_ZONE_7">
+				<Down>BMU.PortalHandlerKeyPress(15, 7)</Down>
+			</Action>
+
+			<Action name="BMU_FAVORITE_ZONE_8">
+				<Down>BMU.PortalHandlerKeyPress(15, 8)</Down>
+			</Action>
 			
 			
 			<Action name="BMU_FAVORITE_PLAYER_1">

@@ -1281,10 +1281,13 @@ function BMU.syncWithItems(portalPlayers)
 				local zoneId = GetAntiquityZoneId(antiquityId)
 				local achievedGoals = GetNumGoalsAchievedForAntiquity(antiquityId)
 					-- leads that are already scried (at least one "achieved goal" in lead scry progress)
-				if (BMU.savedVarsChar.displayAntiquityLeads.scried and achievedGoals > 0)
+				if ((BMU.savedVarsChar.displayAntiquityLeads.scried and achievedGoals > 0)
 					or
 					-- leads that are are scryable (no progress)
-					(BMU.savedVarsChar.displayAntiquityLeads.srcyable and achievedGoals == 0)
+					(BMU.savedVarsChar.displayAntiquityLeads.srcyable and achievedGoals == 0))
+					and
+					-- include or filter completed leads (codex)
+					(BMU.savedVarsChar.displayAntiquityLeads.completed or GetNumAntiquityLoreEntries(antiquityId) ~= GetNumAntiquityLoreEntriesAcquired(antiquityId))
 				then
 					-- check if lead can be matched to an entry in portalPlayers table
 					local isRelated, updatedRecord, recordIndex = BMU.leadIsRelated(portalPlayers, antiquityId)

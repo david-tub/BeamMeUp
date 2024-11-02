@@ -1820,20 +1820,43 @@ local function SetupUI()
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		-- show filter menu
 		ClearMenu()
-		-- Leads
-		local menuIndex = AddCustomMenuItem(GetString(SI_GAMEPAD_VENDOR_ANTIQUITY_LEAD_GROUP_HEADER) .. ": " .. GetString(SI_ANTIQUITY_SUBHEADING_IN_PROGRESS), function() BMU.savedVarsChar.displayAntiquityLeads.scried = not BMU.savedVarsChar.displayAntiquityLeads.scried BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
-		if BMU.savedVarsChar.displayAntiquityLeads.scried then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
-		end
-		local menuIndex = AddCustomMenuItem(GetString(SI_GAMEPAD_VENDOR_ANTIQUITY_LEAD_GROUP_HEADER) .. ": " .. GetString(SI_ANTIQUITY_SCRYABLE), function() BMU.savedVarsChar.displayAntiquityLeads.srcyable = not BMU.savedVarsChar.displayAntiquityLeads.srcyable BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
-		if BMU.savedVarsChar.displayAntiquityLeads.srcyable then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
-		end
+
+		-- Add submenu for antiquity leads
+		AddCustomSubMenuItem(GetString(SI_GAMEPAD_VENDOR_ANTIQUITY_LEAD_GROUP_HEADER),
+			{
+				{
+					label = GetString(SI_ANTIQUITY_SCRYABLE),
+					callback = function()
+						BMU.savedVarsChar.displayAntiquityLeads.srcyable = not BMU.savedVarsChar.displayAntiquityLeads.srcyable
+						BMU.createTable({index=4}) end,
+					itemType = MENU_ADD_OPTION_CHECKBOX,
+					checked = function() return BMU.savedVarsChar.displayAntiquityLeads.srcyable end,
+				},
+				{
+					label = GetString(SI_ANTIQUITY_SUBHEADING_IN_PROGRESS),
+					callback = function()
+						BMU.savedVarsChar.displayAntiquityLeads.scried = not BMU.savedVarsChar.displayAntiquityLeads.scried
+						BMU.createTable({index=4}) end,
+					itemType = MENU_ADD_OPTION_CHECKBOX,
+					checked = function() return BMU.savedVarsChar.displayAntiquityLeads.scried end,
+				},
+				{
+					label = GetString(SI_SCREEN_NARRATION_ACHIEVEMENT_EARNED_ICON_NARRATION) .. " (" .. GetString(SI_ANTIQUITY_LOG_BOOK) .. ")",
+					callback = function()
+						BMU.savedVarsChar.displayAntiquityLeads.completed = not BMU.savedVarsChar.displayAntiquityLeads.completed
+						BMU.createTable({index=4}) end,
+					itemType = MENU_ADD_OPTION_CHECKBOX,
+					checked = function() return BMU.savedVarsChar.displayAntiquityLeads.completed end,
+				},
+			}, nil, nil, nil, 5
+		)
+
 		-- Clues
 		local menuIndex = AddCustomMenuItem(GetString(SI_SPECIALIZEDITEMTYPE113), function() BMU.savedVarsChar.displayMaps.clue = not BMU.savedVarsChar.displayMaps.clue BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.displayMaps.clue then
 			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 		end
+		
 		-- Treasure Maps
 		menuIndex = AddCustomMenuItem(GetString(SI_SPECIALIZEDITEMTYPE100), function() BMU.savedVarsChar.displayMaps.treasure = not BMU.savedVarsChar.displayMaps.treasure BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.displayMaps.treasure then

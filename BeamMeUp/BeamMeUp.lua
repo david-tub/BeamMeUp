@@ -591,6 +591,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["displayAntiquityLeads"] = { -- "displayLeads" was already used in the past (boolean)
 			["srcyable"] = true,
 			["scried"] = true,
+			["completed"] = true,
 		},
 		["displayMaps"] = {
 			["treasure"] = true,

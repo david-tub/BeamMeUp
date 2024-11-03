@@ -2506,6 +2506,31 @@ function BMU.journalUpdated()
 end
 
 
+-- HOUSING_FURNISHING_LIMIT_TYPE_HIGH_IMPACT_COLLECTIBLE
+-- HOUSING_FURNISHING_LIMIT_TYPE_HIGH_IMPACT_ITEM
+-- HOUSING_FURNISHING_LIMIT_TYPE_LOW_IMPACT_COLLECTIBLE
+-- HOUSING_FURNISHING_LIMIT_TYPE_LOW_IMPACT_ITEM
+
+-- update own houses furniture count
+function BMU.updateHouseFurnitureCount(eventCode, option1, option2)
+	-- the player entered a new zone or event furniture count updated
+	local houseId = GetCurrentZoneHouseId()
+	if houseId ~= nil and IsOwnerOfCurrentHouse() then
+		-- player is in an own house
+		if eventCode == EVENT_HOUSE_FURNITURE_COUNT_UPDATED and option1 ~= houseId then
+			-- abort if furniture count was updated but different house
+			return
+		end
+
+		local currentFurnitureCount_LII = GetNumHouseFurnishingsPlaced(HOUSING_FURNISHING_LIMIT_TYPE_LOW_IMPACT_ITEM)
+		if currentFurnitureCount_LII ~= nil then
+			-- save value to savedVars
+			BMU.savedVarsServ.houseFurnitureCount_LII[houseId] = currentFurnitureCount_LII
+		end
+	end
+end
+
+
 -- handles event when player clicks on a chat link
 	-- 1. for sharing teleport destination to the group (built-in type with drive-by data)
 	-- 2. for wayshrine map ping (custom link)

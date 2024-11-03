@@ -1905,6 +1905,13 @@ function BMU.createTableHouses()
 		_, _, entry.houseIcon = GetCollectibleInfo(entry.collectibleId)
 		entry.houseBackgroundImage = GetHousePreviewBackgroundImage(entry.houseId)
 		entry.houseTooltip = {entry.zoneName, "\"" .. entry.nickName .. "\"", entry.parentZoneName, "", "", "|t75:75:" .. entry.houseIcon .. "|t", "", "", entry.houseCategoryType}
+		
+		-- add house furniture count to tooltip
+		local currentFurnitureCount_LII = BMU.savedVarsServ.houseFurnitureCount_LII[entry.houseId]
+		if currentFurnitureCount_LII ~= nil then
+			local tooltipFurnitureCount = GetString(SI_HOUSINGFURNISHINGLIMITTYPE0) .. ": " .. currentFurnitureCount_LII .. "/" .. GetHouseFurnishingPlacementLimit(entry.houseId, HOUSING_FURNISHING_LIMIT_TYPE_LOW_IMPACT_ITEM)
+			table.insert(entry.houseTooltip, tooltipFurnitureCount)
+		end
 	
 		if BMU.savedVarsChar.houseNickNames then
 			-- show nick name instead of real house name

@@ -19,6 +19,9 @@ end
 
 local function alertTeleporterLoaded()
     EVENT_MANAGER:UnregisterForEvent(appName, EVENT_PLAYER_ACTIVATED)
+	-- register events for own houses furniture count update
+	EVENT_MANAGER:RegisterForEvent(appName, EVENT_PLAYER_ACTIVATED, BMU.updateHouseFurnitureCount)
+	EVENT_MANAGER:RegisterForEvent(appName, EVENT_HOUSE_FURNITURE_COUNT_UPDATED, BMU.updateHouseFurnitureCount)
 end
 
 
@@ -569,6 +572,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["lastofflineReminder"] = 1632859025, -- just a timestamp (2021/09/28)
 		["favoriteDungeon"] = 0, -- zone_id of the favorite dungeon
 		["houseCustomSorting"] = {},
+		["houseFurnitureCount_LII"] = {}, -- maps houseId with furniture count
 	}
 	
 	BMU.DefaultsCharacter = {
@@ -591,6 +595,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["displayAntiquityLeads"] = { -- "displayLeads" was already used in the past (boolean)
 			["srcyable"] = true,
 			["scried"] = true,
+			["completed"] = true,
 		},
 		["displayMaps"] = {
 			["treasure"] = true,

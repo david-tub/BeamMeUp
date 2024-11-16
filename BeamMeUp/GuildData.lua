@@ -32,7 +32,7 @@ BMU_GUILD_DATA = {
             631764,			-- "Die magische Miezmuschel"	|@MiezeMelli
             661070,			-- "BMU Crossroad Alliance"		|@square252
             389326,			-- "Ork Mania"					|@OrkManiac4u
-            677494,			-- "BMU Unofficial"				|@Kassec - unlisted aber Leader hat Discord
+            -- 677494,		-- "BMU Unofficial"			    |@Kassec - unlisted aber Leader hat Discord - 16.11.2024 auskommentiert, da Gilde aufgegeben
             418220,			-- "Frozen Lean Gang"			|@Vinc - über Discord angeschrieben
             649984,			-- "Way to warm sands"			|@Ma'pyca (ru)
             701658,			-- "Armoored Rose"				|Discord-name Лютобор Ingame?
@@ -58,7 +58,8 @@ BMU_GUILD_DATA = {
             790978,         -- "Song of Dawn and Dusk"      |@Eryss discord eryss.
             786092,         -- "Nightingale UA"             |@rain_brd     Leader: @ruslanUA Discord:Rain(Михайло) rain_ua
             790008,         -- "TARDIS Tamriel"             |@sapiens_o_0 Discord:sapiens_o0
-            830490,         -- "Akatosh Legion I"           |@Qbi  Discord @likezed
+            830490,         -- "Akatosh Legion I"           |@Qbi  Discord likezed
+            832098,         -- "Only Fun"                   |@RIVVV Discord panolirandom
         },
         ["NA Megaserver"] = {
             698893,			-- "The Descendants"			|@ravenzwind

@@ -1281,10 +1281,13 @@ function BMU.syncWithItems(portalPlayers)
 				local zoneId = GetAntiquityZoneId(antiquityId)
 				local achievedGoals = GetNumGoalsAchievedForAntiquity(antiquityId)
 					-- leads that are already scried (at least one "achieved goal" in lead scry progress)
-				if (BMU.savedVarsChar.displayAntiquityLeads.scried and achievedGoals > 0)
+				if ((BMU.savedVarsChar.displayAntiquityLeads.scried and achievedGoals > 0)
 					or
 					-- leads that are are scryable (no progress)
-					(BMU.savedVarsChar.displayAntiquityLeads.srcyable and achievedGoals == 0)
+					(BMU.savedVarsChar.displayAntiquityLeads.srcyable and achievedGoals == 0))
+					and
+					-- include or filter completed leads (codex)
+					(BMU.savedVarsChar.displayAntiquityLeads.completed or GetNumAntiquityLoreEntries(antiquityId) ~= GetNumAntiquityLoreEntriesAcquired(antiquityId))
 				then
 					-- check if lead can be matched to an entry in portalPlayers table
 					local isRelated, updatedRecord, recordIndex = BMU.leadIsRelated(portalPlayers, antiquityId)
@@ -1902,6 +1905,13 @@ function BMU.createTableHouses()
 		_, _, entry.houseIcon = GetCollectibleInfo(entry.collectibleId)
 		entry.houseBackgroundImage = GetHousePreviewBackgroundImage(entry.houseId)
 		entry.houseTooltip = {entry.zoneName, "\"" .. entry.nickName .. "\"", entry.parentZoneName, "", "", "|t75:75:" .. entry.houseIcon .. "|t", "", "", entry.houseCategoryType}
+		
+		-- add house furniture count to tooltip
+		local currentFurnitureCount_LII = BMU.savedVarsServ.houseFurnitureCount_LII[entry.houseId]
+		if currentFurnitureCount_LII ~= nil then
+			local tooltipFurnitureCount = GetString(SI_HOUSINGFURNISHINGLIMITTYPE0) .. ": " .. currentFurnitureCount_LII .. "/" .. GetHouseFurnishingPlacementLimit(entry.houseId, HOUSING_FURNISHING_LIMIT_TYPE_LOW_IMPACT_ITEM)
+			table.insert(entry.houseTooltip, tooltipFurnitureCount)
+		end
 	
 		if BMU.savedVarsChar.houseNickNames then
 			-- show nick name instead of real house name

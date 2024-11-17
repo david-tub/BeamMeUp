@@ -101,6 +101,8 @@ function BMU.startAutoUnlock(zoneId, isChatLogging, loopType, loopZoneList)
 			isChatLogging = isChatLogging or false,
 		}
 		
+		-- unregiter existing event for furniture count
+		EVENT_MANAGER:UnregisterForEvent(BMU.var.appName, EVENT_PLAYER_ACTIVATED)
 		-- register for event when coming out from loading screen
 		EVENT_MANAGER:RegisterForEvent(BMU.var.appName, EVENT_PLAYER_ACTIVATED, function() zo_callLater(function() BMU.proceedAutoUnlock() end, 1500) end)
 		-- register for event when gaining XP from wayshrine discovery
@@ -267,9 +269,13 @@ function BMU.finishedAutoUnlock(reason)
 	end
 	
 	CancelCast()
+	
 	-- unregister events
 	EVENT_MANAGER:UnregisterForEvent(BMU.var.appName, EVENT_PLAYER_ACTIVATED)
 	EVENT_MANAGER:UnregisterForEvent(BMU.var.appName, EVENT_DISCOVERY_EXPERIENCE)
+	-- register again event for furniture count
+	EVENT_MANAGER:RegisterForEvent(BMU.var.appName, EVENT_PLAYER_ACTIVATED, BMU.updateHouseFurnitureCount)
+
 	-- set flag to "inactivate" the proceed function (if unregister failed or it is called for some other reasons)
 	BMU.uwData.isStarted = false
 	-- restore button texture

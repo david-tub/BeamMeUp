@@ -774,7 +774,6 @@ function BMU.addInfo_2(e)
 	if BMU.savedVarsAcc.currentViewedZoneAlwaysTop and (BMU.getParentZoneId(e.zoneId) == currentZoneId or e.zoneId == currentZoneId or e.zoneId == BMU.getParentZoneId(currentZoneId)) then
 		-- current viewed zone + subzones
 		e.prio = 0
-		e.textColorDisplayName = "teal"
 		e.textColorZoneName = "teal"
 	elseif BMU.savedVarsAcc.currentZoneAlwaysTop and e.playersZone then
 		-- current zone (players location)

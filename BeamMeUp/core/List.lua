@@ -676,11 +676,8 @@ function BMU.PortalToPlayer(displayName, sourceIndex, zoneName, zoneId, zoneCate
 			BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. displayName .. " - " .. zoneName)
 		end
 		if sourceIndex == BMU.SOURCE_INDEX_GROUP then
-			if displayName == GetUnitDisplayName(GetGroupLeaderUnitTag()) then
-				JumpToGroupLeader()
-			else
-				JumpToGroupMember(displayName)
-			end
+			-- 2024/12: a bug was reported, that JumpToGroupLeader() no longer works probably in some cases --> only use JumpToGroupMember()
+			JumpToGroupMember(displayName)
 		elseif sourceIndex == BMU.SOURCE_INDEX_FRIEND then
 			JumpToFriend(displayName)
 		else

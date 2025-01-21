@@ -1317,7 +1317,7 @@ local function SetupUI()
 
 		teleporterWin.guildTexture:SetHandler("OnMouseExit", function(self)
 		  BMU:tooltipTextEnter(teleporterWin.guildTexture)
-		  if BMU.state ~= 13 then
+		  if BMU.state ~= BMU.indexListGuilds then
 			teleporterWin.guildTexture:SetTexture(BMU.textures.guildBtn)
 		  end
 		end)
@@ -1514,14 +1514,14 @@ local function SetupUI()
   
   -- Handlers
   ZO_PreHookHandler(teleporterWin.Searcher_Player, "OnTextChanged", function(self)
-	if self:HasFocus() and (teleporterWin.Searcher_Player:GetText() ~= "" or (teleporterWin.Searcher_Player:GetText() == "" and BMU.state == 2)) then
+	if self:HasFocus() and (teleporterWin.Searcher_Player:GetText() ~= "" or (teleporterWin.Searcher_Player:GetText() == "" and BMU.state == BMU.indexListSearchPlayer)) then
 		-- make sure player placeholder is hidden
 		teleporterWin.Searcher_Player.Placeholder:SetHidden(true)
 		-- clear zone input field
 		teleporterWin.Searcher_Zone:SetText("")
 		-- show zone placeholder
 		teleporterWin.Searcher_Zone.Placeholder:SetHidden(false)
-		BMU.createTable({index=2, inputString=teleporterWin.Searcher_Player:GetText()})
+		BMU.createTable({index=BMU.indexListSearchPlayer, inputString=teleporterWin.Searcher_Player:GetText()})
 	end
   end)
   
@@ -1565,17 +1565,17 @@ local function SetupUI()
   
   -- Handlers
     ZO_PreHookHandler(teleporterWin.Searcher_Zone, "OnTextChanged", function(self)
-		if self:HasFocus() and (teleporterWin.Searcher_Zone:GetText() ~= "" or (teleporterWin.Searcher_Zone:GetText() == "" and BMU.state == 3)) then
+		if self:HasFocus() and (teleporterWin.Searcher_Zone:GetText() ~= "" or (teleporterWin.Searcher_Zone:GetText() == "" and BMU.state == BMU.indexListSearchZone)) then
 			-- make sure zone placeholder is hidden
 			teleporterWin.Searcher_Zone.Placeholder:SetHidden(true)
 			-- clear player input field
 			teleporterWin.Searcher_Player:SetText("")
 			-- show player placeholder
 			teleporterWin.Searcher_Player.Placeholder:SetHidden(false)
-			if BMU.state == 14 then
+			if BMU.state == BMU.indexListDungeons then
 				BMU.createTableDungeons({inputString=teleporterWin.Searcher_Zone:GetText()})
 			else
-				BMU.createTable({index=3, inputString=teleporterWin.Searcher_Zone:GetText()})
+				BMU.createTable({index=BMU.indexListSearchZone, inputString=teleporterWin.Searcher_Zone:GetText()})
 			end
 		end
 	end)
@@ -1602,11 +1602,11 @@ local function SetupUI()
   teleporterWin.Main_Control.RefreshTexture:SetDrawLayer(2)
 
   teleporterWin.Main_Control.RefreshTexture:SetHandler("OnMouseUp", function(self)
-	if BMU.state == 0 then
+	if BMU.state == BMU.indexListMain then
 		-- dont reset slider if user stays already on main list
-		BMU.createTable({index=0, dontResetSlider=true})
+		BMU.createTable({index=BMU.indexListMain, dontResetSlider=true})
 	else
-		BMU.createTable({index=0})
+		BMU.createTable({index=BMU.indexListMain})
 	end
   end)
   
@@ -1720,7 +1720,7 @@ local function SetupUI()
 
 		teleporterWin.Main_Control.PTFTexture:SetHandler("OnMouseExit", function(self)
 			BMU:tooltipTextEnter(teleporterWin.Main_Control.PTFTexture)
-			if BMU.state ~= 12 then
+			if BMU.state ~= BMU.indexListPTFHouses then
 				teleporterWin.Main_Control.PTFTexture:SetTexture(BMU.textures.ptfHouseBtn)
 			end
 		end)
@@ -1773,7 +1773,7 @@ local function SetupUI()
 
   teleporterWin.Main_Control.OwnHouseTexture:SetHandler("OnMouseExit", function(self)
     BMU:tooltipTextEnter(teleporterWin.Main_Control.OwnHouseTexture)
-	if BMU.state ~= 11 then
+	if BMU.state ~= BMU.indexListOwnHouses then
 		teleporterWin.Main_Control.OwnHouseTexture:SetTexture(BMU.textures.houseBtn)
 	end
   end)
@@ -1790,7 +1790,7 @@ local function SetupUI()
   teleporterWin.Main_Control.QuestTexture:SetDrawLayer(2)
 
   teleporterWin.Main_Control.QuestTexture:SetHandler("OnMouseUp", function()
-	BMU.createTable({index=9})
+	BMU.createTable({index=BMU.indexListQuests})
   end)
   
   teleporterWin.Main_Control.QuestTexture:SetHandler("OnMouseEnter", function(self)
@@ -1800,7 +1800,7 @@ local function SetupUI()
 
   teleporterWin.Main_Control.QuestTexture:SetHandler("OnMouseExit", function(self)
     BMU:tooltipTextEnter(teleporterWin.Main_Control.QuestTexture)
-	if BMU.state ~= 9 then
+	if BMU.state ~= BMU.indexListQuests then
 		teleporterWin.Main_Control.QuestTexture:SetTexture(BMU.textures.questBtn)
 	end
   end)
@@ -1828,7 +1828,7 @@ local function SetupUI()
 					label = GetString(SI_ANTIQUITY_SCRYABLE),
 					callback = function()
 						BMU.savedVarsChar.displayAntiquityLeads.srcyable = not BMU.savedVarsChar.displayAntiquityLeads.srcyable
-						BMU.createTable({index=4}) end,
+						BMU.createTable({index=BMU.indexListItems}) end,
 					itemType = MENU_ADD_OPTION_CHECKBOX,
 					checked = function() return BMU.savedVarsChar.displayAntiquityLeads.srcyable end,
 				},
@@ -1836,7 +1836,7 @@ local function SetupUI()
 					label = GetString(SI_ANTIQUITY_SUBHEADING_IN_PROGRESS),
 					callback = function()
 						BMU.savedVarsChar.displayAntiquityLeads.scried = not BMU.savedVarsChar.displayAntiquityLeads.scried
-						BMU.createTable({index=4}) end,
+						BMU.createTable({index=BMU.indexListItems}) end,
 					itemType = MENU_ADD_OPTION_CHECKBOX,
 					checked = function() return BMU.savedVarsChar.displayAntiquityLeads.scried end,
 				},
@@ -1844,7 +1844,7 @@ local function SetupUI()
 					label = GetString(SI_SCREEN_NARRATION_ACHIEVEMENT_EARNED_ICON_NARRATION) .. " (" .. GetString(SI_ANTIQUITY_LOG_BOOK) .. ")",
 					callback = function()
 						BMU.savedVarsChar.displayAntiquityLeads.completed = not BMU.savedVarsChar.displayAntiquityLeads.completed
-						BMU.createTable({index=4}) end,
+						BMU.createTable({index=BMU.indexListItems}) end,
 					itemType = MENU_ADD_OPTION_CHECKBOX,
 					checked = function() return BMU.savedVarsChar.displayAntiquityLeads.completed end,
 				},
@@ -1852,13 +1852,13 @@ local function SetupUI()
 		)
 
 		-- Clues
-		local menuIndex = AddCustomMenuItem(GetString(SI_SPECIALIZEDITEMTYPE113), function() BMU.savedVarsChar.displayMaps.clue = not BMU.savedVarsChar.displayMaps.clue BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
+		local menuIndex = AddCustomMenuItem(GetString(SI_SPECIALIZEDITEMTYPE113), function() BMU.savedVarsChar.displayMaps.clue = not BMU.savedVarsChar.displayMaps.clue BMU.createTable({index=BMU.indexListItems}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.displayMaps.clue then
 			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 		end
 		
 		-- Treasure Maps
-		menuIndex = AddCustomMenuItem(GetString(SI_SPECIALIZEDITEMTYPE100), function() BMU.savedVarsChar.displayMaps.treasure = not BMU.savedVarsChar.displayMaps.treasure BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
+		menuIndex = AddCustomMenuItem(GetString(SI_SPECIALIZEDITEMTYPE100), function() BMU.savedVarsChar.displayMaps.treasure = not BMU.savedVarsChar.displayMaps.treasure BMU.createTable({index=BMU.indexListItems}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.displayMaps.treasure then
 			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 		end
@@ -1873,7 +1873,7 @@ local function SetupUI()
 					-- uncheck all subTypes
 					BMU.updateCheckboxSurveyMap(2)
 				end
-				BMU.createTable({index=4})
+				BMU.createTable({index=BMU.indexListItems})
 			end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 4)
 			
 		if BMU.numOfSurveyTypesChecked() > 0 then
@@ -1888,7 +1888,7 @@ local function SetupUI()
 					callback = function()
 						BMU.savedVarsChar.displayMaps.alchemist = not BMU.savedVarsChar.displayMaps.alchemist
 						BMU.updateCheckboxSurveyMap(3)
-						BMU.createTable({index=4}) end,
+						BMU.createTable({index=BMU.indexListItems}) end,
 					itemType = MENU_ADD_OPTION_CHECKBOX,
 					checked = function() return BMU.savedVarsChar.displayMaps.alchemist end,
 				},
@@ -1897,7 +1897,7 @@ local function SetupUI()
 					callback = function()
 						BMU.savedVarsChar.displayMaps.enchanter = not BMU.savedVarsChar.displayMaps.enchanter
 						BMU.updateCheckboxSurveyMap(3)
-						BMU.createTable({index=4}) end,
+						BMU.createTable({index=BMU.indexListItems}) end,
 					itemType = MENU_ADD_OPTION_CHECKBOX,
 					checked = function() return BMU.savedVarsChar.displayMaps.enchanter end,
 				},
@@ -1906,7 +1906,7 @@ local function SetupUI()
 					callback = function()
 						BMU.savedVarsChar.displayMaps.woodworker = not BMU.savedVarsChar.displayMaps.woodworker
 						BMU.updateCheckboxSurveyMap(3)
-						BMU.createTable({index=4}) end,
+						BMU.createTable({index=BMU.indexListItems}) end,
 					itemType = MENU_ADD_OPTION_CHECKBOX,
 					checked = function() return BMU.savedVarsChar.displayMaps.woodworker end,
 				},
@@ -1915,7 +1915,7 @@ local function SetupUI()
 					callback = function()
 						BMU.savedVarsChar.displayMaps.blacksmith = not BMU.savedVarsChar.displayMaps.blacksmith
 						BMU.updateCheckboxSurveyMap(3)
-						BMU.createTable({index=4}) end,
+						BMU.createTable({index=BMU.indexListItems}) end,
 					itemType = MENU_ADD_OPTION_CHECKBOX,
 					checked = function() return BMU.savedVarsChar.displayMaps.blacksmith end,
 				},
@@ -1924,7 +1924,7 @@ local function SetupUI()
 					callback = function()
 						BMU.savedVarsChar.displayMaps.clothier = not BMU.savedVarsChar.displayMaps.clothier
 						BMU.updateCheckboxSurveyMap(3)
-						BMU.createTable({index=4}) end,
+						BMU.createTable({index=BMU.indexListItems}) end,
 					itemType = MENU_ADD_OPTION_CHECKBOX,
 					checked = function() return BMU.savedVarsChar.displayMaps.clothier end,
 				},
@@ -1933,7 +1933,7 @@ local function SetupUI()
 					callback = function()
 						BMU.savedVarsChar.displayMaps.jewelry = not BMU.savedVarsChar.displayMaps.jewelry
 						BMU.updateCheckboxSurveyMap(3)
-						BMU.createTable({index=4}) end,
+						BMU.createTable({index=BMU.indexListItems}) end,
 					itemType = MENU_ADD_OPTION_CHECKBOX,
 					checked = function() return BMU.savedVarsChar.displayMaps.jewelry end,
 				},
@@ -1944,20 +1944,20 @@ local function SetupUI()
 		AddCustomMenuItem("-", function() end, nil, nil, nil, nil, 5)
 		
 		-- include bank items
-		menuIndex = AddCustomMenuItem(GetString(SI_CRAFTING_INCLUDE_BANKED), function() BMU.savedVarsChar.scanBankForMaps = not BMU.savedVarsChar.scanBankForMaps BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
+		menuIndex = AddCustomMenuItem(GetString(SI_CRAFTING_INCLUDE_BANKED), function() BMU.savedVarsChar.scanBankForMaps = not BMU.savedVarsChar.scanBankForMaps BMU.createTable({index=BMU.indexListItems}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.scanBankForMaps then
 			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 		end
 
 		-- enable/disable counter panel
-		menuIndex = AddCustomMenuItem(GetString(SI_ENDLESS_DUNGEON_BUFF_TRACKER_SWITCH_TO_SUMMARY_KEYBIND), function() BMU.savedVarsChar.displayCounterPanel = not BMU.savedVarsChar.displayCounterPanel BMU.createTable({index=4}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
+		menuIndex = AddCustomMenuItem(GetString(SI_ENDLESS_DUNGEON_BUFF_TRACKER_SWITCH_TO_SUMMARY_KEYBIND), function() BMU.savedVarsChar.displayCounterPanel = not BMU.savedVarsChar.displayCounterPanel BMU.createTable({index=BMU.indexListItems}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.displayCounterPanel then
 			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 		end	
 		
 		ShowMenu()
 	else
-		BMU.createTable({index=4})
+		BMU.createTable({index=BMU.indexListItems})
 		BMU.showNotification(true)
 	end
   end)
@@ -2001,7 +2001,7 @@ local function SetupUI()
 
   teleporterWin.Main_Control.ItemTexture:SetHandler("OnMouseExit", function(self)
     BMU:tooltipTextEnter(teleporterWin.Main_Control.ItemTexture)
-	if BMU.state ~= 4 then
+	if BMU.state ~= BMU.indexListItems then
 		teleporterWin.Main_Control.ItemTexture:SetTexture(BMU.textures.relatedItemsBtn)
 	end
   end)
@@ -2022,7 +2022,7 @@ local function SetupUI()
   teleporterWin.Main_Control.OnlyYourzoneTexture:SetDrawLayer(2)
   
 	teleporterWin.Main_Control.OnlyYourzoneTexture:SetHandler("OnMouseUp", function(self)
-		BMU.createTable({index=1})
+		BMU.createTable({index=BMU.indexListCurrentZone})
 	end)
   
     teleporterWin.Main_Control.OnlyYourzoneTexture:SetHandler("OnMouseEnter", function(self)
@@ -2032,7 +2032,7 @@ local function SetupUI()
 	
 	teleporterWin.Main_Control.OnlyYourzoneTexture:SetHandler("OnMouseExit", function(self)
 		BMU:tooltipTextEnter(teleporterWin.Main_Control.OnlyYourzoneTexture)
-		if BMU.state ~= 1 then
+		if BMU.state ~= BMU.indexListCurrentZone then
 			teleporterWin.Main_Control.OnlyYourzoneTexture:SetTexture(BMU.textures.currentZoneBtn)
 		end
 	end)
@@ -2052,13 +2052,13 @@ local function SetupUI()
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		-- show context menu
 		ClearMenu()
-		local menuIndex = AddCustomMenuItem(GetString(SI_GAMEPAD_GUILD_HISTORY_SUBCATEGORY_ALL), function() BMU.savedVarsChar.showAllDelves = not BMU.savedVarsChar.showAllDelves BMU.createTable({index=5}) end, MENU_ADD_OPTION_CHECKBOX)
+		local menuIndex = AddCustomMenuItem(GetString(SI_GAMEPAD_GUILD_HISTORY_SUBCATEGORY_ALL), function() BMU.savedVarsChar.showAllDelves = not BMU.savedVarsChar.showAllDelves BMU.createTable({index=BMU.indexListDelves}) end, MENU_ADD_OPTION_CHECKBOX)
 		if BMU.savedVarsChar.showAllDelves then
 			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 		end
 		ShowMenu()
 	else
-		BMU.createTable({index=5})
+		BMU.createTable({index=BMU.indexListDelves})
 	end
   end)
   
@@ -2073,7 +2073,7 @@ local function SetupUI()
 
   teleporterWin.Main_Control.DelvesTexture:SetHandler("OnMouseExit", function(self)
     BMU:tooltipTextEnter(teleporterWin.Main_Control.DelvesTexture)
-	if BMU.state ~= 5 then
+	if BMU.state ~= BMU.indexListDelves then
 		teleporterWin.Main_Control.DelvesTexture:SetTexture(BMU.textures.delvesBtn)
 	end
   end)
@@ -2226,7 +2226,7 @@ local function SetupUI()
 
   teleporterWin.Main_Control.DungeonTexture:SetHandler("OnMouseExit", function(self)
     BMU:tooltipTextEnter(teleporterWin.Main_Control.DungeonTexture)
-	if BMU.state ~= 14 then
+	if BMU.state ~= BMU.indexListDungeons then
 		teleporterWin.Main_Control.DungeonTexture:SetTexture(BMU.textures.soloArenaBtn)
 	end
   end)
@@ -2401,36 +2401,36 @@ function BMU.changeState(index)
 	teleporterWin.Searcher_Player:SetHidden(false)
 
 	-- check new state
-	if index == 4 then
+	if index == BMU.indexListItems then
 		-- related Items
 		teleporterWin.Main_Control.ItemTexture:SetTexture(BMU.textures.relatedItemsBtnOver)
 		if BMU.savedVarsChar.displayCounterPanel then
 			BMU.counterPanel:SetHidden(false)
 		end
-	elseif index == 1 then
+	elseif index == BMU.indexListCurrentZone then
 		-- current zone
 		teleporterWin.Main_Control.OnlyYourzoneTexture:SetTexture(BMU.textures.currentZoneBtnOver)
-	elseif index == 5 then
+	elseif index == BMU.indexListDelves then
 		-- current zone delves
 		teleporterWin.Main_Control.DelvesTexture:SetTexture(BMU.textures.delvesBtnOver)
-	elseif index == 2 or index == 3 then
+	elseif index == BMU.indexListSearchPlayer or index == BMU.indexListSearchZone then
 		-- serach by player name or zone name
 		teleporterWin.SearchTexture:SetTexture(BMU.textures.searchBtnOver)
-	elseif index == 9 then
+	elseif index == BMU.indexListQuests then
 		-- related quests
 		teleporterWin.Main_Control.QuestTexture:SetTexture(BMU.textures.questBtnOver)
-	elseif index == 11 then
+	elseif index == BMU.indexListOwnHouses then
 		-- own houses
 		teleporterWin.Main_Control.OwnHouseTexture:SetTexture(BMU.textures.houseBtnOver)
-	elseif index == 12 then
+	elseif index == BMU.indexListPTFHouses then
 		-- PTF houses
 		teleporterWin.Main_Control.PTFTexture:SetTexture(BMU.textures.ptfHouseBtnOver)
-	elseif index == 13 then
+	elseif index == BMU.indexListGuilds then
 		-- guilds
 		if teleporterWin.guildTexture then
 			teleporterWin.guildTexture:SetTexture(BMU.textures.guildBtnOver)
 		end
-	elseif index == 14 then
+	elseif index == BMU.indexListDungeons then
 		-- dungeon finder
 		teleporterWin.Main_Control.DungeonTexture:SetTexture(BMU.textures.soloArenaBtnOver)
 		teleporterWin.Searcher_Player:SetHidden(true)
@@ -2547,7 +2547,7 @@ function BMU.handleChatLinkClick(rawLink, mouseButton, linkText, linkStyle, link
 			local playerTo = tostring(data4)
 			if playerFrom ~= nil and playerTo ~= nil then
 				-- try to find the destination player
-				local result = BMU.createTable({index=2, inputString=playerTo, dontDisplay=true})
+				local result = BMU.createTable({index=BMU.indexListSearchPlayer, inputString=playerTo, dontDisplay=true})
 				local firstRecord = result[1]
 				if firstRecord.displayName == "" then
 					-- player not found

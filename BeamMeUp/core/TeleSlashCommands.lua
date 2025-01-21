@@ -201,7 +201,7 @@ end
 
 
 function BMU.sc_porting(zoneId)
-	local resultTable = BMU.createTable({index=6, fZoneId=zoneId, dontDisplay=true})
+	local resultTable = BMU.createTable({index=BMU.indexListZoneHidden, fZoneId=zoneId, dontDisplay=true})
 	local entry = resultTable[1]
 	
 	if entry.displayName ~= nil and entry.displayName ~= "" then

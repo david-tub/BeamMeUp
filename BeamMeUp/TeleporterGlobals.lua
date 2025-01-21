@@ -254,7 +254,25 @@ BMU.dropdownSecLangValues = {1, 2, 3, 4, 5, 6, 7}
 BMU.dropdownSortChoices = {"zone name", "zone category > zone name", "most used zone > zone name", "most used zone > zone category > zone name", "number of players > zone name", "undiscovered wayshrines > zone category > zone name", "undiscovered skyshards > zone category > zone name", "last used zone > zone name", "last used zone > zone category > zone name", "missing set items > zone category > zone name (LibSets must be installed)", "zone category (zones without free options at the end) > zone name"}
 BMU.dropdownSortValues = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 
--- default zone tab (values represent the "index" value which is handed over to createTable() function)
+-- scenario indicies
+-- list/tab or action id
+BMU.indexListMain = 0				-- main list / everything
+BMU.indexListCurrentZone = 1		-- only current zone
+BMU.indexListSearchPlayer = 2		-- filter by player input text
+BMU.indexListSearchZone = 3			-- filter by zone input text
+BMU.indexListItems = 4				-- related items (survey & treasure maps, antiquity leads, clues)
+BMU.indexListDelves = 5				-- delves and public dungeons (current zone or all)
+BMU.indexListZoneHidden = 6			-- filter by specific zoneId, without state change
+BMU.indexListSource = 7				-- filter by sourceIndex (group, friend, guild)
+BMU.indexListZone = 8				-- filter by specific zoneId, with state change
+BMU.indexListQuests = 9				-- related quests
+
+BMU.indexListOwnHouses = 11			-- own houses
+BMU.indexListPTFHouses = 12			-- "Port to Friend's House" houses
+BMU.indexListGuilds = 13			-- BMU and partner guilds
+BMU.indexListDungeons = 14			-- Dungeon Finder (arenas, dungeons, trials)
+
+-- default tab selection (values represent the "index" value which is handed over to createTable() function)
 BMU.dropdownDefaultTabChoices = {string.format("|t32:32:%s|t", BMU.textures.refreshBtn), string.format("|t32:32:%s|t", BMU.textures.questBtn), string.format("|t32:32:%s|t", BMU.textures.relatedItemsBtn), string.format("|t32:32:%s|t", BMU.textures.currentZoneBtn), string.format("|t32:32:%s|t", BMU.textures.delvesBtn)}
 BMU.dropdownDefaultTabValues = {0, 9, 4, 1, 5}
 

@@ -1602,12 +1602,12 @@ local function SetupUI()
   teleporterWin.Main_Control.RefreshTexture:SetDrawLayer(2)
 
   teleporterWin.Main_Control.RefreshTexture:SetHandler("OnMouseUp", function(self)
-	if BMU.state == BMU.indexListMain then
-		-- dont reset slider if user stays already on main list
-		BMU.createTable({index=BMU.indexListMain, dontResetSlider=true})
-	else
-		BMU.createTable({index=BMU.indexListMain})
-	end
+		if BMU.state == BMU.indexListMain then
+			-- dont reset slider if user stays already on main list
+			BMU.createTable({index=BMU.indexListMain, dontResetSlider=true})
+		else
+			BMU.createTable({index=BMU.indexListMain})
+		end
   end)
   
   teleporterWin.Main_Control.RefreshTexture:SetHandler("OnMouseEnter", function(self)
@@ -1714,7 +1714,8 @@ local function SetupUI()
 		end)
   
 		teleporterWin.Main_Control.PTFTexture:SetHandler("OnMouseEnter", function(self)
-			BMU:tooltipTextEnter(teleporterWin.Main_Control.PTFTexture, SI.get(SI.TELE_UI_BTN_PTF_INTEGRATION) .. SI.get(SI.TELE_UI_BTN_TOOLTIP_CONTEXT_MENU))
+			BMU:tooltipTextEnter(teleporterWin.Main_Control.PTFTexture,
+				SI.get(SI.TELE_UI_BTN_PTF_INTEGRATION) .. SI.get(SI.TELE_UI_BTN_TOOLTIP_CONTEXT_MENU))
 			teleporterWin.Main_Control.PTFTexture:SetTexture(BMU.textures.ptfHouseBtnOver)
 		end)
 
@@ -1767,7 +1768,8 @@ local function SetupUI()
   end)
   
   teleporterWin.Main_Control.OwnHouseTexture:SetHandler("OnMouseEnter", function(self)
-    BMU:tooltipTextEnter(teleporterWin.Main_Control.OwnHouseTexture, SI.get(SI.TELE_UI_BTN_PORT_TO_OWN_HOUSE) .. SI.get(SI.TELE_UI_BTN_TOOLTIP_CONTEXT_MENU))
+    BMU:tooltipTextEnter(teleporterWin.Main_Control.OwnHouseTexture,
+		SI.get(SI.TELE_UI_BTN_PORT_TO_OWN_HOUSE) .. SI.get(SI.TELE_UI_BTN_TOOLTIP_CONTEXT_MENU))
     teleporterWin.Main_Control.OwnHouseTexture:SetTexture(BMU.textures.houseBtnOver)
   end)
 
@@ -1789,12 +1791,24 @@ local function SetupUI()
   teleporterWin.Main_Control.QuestTexture:SetMouseEnabled(true)
   teleporterWin.Main_Control.QuestTexture:SetDrawLayer(2)
 
-  teleporterWin.Main_Control.QuestTexture:SetHandler("OnMouseUp", function()
-	BMU.createTable({index=BMU.indexListQuests})
+  teleporterWin.Main_Control.QuestTexture:SetHandler("OnMouseUp", function(self, button)
+	if button == MOUSE_BUTTON_INDEX_RIGHT then
+		-- show context menu
+		ClearMenu()
+		-- make default tab
+		local menuIndex = AddCustomMenuItem(SI.get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU.savedVarsChar.defaultTab == BMU.indexListQuests then BMU.savedVarsChar.defaultTab = BMU.indexListMain else BMU.savedVarsChar.defaultTab = BMU.indexListQuests end end, MENU_ADD_OPTION_CHECKBOX)
+		if BMU.savedVarsChar.defaultTab == BMU.indexListQuests then
+			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+		end
+		ShowMenu()
+	else
+		BMU.createTable({index=BMU.indexListQuests})
+	end
   end)
   
   teleporterWin.Main_Control.QuestTexture:SetHandler("OnMouseEnter", function(self)
-    BMU:tooltipTextEnter(teleporterWin.Main_Control.QuestTexture, GetString(SI_JOURNAL_MENU_QUESTS))
+    BMU:tooltipTextEnter(teleporterWin.Main_Control.QuestTexture,
+		GetString(SI_JOURNAL_MENU_QUESTS) .. SI.get(SI.TELE_UI_BTN_TOOLTIP_CONTEXT_MENU))
     teleporterWin.Main_Control.QuestTexture:SetTexture(BMU.textures.questBtnOver)
   end)
 
@@ -1953,7 +1967,16 @@ local function SetupUI()
 		menuIndex = AddCustomMenuItem(GetString(SI_ENDLESS_DUNGEON_BUFF_TRACKER_SWITCH_TO_SUMMARY_KEYBIND), function() BMU.savedVarsChar.displayCounterPanel = not BMU.savedVarsChar.displayCounterPanel BMU.createTable({index=BMU.indexListItems}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.displayCounterPanel then
 			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
-		end	
+		end
+
+		-- divider
+		AddCustomMenuItem("-", function() end, nil, nil, nil, nil, 5)
+
+		-- make default tab
+		menuIndex = AddCustomMenuItem(SI.get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU.savedVarsChar.defaultTab == BMU.indexListItems then BMU.savedVarsChar.defaultTab = BMU.indexListMain else BMU.savedVarsChar.defaultTab = BMU.indexListItems end end, MENU_ADD_OPTION_CHECKBOX)
+		if BMU.savedVarsChar.defaultTab == BMU.indexListItems then
+			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+		end
 		
 		ShowMenu()
 	else
@@ -2021,12 +2044,24 @@ local function SetupUI()
   teleporterWin.Main_Control.OnlyYourzoneTexture:SetMouseEnabled(true)
   teleporterWin.Main_Control.OnlyYourzoneTexture:SetDrawLayer(2)
   
-	teleporterWin.Main_Control.OnlyYourzoneTexture:SetHandler("OnMouseUp", function(self)
-		BMU.createTable({index=BMU.indexListCurrentZone})
+	teleporterWin.Main_Control.OnlyYourzoneTexture:SetHandler("OnMouseUp", function(self, button)
+		if button == MOUSE_BUTTON_INDEX_RIGHT then
+			-- show context menu
+			ClearMenu()
+			-- make default tab
+			local menuIndex = AddCustomMenuItem(SI.get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU.savedVarsChar.defaultTab == BMU.indexListCurrentZone then BMU.savedVarsChar.defaultTab = BMU.indexListMain else BMU.savedVarsChar.defaultTab = BMU.indexListCurrentZone end end, MENU_ADD_OPTION_CHECKBOX)
+			if BMU.savedVarsChar.defaultTab == BMU.indexListCurrentZone then
+				ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+			end
+			ShowMenu()
+		else
+			BMU.createTable({index=BMU.indexListCurrentZone})
+		end
 	end)
   
     teleporterWin.Main_Control.OnlyYourzoneTexture:SetHandler("OnMouseEnter", function(self)
-		BMU:tooltipTextEnter(teleporterWin.Main_Control.OnlyYourzoneTexture, GetString(SI_ANTIQUITY_SCRYABLE_CURRENT_ZONE_SUBCATEGORY))
+		BMU:tooltipTextEnter(teleporterWin.Main_Control.OnlyYourzoneTexture,
+			GetString(SI_ANTIQUITY_SCRYABLE_CURRENT_ZONE_SUBCATEGORY) .. SI.get(SI.TELE_UI_BTN_TOOLTIP_CONTEXT_MENU))
 		teleporterWin.Main_Control.OnlyYourzoneTexture:SetTexture(BMU.textures.currentZoneBtnOver)
 	end)
 	
@@ -2052,8 +2087,18 @@ local function SetupUI()
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		-- show context menu
 		ClearMenu()
+		-- show all or only in current zone
 		local menuIndex = AddCustomMenuItem(GetString(SI_GAMEPAD_GUILD_HISTORY_SUBCATEGORY_ALL), function() BMU.savedVarsChar.showAllDelves = not BMU.savedVarsChar.showAllDelves BMU.createTable({index=BMU.indexListDelves}) end, MENU_ADD_OPTION_CHECKBOX)
 		if BMU.savedVarsChar.showAllDelves then
+			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+		end
+
+		-- divider
+		AddCustomMenuItem("-", function() end, nil, nil, nil, nil, 5)
+		
+		-- make default tab
+		menuIndex = AddCustomMenuItem(SI.get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU.savedVarsChar.defaultTab == BMU.indexListDelves then BMU.savedVarsChar.defaultTab = BMU.indexListMain else BMU.savedVarsChar.defaultTab = BMU.indexListDelves end end, MENU_ADD_OPTION_CHECKBOX)
+		if BMU.savedVarsChar.defaultTab == BMU.indexListDelves then
 			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 		end
 		ShowMenu()
@@ -2067,7 +2112,8 @@ local function SetupUI()
 	if not BMU.savedVarsChar.showAllDelves then
 		text = text .. " - " .. GetString(SI_ANTIQUITY_SCRYABLE_CURRENT_ZONE_SUBCATEGORY)
 	end
-	BMU:tooltipTextEnter(teleporterWin.Main_Control.DelvesTexture, text .. SI.get(SI.TELE_UI_BTN_TOOLTIP_CONTEXT_MENU))
+	BMU:tooltipTextEnter(teleporterWin.Main_Control.DelvesTexture,
+		text .. SI.get(SI.TELE_UI_BTN_TOOLTIP_CONTEXT_MENU))
     teleporterWin.Main_Control.DelvesTexture:SetTexture(BMU.textures.delvesBtnOver)
   end)
 
@@ -2220,7 +2266,8 @@ local function SetupUI()
   end)
   
   teleporterWin.Main_Control.DungeonTexture:SetHandler("OnMouseEnter", function(self)
-	BMU:tooltipTextEnter(teleporterWin.Main_Control.DungeonTexture, SI.get(SI.TELE_UI_BTN_DUNGEON_FINDER) .. SI.get(SI.TELE_UI_BTN_TOOLTIP_CONTEXT_MENU))
+	BMU:tooltipTextEnter(teleporterWin.Main_Control.DungeonTexture,
+		SI.get(SI.TELE_UI_BTN_DUNGEON_FINDER) .. SI.get(SI.TELE_UI_BTN_TOOLTIP_CONTEXT_MENU))
     teleporterWin.Main_Control.DungeonTexture:SetTexture(BMU.textures.soloArenaBtnOver)
   end)
 

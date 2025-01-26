@@ -81,18 +81,7 @@ function BMU.getCurrentZoneId()
 end
 
 
--- index: choose scenario
---		1: only current zone
---		2: filter by player name
---		3: filter by zone name
---		4: related items
---		5: delves and public dungeons
---		6: Favorite Search | Looking for specific zoneId (without state change)
---		7: filter by sourceIndex
---		8: Looking for specific zoneId (with state change)
---		9: related quests
---		else (0): everything
-
+-- index: choose scenario / filter action -> see globals
 -- inputString: search string
 -- fZoneId: specific zoneId (favorite)
 -- dontDisplay: flag if the result should be displayed in table (nil or false) or just return the result (true)
@@ -109,20 +98,20 @@ function BMU.createTable(args)
 	local noOwnHouses = args.noOwnHouses or false
 	
 	-- simple checks
-	if type(index) ~= 'number' or (index == 7 and type(filterSourceIndex) ~= 'number') or (index == 8 and type(fZoneId) ~= 'number') then
+	if type(index) ~= 'number' or (index == BMU.indexListSource and type(filterSourceIndex) ~= 'number') or (index == BMU.indexListZone and type(fZoneId) ~= 'number') then
 		return
 	end
 	
 	local startTime = GetGameTimeMilliseconds() -- get start time
 	
 	-- clear input fields
-	if index ~= 2 and index ~= 3 then
+	if index ~= BMU.indexListSearchPlayer and index ~= BMU.indexListSearchZone then
 		BMU.clearInputFields()
 	end
 
-	-- if filtering by name (2 or 3) and inputString is empty -> same as everything (0)
-	if (index == 2 or index == 3) and inputString == "" then
-		index = 0
+	-- if filtering by name and inputString is empty -> same as everything
+	if (index == BMU.indexListSearchPlayer or index == BMU.indexListSearchZone) and inputString == "" then
+		index = BMU.indexListMain
 	end
 
 	if BMU.debugMode == 1 then
@@ -137,12 +126,12 @@ function BMU.createTable(args)
 	end
 	
 	-- save SourceIndex in global variable
-	if index == 7 then
+	if index == BMU.indexListSource then
 		BMU.stateSourceIndex = filterSourceIndex
 	end
 	
 	-- save ZoneId in global variable
-	if index == 8 then
+	if index == BMU.indexListZone then
 		BMU.stateZoneId = fZoneId
 	end
 	
@@ -298,7 +287,7 @@ function BMU.createTable(args)
 		end
 	end
 	
-	if BMU.savedVarsAcc.showZonesWithoutPlayers2 or index == 3 then
+	if BMU.savedVarsAcc.showZonesWithoutPlayers2 or index == BMU.indexListSearchZone then
 		-- 5. add all overland zones without players
 		for overlandZoneId, _ in pairs(BMU.overlandDelvesPublicDungeons) do
 			local e = {}
@@ -319,22 +308,22 @@ function BMU.createTable(args)
 	portalPlayers = TeleportAllPlayersTable
 	
 	-- display number of hits (port alternatives)
-	-- not needed in case of only current zone (1) and favorite zoneId (6 and 8)
-	if BMU.savedVarsAcc.showNumberPlayers and not (index == 1 or index == 6 or index == 8) then
+	-- not needed in case of only current zone and favorite zoneId
+	if BMU.savedVarsAcc.showNumberPlayers and not (index == BMU.indexListCurrentZone or index == BMU.indexListZoneHidden or index == BMU.indexListZone) then
 		portalPlayers = BMU.addNumberPlayers(portalPlayers)
 	end
 	
-	if index == 4 then
+	if index == BMU.indexListItems then
 		-- related items
 		portalPlayers = BMU.syncWithItems(portalPlayers) -- returns already sorted list
-	elseif index == 9 then
+	elseif index == BMU.indexListQuests then
 		-- related quests
 		portalPlayers = BMU.syncWithQuests(portalPlayers) -- returns already sorted list
-	elseif index == 2 then
+	elseif index == BMU.indexListSearchPlayer then
 		-- search by player name
 		-- sort by string match position (displayName and characterName)
 		portalPlayers = BMU.sortByStringFindPosition(portalPlayers, inputString, "displayName", "characterName")
-	elseif index == 3 then
+	elseif index == BMU.indexListSearchZone then
 		-- search by zone name
 		-- sort by string match position (zoneName, zoneNameSecondLanguage)
 		portalPlayers = BMU.sortByStringFindPosition(portalPlayers, inputString, "zoneName", "zoneNameSecondLanguage")
@@ -622,7 +611,7 @@ function BMU.createTable(args)
 		return portalPlayers
 	else
 		BMU.TeleporterList:add_messages(portalPlayers, dontResetSlider)
-		if index == 4 and BMU.savedVarsChar.displayCounterPanel then
+		if index == BMU.indexListItems and BMU.savedVarsChar.displayCounterPanel then
 			-- update counter panel for related items
 			BMU.updateRelatedItemsCounterPanel()
 		end
@@ -774,7 +763,6 @@ function BMU.addInfo_2(e)
 	if BMU.savedVarsAcc.currentViewedZoneAlwaysTop and (BMU.getParentZoneId(e.zoneId) == currentZoneId or e.zoneId == currentZoneId or e.zoneId == BMU.getParentZoneId(currentZoneId)) then
 		-- current viewed zone + subzones
 		e.prio = 0
-		e.textColorDisplayName = "teal"
 		e.textColorZoneName = "teal"
 	elseif BMU.savedVarsAcc.currentZoneAlwaysTop and e.playersZone then
 		-- current zone (players location)
@@ -937,34 +925,34 @@ function BMU.filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filt
 		inputString = string.gsub(inputString, "-", "--")
 	end
 	
-	-- index == 1 -> only own zone
-	if index == 1 then
+	-- only own zone
+	if index == BMU.indexListCurrentZone then
 		-- only add records of the current (displayed) zone (and ensure that a record without player (dark red) is only added if there is no other record -> see BMU.checkOnceOnly())
 		-- OR if displayed zone is not overland and zone is parent of current zone (e.g. to see the parent overland zone in the list if the player is in a delve)
 		if (e.currentZone and BMU.checkOnceOnly(false, e)) or (BMU.categorizeZone(currentZoneId) ~= BMU.ZONE_CATEGORY_OVERLAND and e.zoneId == BMU.getParentZoneId(currentZoneId) and BMU.checkOnceOnly(true, e)) then
 			return true
 		end
 		
-	-- index == 2 -> filter by player name
-	elseif index == 2 then
+	-- filter by player name
+	elseif index == BMU.indexListSearchPlayer then
 		if (string.match(string.lower(e.displayName), string.lower(inputString)) or (BMU.savedVarsAcc.searchCharacterNames and string.match(string.lower(e.characterName), string.lower(inputString)))) then -- and not BMU.isBlacklisted(e.zoneId, e.sourceIndexLeading, BMU.savedVarsAcc.onlyMaps) and BMU.checkOnceOnly(BMU.savedVarsAcc.zoneOnceOnly, e)
 			return true
 		end
 		
-	-- index == 3 -> filter by zone name
-	elseif index == 3 then
+	-- filter by zone name
+	elseif index == BMU.indexListSearchZone then
 		if (string.match(string.lower(e.zoneName), string.lower(inputString)) or (BMU.savedVarsAcc.secondLanguage ~= 1 and string.match(string.lower(e.zoneNameSecondLanguage), string.lower(inputString)))) and not BMU.isBlacklisted(e.zoneId, e.sourceIndexLeading, BMU.savedVarsAcc.onlyMaps) and BMU.checkOnceOnly(BMU.savedVarsAcc.zoneOnceOnly, e) then
 			return true
 		end
 		
-	-- index == 4 -> search for related items
-	elseif index == 4 then
+	-- search for related items
+	elseif index == BMU.indexListItems then
 		if not BMU.isBlacklisted(e.zoneId, e.sourceIndexLeading, BMU.savedVarsAcc.onlyMaps) and BMU.checkOnceOnly(true, e) then
 			return true
 		end
 		
-	-- index == 5 -> only Delves and Public Dungeons (in your own Zone or globally)
-	elseif index == 5 then
+	-- only Delves and Public Dungeons (in your own Zone or globally)
+	elseif index == BMU.indexListDelves then
 		if BMU.savedVarsChar.showAllDelves then
 			-- add all delves and public dungeons
 			-- zone is delve or public dungeon + not blacklisted + add only once to list
@@ -981,22 +969,22 @@ function BMU.filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filt
 			end
 		end
 		
-	-- index == 6 -> looking for specific zone id (favorites, no state change)
-	-- index == 8 -> looking for specific zone id (displaying, state change)
-	elseif index == 6 or index == 8 then
+	-- looking for specific zone id (favorites, no state change)
+	-- looking for specific zone id (displaying, state change)
+	elseif index == BMU.indexListZoneHidden or index == BMU.indexListZone then
 		-- only one entry is needed for favorite search, but this function is also used to get ALL players for a specific zone
 		if e.zoneId == fZoneId and BMU.checkOnceOnly(false, e) then
 			return true
 		end
 	
-	-- index == 7 -> looking for specific sourceIndex
-	elseif index == 7 then
+	-- looking for specific sourceIndex
+	elseif index == BMU.indexListSource then
 		-- add only player with given sourceIndex
 		if BMU.has_value(e.sources, filterSourceIndex) then
 			return true
 		end
 		
-	-- add all / no filters (index == 0)
+	-- add all / no filters (index == BMU.indexListMain)
 	else
 		if (not BMU.isBlacklisted(e.zoneId, e.sourceIndexLeading, BMU.savedVarsAcc.onlyMaps) or BMU.isFavoritePlayer(e.displayName)) and BMU.checkOnceOnly(BMU.savedVarsAcc.zoneOnceOnly, e) then
 			return true
@@ -1874,8 +1862,8 @@ end
 
 
 function BMU.createTableHouses()
-	-- change global state to 11, to have the correct tab active
-	BMU.changeState(11)
+	-- change global state, to have the correct tab active
+	BMU.changeState(BMU.indexListOwnHouses)
 	local resultList = {}
 	
 	for _, house in pairs(COLLECTIONS_BOOK_SINGLETON:GetOwnedHouses()) do
@@ -1950,8 +1938,8 @@ function BMU.createTablePTF()
 	if not PortToFriend or not PortToFriend.GetFavorites then
 		return
 	end
-	-- change global state to 12, to have the correct tab active
-	BMU.changeState(12)
+	-- change global state, to have the correct tab active
+	BMU.changeState(BMU.indexListPTFHouses)
 	local resultList = {}
 	
 	-- add PTF entries
@@ -2101,12 +2089,12 @@ end
 
 function BMU.createTableGuilds(repeatFlag)
 	-- abort repeating the function if user switched to other tab
-	if repeatFlag and BMU.state ~= 13 then
+	if repeatFlag and BMU.state ~= BMU.indexListGuilds then
 		return
 	end
 
-	-- change global state to 13, to have the correct tab active
-	BMU.changeState(13)
+	-- change global state, to have the correct tab active
+	BMU.changeState(BMU.indexListGuilds)
 	local resultList = {}
 	
 	-- headline for the official guilds
@@ -2222,8 +2210,8 @@ end
 
 -- create table of Dungeons, Trials, Arenas depending on the settings
 function BMU.createTableDungeons(args)
-	-- change global state to 14, to have the correct tab active
-	BMU.changeState(14)
+	-- change global state, to have the correct tab active
+	BMU.changeState(BMU.indexListDungeons)
 	local inputString = (args and args.inputString) or nil
 
 	local resultListEndlessDungeons = {}

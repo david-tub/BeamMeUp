@@ -31,63 +31,63 @@ end
 
 
 ----------------------------------- KeyBinds
-function BMU.PortalHandlerKeyPress(index, favorite)
+function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 	-- Port to Group Leader
-	if index == 12 then
+	if keyPressIndex == 12 then
 		BMU.portToGroupLeader()
 		return
 	end
 	
 	-- Port to current zone
-	if index == 17 then
+	if keyPressIndex == 17 then
 		BMU.portToCurrentZone()
 		return
 	end
 	
 	-- Port to currently tracked/focused quest
-	if index == 19 then
+	if keyPressIndex == 19 then
 		BMU.portToTrackedQuestZone()
 		return
 	end
 	
 	-- Port to any available zone (first entry from main list)
-	if index == 20 then
+	if keyPressIndex == 20 then
 		BMU.portToAnyZone()
 		return
 	end
 
 	-- Port into own Primary Residence
-	if index == 13 then
+	if keyPressIndex == 13 then
 		BMU.portToOwnHouse(true, nil, false, nil)
 		return
 	end
 	
 	-- Port outside own Primary Residence
-	if index == 18 then
+	if keyPressIndex == 18 then
 		BMU.portToOwnHouse(true, nil, true, nil)
 		return
 	end
 	
 	-- Port to BMU guild house
-	if index == 14 then
+	if keyPressIndex == 14 then
 		BMU.portToBMUGuildHouse()
 		return
 	end
 	
 	-- Unlock Wayshrines
-	if index == 10 then
+	if keyPressIndex == 10 then
 		BMU.showDialogAutoUnlock()
 		return
 	end
 	
 	-- Zone Favorites
-	if index == 15 then
+	if keyPressIndex == 15 then
 		local fZoneId = BMU.savedVarsServ.favoriteListZones[favorite]
 			if fZoneId == nil then
 				BMU.printToChat(SI.get(SI.TELE_CHAT_FAVORITE_UNSET))
 				return
 			end
-		local result = BMU.createTable({index=6, fZoneId=fZoneId, dontDisplay=true})
+		local result = BMU.createTable({index=BMU.indexListZoneHidden, fZoneId=fZoneId, dontDisplay=true})
 		local firstRecord = result[1]
 		if firstRecord.displayName ~= "" then
 			BMU.PortalToPlayer(firstRecord.displayName, firstRecord.sourceIndexLeading, firstRecord.zoneName, firstRecord.zoneId, firstRecord.category, true, true, true)
@@ -100,13 +100,13 @@ function BMU.PortalHandlerKeyPress(index, favorite)
 	end
 	
 	-- Player Favorites
-	if index == 16 then
+	if keyPressIndex == 16 then
 		local displayName = BMU.savedVarsServ.favoriteListPlayers[favorite]
 			if displayName == nil then
 				BMU.printToChat(SI.get(SI.TELE_CHAT_FAVORITE_UNSET))
 				return
 			end
-		local result = BMU.createTable({index=2, inputString=displayName, dontDisplay=true})
+		local result = BMU.createTable({index=BMU.indexListSearchPlayer, inputString=displayName, dontDisplay=true})
 		local firstRecord = result[1]
 		if firstRecord.displayName == "" then
 			BMU.printToChat(displayName .. " - " .. SI.get(SI.TELE_CHAT_FAVORITE_PLAYER_NO_FAST_TRAVEL))
@@ -119,7 +119,7 @@ function BMU.PortalHandlerKeyPress(index, favorite)
     -- Show/Hide UI with specific Tab
 	if BMU.win.Main_Control:IsHidden() then
 		-- window is hidden
-		if index == 11 then
+		if keyPressIndex == 11 then
 			-- do nothing if window is hidden and user refresh manually
 			return
 		end
@@ -127,30 +127,30 @@ function BMU.PortalHandlerKeyPress(index, favorite)
 		-- open specific tab
 		SetGameCameraUIMode(true)
 		BMU.OpenTeleporter(false)
-		if index == 6 then
+		if keyPressIndex == 6 then
 			-- dungeon finder
 			BMU.createTableDungeons()
-		elseif index == 7 then
+		elseif keyPressIndex == 7 then
 			-- own houses
 			BMU.createTableHouses()
 		else
-			BMU.createTable({index=index})
+			BMU.createTable({index=keyPressIndex})
 		end
 	else
 		-- window is shown
-		if index == 11 then -- Refresh list
+		if keyPressIndex == 11 then -- Refresh list
 			BMU.refreshListAuto()
 		else
-			if index ~= BMU.state and BMU.state ~= 14 and BMU.state ~= 11 then
-				-- index is different -> switch tab but bypass the special states (14 = Dungeon Finder, 11 = Own Houses)
-				if index == 6 then
+			if keyPressIndex ~= BMU.state and BMU.state ~= BMU.indexListDungeons and BMU.state ~= BMU.indexListOwnHouses then
+				-- index is different -> switch tab but bypass the special states (Dungeon Finder, Own Houses)
+				if keyPressIndex == 6 then
 					-- dungeon finder
 					BMU.createTableDungeons()
-				elseif index == 7 then
+				elseif keyPressIndex == 7 then
 					-- own houses
 					BMU.createTableHouses()
 				else
-					BMU.createTable({index=index})
+					BMU.createTable({index=keyPressIndex})
 				end
 			else
 				-- same index -> hide UI

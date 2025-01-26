@@ -70,7 +70,7 @@ function BMU.startAutoUnlock(zoneId, isChatLogging, loopType, loopZoneList)
 	-- ensure unlock process is not already running
 	if not BMU.uwData or not BMU.uwData.isStarted then
 		local formattedZoneName = BMU.formatName(GetZoneNameById(zoneId), false)
-		local list = BMU.createTable({index=8, fZoneId=zoneId, noOwnHouses=true, dontDisplay=true})
+		local list = BMU.createTable({index=BMU.indexListZone, fZoneId=zoneId, noOwnHouses=true, dontDisplay=true})
 		-- check if list is empty
 		local firstRecord = list[1]
 		if #list == 0 or not firstRecord or firstRecord.displayName == "" then
@@ -135,7 +135,7 @@ function BMU.proceedAutoUnlock()
 		end
 		
 		-- get all travel options
-		local list = BMU.createTable({index=8, fZoneId=BMU.uwData.zoneId, dontDisplay=true})
+		local list = BMU.createTable({index=BMU.indexListZone, fZoneId=BMU.uwData.zoneId, dontDisplay=true})
 		
 		if #list ~= 0 or list[1].displayName ~= "" then
 			-- re-calculate total steps in case new players come available during process
@@ -352,7 +352,7 @@ function BMU.startAutoUnlockLoopRandom(prevZoneId, loopType, isChatLogging)
 	-- go over the zones and find one
 	for _, zoneId in ipairs(shuffled) do
 		if zoneId ~= prevZoneId then -- dont take the same zone twice in a row
-			local list = BMU.createTable({index=8, fZoneId=zoneId, noOwnHouses=true, dontDisplay=true})
+			local list = BMU.createTable({index=BMU.indexListZone, fZoneId=zoneId, noOwnHouses=true, dontDisplay=true})
 			-- check if list is empty
 			if #list > 0 and list[1] and list[1].displayName ~= "" then
 				local numWayshrines, numWayshrinesDiscovered = BMU.getZoneWayshrineCompletion(zoneId)
@@ -380,7 +380,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType, isChatLogging)
 			-- consider only zones the user has access to (DLC)
 			if CanJumpToPlayerInZone(overlandZoneId) then
 				--table.insert(overlandZoneIds, overlandZoneId)
-				local resultList = BMU.createTable({index=8, fZoneId=overlandZoneId, noOwnHouses=true, dontDisplay=true})
+				local resultList = BMU.createTable({index=BMU.indexListZone, fZoneId=overlandZoneId, noOwnHouses=true, dontDisplay=true})
 				if #resultList > 0 and resultList[1] and resultList[1].displayName ~= "" then
 					local numWayshrines, numWayshrinesDiscovered = BMU.getZoneWayshrineCompletion(overlandZoneId)
 					if numWayshrinesDiscovered < numWayshrines then
@@ -420,7 +420,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType, isChatLogging)
 	
 	-- at this moment: zoneRecordList was already given or was re-filled right now
 	for index, zoneRecord in pairs(zoneRecordList) do
-		local resultList = BMU.createTable({index=8, fZoneId=zoneRecord.zoneId, noOwnHouses=true, dontDisplay=true})
+		local resultList = BMU.createTable({index=BMU.indexListZone, fZoneId=zoneRecord.zoneId, noOwnHouses=true, dontDisplay=true})
 		if #resultList > 0 and resultList[1] and resultList[1].displayName ~= "" then
 			table.remove(zoneRecordList, index)
 			zo_callLater(function()
@@ -676,11 +676,8 @@ function BMU.PortalToPlayer(displayName, sourceIndex, zoneName, zoneId, zoneCate
 			BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. displayName .. " - " .. zoneName)
 		end
 		if sourceIndex == BMU.SOURCE_INDEX_GROUP then
-			if displayName == GetUnitDisplayName(GetGroupLeaderUnitTag()) then
-				JumpToGroupLeader()
-			else
-				JumpToGroupMember(displayName)
-			end
+			-- 2024/12: a bug was reported, that JumpToGroupLeader() no longer works probably in some cases --> only use JumpToGroupMember()
+			JumpToGroupMember(displayName)
 		elseif sourceIndex == BMU.SOURCE_INDEX_FRIEND then
 			JumpToFriend(displayName)
 		else
@@ -1388,7 +1385,7 @@ function ListView:update()
 				-- hide MouseOver handler
 				list.ColumnNumberPlayersTex:SetHandler("OnMouseExit", function(self) list.ColumnNumberPlayersTex:SetAlpha(0) end)
 				-- set handler for opening
-				list.ColumnNumberPlayersTex:SetHandler("OnMouseUp", function(self, button) BMU.createTable({index=8, fZoneId=message.zoneId}) end)
+				list.ColumnNumberPlayersTex:SetHandler("OnMouseUp", function(self, button) BMU.createTable({index=BMU.indexListZone, fZoneId=message.zoneId}) end)
 			else
 				list.ColumnNumberPlayers:SetText("")
 				-- hide
@@ -1726,18 +1723,18 @@ function BMU.refreshListAuto(mapChanged)
 	end
 
 	local inputString = ""
-	if BMU.state == 2 then
+	if BMU.state == BMU.indexListSearchPlayer then
 		-- catch input string (player)
 		inputString = BMU.win.Searcher_Player:GetText()
-	elseif BMU.state == 3 then
+	elseif BMU.state == BMU.indexListSearchZone then
 		-- catch input string (zone)
 		inputString = BMU.win.Searcher_Zone:GetText()
 	end
 	
-	if BMU.state == 11 or BMU.state == 13 or BMU.state == 14 or (BMU.state == 9 and mapChanged) then
-		-- if list of own houses (11) or guilds (13) or Dungeon Finder (14) or (related quests (9) and trigger from map change) dont auto refresh
+	if BMU.state == BMU.indexListOwnHouses or BMU.state == BMU.indexListGuilds or BMU.state == BMU.indexListDungeons or (BMU.state == BMU.indexListQuests and mapChanged) then
+		-- if list of own houses or guilds or Dungeon Finder or (related quests and trigger from map change) dont auto refresh
 		return
-	elseif BMU.state == 12 then
+	elseif BMU.state == BMU.indexListPTFHouses then
 		BMU.createTablePTF()
 	else
 		BMU.createTable({index=BMU.state, inputString=inputString, fZoneId=BMU.stateZoneId, filterSourceIndex=BMU.stateSourceIndex, dontResetSlider=true})
@@ -2254,11 +2251,11 @@ function BMU.clickOnPlayerName(button, record)
 		local entries_filter = {
 				{
 					label = BMU.colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_GROUP_MEMBERS), "orange"),
-					callback = function(state) BMU.createTable({index=7, filterSourceIndex=BMU.SOURCE_INDEX_GROUP}) end,
+					callback = function(state) BMU.createTable({index=BMU.indexListSource, filterSourceIndex=BMU.SOURCE_INDEX_GROUP}) end,
 				},
 				{
 					label = BMU.colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_FRIENDS), "green"),
-					callback = function(state) BMU.createTable({index=7, filterSourceIndex=BMU.SOURCE_INDEX_FRIEND}) end,
+					callback = function(state) BMU.createTable({index=BMU.indexListSource, filterSourceIndex=BMU.SOURCE_INDEX_FRIEND}) end,
 				},
 			}
 			
@@ -2267,7 +2264,7 @@ function BMU.clickOnPlayerName(button, record)
 			local guildId = GetGuildId(guildIndex)
 			local entry = {
 					label = BMU.colorizeText(GetGuildName(guildId), "white"),
-					callback = function() BMU.createTable({index=7, filterSourceIndex=2+guildIndex}) end,
+					callback = function() BMU.createTable({index=BMU.indexListSource, filterSourceIndex=2+guildIndex}) end,
 				}
 				table.insert(entries_filter, entry)
 		end		
@@ -2585,7 +2582,7 @@ end
 
 -- to get to the next wayshrine without preference travel to any available zone/player (first entry from main list)
 function BMU.portToAnyZone()
-	local resultTable = BMU.createTable({index=0, noOwnHouses=true, dontDisplay=true})
+	local resultTable = BMU.createTable({index=BMU.indexListMain, noOwnHouses=true, dontDisplay=true})
 	
 	for _, entry in pairs(resultTable) do
 		if not entry.zoneWithoutPlayer and entry.displayName ~= nil and entry.displayName ~= "" then
@@ -2609,11 +2606,11 @@ end
 -- makes intelligent decision whether to try to port to another player or not
 function BMU.decideTryAgainPorting(errorCode, zoneId, displayName, sourceIndex, updateSavedGold)
 	-- don't try to port again when: other errors (e.g. solo zone); player is group member; player is favorite; search by player name
-	if (errorCode ~= SOCIAL_RESULT_NO_LOCATION and errorCode ~= SOCIAL_RESULT_CHARACTER_NOT_FOUND) or sourceIndex == BMU.SOURCE_INDEX_GROUP or BMU.isFavoritePlayer(displayName) or BMU.state == 2 then
+	if (errorCode ~= SOCIAL_RESULT_NO_LOCATION and errorCode ~= SOCIAL_RESULT_CHARACTER_NOT_FOUND) or sourceIndex == BMU.SOURCE_INDEX_GROUP or BMU.isFavoritePlayer(displayName) or BMU.state == BMU.indexListSearchPlayer then
 		return -- do nothing
 	else
 		-- try to find another player in the zone
-		local result = BMU.createTable({index=6, fZoneId=zoneId, dontDisplay=true})
+		local result = BMU.createTable({index=BMU.indexListZoneHidden, fZoneId=zoneId, dontDisplay=true})
 		for index, record in pairs(result) do
 			if record ~= nil then
 				if record.displayName ~= "" and record.displayName ~= displayName then -- player name must be different

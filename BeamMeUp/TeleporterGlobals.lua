@@ -254,9 +254,27 @@ BMU.dropdownSecLangValues = {1, 2, 3, 4, 5, 6, 7}
 BMU.dropdownSortChoices = {"zone name", "zone category > zone name", "most used zone > zone name", "most used zone > zone category > zone name", "number of players > zone name", "undiscovered wayshrines > zone category > zone name", "undiscovered skyshards > zone category > zone name", "last used zone > zone name", "last used zone > zone category > zone name", "missing set items > zone category > zone name (LibSets must be installed)", "zone category (zones without free options at the end) > zone name"}
 BMU.dropdownSortValues = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 
--- default zone tab (values represent the "index" value which is handed over to createTable() function)
+-- scenario indicies
+-- list/tab or action id
+BMU.indexListMain = 0				-- main list / everything
+BMU.indexListCurrentZone = 1		-- only current zone
+BMU.indexListSearchPlayer = 2		-- filter by player input text
+BMU.indexListSearchZone = 3			-- filter by zone input text
+BMU.indexListItems = 4				-- related items (survey & treasure maps, antiquity leads, clues)
+BMU.indexListDelves = 5				-- delves and public dungeons (current zone or all)
+BMU.indexListZoneHidden = 6			-- filter by specific zoneId, without state change
+BMU.indexListSource = 7				-- filter by sourceIndex (group, friend, guild)
+BMU.indexListZone = 8				-- filter by specific zoneId, with state change
+BMU.indexListQuests = 9				-- related quests
+
+BMU.indexListOwnHouses = 11			-- own houses
+BMU.indexListPTFHouses = 12			-- "Port to Friend's House" houses
+BMU.indexListGuilds = 13			-- BMU and partner guilds
+BMU.indexListDungeons = 14			-- Dungeon Finder (arenas, dungeons, trials)
+
+-- default tab selection (values represent the "index" value which is handed over to createTable() function)
 BMU.dropdownDefaultTabChoices = {string.format("|t32:32:%s|t", BMU.textures.refreshBtn), string.format("|t32:32:%s|t", BMU.textures.questBtn), string.format("|t32:32:%s|t", BMU.textures.relatedItemsBtn), string.format("|t32:32:%s|t", BMU.textures.currentZoneBtn), string.format("|t32:32:%s|t", BMU.textures.delvesBtn)}
-BMU.dropdownDefaultTabValues = {0, 9, 4, 1, 5}
+BMU.dropdownDefaultTabValues = {BMU.indexListMain, BMU.indexListQuests, BMU.indexListItems, BMU.indexListCurrentZone, BMU.indexListDelves}
 
 -- prioritization of the sources
 BMU.dropdownPrioSourceChoices = {"Friends"}
@@ -327,7 +345,7 @@ BMU.blacklistBattlegrounds = {509, 511, 510, 508, 513, 512, 514, 517, 518}
 --------
 
 -- 4 men Group Dungeons -- order -> http://en.uesp.net/wiki/Online:Veteran_Dungeons
-BMU.blacklistGroupDungeons = {380, 935, 126, 931, 176, 681, 1055, 131, 1052, 31, 22, 38, 1009, 144, 936, 130, 932, 1010, 146, 933, 63, 930, 449, 64, 148, 848, 843, 283, 934, 11, 973, 974, 688, 678, 1080, 1081, 1122, 1123, 1152, 1153, 1201, 1197, 1228, 1229, 1267, 1268, 1301, 1302, 1360, 1361, 1389, 1390, 1470, 1471}
+BMU.blacklistGroupDungeons = {380, 935, 126, 931, 176, 681, 1055, 131, 1052, 31, 22, 38, 1009, 144, 936, 130, 932, 1010, 146, 933, 63, 930, 449, 64, 148, 848, 843, 283, 934, 11, 973, 974, 688, 678, 1080, 1081, 1122, 1123, 1152, 1153, 1201, 1197, 1228, 1229, 1267, 1268, 1301, 1302, 1360, 1361, 1389, 1390, 1470, 1471, 1496, 1497}
 
 -- 12 men Raids (Trials) -- order -> http://en.uesp.net/wiki/Online:Trials
 BMU.blacklistRaids = {1000, 638, 636, 639, 725, 1051, 975, 1121, 1196, 1263, 1344, 1427, 1478}
@@ -344,7 +362,7 @@ BMU.blacklistEndlessDungeons = {1436}
 --------
 
 -- Houses
-BMU.blacklistHouses = {940, 942, 941, 939, 938, 937, 859, 858, 878, 868, 869, 873, 860, 861, 877, 852, 853, 881, 867, 866, 874, 863, 862, 876, 871, 870, 872, 864, 865, 875, 855, 854, 880, 856, 857, 879, 944, 943, 945, 882, 883, 994, 995, 997, 996, 1005, 1008, 1007, 1006, 1042, 1043, 1044, 1045, 1059, 1060, 1061, 1063, 1108, 1109, 1064, 1125, 1126, 1128, 1129, 1130, 1154, 1155, 1192, 1193, 1199, 1200, 1218, 1219, 1220, 1233, 1234, 1264, 1265, 1270, 1271, 1275, 1276, 1277, 1307, 1342, 1343, 1306, 1345, 1363, 1364, 1432, 1433, 1434, 1435, 1437, 1468, 1472, 1473, 1438, 1479, 1487, 1491, 1492, 1494, 1495, 1500, 1501}
+BMU.blacklistHouses = {940, 942, 941, 939, 938, 937, 859, 858, 878, 868, 869, 873, 860, 861, 877, 852, 853, 881, 867, 866, 874, 863, 862, 876, 871, 870, 872, 864, 865, 875, 855, 854, 880, 856, 857, 879, 944, 943, 945, 882, 883, 994, 995, 997, 996, 1005, 1008, 1007, 1006, 1042, 1043, 1044, 1045, 1059, 1060, 1061, 1063, 1108, 1109, 1064, 1125, 1126, 1128, 1129, 1130, 1154, 1155, 1192, 1193, 1199, 1200, 1218, 1219, 1220, 1233, 1234, 1264, 1265, 1270, 1271, 1275, 1276, 1277, 1307, 1342, 1343, 1306, 1345, 1363, 1364, 1432, 1433, 1434, 1435, 1437, 1468, 1472, 1473, 1438, 1479, 1487, 1491, 1492, 1494, 1495, 1500, 1501, 1546, 1547}
 
 -----------------------------------------
 
@@ -1312,6 +1330,24 @@ BMU.nodeIndexMap = {
 		updateName = "Scions of Ithelia",
 		updateNum = 41,
 		releaseDate = "2024/03"
+	},
+	-- Exiled Redoubt
+	[1496] = {
+		nodeIndex = 581,
+		abbreviation = "ER",
+		isDLC = true,
+		updateName = "Fallen Banners",
+		updateNum = 45,
+		releaseDate = "2025/03"
+	},
+	-- Lep Seclusa
+	[1497] = {
+		nodeIndex = 582,
+		abbreviation = "LS",
+		isDLC = true,
+		updateName = "Fallen Banners",
+		updateNum = 45,
+		releaseDate = "2025/03"
 	},
 }
 

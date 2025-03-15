@@ -2571,14 +2571,29 @@ end
 
 -- get completion info for specific zone and completionType
 function BMU.getZoneGuideDiscoveryInfo(zoneId, completionType)
+	local numCompletedActivities = 0
+	local totalActivities = 0
 
-	-- check for any zone exceptions
+	-- check for any zone mapping exceptions
 	local mainZoneId = BMU.getMainZoneId(zoneId)
 	if mainZoneId then
 		zoneId = mainZoneId
 	end
 
-	local numCompletedActivities, totalActivities, numUnblockedActivities, blockingBranchErrorStringId = ZO_ZoneStories_Manager.GetActivityCompletionProgressValues(zoneId, completionType)
+	-- additional wayshrine exception for Eyevea (Augvea) since this map has no zone completion info
+	if zoneId == 267 and completionType == ZONE_COMPLETION_TYPE_WAYSHRINES then
+		totalActivities = 1
+		-- check the only one wayshrine on this map
+		local known, _, _, _, _, _, _, _, _ = GetFastTravelNodeInfo(215)
+		if known then
+			numCompletedActivities = 1
+		else
+			numCompletedActivities = 0
+		end
+	else
+		numCompletedActivities, totalActivities, _, _ = ZO_ZoneStories_Manager.GetActivityCompletionProgressValues(zoneId, completionType)
+	end
+	
 	if totalActivities == 0 then
 		return nil
 	end

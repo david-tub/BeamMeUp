@@ -671,30 +671,35 @@ BMU.overlandDelvesPublicDungeons = {
 	},
 	-- Telvanni Peninsula
 	[1414] = {
-    		delves = {1396, 1397, 1398},
-    		publicDungeons = {1415},
+    	delves = {1396, 1397, 1398},
+    	publicDungeons = {1415},
 		publicDungeonsAchievements = {
 			[1415] = 3658,		--Gorne
 		}
   	},
   	-- Apocrypha
   	[1413] = {
-    		delves = {1399, 1400, 1401},
-    		publicDungeons = {1416},
+    	delves = {1399, 1400, 1401},
+    	publicDungeons = {1416},
 		publicDungeonsAchievements = {
 			[1416] = 3657,		--The Underweave
 		}
   	},
 	-- West Weald
   	[1443] = {
-    		delves = {1444, 1445, 1446, 1447, 1448, 1449},
-    		publicDungeons = {1466, 1467},
+    	delves = {1444, 1445, 1446, 1447, 1448, 1449},
+    	publicDungeons = {1466, 1467},
 		publicDungeonsAchievements = {
 			[1466] = 4000,		--Leftwheal Trading Post
 			[1467] = 4002,		--Silorn
 		}
 	},
-	}
+	-- Eyevea (Augvea)
+	[267] = {
+		delves = {},
+		publicDungeons = {},
+	},
+}
 			
 
 -- maps nodeIndicies with specific/selected zoneIds

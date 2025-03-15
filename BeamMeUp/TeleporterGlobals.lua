@@ -285,7 +285,7 @@ for i = 1, GetNumGuilds() do
 end
 
 -- flag to toggle debug mode
-BMU.debugMode = 0
+BMU.debugMode = false
 
 -- game language of the client
 BMU.lang = GetCVar("language.2")

@@ -549,7 +549,6 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["surveyMapsNotification"] = false,
 		["infoFavoritePlayerStatusNotification"] = false, -- false = not yet read
 		["infoSurveyMapsNotification"] = false, -- false = not yet read
-		["unlockingLessChatOutput"] = false,
 		["showOpenButtonOnMap"] = true,
 		["surveyMapsNotificationSound"] = true,
 		["wayshrineTravelAutoConfirm"] = false,
@@ -563,7 +562,9 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["usePanAndZoom"] = true,
 		["useMapPing"] = false,
 		["showZonesWithoutPlayers2"] = true,
-		["autoUnlockChatLogging"] = true,
+		["chatOutputFastTravel"] = true,
+		["chatOutputAdditional"] = true,
+		["chatOutputUnlock"] = true,
     }
     
 	BMU.DefaultsServer = {

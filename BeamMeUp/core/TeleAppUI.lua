@@ -248,15 +248,6 @@ local function SetupOptionsMenu(index) --index == Addon name
 			  submenu = "ui",
          },
 		 {
-              type = "checkbox",
-              name = SI.get(SI.TELE_SETTINGS_UNLOCKING_LESS_CHAT_OUTPUT),
-              tooltip = SI.get(SI.TELE_SETTINGS_UNLOCKING_LESS_CHAT_OUTPUT_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["unlockingLessChatOutput"]) .. "]",
-              getFunc = function() return BMU.savedVarsAcc.unlockingLessChatOutput end,
-              setFunc = function(value) BMU.savedVarsAcc.unlockingLessChatOutput = value end,
-			  default = BMU.DefaultsAccount["unlockingLessChatOutput"],
-			  submenu = "ui",
-         },
-		 {
               type = "slider",
               name = SI.get(SI.TELE_SETTINGS_AUTO_PORT_FREQ),
               tooltip = SI.get(SI.TELE_SETTINGS_AUTO_PORT_FREQ_TOOLTIP) .. " [DEFAULT: " .. BMU.DefaultsAccount["AutoPortFreq"] .. "]",
@@ -808,6 +799,43 @@ local function SetupOptionsMenu(index) --index == Addon name
 			  submenu = "adv",
          },
 		 {
+			  type = "checkbox",
+			  name = SI.get(SI.TELE_SETTINGS_OUTPUT_FAST_TRAVEL),
+			  tooltip = SI.get(SI.TELE_SETTINGS_OUTPUT_FAST_TRAVEL_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["chatOutputFastTravel"]) .. "]",
+			  getFunc = function() return BMU.savedVarsAcc.chatOutputFastTravel end,
+			  setFunc = function(value) BMU.savedVarsAcc.chatOutputFastTravel = value end,
+			  default = BMU.DefaultsAccount["chatOutputFastTravel"],
+			  submenu = "co",
+	     },
+	     {
+			  type = "checkbox",
+			  name = SI.get(SI.TELE_SETTINGS_OUTPUT_ADDITIONAL),
+			  tooltip = SI.get(SI.TELE_SETTINGS_OUTPUT_ADDITIONAL_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["chatOutputAdditional"]) .. "]",
+			  getFunc = function() return BMU.savedVarsAcc.chatOutputAdditional end,
+			  setFunc = function(value) BMU.savedVarsAcc.chatOutputAdditional = value end,
+			  default = BMU.DefaultsAccount["chatOutputAdditional"],
+			  submenu = "co",
+   		 },
+   		 {
+			  type = "checkbox",
+			  name = SI.get(SI.TELE_SETTINGS_OUTPUT_UNLOCK),
+		 	  tooltip = SI.get(SI.TELE_SETTINGS_OUTPUT_UNLOCK_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["chatOutputUnlock"]) .. "]",
+			  getFunc = function() return BMU.savedVarsAcc.chatOutputUnlock end,
+			  setFunc = function(value) BMU.savedVarsAcc.chatOutputUnlock = value end,
+			  default = BMU.DefaultsAccount["chatOutputUnlock"],
+			  submenu = "co",
+		 },
+		 {
+			  type = "checkbox",
+			  name = SI.get(SI.TELE_SETTINGS_OUTPUT_DEBUG),
+			  tooltip = SI.get(SI.TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP),
+			  getFunc = function() return BMU.debugMode end,
+			  setFunc = function(value) BMU.debugMode = value end,
+			  default = false,
+			  warning = "This option can not be set permanently.",
+			  submenu = "co",
+	     },
+		 {
               type = "button",
               name = BMU.colorizeText(SI.get(SI.TELE_SETTINGS_RESET_ALL_COUNTERS), "red"),
 			  tooltip = SI.get(SI.TELE_SETTINGS_RESET_ALL_COUNTERS_TOOLTIP),
@@ -1004,10 +1032,15 @@ local function SetupOptionsMenu(index) --index == Addon name
 	}
 	local submenu7 = {
 		type = "submenu",
+		name = SI.get(SI.TELE_SETTINGS_HEADER_CHAT_OUTPUT),
+		controls = optionsBySubmenu["co"],
+	}
+	local submenu8 = {
+		type = "submenu",
 		name = SI.get(SI.TELE_SETTINGS_HEADER_CHAT_COMMANDS),
 		controls = optionsBySubmenu["cc"],
 	}
-	local submenu8 = {
+	local submenu9 = {
 		type = "submenu",
 		name = SI.get(SI.TELE_SETTINGS_HEADER_STATS),
 		controls = optionsBySubmenu["stats"],
@@ -1015,7 +1048,7 @@ local function SetupOptionsMenu(index) --index == Addon name
 	
 	-- register all submenus with options
 	-- TODO: add submenu1
-	LAM2:RegisterOptionControls(appName .. "Options", {submenu1, submenu2, submenu3, submenu4, submenu5, submenu6, submenu7, submenu8})
+	LAM2:RegisterOptionControls(appName .. "Options", {submenu1, submenu2, submenu3, submenu4, submenu5, submenu6, submenu7, submenu8, submenu9})
 end
 
 
@@ -2424,7 +2457,7 @@ end
 -- display the correct persistent MouseOver depending on Button
 -- also set global state for auto refresh
 function BMU.changeState(index)
-	if BMU.debugMode == 1 then
+	if BMU.debugMode then
 		-- debug mode
 		BMU.printToChat("Changed - state: " .. tostring(index))
 	end

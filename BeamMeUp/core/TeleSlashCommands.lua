@@ -62,11 +62,11 @@ end
 
 
 function BMU.sc_toggleDebugMode()
-	if BMU.debugMode == 1 then
-		BMU.debugMode = 0
+	if BMU.debugMode then
+		BMU.debugMode = false
 		BMU.printToChat("Debug mode disabled")
 	else
-		BMU.debugMode = 1
+		BMU.debugMode = true
 		BMU.printToChat("Debug mode enabled")
 	end
 end

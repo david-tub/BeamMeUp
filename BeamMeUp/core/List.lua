@@ -495,7 +495,7 @@ function BMU.showDialogAutoUnlock(zoneId)
 		BMU.customDialog_dropdownControl:SelectItem(entry1, true)
 	end
 	
-	ZO_CheckButton_SetCheckState(BMU.customDialog_checkboxControl, BMU.savedVarsAcc.autoUnlockChatLogging)
+	ZO_CheckButton_SetCheckState(BMU.customDialog_checkboxControl, BMU.savedVarsAcc.chatOutputUnlock)
 	
 
 	local globalDialogName
@@ -523,7 +523,7 @@ function BMU.showDialogAutoUnlock(zoneId)
 		BMU.customDialogSection:SetHidden(true)
 		-- save status to savedVars
 		local isChatLoggingChecked = ZO_CheckButton_IsChecked(BMU.customDialog_checkboxControl)
-		BMU.savedVarsAcc.autoUnlockChatLogging = isChatLoggingChecked
+		BMU.savedVarsAcc.chatOutputUnlock = isChatLoggingChecked
 	end
 	
 	local dialogInfo = {

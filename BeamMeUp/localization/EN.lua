@@ -177,6 +177,15 @@ mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Show displayed zone & subzones a
 mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Show currently displayed zone and subzones (opened world map) always on top of the list.")
 mkstr(SI.TELE_SETTINGS_DEFAULT_TAB, "Default list")
 mkstr(SI.TELE_SETTINGS_DEFAULT_TAB_TOOLTIP, "The list that is displayed by default when opening BeamMeUp.")
+mkstr(SI.TELE_SETTINGS_HEADER_CHAT_OUTPUT, "Chat Output")
+mkstr(SI.TELE_SETTINGS_OUTPUT_FAST_TRAVEL, "Fast travel processes")
+mkstr(SI.TELE_SETTINGS_OUTPUT_FAST_TRAVEL_TOOLTIP, "...")
+mkstr(SI.TELE_SETTINGS_OUTPUT_ADDITIONAL, "Supporting messages")
+mkstr(SI.TELE_SETTINGS_OUTPUT_ADDITIONAL_TOOLTIP, "...")
+mkstr(SI.TELE_SETTINGS_OUTPUT_UNLOCK, "Automatic unlocking results")
+mkstr(SI.TELE_SETTINGS_OUTPUT_UNLOCK_TOOLTIP, "...")
+mkstr(SI.TELE_SETTINGS_OUTPUT_DEBUG, "Debug information")
+mkstr(SI.TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP, "...")
 
 
 -----------------------------------------------------------------------------

@@ -114,7 +114,7 @@ function BMU.createTable(args)
 		index = BMU.indexListMain
 	end
 
-	if BMU.debugMode == 1 then
+	if BMU.debugMode then
 		-- debug mode
 		-- print status
 		BMU.printToChat("Refreshed - state: " .. tostring(index) .. " - String: " .. tostring(inputString))
@@ -601,7 +601,7 @@ function BMU.createTable(args)
 		table.insert(portalPlayers, BMU.createNoResultsInfo())
 	end
 	
-	if BMU.debugMode == 1 then
+	if BMU.debugMode then
 		-- get end time and print runtime in milliseconds
 		BMU.printToChat("RunTime: " .. (GetGameTimeMilliseconds() - startTime) .. " ms")
 	end

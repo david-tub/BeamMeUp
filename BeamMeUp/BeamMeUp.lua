@@ -260,6 +260,7 @@ end
 function BMU.HideTeleporter()
     BMU.win.Main_Control:SetHidden(true) -- hide main window
 	ClearMenu() -- close all submenus
+	ZO_Tooltips_HideTextTooltip() -- close all tooltips
 	
 	if SCENE_MANAGER:IsShowing("worldMap") then
 		-- show button only when main window is hidden and world map is open

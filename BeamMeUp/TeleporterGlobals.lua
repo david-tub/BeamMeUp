@@ -120,13 +120,31 @@ function BMU.colorizeText(text, color)
 end
 
 -- send addon messages to the chat
-function BMU.printToChat(text)
-	local prefix = "[" .. BMU.var.appNameAbbr .. "]"
-	local prefix_colorized = BMU.colorizeText(prefix, "white")
+function BMU.printToChat(text, messageType)
+	-- prevent chat printouts according to the user options
+	if messageType == BMU.MSG_FT and not BMU.savedVarsAcc.chatOutputFastTravel then
+		return
+	elseif messageType == BMU.MSG_AD and not BMU.savedVarsAcc.chatOutputAdditional then
+		return
+	elseif messageType == BMU.MSG_UL and not BMU.savedVarsAcc.chatOutputUnlock then
+		return
+	elseif messageType == BMU.MSG_DB and not BMU.debugMode then
+		return
+	else
+		-- print message to chat
+		local prefix = "[" .. BMU.var.appNameAbbr .. "]"
+		local prefix_colorized = BMU.colorizeText(prefix, "white")
 
-	d(prefix_colorized .. ": " .. text)
+		d(prefix_colorized .. ": " .. text)
+	end
 end
 -----------------------------------------
+
+-- Message Types (chat output)
+BMU.MSG_FT = 1
+BMU.MSG_AD = 2
+BMU.MSG_UL = 3
+BMU.MSG_DB = 4
 
 -- Textures
 BMU.textures = {

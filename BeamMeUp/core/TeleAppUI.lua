@@ -2457,11 +2457,10 @@ end
 -- display the correct persistent MouseOver depending on Button
 -- also set global state for auto refresh
 function BMU.changeState(index)
-	if BMU.debugMode then
-		-- debug mode
-		BMU.printToChat("Changed - state: " .. tostring(index))
-	end
-    local teleporterWin     = BMU.win
+
+	BMU.printToChat("Changed - state: " .. tostring(index), BMU.MSG_DB)
+    
+	local teleporterWin = BMU.win
 
 	-- first disable all MouseOver
 	teleporterWin.Main_Control.ItemTexture:SetTexture(BMU.textures.relatedItemsBtn)

@@ -114,11 +114,8 @@ function BMU.createTable(args)
 		index = BMU.indexListMain
 	end
 
-	if BMU.debugMode then
-		-- debug mode
-		-- print status
-		BMU.printToChat("Refreshed - state: " .. tostring(index) .. " - String: " .. tostring(inputString))
-	end
+	-- print status (debug)
+	BMU.printToChat("Refreshed - state: " .. tostring(index) .. " - String: " .. tostring(inputString), BMU.MSG_DB)
 	
 	-- change state for correct persistent MouseOver and for auto refresh
 	if not dontDisplay then -- dont change when result should not be displayed in list
@@ -601,10 +598,8 @@ function BMU.createTable(args)
 		table.insert(portalPlayers, BMU.createNoResultsInfo())
 	end
 	
-	if BMU.debugMode then
-		-- get end time and print runtime in milliseconds
-		BMU.printToChat("RunTime: " .. (GetGameTimeMilliseconds() - startTime) .. " ms")
-	end
+	-- get end time and print runtime in milliseconds (debug)
+	BMU.printToChat("RunTime: " .. (GetGameTimeMilliseconds() - startTime) .. " ms", BMU.MSG_DB)
 	
 	-- display or return result
 	if dontDisplay == true then

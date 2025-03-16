@@ -35,7 +35,7 @@ end
 
 -- does all the necessary checks for the given zoneId (if auto unlock is possible)
 -- starts the auto unlock core process
-function BMU.checkAndStartAutoUnlockOfZone(zoneId, isChatLogging)
+function BMU.checkAndStartAutoUnlockOfZone(zoneId)
 	if not BMU.isZoneOverlandZone(zoneId) or not CanJumpToPlayerInZone(zoneId) then
 		-- zone is no OverlandZone OR user has no access to zone (DLC) -> show dialog, that unlocking is not possible
 		BMU.showDialogSimple("RefuseAutoUnlock2", SI.get(SI.TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE), BMU.formatName(GetZoneNameById(zoneId), false) .. ": " .. SI.get(SI.TELE_DIALOG_REFUSE_AUTO_UNLOCK_BODY2), nil, nil)
@@ -49,24 +49,24 @@ function BMU.checkAndStartAutoUnlockOfZone(zoneId, isChatLogging)
 		BMU.showDialogSimple("RefuseAutoUnlock", SI.get(SI.TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE), BMU.formatName(GetZoneNameById(zoneId), false) .. ": " .. SI.get(SI.TELE_DIALOG_REFUSE_AUTO_UNLOCK_BODY) .. BMU.colorizeText(" (" .. numWayshrinesDiscovered .. "/" .. numWayshrines .. ")", "green"), nil, nil)
 		return
 	end
-	BMU.prepareAutoUnlock(zoneId, isChatLogging, nil, nil)
+	BMU.prepareAutoUnlock(zoneId, nil, nil)
 end
 
 
 -- closing interface and starting auto unlock core process
-function BMU.prepareAutoUnlock(zoneId, isChatLogging, loopType, loopZoneList)
+function BMU.prepareAutoUnlock(zoneId, loopType, loopZoneList)
 	-- hide world map if open
 	SCENE_MANAGER:Hide("worldMap")
 	-- hide UI if open
 	BMU.HideTeleporter()
 	-- delay function call, otherwise the auto-unlock-dialog fails (for whatever reason)
-	zo_callLater(function() BMU.startAutoUnlock(zoneId, isChatLogging, loopType, loopZoneList) end, 150)
+	zo_callLater(function() BMU.startAutoUnlock(zoneId, loopType, loopZoneList) end, 150)
 end
 
 
 ------------ AUTO UNLOCK CORE PROCESS ------------
 -- initialization
-function BMU.startAutoUnlock(zoneId, isChatLogging, loopType, loopZoneList)
+function BMU.startAutoUnlock(zoneId, loopType, loopZoneList)
 	-- ensure unlock process is not already running
 	if not BMU.uwData or not BMU.uwData.isStarted then
 		local formattedZoneName = BMU.formatName(GetZoneNameById(zoneId), false)
@@ -97,8 +97,7 @@ function BMU.startAutoUnlock(zoneId, isChatLogging, loopType, loopZoneList)
 			totalSteps = #list, -- store #list and update only if the new number is higher than before
 			loopType = loopType, -- can be nil
 			loopZoneList = loopZoneList, -- can be nil
-			gainedXP = 0,
-			isChatLogging = isChatLogging or false,
+			gainedXP = 0
 		}
 		
 		-- unregiter existing event for furniture count
@@ -233,7 +232,7 @@ function BMU.showAutoUnlockProceedDialog(record)
 			-- finishedCallback is also triggered when entering the loading screen
 			-- -> consider only during countdown
 			-- timeout is handled via update function
-			BMU.printToChat(SI.get(SI.TELE_CHAT_AUTO_UNLOCK_CANCELED))
+			BMU.printToChat(SI.get(SI.TELE_CHAT_AUTO_UNLOCK_CANCELED), BMU.MSG_UL)
 			BMU.finishedAutoUnlock("canceled")
 		end
 	end
@@ -263,7 +262,7 @@ function BMU.finishedAutoUnlock(reason)
 	if reason == "timeout" and BMU.flagSocialErrorWhilePorting ~= 0 then
 		BMU.flagSocialErrorWhilePorting = 0
 		-- just proceed with next player
-		BMU.printToChat(SI.get(SI.TELE_CHAT_AUTO_UNLOCK_SKIP))
+		BMU.printToChat(SI.get(SI.TELE_CHAT_AUTO_UNLOCK_SKIP), BMU.MSG_UL)
 		BMU.proceedAutoUnlock()
 		return
 	end
@@ -310,13 +309,11 @@ function BMU.finishedAutoUnlock(reason)
 	
 	local globalDialogName, dialogReference = BMU.showDialogSimple("AutoUnlockFinished", finishDialogTitle, finishDialogBody, nil, nil)
 
-	if BMU.uwData.isChatLogging then
-		-- print summary into chat
-		BMU.printToChat(
-			BMU.uwData.fZoneName .. ": " ..
-			SI.get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_DISCOVERY) .. " " .. tostring(unlockedWayshrinesString) .. " (" .. tostring(totalWayshrinesString) .. ")  " ..
-			SI.get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_XP) .. " " .. tostring(gainedXPString))
-	end
+	-- print summary into chat
+	BMU.printToChat(
+		BMU.uwData.fZoneName .. ": " ..
+		SI.get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_DISCOVERY) .. " " .. tostring(unlockedWayshrinesString) .. " (" .. tostring(totalWayshrinesString) .. ")  " ..
+		SI.get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_XP) .. " " .. tostring(gainedXPString), BMU.MSG_UL)
 
 	-- if continuing with next zones and process finished successfully
 	if BMU.uwData.loopType and (reason == "finished" or reason == "wayshrinesComplete") then
@@ -325,9 +322,9 @@ function BMU.finishedAutoUnlock(reason)
 		end, 1700)
 		zo_callLater(function()
 			if BMU.uwData.loopType == "suffle" then
-				BMU.startAutoUnlockLoopRandom(BMU.uwData.zoneId, BMU.uwData.loopType, BMU.uwData.isChatLogging)
+				BMU.startAutoUnlockLoopRandom(BMU.uwData.zoneId, BMU.uwData.loopType)
 			else
-				BMU.startAutoUnlockLoopSorted(BMU.uwData.loopZoneList, BMU.uwData.loopType, BMU.uwData.isChatLogging)
+				BMU.startAutoUnlockLoopSorted(BMU.uwData.loopZoneList, BMU.uwData.loopType)
 			end
 		end, 1750)
 	end
@@ -336,7 +333,7 @@ end
 ------------------------
 
 -- checks for zones that can be unlocked and picks a random one to start auto unlock
-function BMU.startAutoUnlockLoopRandom(prevZoneId, loopType, isChatLogging)
+function BMU.startAutoUnlockLoopRandom(prevZoneId, loopType)
 	local overlandZoneIds = {}
 	-- add all overlandZoneIds to a new table
 	for overlandZoneId, _ in pairs(BMU.overlandDelvesPublicDungeons) do
@@ -358,7 +355,7 @@ function BMU.startAutoUnlockLoopRandom(prevZoneId, loopType, isChatLogging)
 				local numWayshrines, numWayshrinesDiscovered = BMU.getZoneWayshrineCompletion(zoneId)
 				if numWayshrinesDiscovered < numWayshrines then		
 					zo_callLater(function()
-						BMU.prepareAutoUnlock(zoneId, isChatLogging, loopType, nil)
+						BMU.prepareAutoUnlock(zoneId, loopType, nil)
 					end, 400)
 					return
 				end
@@ -371,7 +368,7 @@ end
 
 
 -- checks for zones that can be unlocked, sort them and queue the list for auto unlock
-function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType, isChatLogging)
+function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType)
 	if not zoneRecordList or #zoneRecordList == 0 then
 		local overlandZoneIds = {}
 		local cleanZoneList = {}
@@ -424,7 +421,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType, isChatLogging)
 		if #resultList > 0 and resultList[1] and resultList[1].displayName ~= "" then
 			table.remove(zoneRecordList, index)
 			zo_callLater(function()
-				BMU.prepareAutoUnlock(zoneRecord.zoneId, isChatLogging, loopType, zoneRecordList)
+				BMU.prepareAutoUnlock(zoneRecord.zoneId, loopType, zoneRecordList)
 			end, 400)
 			return
 		end
@@ -435,7 +432,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType, isChatLogging)
 		-- because 1.: if we skipped entries, see case before
 		-- because 2.: in case the last entry was processed, it will automatically start again
 	if #zoneRecordList > 0 then
-		BMU.startAutoUnlockLoopSorted(nil, loopType, isChatLogging)
+		BMU.startAutoUnlockLoopSorted(nil, loopType)
 		return
 	end
 	
@@ -537,17 +534,18 @@ function BMU.showDialogAutoUnlock(zoneId)
 				callback = function()
 					local flagLoop = dialogReference.radioButtonGroup:GetClickedButton().data.loop
 					local isChatLoggingChecked = ZO_CheckButton_IsChecked(BMU.customDialog_checkboxControl)
+					BMU.savedVarsAcc.chatOutputUnlock = isChatLoggingChecked
 					local selectedEntry = BMU.customDialog_dropdownControl:GetSelectedItemData()
 					if flagLoop then
 						if selectedEntry.key == "suffle" then
 							-- directly start with random zones
-							BMU.startAutoUnlockLoopRandom(nil, selectedEntry.key, isChatLoggingChecked)
+							BMU.startAutoUnlockLoopRandom(nil, selectedEntry.key)
 						else
-							BMU.startAutoUnlockLoopSorted(nil, selectedEntry.key, isChatLoggingChecked)
+							BMU.startAutoUnlockLoopSorted(nil, selectedEntry.key)
 						end
 					else
 						-- check and start auto unlocking for given zoneId
-						BMU.checkAndStartAutoUnlockOfZone(zoneId, isChatLoggingChecked)
+						BMU.checkAndStartAutoUnlockOfZone(zoneId)
 					end
 				end,
 			},
@@ -673,7 +671,7 @@ function BMU.PortalToPlayer(displayName, sourceIndex, zoneName, zoneId, zoneCate
 		
 		-- start porting
 		if printToChat then
-			BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. displayName .. " - " .. zoneName)
+			BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. displayName .. " - " .. zoneName, BMU.MSG_FT)
 		end
 		if sourceIndex == BMU.SOURCE_INDEX_GROUP then
 			-- 2024/12: a bug was reported, that JumpToGroupLeader() no longer works probably in some cases --> only use JumpToGroupMember()
@@ -736,7 +734,7 @@ function BMU.PortalToZone(zoneId)
 				FastTravelToNode(nodeIndex)
 				return
 			else
-				BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(GetZoneNameById(zoneId)) .. " (" .. zo_strformat(SI_MONEY_FORMAT, GetRecallCost()) .. ")")
+				BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(GetZoneNameById(zoneId)) .. " (" .. zo_strformat(SI_MONEY_FORMAT, GetRecallCost()) .. ")", BMU.MSG_FT)
 				-- show additional animation
 				if BMU.savedVarsAcc.showTeleportAnimation then
 					BMU.showTeleportAnimation()
@@ -1644,10 +1642,10 @@ function BMU.clickOnTeleportToPTFHouseButton(textureControl, button, message)
 		CancelCast()
 		if message.displayName == GetDisplayName() or message.displayName == nil or zo_strtrim(message.displayName) == "" then
 			-- own house
-			BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(GetZoneNameById(message.zoneId), false))
+			BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(GetZoneNameById(message.zoneId), false), BMU.MSG_FT)
 			RequestJumpToHouse(message.houseId)
 		else
-			BMU.printToChat("Port to PTF House:" .. " " .. message.displayName .. " - " .. BMU.formatName(GetZoneNameById(message.zoneId), false))
+			BMU.printToChat("Port to PTF House:" .. " " .. message.displayName .. " - " .. BMU.formatName(GetZoneNameById(message.zoneId), false), BMU.MSG_FT)
 			JumpToSpecificHouse(message.displayName, message.houseId)
 		end
 	
@@ -1698,7 +1696,7 @@ function BMU.clickOnTeleportToDungeonButton_2(message)
 		return
 	else
 		-- port for costs
-		BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. message.zoneName .. " (" .. zo_strformat(SI_MONEY_FORMAT, GetRecallCost()) .. ")")
+		BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. message.zoneName .. " (" .. zo_strformat(SI_MONEY_FORMAT, GetRecallCost()) .. ")", BMU.MSG_FT)
 		-- show additional animation
 		if BMU.savedVarsAcc.showTeleportAnimation then
 			BMU.showTeleportAnimation()
@@ -2316,7 +2314,7 @@ function BMU.addFavoriteZone(position, zoneId, zoneName)
 			BMU.savedVarsServ.favoriteListZones[oldPos] = BMU.savedVarsServ.favoriteListZones[position]
 		end
 		BMU.savedVarsServ.favoriteListZones[position] = zoneId
-		BMU.printToChat(SI.get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. position .. ": " .. zoneName)
+		BMU.printToChat(SI.get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. position .. ": " .. zoneName, BMU.MSG_AD)
 		BMU.refreshListAuto()
 end
 
@@ -2330,7 +2328,7 @@ function BMU.addFavoritePlayer(position, displayName)
 			BMU.savedVarsServ.favoriteListPlayers[oldPos] = BMU.savedVarsServ.favoriteListPlayers[position]
 		end
 		BMU.savedVarsServ.favoriteListPlayers[position] = displayName
-		BMU.printToChat(SI.get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. position .. ": " .. displayName)
+		BMU.printToChat(SI.get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. position .. ": " .. displayName, BMU.MSG_AD)
 		BMU.refreshListAuto()
 end
 
@@ -2504,9 +2502,9 @@ function BMU.portToOwnHouse(primary, houseId, jumpOutside, parentZoneName)
 	
 	-- print info to chat
 	if jumpOutside then
-		BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. parentZoneName .. " (" .. BMU.formatName(GetZoneNameById(zoneId), false) .. ")")
+		BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. parentZoneName .. " (" .. BMU.formatName(GetZoneNameById(zoneId), false) .. ")", BMU.MSG_FT)
 	else
-		BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(GetZoneNameById(zoneId), false))
+		BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(GetZoneNameById(zoneId), false), BMU.MSG_FT)
 	end
 	
 	-- start port process
@@ -2536,7 +2534,7 @@ function BMU.portToBMUGuildHouse()
 		end
 		CancelCast()
 		JumpToSpecificHouse(displayName, houseId)
-		BMU.printToChat("Porting to BMU guild house (" .. displayName .. ")")
+		BMU.printToChat("Porting to BMU guild house (" .. displayName .. ")", BMU.MSG_FT)
 		if BMU.savedVarsAcc.closeOnPorting then
 			-- hide world map if open
 			SCENE_MANAGER:Hide("worldMap")
@@ -2572,7 +2570,7 @@ function BMU.portToTrackedQuestZone()
 				-- get exact quest location
 				questZoneId = BMU.findExactQuestLocation(slotIndex)
 			end
-			BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. questName)
+			BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. questName, BMU.MSG_FT)
 			BMU.sc_porting(questZoneId)
 			return
 		end

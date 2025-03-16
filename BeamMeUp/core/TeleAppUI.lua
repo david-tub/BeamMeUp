@@ -2632,7 +2632,7 @@ function BMU.handleChatLinkClick(rawLink, mouseButton, linkText, linkStyle, link
 					-- player not found
 					BMU.printToChat(playerTo .. " - " .. GetString(SI_FASTTRAVELKEEPRESULT9))
 				else
-					BMU.printToChat(SI.get(SI.TELE_CHAT_SHARING_FOLLOW_LINK))
+					BMU.printToChat(SI.get(SI.TELE_CHAT_SHARING_FOLLOW_LINK), BMU.MSG_AD)
 					BMU.PortalToPlayer(firstRecord.displayName, firstRecord.sourceIndexLeading, firstRecord.zoneName, firstRecord.zoneId, firstRecord.category, true, false, true)
 				end
 				return true
@@ -2644,7 +2644,7 @@ function BMU.handleChatLinkClick(rawLink, mouseButton, linkText, linkStyle, link
 			local houseId = tonumber(data4)
 			if player ~= nil and houseId ~= nil then
 				-- try to port to the house of the player
-				BMU.printToChat(SI.get(SI.TELE_CHAT_SHARING_FOLLOW_LINK))
+				BMU.printToChat(SI.get(SI.TELE_CHAT_SHARING_FOLLOW_LINK), BMU.MSG_AD)
 				CancelCast()
 				JumpToSpecificHouse(player, houseId)
 			end

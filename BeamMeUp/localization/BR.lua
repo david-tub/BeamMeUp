@@ -146,8 +146,6 @@ mkstr(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION, "Notificação do mapa de pesqui
 mkstr(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION_TOOLTIP, "Se você possuir um mapa de pesquisa e ainda há alguns mapas idênticos (no mesmo local) em seu inventário, uma notificação (mensagem central) irá informá-lo.")
 mkstr(SI.TELE_SETTINGS_HEADER_PRIO, "Priorização")
 mkstr(SI.TELE_SETTINGS_HEADER_CHAT_COMMANDS, "Comandos de bate-papo.")
-mkstr(SI.TELE_SETTINGS_UNLOCKING_LESS_CHAT_OUTPUT, "Minimizar a saída de bate-papo.")
-mkstr(SI.TELE_SETTINGS_UNLOCKING_LESS_CHAT_OUTPUT_TOOLTIP, "Reduza o número de saídas de bate-papo ao usar o recurso de desbloqueio automático.")
 mkstr(SI.TELE_SETTINGS_PRIORITIZATION_DESCRIPTION, "Aqui você pode definir quais jogadores devem ser usados de forma rápida. Depois de sair ou unir uma guilda, um reinicio de UI é necessária para ser exibida corretamente aqui.")
 mkstr(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP, "Mostrar botão adicional no mapa")
 mkstr(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP_TOOLTIP, "Exibir um botão de texto no canto superior esquerdo do mapa do mundo para abrir o BeamMeUp.")

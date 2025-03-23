@@ -146,8 +146,6 @@ mkstr(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION, "Powiadomienie o mapie surowców
 mkstr(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION_TOOLTIP, "Jeśli wydobywasz surowce z mapy i masz nadal jakieś identyczne mapy (ta sama lokalizacja) w swoim ekwipunku, powiadomienie (wiadomość na środku ekranu) poinformuje Cię o tym.")
 mkstr(SI.TELE_SETTINGS_HEADER_PRIO, "Priorytety")
 mkstr(SI.TELE_SETTINGS_HEADER_CHAT_COMMANDS, "Komendy Czatu")
-mkstr(SI.TELE_SETTINGS_UNLOCKING_LESS_CHAT_OUTPUT, "Zmniejsz ilość wiadomości w czacie")
-mkstr(SI.TELE_SETTINGS_UNLOCKING_LESS_CHAT_OUTPUT_TOOLTIP, "Zmniejsza ilość wiadomości w czacie kiedy używasz funkcji Automatycznego Odblokowania.")
 mkstr(SI.TELE_SETTINGS_PRIORITIZATION_DESCRIPTION, "Możesz wybrać, którzy gracze będą preferowani w opcji szybkiej podróży. Po opuszczeniu lub przyłączeniu się do gildii, odświeżenie jest potrzebne by poprawnie wyświetlić.")
 mkstr(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP, "Pokaż dodatkowy przycisk na mapie")
 mkstr(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP_TOOLTIP, "Pokaż przycisk z tekstem w górnym lewym rogu mapy świata do otwierania BeamMeUp.")

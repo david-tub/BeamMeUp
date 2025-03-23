@@ -146,8 +146,6 @@ mkstr(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION, "重複した調査の地図の�
 mkstr(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION_TOOLTIP, "調査の地図の収穫完了時、インベントリに同じ地図がまだ残っていたら通知を表示します。 (画面中央のメッセージ)")
 mkstr(SI.TELE_SETTINGS_HEADER_PRIO, "表示優先度")
 mkstr(SI.TELE_SETTINGS_HEADER_CHAT_COMMANDS, "チャットコマンド")
-mkstr(SI.TELE_SETTINGS_UNLOCKING_LESS_CHAT_OUTPUT, "自動解除時、システムメッセージを抑制する")
-mkstr(SI.TELE_SETTINGS_UNLOCKING_LESS_CHAT_OUTPUT_TOOLTIP, "自動解除機能の使用時に出力されるシステムメッセージを減少させます。")
 mkstr(SI.TELE_SETTINGS_PRIORITIZATION_DESCRIPTION, "テレポート先として利用するプレイヤーの優先度を設定できます。ギルドへの加入と脱退のあとにはリロードが必要です。")
 mkstr(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP, "マップにBeamMeUp呼び出しリンクを表示")
 mkstr(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP_TOOLTIP, "マップ左上にBeamMeUp切り替え用のテキストリンクを表示します。")

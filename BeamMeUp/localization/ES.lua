@@ -146,8 +146,6 @@ mkstr(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION, "Notificación de mapa prospecci
 mkstr(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION_TOOLTIP, "Si extrae un mapa de prospeccion y todavía hay algunos mapas idénticos (misma ubicación) en su inventario, una notificación (mensaje en la pantalla central) le informará.")
 mkstr(SI.TELE_SETTINGS_HEADER_PRIO, "Priorización")
 mkstr(SI.TELE_SETTINGS_HEADER_CHAT_COMMANDS, "Comandos de Chat")
-mkstr(SI.TELE_SETTINGS_UNLOCKING_LESS_CHAT_OUTPUT, "Minimizar la salida del chat")
-mkstr(SI.TELE_SETTINGS_UNLOCKING_LESS_CHAT_OUTPUT_TOOLTIP, "Reduzca la cantidad de salidas de chat al usar la función de desbloqueo automático.")
 mkstr(SI.TELE_SETTINGS_PRIORITIZATION_DESCRIPTION, "Aqui podra definir cuales jugadores seran preferentemente utilizados para viaje rapido. Tras dejar o unirse a un Gremio, una recarga sera necesaria para desplazarse correctamente ahi.")
 mkstr(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP, "Mostrar boton adicional en el mapa.")
 mkstr(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP_TOOLTIP, "Desplegar un boton de texto en la esquina superior izquierda del mapa mundial para abrir BeamMeUp.")

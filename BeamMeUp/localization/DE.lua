@@ -175,7 +175,7 @@ mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Angezeigte Zone & Unterzonen imm
 mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Aktuell angezeigte Zone und Unterzonen (geöffnete Karte) immer an oberster Stelle der Liste anzeigen.")
 mkstr(SI.TELE_SETTINGS_DEFAULT_TAB, "Standardliste")
 mkstr(SI.TELE_SETTINGS_DEFAULT_TAB_TOOLTIP, "Die Liste, die standardmäßig beim Öffnen von BeamMeUp angezeigt wird.")
-mkstr(SI.TELE_SETTINGS_HEADER_CHAT_OUTPUT, "Chat-Meldungen")
+mkstr(SI.TELE_SETTINGS_HEADER_CHAT_OUTPUT, "Chat Meldungen")
 mkstr(SI.TELE_SETTINGS_OUTPUT_FAST_TRAVEL, "Schnellreisevorgänge")
 mkstr(SI.TELE_SETTINGS_OUTPUT_FAST_TRAVEL_TOOLTIP, "Informative Chat-Meldungen über die eingeleiteten Schnellreisen. Fehlermeldungen werden weiterhin im Chat angezeigt.")
 mkstr(SI.TELE_SETTINGS_OUTPUT_ADDITIONAL, "Unterstützende Meldungen")

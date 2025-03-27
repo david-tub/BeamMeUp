@@ -291,8 +291,8 @@ BMU.indexListGuilds = 13			-- BMU and partner guilds
 BMU.indexListDungeons = 14			-- Dungeon Finder (arenas, dungeons, trials)
 
 -- default tab selection (values represent the "index" value which is handed over to createTable() function)
-BMU.dropdownDefaultTabChoices = {string.format("|t32:32:%s|t", BMU.textures.refreshBtn), string.format("|t32:32:%s|t", BMU.textures.questBtn), string.format("|t32:32:%s|t", BMU.textures.relatedItemsBtn), string.format("|t32:32:%s|t", BMU.textures.currentZoneBtn), string.format("|t32:32:%s|t", BMU.textures.delvesBtn)}
-BMU.dropdownDefaultTabValues = {BMU.indexListMain, BMU.indexListQuests, BMU.indexListItems, BMU.indexListCurrentZone, BMU.indexListDelves}
+BMU.dropdownDefaultTabChoices = {string.format("|t32:32:%s|t", BMU.textures.refreshBtn), string.format("|t32:32:%s|t", BMU.textures.questBtn), string.format("|t32:32:%s|t", BMU.textures.relatedItemsBtn), string.format("|t32:32:%s|t", BMU.textures.currentZoneBtn), string.format("|t32:32:%s|t", BMU.textures.delvesBtn), string.format("|t32:32:%s|t", BMU.textures.houseBtn), string.format("|t32:32:%s|t", BMU.textures.soloArenaBtn)}
+BMU.dropdownDefaultTabValues = {BMU.indexListMain, BMU.indexListQuests, BMU.indexListItems, BMU.indexListCurrentZone, BMU.indexListDelves, BMU.indexListOwnHouses, BMU.indexListDungeons}
 
 -- prioritization of the sources
 BMU.dropdownPrioSourceChoices = {"Friends"}

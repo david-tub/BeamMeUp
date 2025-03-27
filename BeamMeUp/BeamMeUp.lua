@@ -242,7 +242,14 @@ function BMU.OpenTeleporter(refresh)
 	if BMU.savedVarsAcc.autoRefresh and refresh then
 		-- reset input and load default tab
 		BMU.clearInputFields()
-		BMU.createTable({index=BMU.savedVarsChar.defaultTab})
+		
+		if BMU.savedVarsChar.defaultTab == BMU.indexListOwnHouses then
+			BMU.createTableHouses()
+		elseif BMU.savedVarsChar.defaultTab == BMU.indexListDungeons then
+			BMU.createTableDungeons()
+		else
+			BMU.createTable({index=BMU.savedVarsChar.defaultTab})
+		end
 	end
 	
 	-- start auto refresh

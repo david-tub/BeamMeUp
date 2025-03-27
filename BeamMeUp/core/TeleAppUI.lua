@@ -1776,7 +1776,7 @@ local function SetupUI()
 	end
 	  
   ---------------------------------------------------------------------------------------------------------------
-  -- Port to own Residences
+  -- Own Houses
   
   teleporterWin.Main_Control.OwnHouseTexture = wm:CreateControl(nil, teleporterWin.Main_Control, CT_TEXTURE)
   teleporterWin.Main_Control.OwnHouseTexture:SetDimensions(50*BMU.savedVarsAcc.Scale, 50*BMU.savedVarsAcc.Scale)
@@ -1787,12 +1787,23 @@ local function SetupUI()
 
   teleporterWin.Main_Control.OwnHouseTexture:SetHandler("OnMouseUp", function(self, button)
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
-		-- toggle between nicknames and standard names
 		ClearMenu()
+		
+		-- toggle between nicknames and standard names
 		local menuIndex = AddCustomMenuItem(SI.get(SI.TELE_UI_TOGGLE_HOUSE_NICKNAME), function() BMU.savedVarsChar.houseNickNames = not BMU.savedVarsChar.houseNickNames BMU.clearInputFields() BMU.createTableHouses() end, MENU_ADD_OPTION_CHECKBOX)
 		if BMU.savedVarsChar.houseNickNames then
 			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 		end
+
+		-- divider
+		AddCustomMenuItem("-", function() end, nil, nil, nil, nil, 5)
+
+		-- make default tab
+		menuIndex = AddCustomMenuItem(SI.get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU.savedVarsChar.defaultTab == BMU.indexListOwnHouses then BMU.savedVarsChar.defaultTab = BMU.indexListMain else BMU.savedVarsChar.defaultTab = BMU.indexListOwnHouses end end, MENU_ADD_OPTION_CHECKBOX)
+		if BMU.savedVarsChar.defaultTab == BMU.indexListOwnHouses then
+			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+		end
+
 		ShowMenu()
 	else
 		BMU.clearInputFields()
@@ -2291,6 +2302,16 @@ local function SetupUI()
 				ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 			end
 		end
+
+		-- divider
+		AddCustomMenuItem("-", function() end, nil, nil, nil, nil, 5)
+
+		-- make default tab
+		local menuIndex = AddCustomMenuItem(SI.get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU.savedVarsChar.defaultTab == BMU.indexListDungeons then BMU.savedVarsChar.defaultTab = BMU.indexListMain else BMU.savedVarsChar.defaultTab = BMU.indexListDungeons end end, MENU_ADD_OPTION_CHECKBOX)
+		if BMU.savedVarsChar.defaultTab == BMU.indexListDungeons then
+			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+		end
+
 		ShowMenu()
 	else
 		BMU.clearInputFields()

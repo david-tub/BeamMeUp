@@ -690,7 +690,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	
 	-- Show Note, when survey map is mined and there are still some identical maps left
 	if BMU.savedVarsAcc.surveyMapsNotification then
-		SHARED_INVENTORY:RegisterCallback("SingleSlotInventoryUpdate", BMU.surveyMapUsed, self)
+		SHARED_INVENTORY:RegisterCallback("SingleSlotInventoryUpdate", BMU.surveyMapUsed)
 	end
 	
 	-- Auto confirm dailog when using wayshrines

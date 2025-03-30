@@ -1,4 +1,4 @@
-﻿-- keybindings
+-- keybindings
 local SI = BMU.SI
 
 ZO_CreateStringId("SI_BINDING_NAME_BMU_TOGGLE_MAIN", SI.get(SI.TELE_KEYBINDING_TOGGLE_MAIN))

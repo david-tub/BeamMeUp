@@ -588,8 +588,8 @@ function BMU.getZoneWayshrineCompletion(zoneId)
 	local mapIndex = BMU.getMapIndex(zoneId)
 	if mapIndex ~= nil then
 		-- switch to Tamriel and back to target map in order to reset any subzone or zoom
-		ZO_WorldMap_SetMapByIndex(1)
-		ZO_WorldMap_SetMapByIndex(mapIndex)
+		WORLD_MAP_MANAGER:SetMapByIndex(1)
+		WORLD_MAP_MANAGER:SetMapByIndex(mapIndex)
 	end
 	
 	-- handling of special cases/zones
@@ -724,7 +724,7 @@ end
 function BMU.PortalToZone(zoneId)
 	-- set map and find wayshrine node
 	local mapIndex = BMU.getMapIndex(zoneId)
-	ZO_WorldMap_SetMapByIndex(mapIndex)
+	WORLD_MAP_MANAGER:SetMapByIndex(mapIndex)
 	for nodeIndex = 1, GetNumFastTravelNodes() do
 		local known, name, normalizedX, normalizedY, icon, glowIcon, poiType, isShownInCurrentMap, linkedCollectibleIsLocked = GetFastTravelNodeInfo(nodeIndex)
 		if known and isShownInCurrentMap and poiType == POI_TYPE_WAYSHRINE then
@@ -1786,8 +1786,8 @@ function BMU.clickOnZoneName(button, record)
 		-- switch to Tamriel and back to players map in order to reset any subzone or zoom
 		if record.mapIndex ~= nil then
 			SCENE_MANAGER:Show("worldMap")
-			ZO_WorldMap_SetMapByIndex(1)
-			ZO_WorldMap_SetMapByIndex(record.mapIndex)
+			WORLD_MAP_MANAGER:SetMapByIndex(1)
+			WORLD_MAP_MANAGER:SetMapByIndex(record.mapIndex)
 			CALLBACK_MANAGER:FireCallbacks("OnWorldMapChanged")
 		end
 		
@@ -2273,8 +2273,8 @@ function BMU.clickOnPlayerName(button, record)
 		
 	else -- left mouse click
 		if record.groupUnitTag then		
-			ZO_WorldMap_SetMapByIndex(1)
-			ZO_WorldMap_SetMapByIndex(record.mapIndex)
+			WORLD_MAP_MANAGER:SetMapByIndex(1)
+			WORLD_MAP_MANAGER:SetMapByIndex(record.mapIndex)
 			CALLBACK_MANAGER:FireCallbacks("OnWorldMapChanged")
 			local xLoc, yLoc = GetMapPlayerPosition(record.groupUnitTag)
 			-- Map Ping

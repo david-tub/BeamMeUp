@@ -248,15 +248,6 @@ local function SetupOptionsMenu(index) --index == Addon name
 			  submenu = "ui",
          },
 		 {
-              type = "checkbox",
-              name = SI.get(SI.TELE_SETTINGS_UNLOCKING_LESS_CHAT_OUTPUT),
-              tooltip = SI.get(SI.TELE_SETTINGS_UNLOCKING_LESS_CHAT_OUTPUT_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["unlockingLessChatOutput"]) .. "]",
-              getFunc = function() return BMU.savedVarsAcc.unlockingLessChatOutput end,
-              setFunc = function(value) BMU.savedVarsAcc.unlockingLessChatOutput = value end,
-			  default = BMU.DefaultsAccount["unlockingLessChatOutput"],
-			  submenu = "ui",
-         },
-		 {
               type = "slider",
               name = SI.get(SI.TELE_SETTINGS_AUTO_PORT_FREQ),
               tooltip = SI.get(SI.TELE_SETTINGS_AUTO_PORT_FREQ_TOOLTIP) .. " [DEFAULT: " .. BMU.DefaultsAccount["AutoPortFreq"] .. "]",
@@ -808,6 +799,43 @@ local function SetupOptionsMenu(index) --index == Addon name
 			  submenu = "adv",
          },
 		 {
+			  type = "checkbox",
+			  name = SI.get(SI.TELE_SETTINGS_OUTPUT_FAST_TRAVEL),
+			  tooltip = SI.get(SI.TELE_SETTINGS_OUTPUT_FAST_TRAVEL_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["chatOutputFastTravel"]) .. "]",
+			  getFunc = function() return BMU.savedVarsAcc.chatOutputFastTravel end,
+			  setFunc = function(value) BMU.savedVarsAcc.chatOutputFastTravel = value end,
+			  default = BMU.DefaultsAccount["chatOutputFastTravel"],
+			  submenu = "co",
+	     },
+	     {
+			  type = "checkbox",
+			  name = SI.get(SI.TELE_SETTINGS_OUTPUT_ADDITIONAL),
+			  tooltip = SI.get(SI.TELE_SETTINGS_OUTPUT_ADDITIONAL_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["chatOutputAdditional"]) .. "]",
+			  getFunc = function() return BMU.savedVarsAcc.chatOutputAdditional end,
+			  setFunc = function(value) BMU.savedVarsAcc.chatOutputAdditional = value end,
+			  default = BMU.DefaultsAccount["chatOutputAdditional"],
+			  submenu = "co",
+   		 },
+   		 {
+			  type = "checkbox",
+			  name = SI.get(SI.TELE_SETTINGS_OUTPUT_UNLOCK),
+		 	  tooltip = SI.get(SI.TELE_SETTINGS_OUTPUT_UNLOCK_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["chatOutputUnlock"]) .. "]",
+			  getFunc = function() return BMU.savedVarsAcc.chatOutputUnlock end,
+			  setFunc = function(value) BMU.savedVarsAcc.chatOutputUnlock = value end,
+			  default = BMU.DefaultsAccount["chatOutputUnlock"],
+			  submenu = "co",
+		 },
+		 {
+			  type = "checkbox",
+			  name = SI.get(SI.TELE_SETTINGS_OUTPUT_DEBUG),
+			  tooltip = SI.get(SI.TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP),
+			  getFunc = function() return BMU.debugMode end,
+			  setFunc = function(value) BMU.debugMode = value end,
+			  default = false,
+			  warning = "This option can not be set permanently.",
+			  submenu = "co",
+	     },
+		 {
               type = "button",
               name = BMU.colorizeText(SI.get(SI.TELE_SETTINGS_RESET_ALL_COUNTERS), "red"),
 			  tooltip = SI.get(SI.TELE_SETTINGS_RESET_ALL_COUNTERS_TOOLTIP),
@@ -1004,10 +1032,15 @@ local function SetupOptionsMenu(index) --index == Addon name
 	}
 	local submenu7 = {
 		type = "submenu",
+		name = SI.get(SI.TELE_SETTINGS_HEADER_CHAT_OUTPUT),
+		controls = optionsBySubmenu["co"],
+	}
+	local submenu8 = {
+		type = "submenu",
 		name = SI.get(SI.TELE_SETTINGS_HEADER_CHAT_COMMANDS),
 		controls = optionsBySubmenu["cc"],
 	}
-	local submenu8 = {
+	local submenu9 = {
 		type = "submenu",
 		name = SI.get(SI.TELE_SETTINGS_HEADER_STATS),
 		controls = optionsBySubmenu["stats"],
@@ -1015,7 +1048,7 @@ local function SetupOptionsMenu(index) --index == Addon name
 	
 	-- register all submenus with options
 	-- TODO: add submenu1
-	LAM2:RegisterOptionControls(appName .. "Options", {submenu1, submenu2, submenu3, submenu4, submenu5, submenu6, submenu7, submenu8})
+	LAM2:RegisterOptionControls(appName .. "Options", {submenu1, submenu2, submenu3, submenu4, submenu5, submenu6, submenu7, submenu8, submenu9})
 end
 
 
@@ -1743,7 +1776,7 @@ local function SetupUI()
 	end
 	  
   ---------------------------------------------------------------------------------------------------------------
-  -- Port to own Residences
+  -- Own Houses
   
   teleporterWin.Main_Control.OwnHouseTexture = wm:CreateControl(nil, teleporterWin.Main_Control, CT_TEXTURE)
   teleporterWin.Main_Control.OwnHouseTexture:SetDimensions(50*BMU.savedVarsAcc.Scale, 50*BMU.savedVarsAcc.Scale)
@@ -1754,12 +1787,23 @@ local function SetupUI()
 
   teleporterWin.Main_Control.OwnHouseTexture:SetHandler("OnMouseUp", function(self, button)
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
-		-- toggle between nicknames and standard names
 		ClearMenu()
+		
+		-- toggle between nicknames and standard names
 		local menuIndex = AddCustomMenuItem(SI.get(SI.TELE_UI_TOGGLE_HOUSE_NICKNAME), function() BMU.savedVarsChar.houseNickNames = not BMU.savedVarsChar.houseNickNames BMU.clearInputFields() BMU.createTableHouses() end, MENU_ADD_OPTION_CHECKBOX)
 		if BMU.savedVarsChar.houseNickNames then
 			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 		end
+
+		-- divider
+		AddCustomMenuItem("-", function() end, nil, nil, nil, nil, 5)
+
+		-- make default tab
+		menuIndex = AddCustomMenuItem(SI.get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU.savedVarsChar.defaultTab == BMU.indexListOwnHouses then BMU.savedVarsChar.defaultTab = BMU.indexListMain else BMU.savedVarsChar.defaultTab = BMU.indexListOwnHouses end end, MENU_ADD_OPTION_CHECKBOX)
+		if BMU.savedVarsChar.defaultTab == BMU.indexListOwnHouses then
+			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+		end
+
 		ShowMenu()
 	else
 		BMU.clearInputFields()
@@ -2258,6 +2302,16 @@ local function SetupUI()
 				ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
 			end
 		end
+
+		-- divider
+		AddCustomMenuItem("-", function() end, nil, nil, nil, nil, 5)
+
+		-- make default tab
+		local menuIndex = AddCustomMenuItem(SI.get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU.savedVarsChar.defaultTab == BMU.indexListDungeons then BMU.savedVarsChar.defaultTab = BMU.indexListMain else BMU.savedVarsChar.defaultTab = BMU.indexListDungeons end end, MENU_ADD_OPTION_CHECKBOX)
+		if BMU.savedVarsChar.defaultTab == BMU.indexListDungeons then
+			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+		end
+
 		ShowMenu()
 	else
 		BMU.clearInputFields()
@@ -2424,11 +2478,10 @@ end
 -- display the correct persistent MouseOver depending on Button
 -- also set global state for auto refresh
 function BMU.changeState(index)
-	if BMU.debugMode == 1 then
-		-- debug mode
-		BMU.printToChat("Changed - state: " .. tostring(index))
-	end
-    local teleporterWin     = BMU.win
+
+	BMU.printToChat("Changed - state: " .. tostring(index), BMU.MSG_DB)
+    
+	local teleporterWin = BMU.win
 
 	-- first disable all MouseOver
 	teleporterWin.Main_Control.ItemTexture:SetTexture(BMU.textures.relatedItemsBtn)
@@ -2600,7 +2653,7 @@ function BMU.handleChatLinkClick(rawLink, mouseButton, linkText, linkStyle, link
 					-- player not found
 					BMU.printToChat(playerTo .. " - " .. GetString(SI_FASTTRAVELKEEPRESULT9))
 				else
-					BMU.printToChat(SI.get(SI.TELE_CHAT_SHARING_FOLLOW_LINK))
+					BMU.printToChat(SI.get(SI.TELE_CHAT_SHARING_FOLLOW_LINK), BMU.MSG_AD)
 					BMU.PortalToPlayer(firstRecord.displayName, firstRecord.sourceIndexLeading, firstRecord.zoneName, firstRecord.zoneId, firstRecord.category, true, false, true)
 				end
 				return true
@@ -2612,7 +2665,7 @@ function BMU.handleChatLinkClick(rawLink, mouseButton, linkText, linkStyle, link
 			local houseId = tonumber(data4)
 			if player ~= nil and houseId ~= nil then
 				-- try to port to the house of the player
-				BMU.printToChat(SI.get(SI.TELE_CHAT_SHARING_FOLLOW_LINK))
+				BMU.printToChat(SI.get(SI.TELE_CHAT_SHARING_FOLLOW_LINK), BMU.MSG_AD)
 				CancelCast()
 				JumpToSpecificHouse(player, houseId)
 			end

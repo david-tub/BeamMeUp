@@ -146,8 +146,6 @@ mkstr(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION, "Notificação do mapa de pesqui
 mkstr(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION_TOOLTIP, "Se você possuir um mapa de pesquisa e ainda há alguns mapas idênticos (no mesmo local) em seu inventário, uma notificação (mensagem central) irá informá-lo.")
 mkstr(SI.TELE_SETTINGS_HEADER_PRIO, "Priorização")
 mkstr(SI.TELE_SETTINGS_HEADER_CHAT_COMMANDS, "Comandos de bate-papo.")
-mkstr(SI.TELE_SETTINGS_UNLOCKING_LESS_CHAT_OUTPUT, "Minimizar a saída de bate-papo.")
-mkstr(SI.TELE_SETTINGS_UNLOCKING_LESS_CHAT_OUTPUT_TOOLTIP, "Reduza o número de saídas de bate-papo ao usar o recurso de desbloqueio automático.")
 mkstr(SI.TELE_SETTINGS_PRIORITIZATION_DESCRIPTION, "Aqui você pode definir quais jogadores devem ser usados de forma rápida. Depois de sair ou unir uma guilda, um reinicio de UI é necessária para ser exibida corretamente aqui.")
 mkstr(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP, "Mostrar botão adicional no mapa")
 mkstr(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP_TOOLTIP, "Exibir um botão de texto no canto superior esquerdo do mapa do mundo para abrir o BeamMeUp.")
@@ -177,6 +175,15 @@ mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "Mostrar zonas e subzonas exibida
 mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "Mostrar zona e subzonas atualmente exibidas (mapa mundial aberto) sempre no topo da lista.")
 mkstr(SI.TELE_SETTINGS_DEFAULT_TAB, "Default list")
 mkstr(SI.TELE_SETTINGS_DEFAULT_TAB_TOOLTIP, "The list that is displayed by default when opening BeamMeUp.")
+mkstr(SI.TELE_SETTINGS_HEADER_CHAT_OUTPUT, "Chat Output")
+mkstr(SI.TELE_SETTINGS_OUTPUT_FAST_TRAVEL, "Fast travel executions")
+mkstr(SI.TELE_SETTINGS_OUTPUT_FAST_TRAVEL_TOOLTIP, "Informative chat messages about the initiated fast travels. Error messages are still displayed in the chat.")
+mkstr(SI.TELE_SETTINGS_OUTPUT_ADDITIONAL, "Supporting messages")
+mkstr(SI.TELE_SETTINGS_OUTPUT_ADDITIONAL_TOOLTIP, "Further helpful chat messages on various actions of the addon.")
+mkstr(SI.TELE_SETTINGS_OUTPUT_UNLOCK, "Automatic discovery results")
+mkstr(SI.TELE_SETTINGS_OUTPUT_UNLOCK_TOOLTIP, "Interim results (discovered wayshrines and XP) and supporting messages of the automatic wayshrine discovery.")
+mkstr(SI.TELE_SETTINGS_OUTPUT_DEBUG, "Debug messages")
+mkstr(SI.TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP, "Technical messages for troubleshooting. It will spam your chat. Please use only on request for short time!")
 
 
 -----------------------------------------------------------------------------

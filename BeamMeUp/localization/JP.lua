@@ -146,8 +146,6 @@ mkstr(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION, "重複した調査の地図の�
 mkstr(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION_TOOLTIP, "調査の地図の収穫完了時、インベントリに同じ地図がまだ残っていたら通知を表示します。 (画面中央のメッセージ)")
 mkstr(SI.TELE_SETTINGS_HEADER_PRIO, "表示優先度")
 mkstr(SI.TELE_SETTINGS_HEADER_CHAT_COMMANDS, "チャットコマンド")
-mkstr(SI.TELE_SETTINGS_UNLOCKING_LESS_CHAT_OUTPUT, "自動解除時、システムメッセージを抑制する")
-mkstr(SI.TELE_SETTINGS_UNLOCKING_LESS_CHAT_OUTPUT_TOOLTIP, "自動解除機能の使用時に出力されるシステムメッセージを減少させます。")
 mkstr(SI.TELE_SETTINGS_PRIORITIZATION_DESCRIPTION, "テレポート先として利用するプレイヤーの優先度を設定できます。ギルドへの加入と脱退のあとにはリロードが必要です。")
 mkstr(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP, "マップにBeamMeUp呼び出しリンクを表示")
 mkstr(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP_TOOLTIP, "マップ左上にBeamMeUp切り替え用のテキストリンクを表示します。")
@@ -177,6 +175,15 @@ mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP, "表示されているゾーン�
 mkstr(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP, "現在表示されているゾーンとサブゾーン (開いているワールドマップ) を常にリストの先頭に表示します。")
 mkstr(SI.TELE_SETTINGS_DEFAULT_TAB, "Default list")
 mkstr(SI.TELE_SETTINGS_DEFAULT_TAB_TOOLTIP, "The list that is displayed by default when opening BeamMeUp.")
+mkstr(SI.TELE_SETTINGS_HEADER_CHAT_OUTPUT, "Chat Output")
+mkstr(SI.TELE_SETTINGS_OUTPUT_FAST_TRAVEL, "Fast travel executions")
+mkstr(SI.TELE_SETTINGS_OUTPUT_FAST_TRAVEL_TOOLTIP, "Informative chat messages about the initiated fast travels. Error messages are still displayed in the chat.")
+mkstr(SI.TELE_SETTINGS_OUTPUT_ADDITIONAL, "Supporting messages")
+mkstr(SI.TELE_SETTINGS_OUTPUT_ADDITIONAL_TOOLTIP, "Further helpful chat messages on various actions of the addon.")
+mkstr(SI.TELE_SETTINGS_OUTPUT_UNLOCK, "Automatic discovery results")
+mkstr(SI.TELE_SETTINGS_OUTPUT_UNLOCK_TOOLTIP, "Interim results (discovered wayshrines and XP) and supporting messages of the automatic wayshrine discovery.")
+mkstr(SI.TELE_SETTINGS_OUTPUT_DEBUG, "Debug messages")
+mkstr(SI.TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP, "Technical messages for troubleshooting. It will spam your chat. Please use only on request for short time!")
 
 
 -----------------------------------------------------------------------------

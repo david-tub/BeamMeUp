@@ -242,7 +242,14 @@ function BMU.OpenTeleporter(refresh)
 	if BMU.savedVarsAcc.autoRefresh and refresh then
 		-- reset input and load default tab
 		BMU.clearInputFields()
-		BMU.createTable({index=BMU.savedVarsChar.defaultTab})
+		
+		if BMU.savedVarsChar.defaultTab == BMU.indexListOwnHouses then
+			BMU.createTableHouses()
+		elseif BMU.savedVarsChar.defaultTab == BMU.indexListDungeons then
+			BMU.createTableDungeons()
+		else
+			BMU.createTable({index=BMU.savedVarsChar.defaultTab})
+		end
 	end
 	
 	-- start auto refresh
@@ -260,6 +267,7 @@ end
 function BMU.HideTeleporter()
     BMU.win.Main_Control:SetHidden(true) -- hide main window
 	ClearMenu() -- close all submenus
+	ZO_Tooltips_HideTextTooltip() -- close all tooltips
 	
 	if SCENE_MANAGER:IsShowing("worldMap") then
 		-- show button only when main window is hidden and world map is open
@@ -548,7 +556,6 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["surveyMapsNotification"] = false,
 		["infoFavoritePlayerStatusNotification"] = false, -- false = not yet read
 		["infoSurveyMapsNotification"] = false, -- false = not yet read
-		["unlockingLessChatOutput"] = false,
 		["showOpenButtonOnMap"] = true,
 		["surveyMapsNotificationSound"] = true,
 		["wayshrineTravelAutoConfirm"] = false,
@@ -562,7 +569,9 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["usePanAndZoom"] = true,
 		["useMapPing"] = false,
 		["showZonesWithoutPlayers2"] = true,
-		["autoUnlockChatLogging"] = true,
+		["chatOutputFastTravel"] = true,
+		["chatOutputAdditional"] = true,
+		["chatOutputUnlock"] = true,
     }
     
 	BMU.DefaultsServer = {

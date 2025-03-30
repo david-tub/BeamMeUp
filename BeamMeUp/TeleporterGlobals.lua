@@ -120,13 +120,31 @@ function BMU.colorizeText(text, color)
 end
 
 -- send addon messages to the chat
-function BMU.printToChat(text)
-	local prefix = "[" .. BMU.var.appNameAbbr .. "]"
-	local prefix_colorized = BMU.colorizeText(prefix, "white")
+function BMU.printToChat(text, messageType)
+	-- prevent chat printouts according to the user options
+	if messageType == BMU.MSG_FT and not BMU.savedVarsAcc.chatOutputFastTravel then
+		return
+	elseif messageType == BMU.MSG_AD and not BMU.savedVarsAcc.chatOutputAdditional then
+		return
+	elseif messageType == BMU.MSG_UL and not BMU.savedVarsAcc.chatOutputUnlock then
+		return
+	elseif messageType == BMU.MSG_DB and not BMU.debugMode then
+		return
+	else
+		-- print message to chat
+		local prefix = "[" .. BMU.var.appNameAbbr .. "]"
+		local prefix_colorized = BMU.colorizeText(prefix, "white")
 
-	d(prefix_colorized .. ": " .. text)
+		d(prefix_colorized .. ": " .. text)
+	end
 end
 -----------------------------------------
+
+-- Message Types (chat output)
+BMU.MSG_FT = 1
+BMU.MSG_AD = 2
+BMU.MSG_UL = 3
+BMU.MSG_DB = 4
 
 -- Textures
 BMU.textures = {
@@ -273,8 +291,8 @@ BMU.indexListGuilds = 13			-- BMU and partner guilds
 BMU.indexListDungeons = 14			-- Dungeon Finder (arenas, dungeons, trials)
 
 -- default tab selection (values represent the "index" value which is handed over to createTable() function)
-BMU.dropdownDefaultTabChoices = {string.format("|t32:32:%s|t", BMU.textures.refreshBtn), string.format("|t32:32:%s|t", BMU.textures.questBtn), string.format("|t32:32:%s|t", BMU.textures.relatedItemsBtn), string.format("|t32:32:%s|t", BMU.textures.currentZoneBtn), string.format("|t32:32:%s|t", BMU.textures.delvesBtn)}
-BMU.dropdownDefaultTabValues = {BMU.indexListMain, BMU.indexListQuests, BMU.indexListItems, BMU.indexListCurrentZone, BMU.indexListDelves}
+BMU.dropdownDefaultTabChoices = {string.format("|t32:32:%s|t", BMU.textures.refreshBtn), string.format("|t32:32:%s|t", BMU.textures.questBtn), string.format("|t32:32:%s|t", BMU.textures.relatedItemsBtn), string.format("|t32:32:%s|t", BMU.textures.currentZoneBtn), string.format("|t32:32:%s|t", BMU.textures.delvesBtn), string.format("|t32:32:%s|t", BMU.textures.houseBtn), string.format("|t32:32:%s|t", BMU.textures.soloArenaBtn)}
+BMU.dropdownDefaultTabValues = {BMU.indexListMain, BMU.indexListQuests, BMU.indexListItems, BMU.indexListCurrentZone, BMU.indexListDelves, BMU.indexListOwnHouses, BMU.indexListDungeons}
 
 -- prioritization of the sources
 BMU.dropdownPrioSourceChoices = {"Friends"}
@@ -285,7 +303,7 @@ for i = 1, GetNumGuilds() do
 end
 
 -- flag to toggle debug mode
-BMU.debugMode = 0
+BMU.debugMode = false
 
 -- game language of the client
 BMU.lang = GetCVar("language.2")
@@ -671,30 +689,35 @@ BMU.overlandDelvesPublicDungeons = {
 	},
 	-- Telvanni Peninsula
 	[1414] = {
-    		delves = {1396, 1397, 1398},
-    		publicDungeons = {1415},
+    	delves = {1396, 1397, 1398},
+    	publicDungeons = {1415},
 		publicDungeonsAchievements = {
 			[1415] = 3658,		--Gorne
 		}
   	},
   	-- Apocrypha
   	[1413] = {
-    		delves = {1399, 1400, 1401},
-    		publicDungeons = {1416},
+    	delves = {1399, 1400, 1401},
+    	publicDungeons = {1416},
 		publicDungeonsAchievements = {
 			[1416] = 3657,		--The Underweave
 		}
   	},
 	-- West Weald
   	[1443] = {
-    		delves = {1444, 1445, 1446, 1447, 1448, 1449},
-    		publicDungeons = {1466, 1467},
+    	delves = {1444, 1445, 1446, 1447, 1448, 1449},
+    	publicDungeons = {1466, 1467},
 		publicDungeonsAchievements = {
 			[1466] = 4000,		--Leftwheal Trading Post
 			[1467] = 4002,		--Silorn
 		}
 	},
-	}
+	-- Eyevea (Augvea)
+	[267] = {
+		delves = {},
+		publicDungeons = {},
+	},
+}
 			
 
 -- maps nodeIndicies with specific/selected zoneIds

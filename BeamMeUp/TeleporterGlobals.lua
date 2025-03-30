@@ -65,9 +65,9 @@ if BMU.LibSets == nil and LibStub then
 	BMU.LibSets = LibStub('LibSets', true)
 end
 
-BMU.LibMapPing = LibMapPing
+BMU.LibMapPing = LibMapPing2
 if BMU.LibMapPing == nil and LibStub then
-	BMU.LibMapPing = LibStub('LibMapPing', true)
+	BMU.LibMapPing = LibStub('LibMapPing2', true)
 end
 
 BMU.LCMB = LibChatMenuButton

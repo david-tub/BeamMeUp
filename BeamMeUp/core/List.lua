@@ -1795,6 +1795,7 @@ function BMU.clickOnZoneName(button, record)
 		if record.parentZoneId ~= nil and (record.category ~= BMU.ZONE_CATEGORY_OVERLAND or record.forceOutside) then			
 			local normalizedX
 			local normalizedZ
+			local _
 			-- primary: use LibZone function
 			local parentZoneId, parentZoneIndex, poiIndex = BMU.LibZone:GetZoneMapPinInfo(record.zoneId, record.parentZoneId)
 			if poiIndex ~= nil and poiIndex ~= 0 then

@@ -1936,7 +1936,8 @@ function BMU.createTablePTF()
 	-- change global state, to have the correct tab active
 	BMU.changeState(BMU.indexListPTFHouses)
 	local resultList = {}
-	
+	local _
+
 	-- add PTF entries
 	local favorites = PortToFriend.GetFavorites()
 	if favorites and #favorites > 0 then
@@ -2570,6 +2571,7 @@ end
 function BMU.getZoneGuideDiscoveryInfo(zoneId, completionType)
 	local numCompletedActivities = 0
 	local totalActivities = 0
+	local _
 
 	-- check for any zone mapping exceptions
 	local mainZoneId = BMU.getMainZoneId(zoneId)

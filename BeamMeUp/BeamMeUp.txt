@@ -3,8 +3,8 @@
 ## Author: DeadSoon, Gamer1986PAN
 ## APIVersion: 101045
 ## SavedVariables: BeamMeUp_SV
-## Version: 3.7.0
-## AddOnVersion: 370
+## Version: 3.7.1
+## AddOnVersion: 371
 ## IsLibrary: false
 ## DependsOn: LibAddonMenu-2.0 LibCustomMenu LibZone
 ## OptionalDependsOn: LibSlashCommander LibSets LibMapPing LibChatMenuButton PortToFriendsHouse BanditsUserInterface MorrowindStyleUI

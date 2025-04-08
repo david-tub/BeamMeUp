@@ -2684,8 +2684,8 @@ function BMU.handleChatLinkClick(rawLink, mouseButton, linkText, linkStyle, link
 		if signature == "BMU_P" and mapIndex ~= nil and coorX ~= nil and coorY ~= nil then
 			-- valid map ping
 			-- switch to Tamriel and back to specific map in order to reset any subzone or zoom
-			ZO_WorldMap_SetMapByIndex(1)
-			ZO_WorldMap_SetMapByIndex(mapIndex)
+			WORLD_MAP_MANAGER:SetMapByIndex(1)
+			WORLD_MAP_MANAGER:SetMapByIndex(mapIndex)
 			-- start ping
 			if not SCENE_MANAGER:IsShowing("worldMap") then SCENE_MANAGER:Show("worldMap") end
 			PingMap(MAP_PIN_TYPE_RALLY_POINT, MAP_TYPE_LOCATION_CENTERED, coorX, coorY)

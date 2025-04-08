@@ -35,45 +35,16 @@ BMU.var = {
   numFavoritePlayers = 5,
 }
 
--- libraries
+-- necessary libraries
 BMU.LibZone = LibZone
-if BMU.LibZone == nil then
-	if LibStub then
-		BMU.LibZone = LibStub('LibZone', true)
-	else
-		d("[" .. BMU.var.appName .. " - ERROR] unable to load library LibZone")
-	end
-end
-
 BMU.LAM = LibAddonMenu2
-if BMU.LAM == nil then
-	if LibStub then
-		BMU.LAM = LibStub('LibAddonMenu-2.0', true)
-	else
-		d("[" .. BMU.var.appName .. " - ERROR] unable to load library LibAddonMenu-2.0")
-	end
-end
 
 -- optional libraries
 BMU.LSC = LibSlashCommander
-if BMU.LSC == nil and LibStub then
-	BMU.LSC = LibStub('LibSlashCommander', true)
-end
-
 BMU.LibSets = LibSets
-if BMU.LibSets == nil and LibStub then
-	BMU.LibSets = LibStub('LibSets', true)
-end
-
 BMU.LibMapPing = LibMapPing2
-if BMU.LibMapPing == nil and LibStub then
-	BMU.LibMapPing = LibStub('LibMapPing2', true)
-end
-
 BMU.LCMB = LibChatMenuButton
-if BMU.LCMB == nil and LibStub then
-	BMU.LCMB = LibStub('LibChatMenuButton', true)
-end
+
 
 -------------VERY FIRST FUNCTIONS---------
 function BMU.mergeTables(t, ...)

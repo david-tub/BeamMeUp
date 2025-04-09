@@ -20,6 +20,11 @@ for i=1, 5, 1 do
     ZO_CreateStringId("SI_BINDING_NAME_BMU_FAVORITE_PLAYER_" .. tostring(i), SI.get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. tostring(i))
 end
 
+for i=1, 3, 1 do
+    -- TODO: string localization
+    ZO_CreateStringId("SI_BINDING_NAME_BMU_FAVORITE_WAYSHRINE_" .. tostring(i), SI.get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. tostring(i))
+end
+
 ZO_CreateStringId("SI_BINDING_NAME_BMU_GROUP_LEADER", GetString(SI_JUMP_TO_GROUP_LEADER_TITLE))
 ZO_CreateStringId("SI_BINDING_NAME_BMU_CURRENT_ZONE", SI.get(SI.TELE_KEYBINDING_CURRENT_ZONE))
 ZO_CreateStringId("SI_BINDING_NAME_BMU_TRACKED_QUEST", SI.get(SI.TELE_KEYBINDING_TRACKED_QUEST))

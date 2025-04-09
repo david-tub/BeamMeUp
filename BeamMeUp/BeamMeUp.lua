@@ -115,6 +115,19 @@ function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 		end
 		return
 	end
+
+	-- Wayshrine Favorites
+	if keyPressIndex == 21 then
+		local nodeIndex = BMU.savedVarsServ.favoriteListWayshrines[favorite]
+		if nodeIndex == nil then
+			BMU.printToChat(SI.get(SI.TELE_CHAT_FAVORITE_UNSET))
+			return
+		end
+		local _, name, _, _, _, _, _, _, _ = GetFastTravelNodeInfo(nodeIndex)
+		BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(name) .. " (" .. zo_strformat(SI_MONEY_FORMAT, GetRecallCost()) .. ")", BMU.MSG_FT)
+		FastTravelToNode(nodeIndex)
+		return
+	end
 	
     -- Show/Hide UI with specific Tab
 	if BMU.win.Main_Control:IsHidden() then

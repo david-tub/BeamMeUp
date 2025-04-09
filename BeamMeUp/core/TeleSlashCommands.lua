@@ -146,6 +146,7 @@ function BMU.sc_addFavoriteWayshrine(option)
 	local countDownSec = 10
 	EVENT_MANAGER:RegisterForEvent(BMU.var.appName,  EVENT_START_FAST_TRAVEL_INTERACTION, updateWayshrineInteraction)
 	zo_callLater(function() EVENT_MANAGER:UnregisterForEvent(BMU.var.appName, EVENT_START_FAST_TRAVEL_INTERACTION) end, countDownSec*1000)
+	BMU.printToChat("Interact with your favorite wayshrine in the next 10 seconds!", BMU.MSG_AD)
 end
 
 

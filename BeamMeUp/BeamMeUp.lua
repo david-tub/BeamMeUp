@@ -582,6 +582,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["favoriteDungeon"] = 0, -- zone_id of the favorite dungeon
 		["houseCustomSorting"] = {},
 		["houseFurnitureCount_LII"] = {}, -- maps houseId with furniture count
+		["favoriteListWayshrines"] = {},
 	}
 	
 	BMU.DefaultsCharacter = {

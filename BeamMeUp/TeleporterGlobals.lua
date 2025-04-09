@@ -33,6 +33,7 @@ BMU.var = {
 
   numFavoriteZones = 10,
   numFavoritePlayers = 5,
+  numFavoriteWayshrines = 3,
 }
 
 -- necessary libraries

@@ -128,8 +128,7 @@ function BMU.sc_addFavoriteWayshrine(option)
 	local function updateWayshrineInteraction(eventCode, nodeIndex)
 		BMU.savedVarsServ.favoriteListWayshrines[BMU.favWayshrineCurrentPosition] = nodeIndex
 		local _, name, _, _, _, _, _, _, _ = GetFastTravelNodeInfo(nodeIndex)
-		-- TODO: string localization
-		BMU.printToChat(SI.get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. BMU.favWayshrineCurrentPosition .. ": " .. BMU.formatName(name), BMU.MSG_AD)
+		BMU.printToChat(SI.get(SI.TELE_KEYBINDING_WAYSHRINE_FAVORITE) .. " " .. BMU.favWayshrineCurrentPosition .. ": " .. BMU.formatName(name), BMU.MSG_AD)
 	end
 
 	-- extract position (slot) number from input options
@@ -140,6 +139,7 @@ function BMU.sc_addFavoriteWayshrine(option)
 		BMU.printToChat("<favorite slot (1-3)>")
 		return
 	end
+	-- remember requested fav position/slot
 	BMU.favWayshrineCurrentPosition = position
 
 	-- start interaction countdown - player has to interact with a wayshrine within the countdown

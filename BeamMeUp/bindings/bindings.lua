@@ -21,8 +21,7 @@ for i=1, 5, 1 do
 end
 
 for i=1, 3, 1 do
-    -- TODO: string localization
-    ZO_CreateStringId("SI_BINDING_NAME_BMU_FAVORITE_WAYSHRINE_" .. tostring(i), SI.get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. tostring(i))
+    ZO_CreateStringId("SI_BINDING_NAME_BMU_FAVORITE_WAYSHRINE_" .. tostring(i), SI.get(SI.TELE_KEYBINDING_WAYSHRINE_FAVORITE) .. " " .. tostring(i))
 end
 
 ZO_CreateStringId("SI_BINDING_NAME_BMU_GROUP_LEADER", GetString(SI_JUMP_TO_GROUP_LEADER_TITLE))

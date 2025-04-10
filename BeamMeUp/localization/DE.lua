@@ -200,6 +200,7 @@ mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "Schnellreise vor den Hauptw
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "Arenen / Prüfungen / Verliese")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "Schnellreise zur verfolgten Quest")
 mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Schnellreise in beliebiges Gebiet")
+mkstr(SI.TELE_KEYBINDING_WAYSHRINE_FAVORITE, "Wegschrein-Favorit")
 
 
 -----------------------------------------------------------------------------

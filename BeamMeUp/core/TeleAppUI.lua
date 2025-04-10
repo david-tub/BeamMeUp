@@ -892,10 +892,15 @@ local function SetupOptionsMenu(index) --index == Addon name
               text = "Add player favorite manually\n" .. BMU.colorizeText("/bmu/favorites/add/player <fav slot> <player name>\n", "gold") .. BMU.colorizeText("Example: /bmu/favorites/add/player 1 @DeadSoon", "lgray"),
 			  submenu = "cc",
          },
-		 {
-              type = "divider",
+	     {
+			  type = "description",
+			  text = "Add wayshrine favorite\nOnce executed, you must interact (`E`) with your favorite wayshrine within 10 seconds. You can assign hotkeys for your favorite wayshrines.\n" .. BMU.colorizeText("/bmu/favorites/add/wayshrine <fav slot>\n", "gold") .. BMU.colorizeText("Example: /bmu/favorites/add/wayshrine 1", "lgray"),
 			  submenu = "cc",
-         },
+	     },
+	     {
+			  type = "divider",
+			  submenu = "cc",
+	     },
 	     {
               type = "description",
               text = "Start custom vote in group (100% are necessary)\n" .. BMU.colorizeText("/bmu/vote/custom_vote_unanimous <your text>\n", "gold") .. BMU.colorizeText("Example: /bmu/vote/custom_vote_unanimous Do you like BeamMeUp?", "lgray"),

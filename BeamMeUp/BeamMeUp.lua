@@ -124,7 +124,10 @@ function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 			return
 		end
 		local _, name, _, _, _, _, _, _, _ = GetFastTravelNodeInfo(nodeIndex)
-		BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(name) .. " (" .. zo_strformat(SI_MONEY_FORMAT, GetRecallCost()) .. ")", BMU.MSG_FT)
+		if GetInteractionType() ~= INTERACTION_FAST_TRAVEL then
+			-- only show info message if the player is not interacting with a wayshrine
+			BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(name) .. " (" .. zo_strformat(SI_MONEY_FORMAT, GetRecallCost()) .. ")", BMU.MSG_FT)
+		end
 		FastTravelToNode(nodeIndex)
 		return
 	end

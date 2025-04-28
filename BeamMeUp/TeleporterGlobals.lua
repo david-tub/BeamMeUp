@@ -1721,17 +1721,6 @@ BMU.treasureAndSurveyMaps = {
 		treasure = {207964, 207965, 207966, 207967, 207968, 207969, 206535, 206536, 206537},
 		clue = {207971, 207972},
 	},
-	-- Solstice - not sure if there will be any maps, but this would be the correct place for it
-	[1502] = {
-		--[[alchemist = {207989},
-		enchanter = {207992},
-		woodworker = {166456},
-		blacksmith = {207990},
-		clothier = {207991},
-		jewelry = {207993},
-		treasure = {207964, 207965, 207966, 207967, 207968, 207969, 206535, 206536, 206537},
-		clue = {207971, 207972},]]
-	},
 }
 
 
@@ -1771,14 +1760,15 @@ BMU.sortingByCategory = {
 	[BMU.ZONE_CATEGORY_OVERLAND] 	= 1,
 	[BMU.ZONE_CATEGORY_PUBDUNGEON] 	= 2,
 	[BMU.ZONE_CATEGORY_DELVE] 		= 3,
-	[BMU.ZONE_CATEGORY_UNKNOWN] 		= 4,
+	[BMU.ZONE_CATEGORY_UNKNOWN] 	= 4,
 	[BMU.ZONE_CATEGORY_TRAIL] 		= 5,
 	[BMU.ZONE_CATEGORY_GRPDUNGEON] 	= 6,
 	[BMU.ZONE_CATEGORY_GRPARENA] 	= 7,
 	[BMU.ZONE_CATEGORY_ENDLESSD] 	= 8,
 	[BMU.ZONE_CATEGORY_GRPZONES] 	= 9,
 	[BMU.ZONE_CATEGORY_HOUSE] 		= 10,
-	[BMU.ZONE_CATEGORY_SOLOARENA] 	= 11}
+	[BMU.ZONE_CATEGORY_SOLOARENA] 	= 11
+}
 
 -----------------------------------------
 

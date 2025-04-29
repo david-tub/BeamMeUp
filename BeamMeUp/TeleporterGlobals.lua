@@ -872,7 +872,7 @@ BMU.nodeIndexMap = {
 		nodeIndex = 589,
 		abbreviation = "OC",
 		isChapter = true,
-		updateName = GetString(SI_CHAPTER8),
+		updateName = GetString(SI_CHAPTER9),
 		updateNum = 46,
 		releaseDate = "2025/06"
 	},

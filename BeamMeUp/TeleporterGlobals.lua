@@ -1721,6 +1721,16 @@ BMU.treasureAndSurveyMaps = {
 		treasure = {207964, 207965, 207966, 207967, 207968, 207969, 206535, 206536, 206537},
 		clue = {207971, 207972},
 	},
+	-- Solstice
+	[1502] = {
+		alchemist = {217929},
+		enchanter = {217932},
+		woodworker = {217934},
+		blacksmith = {217930},
+		clothier = {217931},
+		jewelry = {217933},
+		treasure = {217926, 217927, 217928},
+	},
 }
 
 

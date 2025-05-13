@@ -28,6 +28,8 @@ function BMU.activateSlashCommands()
 	BMU.registerChatCommand("/bmu/favorites/add/player", function(option) BMU.sc_addFavoritePlayer(option) end, "Add player favorite")
 	-- Adding new zone favorite
 	BMU.registerChatCommand("/bmu/favorites/add/zone", function(option) BMU.sc_addFavoriteZone(option) end, "Add zone favorite")
+	-- Adding new wayshrine favorite
+	BMU.registerChatCommand("/bmu/favorites/add/wayshrine", function(option) BMU.sc_addFavoriteWayshrine(option) end, "Add wayshrine favorite")
 
 	-- Port to goup leader
 	BMU.registerChatCommand("/bmutp/leader", function(option) BMU.portToGroupLeader() end, "Port to group leader")
@@ -117,6 +119,34 @@ function BMU.sc_addFavoriteZone(option)
 		BMU.printToChat("invalid input")
 		BMU.printToChat("<favorite slot (1-10)>  <zone (zoneId or zone name)>")
 	end
+end
+
+
+-- Examples:
+-- "/bmu/favorites/add/wayshrine 1"
+function BMU.sc_addFavoriteWayshrine(option)
+	local function updateWayshrineInteraction(eventCode, nodeIndex)
+		BMU.savedVarsServ.favoriteListWayshrines[BMU.favWayshrineCurrentPosition] = nodeIndex
+		local _, name, _, _, _, _, _, _, _ = GetFastTravelNodeInfo(nodeIndex)
+		BMU.printToChat(SI.get(SI.TELE_KEYBINDING_WAYSHRINE_FAVORITE) .. " " .. BMU.favWayshrineCurrentPosition .. ": " .. BMU.formatName(name), BMU.MSG_AD)
+	end
+
+	-- extract position (slot) number from input options
+	local options = BMU.sc_parseOptions(option)
+	local position = tonumber(options[1])
+	if position == nil or position < 1 or position > BMU.var.numFavoriteWayshrines then
+		BMU.printToChat("invalid input")
+		BMU.printToChat("<favorite slot (1-3)>")
+		return
+	end
+	-- remember requested fav position/slot
+	BMU.favWayshrineCurrentPosition = position
+
+	-- start interaction countdown - player has to interact with a wayshrine within the countdown
+	local countDownSec = 10
+	EVENT_MANAGER:RegisterForEvent(BMU.var.appName,  EVENT_START_FAST_TRAVEL_INTERACTION, updateWayshrineInteraction)
+	zo_callLater(function() EVENT_MANAGER:UnregisterForEvent(BMU.var.appName, EVENT_START_FAST_TRAVEL_INTERACTION) end, countDownSec*1000)
+	BMU.printToChat("Interact with your favorite wayshrine in the next 10 seconds!", BMU.MSG_AD)
 end
 
 

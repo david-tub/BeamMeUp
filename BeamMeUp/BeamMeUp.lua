@@ -115,6 +115,22 @@ function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 		end
 		return
 	end
+
+	-- Wayshrine Favorites
+	if keyPressIndex == 21 then
+		local nodeIndex = BMU.savedVarsServ.favoriteListWayshrines[favorite]
+		if nodeIndex == nil then
+			BMU.printToChat(SI.get(SI.TELE_CHAT_FAVORITE_UNSET))
+			return
+		end
+		local _, name, _, _, _, _, _, _, _ = GetFastTravelNodeInfo(nodeIndex)
+		if GetInteractionType() ~= INTERACTION_FAST_TRAVEL then
+			-- only show info message if the player is not interacting with a wayshrine
+			BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(name) .. " (" .. zo_strformat(SI_MONEY_FORMAT, GetRecallCost()) .. ")", BMU.MSG_FT)
+		end
+		FastTravelToNode(nodeIndex)
+		return
+	end
 	
     -- Show/Hide UI with specific Tab
 	if BMU.win.Main_Control:IsHidden() then
@@ -582,6 +598,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["favoriteDungeon"] = 0, -- zone_id of the favorite dungeon
 		["houseCustomSorting"] = {},
 		["houseFurnitureCount_LII"] = {}, -- maps houseId with furniture count
+		["favoriteListWayshrines"] = {},
 	}
 	
 	BMU.DefaultsCharacter = {
@@ -690,7 +707,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	
 	-- Show Note, when survey map is mined and there are still some identical maps left
 	if BMU.savedVarsAcc.surveyMapsNotification then
-		SHARED_INVENTORY:RegisterCallback("SingleSlotInventoryUpdate", BMU.surveyMapUsed, self)
+		SHARED_INVENTORY:RegisterCallback("SingleSlotInventoryUpdate", BMU.surveyMapUsed)
 	end
 	
 	-- Auto confirm dailog when using wayshrines

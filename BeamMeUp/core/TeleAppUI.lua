@@ -892,10 +892,15 @@ local function SetupOptionsMenu(index) --index == Addon name
               text = "Add player favorite manually\n" .. BMU.colorizeText("/bmu/favorites/add/player <fav slot> <player name>\n", "gold") .. BMU.colorizeText("Example: /bmu/favorites/add/player 1 @DeadSoon", "lgray"),
 			  submenu = "cc",
          },
-		 {
-              type = "divider",
+	     {
+			  type = "description",
+			  text = "Add wayshrine favorite\nOnce executed, you must interact (`E`) with your favorite wayshrine within 10 seconds. You can assign hotkeys for your favorite wayshrines.\n" .. BMU.colorizeText("/bmu/favorites/add/wayshrine <fav slot>\n", "gold") .. BMU.colorizeText("Example: /bmu/favorites/add/wayshrine 1", "lgray"),
 			  submenu = "cc",
-         },
+	     },
+	     {
+			  type = "divider",
+			  submenu = "cc",
+	     },
 	     {
               type = "description",
               text = "Start custom vote in group (100% are necessary)\n" .. BMU.colorizeText("/bmu/vote/custom_vote_unanimous <your text>\n", "gold") .. BMU.colorizeText("Example: /bmu/vote/custom_vote_unanimous Do you like BeamMeUp?", "lgray"),
@@ -2684,8 +2689,8 @@ function BMU.handleChatLinkClick(rawLink, mouseButton, linkText, linkStyle, link
 		if signature == "BMU_P" and mapIndex ~= nil and coorX ~= nil and coorY ~= nil then
 			-- valid map ping
 			-- switch to Tamriel and back to specific map in order to reset any subzone or zoom
-			ZO_WorldMap_SetMapByIndex(1)
-			ZO_WorldMap_SetMapByIndex(mapIndex)
+			WORLD_MAP_MANAGER:SetMapByIndex(1)
+			WORLD_MAP_MANAGER:SetMapByIndex(mapIndex)
 			-- start ping
 			if not SCENE_MANAGER:IsShowing("worldMap") then SCENE_MANAGER:Show("worldMap") end
 			PingMap(MAP_PIN_TYPE_RALLY_POINT, MAP_TYPE_LOCATION_CENTERED, coorX, coorY)

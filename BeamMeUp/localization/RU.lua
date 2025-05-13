@@ -200,6 +200,7 @@ mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "Перемещение ко
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "Арены / Испытания / Подземелья")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "Перeмещение на выбранный квест")
 mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Порт в любую зону")
+mkstr(SI.TELE_KEYBINDING_WAYSHRINE_FAVORITE, "Wayshrine Favorite")
 
 
 -----------------------------------------------------------------------------

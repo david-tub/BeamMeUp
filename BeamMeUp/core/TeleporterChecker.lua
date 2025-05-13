@@ -1936,7 +1936,8 @@ function BMU.createTablePTF()
 	-- change global state, to have the correct tab active
 	BMU.changeState(BMU.indexListPTFHouses)
 	local resultList = {}
-	
+	local _
+
 	-- add PTF entries
 	local favorites = PortToFriend.GetFavorites()
 	if favorites and #favorites > 0 then
@@ -2075,7 +2076,8 @@ function BMU.sortByStringFindPosition(portalPlayers, inputString, key1, key2)
 			elseif pos1 and pos2 then
 				return pos1 < pos2
 			end
-		end		
+		end
+		return false -- Default: no swap if all conditions are equal
 	end)
 	
 	return portalPlayers
@@ -2189,6 +2191,7 @@ function BMU.createTableGuilds(repeatFlag)
 		if a.size ~= b.size then
 			return a.size > b.size
 		end
+		return false -- Default: no swap if all conditions are equal
 	end)
 	-- add partner guild list to final list
 	for _, v in pairs(tempList) do table.insert(resultList, v) end
@@ -2568,6 +2571,7 @@ end
 function BMU.getZoneGuideDiscoveryInfo(zoneId, completionType)
 	local numCompletedActivities = 0
 	local totalActivities = 0
+	local _
 
 	-- check for any zone mapping exceptions
 	local mainZoneId = BMU.getMainZoneId(zoneId)

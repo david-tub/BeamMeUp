@@ -1,4 +1,4 @@
-﻿<Bindings>
+<Bindings>
 	<Layer name="SI_KEYBINDINGS_LAYER_GENERAL">
 		<Category name="|cd5b526BeamMeUp|r - Teleporter">
 		
@@ -120,6 +120,18 @@
 			
 			<Action name="BMU_FAVORITE_PLAYER_5">
 				<Down>BMU.PortalHandlerKeyPress(16, 5)</Down>
+			</Action>
+
+			<Action name="BMU_FAVORITE_WAYSHRINE_1">
+				<Down>BMU.PortalHandlerKeyPress(21, 1)</Down>
+			</Action>
+
+			<Action name="BMU_FAVORITE_WAYSHRINE_2">
+				<Down>BMU.PortalHandlerKeyPress(21, 2)</Down>
+			</Action>
+
+			<Action name="BMU_FAVORITE_WAYSHRINE_3">
+				<Down>BMU.PortalHandlerKeyPress(21, 3)</Down>
 			</Action>
 			
 		</Category>

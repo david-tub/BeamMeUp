@@ -200,6 +200,7 @@ mkstr(SI.TELE_KEYBINDING_PRIMARY_RESIDENCE_OUTSIDE, "Viajar para fora da residê
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER, "Arenas / Provações / Masmorras")
 mkstr(SI.TELE_KEYBINDING_TRACKED_QUEST, "Trocar para missão escolhida")
 mkstr(SI.TELE_KEYBINDING_ANY_ZONE, "Viajar para zona aleatória")
+mkstr(SI.TELE_KEYBINDING_WAYSHRINE_FAVORITE, "Wayshrine Favorite")
 
 
 -----------------------------------------------------------------------------

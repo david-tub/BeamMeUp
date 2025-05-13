@@ -93,6 +93,7 @@ BMU_GUILD_DATA = {
             705143,         -- "TheDarkOnes"                |@james brent discord: jamesbrent
             761629,         -- "The Chill Syndicate"        |@bluberrygamingyt
             960355,         -- "HuckleBerry's Posse"        |@I'mUrHuckleBerry / Discord craigcasnerconsulting
+            971015,         -- "DIY"                        |@Loralye Discord: notloralye
         },
     }
 

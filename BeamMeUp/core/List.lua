@@ -663,7 +663,7 @@ function BMU.PortalToPlayer(displayName, sourceIndex, zoneName, zoneId, zoneCate
 	
 		-- prophylactic cancel cast
 		CancelCast()
-		
+
 		-- show additional animation
 		if BMU.savedVarsAcc.showTeleportAnimation then
 			BMU.showTeleportAnimation()
@@ -1556,7 +1556,12 @@ function BMU.clickOnTeleportToPlayerButton(textureControl, button, message)
 	
 	-- port to player anyway
 	BMU.PortalToPlayer(message.displayName, message.sourceIndexLeading, message.zoneName, message.zoneId, message.category, true, true, true)
-	if BMU.savedVarsAcc.closeOnPorting then
+	if BMU.savedVarsAcc.closeOnPorting or GetInteractionType() == INTERACTION_FAST_TRAVEL then
+		-- 2025_06
+			-- check additionally if the player is interacting with a wayshrine
+			-- in that case fast travel attempt starts immediately (base game feature)
+			-- unfortunately the interaction is not ended correctly (bug), that could lead to trouble for minimap addons
+			-- so we force map closing to end the interaction somehow (it makes no difference because instant loading screen)
 		-- hide world map if open
 		SCENE_MANAGER:Hide("worldMap")
 		-- hide UI if open

@@ -60,6 +60,7 @@ BMU_GUILD_DATA = {
             790008,         -- "TARDIS Tamriel"             |@sapiens_o_0 Discord:sapiens_o0
             830490,         -- "Akatosh Legion I"           |@Qbi  Discord likezed
             832098,         -- "Only Fun"                   |@RIVVV Discord panolirandom
+            783860,         -- "Zenithar's Artisans"        |@CassieAeri - discord cassieaeri
         },
         ["NA Megaserver"] = {
             698893,			-- "The Descendants"			|@ravenzwind

@@ -1700,7 +1700,7 @@ BMU.treasureAndSurveyMaps = {
 		woodworker = {198297},
 		blacksmith = {198291},
 		jewelry = {198294},
-		treasure = {196201, 196202, 198087, 198098, 198099, 198100},
+		treasure = {196201, 196202, 198097, 198098, 198099, 198100},
 		clue = {197842},
   	},
 	-- Apocrypha

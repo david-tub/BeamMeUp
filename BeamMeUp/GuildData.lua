@@ -61,6 +61,7 @@ BMU_GUILD_DATA = {
             830490,         -- "Akatosh Legion I"           |@Qbi  Discord likezed
             832098,         -- "Only Fun"                   |@RIVVV Discord panolirandom
             783860,         -- "Zenithar's Artisans"        |@CassieAeri - discord cassieaeri
+            829144,         -- "La Taverne du Poulpe"       |@SecundaHyadum - discord nebuleuse_du_sablier
         },
         ["NA Megaserver"] = {
             698893,			-- "The Descendants"			|@ravenzwind
@@ -95,6 +96,7 @@ BMU_GUILD_DATA = {
             761629,         -- "The Chill Syndicate"        |@bluberrygamingyt
             960355,         -- "HuckleBerry's Posse"        |@I'mUrHuckleBerry / Discord craigcasnerconsulting
             971015,         -- "DIY"                        |@Loralye Discord: notloralye
+            982001,         -- "Chances We're High Too      |@GYATT [main] @BeardsAndBongs [GM account for this guild]
         },
     }
 

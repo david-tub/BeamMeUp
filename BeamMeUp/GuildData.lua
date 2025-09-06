@@ -96,7 +96,9 @@ BMU_GUILD_DATA = {
             761629,         -- "The Chill Syndicate"        |@bluberrygamingyt
             960355,         -- "HuckleBerry's Posse"        |@I'mUrHuckleBerry / Discord craigcasnerconsulting
             971015,         -- "DIY"                        |@Loralye Discord: notloralye
-            982001,         -- "Chances We're High Too      |@GYATT [main] @BeardsAndBongs [GM account for this guild]
+            982001,         -- "Chances We're High Too"     |@GYATT [main] @BeardsAndBongs [GM account for this guild]
+            986137,         -- "Don't Talk to Me"           |@Cadence_Nightingale discord neurotopia
+            978203,         -- "The Daedric Wastelanders"   |@K1LL3R-Cfrags discord shade_k1ller
         },
     }
 

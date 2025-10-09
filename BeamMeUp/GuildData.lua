@@ -62,6 +62,7 @@ BMU_GUILD_DATA = {
             832098,         -- "Only Fun"                   |@RIVVV Discord panolirandom
             783860,         -- "Zenithar's Artisans"        |@CassieAeri - discord cassieaeri
             829144,         -- "La Taverne du Poulpe"       |@SecundaHyadum - discord nebuleuse_du_sablier
+            852144,         -- "Standing Ovation Society"   |@EliTheDramaQueen - discord pankromka
         },
         ["NA Megaserver"] = {
             698893,			-- "The Descendants"			|@ravenzwind

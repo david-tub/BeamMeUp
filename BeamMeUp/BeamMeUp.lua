@@ -58,13 +58,13 @@ function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 
 	-- Port into own Primary Residence
 	if keyPressIndex == 13 then
-		BMU.portToOwnHouse(true, nil, false, nil)
+		BMU.portToOwnHouseWithZonePreference(true)
 		return
 	end
 	
 	-- Port outside own Primary Residence
 	if keyPressIndex == 18 then
-		BMU.portToOwnHouse(true, nil, true, nil)
+		BMU.portToOwnHouseWithZonePreference(true)
 		return
 	end
 	
@@ -325,12 +325,12 @@ function BMU.toggleZoneGuide(show)
 		-- show ZoneGuide
 		--ZO_WorldMapZoneStoryTopLevel_Keyboard:SetHidden(false)
 		--ZO_SharedMediumLeftPanelBackground:SetHidden(false)
-		WORLD_MAP_SCENE:AddFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
+		--WORLD_MAP_SCENE:AddFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
 	else
 		-- hide ZoneGuide
 		--ZO_WorldMapZoneStoryTopLevel_Keyboard:SetHidden(true)
 		--ZO_SharedMediumLeftPanelBackground:SetHidden(true)
-		WORLD_MAP_SCENE:RemoveFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
+		--WORLD_MAP_SCENE:RemoveFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
 	end
 end
 
@@ -509,6 +509,173 @@ function BMU.isPlayerInBMUGuild()
 end
 
 
+-- Helper functions for zone-specific house preferences
+function BMU.setZoneSpecificHouse(zoneId, houseId)
+	if not BMU.savedVarsServ.zoneSpecificHouses then
+		BMU.savedVarsServ.zoneSpecificHouses = {}
+	end
+	BMU.savedVarsServ.zoneSpecificHouses[zoneId] = houseId
+end
+
+function BMU.getZoneSpecificHouse(zoneId)
+	if not BMU.savedVarsServ.zoneSpecificHouses then
+		return nil
+	end
+	return BMU.savedVarsServ.zoneSpecificHouses[zoneId]
+end
+
+function BMU.clearZoneSpecificHouse(zoneId)
+	if BMU.savedVarsServ.zoneSpecificHouses then
+		BMU.savedVarsServ.zoneSpecificHouses[zoneId] = nil
+	end
+end
+
+-- Slash command handlers for zone-specific houses
+function BMU.slashSetZoneHouse(args)
+	local houseId = tonumber(args)
+	if not houseId then
+		BMU.printToChat("Usage: /bmusetzh <houseId> - Sets preferred house for current zone")
+		return
+	end
+	
+	local currentZoneId = GetCurrentMapZoneIndex()
+	local zoneName = GetZoneNameById(currentZoneId)
+	local houseName = GetCollectibleName(houseId)
+	
+	-- Clean up zone name
+	if zoneName == "" or zoneName == nil then
+		zoneName = "Unknown Zone ID: " .. tostring(currentZoneId)
+	end
+	
+	-- Clean up house name
+	if houseName == "" or houseName == nil then
+		BMU.printToChat("Invalid house ID: " .. houseId)
+		return
+	else
+		houseName = string.gsub(houseName, "[\n\r]", "")
+		houseName = string.gsub(houseName, "%s+$", "")
+	end
+	
+	BMU.setZoneSpecificHouse(currentZoneId, houseId)
+	BMU.printToChat("Zone-specific house set: " .. zoneName .. " -> " .. houseName)
+end
+
+function BMU.slashSetCurrentHouse(args)
+	local currentHouseId = GetCurrentZoneHouseId()
+	if not currentHouseId or currentHouseId == 0 then
+		BMU.printToChat("You are not currently in a house")
+		return
+	end
+	
+	local currentZoneId = GetCurrentMapZoneIndex()
+	local zoneName = GetZoneNameById(currentZoneId)
+	local houseName = GetCollectibleName(currentHouseId)
+	
+	-- Clean up zone name
+	if zoneName == "" or zoneName == nil then
+		zoneName = "Unknown Zone ID: " .. tostring(currentZoneId)
+	end
+	
+	-- Clean up house name
+	if houseName and houseName ~= "" then
+		houseName = string.gsub(houseName, "[\n\r]", "")
+		houseName = string.gsub(houseName, "%s+$", "")
+	else
+		houseName = "Unknown House ID: " .. tostring(currentHouseId)
+	end
+	
+	BMU.setZoneSpecificHouse(currentZoneId, currentHouseId)
+	BMU.printToChat("Current house set as preferred for " .. zoneName .. ": " .. houseName)
+end
+
+function BMU.slashClearZoneHouse(args)
+	local currentZoneId = GetCurrentMapZoneIndex()
+	local zoneName = GetZoneNameById(currentZoneId)
+	local currentHouseId = BMU.getZoneSpecificHouse(currentZoneId)
+	
+	-- Clean up zone name
+	if zoneName == "" or zoneName == nil then
+		zoneName = "Unknown Zone ID: " .. tostring(currentZoneId)
+	end
+	
+	if not currentHouseId then
+		BMU.printToChat("No zone-specific house set for " .. zoneName)
+		return
+	end
+	
+	local houseName = GetCollectibleName(currentHouseId)
+	-- Clean up house name
+	if houseName and houseName ~= "" then
+		houseName = string.gsub(houseName, "[\n\r]", "")
+		houseName = string.gsub(houseName, "%s+$", "")
+	else
+		houseName = "Unknown House ID: " .. tostring(currentHouseId)
+	end
+	
+	BMU.clearZoneSpecificHouse(currentZoneId)
+	BMU.printToChat("Zone-specific house cleared: " .. zoneName .. " (was " .. houseName .. ")")
+end
+
+function BMU.slashListZoneHouses(args)
+	if not BMU.savedVarsServ.zoneSpecificHouses or next(BMU.savedVarsServ.zoneSpecificHouses) == nil then
+		BMU.printToChat("No zone-specific houses configured")
+		return
+	end
+	
+	BMU.printToChat("Zone-specific house mappings:")
+	for zoneId, houseId in pairs(BMU.savedVarsServ.zoneSpecificHouses) do
+		local zoneName = GetZoneNameById(zoneId)
+		local houseName = GetCollectibleName(houseId)
+		
+		-- Clean up zone name
+		if zoneName == "" or zoneName == nil then
+			zoneName = "Unknown Zone ID: " .. tostring(zoneId)
+		end
+		
+		-- Clean up house name
+		if houseName and houseName ~= "" then
+			houseName = string.gsub(houseName, "[\n\r]", "")
+			houseName = string.gsub(houseName, "%s+$", "")
+		else
+			houseName = "Unknown House ID: " .. tostring(houseId)
+		end
+		
+		BMU.printToChat("  " .. zoneName .. " (ID: " .. tostring(zoneId) .. ") -> " .. houseName .. " (ID: " .. tostring(houseId) .. ")")
+	end
+end
+
+-- Modified house porting function to check for zone-specific preferences
+-- Params:
+--   useCurrentZone   (boolean) respect zone-specific mapping
+--   explicitZoneId   (number|nil) zoneId to check mapping for; defaults to current displayed zone
+--   jumpOutside      (boolean|nil) nil defaults to true, false forces inside
+--   fallbackHouseId  (number|nil) houseId to use if no mapping exists for the zone
+function BMU.portToOwnHouseWithZonePreference(useCurrentZone, explicitZoneId, jumpOutside, fallbackHouseId)
+	-- resolve zone to use
+	local resolvedZoneId = explicitZoneId or GetZoneId(GetCurrentMapZoneIndex())
+	local parentZoneId = BMU.getParentZoneId(resolvedZoneId)
+	local zoneName = GetZoneNameById(parentZoneId)
+	-- default outside unless explicitly false
+	local goOutside = (jumpOutside ~= false)
+
+	if useCurrentZone then
+		local preferredHouseId = BMU.getZoneSpecificHouse(parentZoneId)
+		if preferredHouseId then
+			BMU.portToOwnHouse(false, preferredHouseId, goOutside, (zoneName ~= "" and zoneName) or nil)
+			return
+		end
+	end
+
+	-- no mapping -> try fallback house (e.g., the clicked house)
+	if fallbackHouseId then
+		BMU.portToOwnHouse(false, fallbackHouseId, goOutside, (zoneName ~= "" and zoneName) or nil)
+		return
+	end
+
+	-- final fallback -> primary residence
+	BMU.portToOwnHouse(true, nil, goOutside, nil)
+end
+
 local function OnAddOnLoaded(eventCode, addOnName)
     if (appName ~= addOnName) then return end
 
@@ -599,6 +766,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["houseCustomSorting"] = {},
 		["houseFurnitureCount_LII"] = {}, -- maps houseId with furniture count
 		["favoriteListWayshrines"] = {},
+		["zoneSpecificHouses"] = {}, -- maps zoneId to preferred houseId for that zone
 	}
 	
 	BMU.DefaultsCharacter = {

@@ -903,6 +903,40 @@ local function SetupOptionsMenu(index) --index == Addon name
 	     },
 	     {
               type = "description",
+              text = "Add house favorite for zoneID\n" .. BMU.colorizeText("/bmu/house/set/zone <zoneID> <houseID>\n", "gold") .. BMU.colorizeText("Example: /bmu/house/set/zone 1086 68", "lgray"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Add house favorite for current zone\n" .. BMU.colorizeText("/bmu/house/set/current_zone <houseID>\n", "gold") .. BMU.colorizeText("Example: /bmu/house/set/current_zone 68", "lgray"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Add current house as favorite for current zone\n" .. BMU.colorizeText("/bmu/house/set/current_house\n", "gold"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Clear house favorite for current zone\n" .. BMU.colorizeText("/bmu/house/clear/current_zone\n", "gold"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Clear house for zone\n" .. BMU.colorizeText("/bmu/house/clear/zone <zoneID>\n", "gold") .. BMU.colorizeText("Example: /bmu/house/clear/zone 1086", "lgray"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "List house favorites\n" .. BMU.colorizeText("/bmu/house/list\n", "gold"),
+			  submenu = "cc",
+         },
+	     {
+			  type = "divider",
+			  submenu = "cc",
+	     },
+	     {
+              type = "description",
               text = "Start custom vote in group (100% are necessary)\n" .. BMU.colorizeText("/bmu/vote/custom_vote_unanimous <your text>\n", "gold") .. BMU.colorizeText("Example: /bmu/vote/custom_vote_unanimous Do you like BeamMeUp?", "lgray"),
 			  submenu = "cc",
          },

@@ -325,12 +325,12 @@ function BMU.toggleZoneGuide(show)
 		-- show ZoneGuide
 		--ZO_WorldMapZoneStoryTopLevel_Keyboard:SetHidden(false)
 		--ZO_SharedMediumLeftPanelBackground:SetHidden(false)
-		--WORLD_MAP_SCENE:AddFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
+		WORLD_MAP_SCENE:AddFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
 	else
 		-- hide ZoneGuide
 		--ZO_WorldMapZoneStoryTopLevel_Keyboard:SetHidden(true)
 		--ZO_SharedMediumLeftPanelBackground:SetHidden(true)
-		--WORLD_MAP_SCENE:RemoveFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
+		WORLD_MAP_SCENE:RemoveFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
 	end
 end
 

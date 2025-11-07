@@ -398,7 +398,7 @@ function BMU.sc_printNodesOfCurrentZone()
 	end
 end
 
-local function getHouseNameByHouseId(houseId)
+function BMU.getHouseNameByHouseId(houseId)
 	local collectibleId = GetCollectibleIdForHouse(houseId)
 	if collectibleId and collectibleId > 0 then
 		local houseName = GetCollectibleName(collectibleId)
@@ -502,7 +502,7 @@ function BMU.sc_setCurrentZoneHouse(option)
 	local currentZoneId = GetCurrentMapZoneIndex()
 	local parentZoneId = BMU.getParentZoneId(GetZoneId(currentZoneId))
 	local zoneName = getZoneNameWithFallback(parentZoneId)
-	local houseName = getHouseNameByHouseId(houseId)
+	local houseName = BMU.getHouseNameByHouseId(houseId)
 
 	BMU.setZoneSpecificHouse(parentZoneId, houseId)
 	BMU.printToChat("Zone-specific house set: " .. zoneName .. " (ID: " .. parentZoneId .. ") -> " .. houseName)
@@ -518,7 +518,7 @@ function BMU.sc_setCurrentHouse(option)
 	local currentZoneId = GetCurrentMapZoneIndex()
 	local parentZoneId = BMU.getParentZoneId(GetZoneId(currentZoneId))
 	local zoneName = getZoneNameWithFallback(parentZoneId)
-	local houseName = getHouseNameByHouseId(currentHouseId)
+	local houseName = BMU.getHouseNameByHouseId(currentHouseId)
 
 	BMU.setZoneSpecificHouse(parentZoneId, currentHouseId)
 	BMU.printToChat("Current house set as preferred for " .. zoneName .. " (ID: " .. parentZoneId .. "): " .. houseName)
@@ -566,7 +566,7 @@ function BMU.sc_setZoneHouse(option)
 		return
 	end
 
-	local houseName = getHouseNameByHouseId(houseId)
+	local houseName = BMU.getHouseNameByHouseId(houseId)
 	BMU.setZoneSpecificHouse(zoneId, houseId)
 	BMU.printToChat("Zone-specific house set: " .. zoneName .. " -> " .. houseName)
 end
@@ -582,7 +582,7 @@ function BMU.sc_clearCurrentZoneHouse(option)
 		return
 	end
 
-	local houseName = getHouseNameByHouseId(currentHouseId)
+	local houseName = BMU.getHouseNameByHouseId(currentHouseId)
 	BMU.clearZoneSpecificHouse(parentZoneId)
 	BMU.printToChat("Zone-specific house cleared: " .. zoneName .. " (ID: " .. parentZoneId .. ") (was " .. houseName .. ")")
 end
@@ -596,7 +596,7 @@ function BMU.sc_listZoneHouses(option)
 	BMU.printToChat("Zone-specific house mappings:")
 	for zoneId, houseId in pairs(BMU.savedVarsServ.zoneSpecificHouses) do
 		local zoneName = getZoneNameWithFallback(zoneId)
-		local houseName = getHouseNameByHouseId(houseId)
+		local houseName = BMU.getHouseNameByHouseId(houseId)
 		BMU.printToChat("  " .. zoneName .. " (ID: " .. tostring(zoneId) .. ") -> " .. houseName .. " (House ID: " .. tostring(houseId) .. ")")
 	end
 end
@@ -621,7 +621,7 @@ function BMU.sc_clearZoneHouse(option)
 		return
 	end
 
-	local houseName = getHouseNameByHouseId(currentHouseId)
+	local houseName = BMU.getHouseNameByHouseId(currentHouseId)
 	BMU.clearZoneSpecificHouse(zoneId)
 	BMU.printToChat("Zone-specific house cleared: " .. zoneName .. " (was " .. houseName .. ")")
 end

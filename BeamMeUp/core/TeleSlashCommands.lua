@@ -74,7 +74,7 @@ function BMU.activateSlashCommands()
 	BMU.registerChatCommand("/bmu/house/set/zone", function(option) BMU.sc_setZoneHouse(option) end, "Set preferred house for specific zone")
 	BMU.registerChatCommand("/bmu/house/clear/current_zone", function(option) BMU.sc_clearCurrentZoneHouse(option) end, "Clear zone-specific house preference for current zone")
 	BMU.registerChatCommand("/bmu/house/clear/zone", function(option) BMU.sc_clearZoneHouse(option) end, "Clear zone-specific house preference for specific zone")
-	BMU.registerChatCommand("/bmu/house/list", function(option) BMU.sc_listZoneHouses(option) end, "List all zone-specific house mappings")
+	BMU.registerChatCommand("/bmu/house/list", function() BMU.sc_listZoneHouses() end, "List all zone-specific house mappings")
 
 	-- Port to goup leader
 	BMU.registerChatCommand("/bmutp/leader", function(option) BMU.portToGroupLeader() end, "Port to group leader")
@@ -493,7 +493,7 @@ function BMU.sc_setCurrentZoneHouse(option)
 		return
 	end
 
-	local houseId = resolveHouseId(inputId)
+	local houseId = BMU.resolveHouseId(inputId)
 	if not houseId or houseId == 0 then
 		BMU.printToChat("Invalid house ID: " .. tostring(inputId))
 		return
@@ -525,7 +525,7 @@ function BMU.sc_setCurrentHouse(option)
 end
 
 -- Helpers to resolve house IDs and names
-local function resolveHouseId(idOrCollectible)
+function BMU.resolveHouseId(idOrCollectible)
 	local id = tonumber(idOrCollectible)
 	if not id then return nil end
 	-- If the value looks like a collectible, try to map it to a houseId (if API is available)
@@ -551,7 +551,7 @@ function BMU.sc_setZoneHouse(option)
 		BMU.printToChat("Invalid house ID: " .. (parts[#parts] or "nil"))
 		return
 	end
-	local houseId = resolveHouseId(inputId)
+	local houseId = BMU.resolveHouseId(inputId)
 	if not houseId or houseId == 0 then
 		BMU.printToChat("Invalid house ID: " .. tostring(inputId))
 		return
@@ -587,7 +587,7 @@ function BMU.sc_clearCurrentZoneHouse(option)
 	BMU.printToChat("Zone-specific house cleared: " .. zoneName .. " (ID: " .. parentZoneId .. ") (was " .. houseName .. ")")
 end
 
-function BMU.sc_listZoneHouses(option)
+function BMU.sc_listZoneHouses()
 	if not BMU.savedVarsServ.zoneSpecificHouses or next(BMU.savedVarsServ.zoneSpecificHouses) == nil then
 		BMU.printToChat("No zone-specific houses configured")
 		return

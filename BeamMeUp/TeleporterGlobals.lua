@@ -696,7 +696,6 @@ BMU.overlandDelvesPublicDungeons = {
 		publicDungeonsAchievements = {
 			[1514] = 4264,		--Deetra Grotto
 			[1530] = 4471,		--Calindvale Gardens
-			[1553] = ,			--Event Dungeon: Writhing Fortress - no Skillpoint Achievement
 		}
 	},
 }

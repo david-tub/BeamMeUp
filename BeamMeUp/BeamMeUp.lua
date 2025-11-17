@@ -654,7 +654,7 @@ function BMU.portToOwnHouseWithZonePreference(useCurrentZone, explicitZoneId, ju
 	-- resolve zone to use
 	local resolvedZoneId = explicitZoneId or GetZoneId(GetCurrentMapZoneIndex())
 	local parentZoneId = BMU.getParentZoneId(resolvedZoneId)
-	local zoneName = GetZoneNameById(parentZoneId)
+	local zoneName = BMU.formatName(GetZoneNameById(parentZoneId), false)
 	-- default outside unless explicitly false
 	local goOutside = (jumpOutside ~= false)
 

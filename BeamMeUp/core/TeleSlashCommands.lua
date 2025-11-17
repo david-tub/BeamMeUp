@@ -595,8 +595,8 @@ function BMU.sc_listZoneHouses()
 
 	BMU.printToChat("Zone-specific house mappings:")
 	for zoneId, houseId in pairs(BMU.savedVarsServ.zoneSpecificHouses) do
-		local zoneName = getZoneNameWithFallback(zoneId)
-		local houseName = BMU.getHouseNameByHouseId(houseId)
+		local zoneName = BMU.formatName(getZoneNameWithFallback(zoneId), false)
+		local houseName = BMU.formatName(BMU.getHouseNameByHouseId(houseId), false)
 		BMU.printToChat("  " .. zoneName .. " (ID: " .. tostring(zoneId) .. ") -> " .. houseName .. " (House ID: " .. tostring(houseId) .. ")")
 	end
 end

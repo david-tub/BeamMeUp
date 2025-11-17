@@ -1993,7 +1993,7 @@ function BMU.clickOnZoneName(button, record)
 		if inQuestTab then
 			for k, v in pairs(record.relatedQuests) do
 				-- Show quest marker on map if record contains quest
-				AddCustomMenuItem(SI.get(SI_TELE_UI_SHOW_QUEST_MARKER_ON_MAP) .. ": \"" .. record.relatedQuests[k] .. "\"", function() ZO_WorldMap_ShowQuestOnMap(record.relatedQuestsSlotIndex[k]) end)
+				AddCustomMenuItem(SI.get(SI.TELE_UI_SHOW_QUEST_MARKER_ON_MAP) .. ": \"" .. record.relatedQuests[k] .. "\"", function() ZO_WorldMap_ShowQuestOnMap(record.relatedQuestsSlotIndex[k]) end)
 			end
 		end
 		
@@ -2003,7 +2003,7 @@ function BMU.clickOnZoneName(button, record)
 			for index, item in pairs(record.relatedItems) do
 				if item.bagId == BAG_BACKPACK and IsProtectedFunction("UseItem") then -- item is in inventory and can be used
 					-- use item
-					AddCustomMenuItem(SI.get(SI_TELE_UI_VIEW_MAP_ITEM) .. ": '" .. item.itemName .. "'", function()
+					AddCustomMenuItem(SI.get(SI.TELE_UI_VIEW_MAP_ITEM) .. ": '" .. item.itemName .. "'", function()
 						-- hide world map if open
 						SCENE_MANAGER:Hide("worldMap")
 						-- hide UI if open

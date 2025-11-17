@@ -1749,7 +1749,7 @@ BMU.treasureAndSurveyMaps = {
 		blacksmith = {217930},
 		clothier = {217931},
 		jewelry = {217933},
-		treasure = {217926, 217927, 217928},
+		treasure = {217926, 217927, 217928, 223772, 223773, 223774},
 	},
 }
 

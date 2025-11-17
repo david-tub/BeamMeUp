@@ -501,8 +501,8 @@ function BMU.sc_setCurrentZoneHouse(option)
 
 	local currentZoneId = GetCurrentMapZoneIndex()
 	local parentZoneId = BMU.getParentZoneId(GetZoneId(currentZoneId))
-	local zoneName = getZoneNameWithFallback(parentZoneId)
-	local houseName = BMU.getHouseNameByHouseId(houseId)
+	local zoneName = BMU.formatName(getZoneNameWithFallback(parentZoneId), false)
+	local houseName = BMU.formatName(BMU.getHouseNameByHouseId(houseId), false)
 
 	BMU.setZoneSpecificHouse(parentZoneId, houseId)
 	BMU.printToChat("Zone-specific house set: " .. zoneName .. " (ID: " .. parentZoneId .. ") -> " .. houseName)
@@ -517,8 +517,8 @@ function BMU.sc_setCurrentHouse(option)
 
 	local currentZoneId = GetCurrentMapZoneIndex()
 	local parentZoneId = BMU.getParentZoneId(GetZoneId(currentZoneId))
-	local zoneName = getZoneNameWithFallback(parentZoneId)
-	local houseName = BMU.getHouseNameByHouseId(currentHouseId)
+	local zoneName = BMU.formatName(getZoneNameWithFallback(parentZoneId), false)
+	local houseName = BMU.formatName(BMU.getHouseNameByHouseId(currentHouseId), false)
 
 	BMU.setZoneSpecificHouse(parentZoneId, currentHouseId)
 	BMU.printToChat("Current house set as preferred for " .. zoneName .. " (ID: " .. parentZoneId .. "): " .. houseName)
@@ -574,7 +574,7 @@ end
 function BMU.sc_clearCurrentZoneHouse(option)
 	local currentZoneId = GetCurrentMapZoneIndex()
 	local parentZoneId = BMU.getParentZoneId(GetZoneId(currentZoneId))
-	local zoneName = getZoneNameWithFallback(parentZoneId)
+	local zoneName = BMU.formatName(getZoneNameWithFallback(parentZoneId), false)
 	local currentHouseId = BMU.getZoneSpecificHouse(parentZoneId)
 
 	if not currentHouseId then
@@ -582,7 +582,7 @@ function BMU.sc_clearCurrentZoneHouse(option)
 		return
 	end
 
-	local houseName = BMU.getHouseNameByHouseId(currentHouseId)
+	local houseName = BMU.formatName(BMU.getHouseNameByHouseId(currentHouseId), false)
 	BMU.clearZoneSpecificHouse(parentZoneId)
 	BMU.printToChat("Zone-specific house cleared: " .. zoneName .. " (ID: " .. parentZoneId .. ") (was " .. houseName .. ")")
 end

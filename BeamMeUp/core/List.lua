@@ -1851,10 +1851,6 @@ function BMU.clickOnZoneName(button, record)
 				if record.forceOutside then
 					toSearch = record.houseNameUnformatted
 				end
-				-- zone-specific house name override
-				if BMU.savedVarsServ.zoneSpecificHouses[record.parentZoneId] then
-					toSearch = BMU.getHouseNameByHouseId(BMU.savedVarsServ.zoneSpecificHouses[record.parentZoneId])
-				end
 
 				-- find out coordinates in order to Ping on Map (e.g. Delves, Public Dungeons)
 				local coordinate_x = 0

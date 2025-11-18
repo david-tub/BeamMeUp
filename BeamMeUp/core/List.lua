@@ -1623,28 +1623,9 @@ function BMU.clickOnTeleportToOwnHouseButton_2(button, message, jumpOutside)
 		StartChatInput(preText .. link, CHAT_CHANNEL_PARTY)
 	end
 
-	-- For zone-derived house entries: use zone-aware preference with fallback to the clicked house
-	if message.forceOutside and BMU.state ~= 8 then
-		if BMU.debugMode then
-			if BMU.state == 8 then
-				d("[BMU][WARN] state=8 but forceOutside=true -> zone-preference WILL be used. If this list should ignore preference, forceOutside is likely set incorrectly for its entries.")
-			end
-			d(string.format("[BMU] zone-aware branch -> BMU.portToOwnHouseWithZonePreference(true, explicitZoneId=%s, jumpOutside=true, fallbackHouseId=%s)",
-				tostring(message.parentZoneId), tostring(message.houseId)))
-		end
-		BMU.portToOwnHouseWithZonePreference(true, message.parentZoneId, true, message.houseId)
-		return
-	end
-
-	-- Direct house selection: always port to that specific house (inside/outside based on user choice)
-	if BMU.debugMode then
-		d(string.format("[BMU] direct house branch -> BMU.portToOwnHouse(false, houseId=%s, jumpOutside=%s, parentZoneName=%s)",
-			tostring(message.houseId), tostring(jumpOutside), tostring(message.parentZoneName)))
-	end
+	-- port to own house anyway
 	BMU.portToOwnHouse(false, message.houseId, jumpOutside, message.parentZoneName)
 end
-
--- ...existing code...
 
 
 function BMU.clickOnTeleportToPTFHouseButton(textureControl, button, message)

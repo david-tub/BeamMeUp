@@ -560,13 +560,13 @@ function BMU.sc_setZoneHouse(option)
 	-- Zone can be multi-word
 	local zoneStr = table.concat(parts, " ", 1, #parts - 1)
 	local zoneId = tonumber(zoneStr) or BMU.getZoneIdFromZoneName(zoneStr)
-	local zoneName = GetZoneNameById(zoneId)
+	local zoneName = BMU.formatName(GetZoneNameById(zoneId), false)
 	if not zoneId or not zoneName or zoneName == "" then
 		BMU.printToChat("Invalid zone: " .. zoneStr)
 		return
 	end
 
-	local houseName = BMU.getHouseNameByHouseId(houseId)
+	local houseName = BMU.formatName(BMU.getHouseNameByHouseId(houseId), false)
 	BMU.setZoneSpecificHouse(zoneId, houseId)
 	BMU.printToChat("Zone-specific house set: " .. zoneName .. " -> " .. houseName)
 end
@@ -584,7 +584,7 @@ function BMU.sc_clearCurrentZoneHouse(option)
 
 	local houseName = BMU.formatName(BMU.getHouseNameByHouseId(currentHouseId), false)
 	BMU.clearZoneSpecificHouse(parentZoneId)
-	BMU.printToChat("Zone-specific house cleared: " .. zoneName .. " (ID: " .. parentZoneId .. ") (was " .. houseName .. ")")
+	BMU.printToChat("Zone-specific house cleared: " .. zoneName .. " (ID: " .. parentZoneId .. ") (was '" .. houseName .. "')")
 end
 
 function BMU.sc_listZoneHouses()

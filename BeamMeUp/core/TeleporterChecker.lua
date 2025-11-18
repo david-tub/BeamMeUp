@@ -248,23 +248,8 @@ function BMU.createTable(args)
 	if not BMU.savedVarsAcc.hideOwnHouses and not noOwnHouses then
 		-- 4. go over own houses
 		-- player can port outside own houses -> check own houses and add parent zone entries if not already in list
-		local listHouseIds = {}
-
-		-- a. go over list of preferred houses (personalized house->zone mapping)
-		for _, preferredHouseId in pairs(BMU.savedVarsServ.zoneSpecificHouses) do
-			table.insert(listHouseIds, preferredHouseId)
-		end
-		-- b. go over general list of all owned houses & prevent duplicates
 		for _, house in pairs(COLLECTIONS_BOOK_SINGLETON:GetOwnedHouses()) do
-			local generalHouseId = house.houseId
-			if not BMU.has_value(listHouseIds, generalHouseId) then
-				table.insert(listHouseIds, generalHouseId)
-			end
-		end
-
-		-- final list of house IDs to iterate
-		for _, houseId in ipairs(listHouseIds) do
-			local houseZoneId = GetHouseZoneId(houseId)
+			local houseZoneId = GetHouseZoneId(house.houseId)
 			local mapIndex = BMU.getMapIndex(houseZoneId)
 			local parentZoneId = BMU.getParentZoneId(houseZoneId)
 			-- check if parent zone not already in result list
@@ -275,7 +260,7 @@ function BMU.createTable(args)
 			e.parentZoneName = BMU.formatName(GetZoneNameById(e.parentZoneId))
 			e.zoneId = e.parentZoneId
 			e.displayName = ""
-			e.houseId = houseId
+			e.houseId = house.houseId
 			e.isOwnHouse = true
 			-- add flag to port outside the house
 			e.forceOutside = true

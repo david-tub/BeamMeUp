@@ -58,13 +58,13 @@ function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 
 	-- Port into own Primary Residence
 	if keyPressIndex == 13 then
-		BMU.portToOwnHouseWithZonePreference(true)
+		BMU.portToOwnHouse(true, nil, false, nil)
 		return
 	end
 	
 	-- Port outside own Primary Residence
 	if keyPressIndex == 18 then
-		BMU.portToOwnHouseWithZonePreference(true)
+		BMU.portToOwnHouse(true, nil, true, nil)
 		return
 	end
 	

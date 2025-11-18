@@ -1500,12 +1500,6 @@ function ListView:update()
 				list.portalToPlayerTex:SetHandler("OnMouseExit", function(self) list.portalToPlayerTex:SetTexture(texture_normal) BMU.pauseAutoRefresh = false end)
 				list.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) BMU.clickOnTeleportToPlayerButton(list.portalToPlayerTex, button, message) end)
 
-
-
-
-
-
-
 			elseif BMU.savedVarsAcc.showZonesWithoutPlayers2 and message.displayName == "" and message.zoneWithoutPlayer and CanLeaveCurrentLocationViaTeleport() and message.zoneWayshrineDiscovered and message.zoneWayshrineDiscovered > 0 then
 				-- zones without players (fast travel for gold)
 				list.portalToPlayerTex:SetHidden(false)

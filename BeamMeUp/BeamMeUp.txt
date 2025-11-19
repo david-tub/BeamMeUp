@@ -6,7 +6,7 @@
 ## Version: 3.7.4
 ## AddOnVersion: 374
 ## IsLibrary: false
-## DependsOn: LibAddonMenu-2.0>=40 LibCustomMenu>=730 LibZone>=0894
+## DependsOn: LibAddonMenu-2.0>=41 LibCustomMenu>=730 LibZone>=0895
 ## OptionalDependsOn: LibSlashCommander LibSets LibMapPing LibChatMenuButton PortToFriendsHouse BanditsUserInterface MorrowindStyleUI
 
 

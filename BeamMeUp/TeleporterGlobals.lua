@@ -312,8 +312,8 @@ BMU.isCurrentlyRequestingGuildData = false
 BMU.blacklist = {}
 BMU.blacklistForSlashPorting = {}
 
--- different unaccessable zones (Thieves Den, Dark Brotherhood Sanctuary)
-BMU.blacklistOthers = {821, 826}
+-- different unaccessable zones (Thieves Den, Dark Brotherhood Sanctuary, Writhing Fortress)
+BMU.blacklistOthers = {821, 826, 1553}
 
 -- other zones only for groups (the specific player has to be in the same group) (Group Delves/Dungeons in Craglorn)
 BMU.blacklistGroupZones = {890, 893, 895, 897, 899, 904, 906, 908, 907, 913, 909, 914, 915, 916}

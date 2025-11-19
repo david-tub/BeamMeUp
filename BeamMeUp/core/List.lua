@@ -1499,7 +1499,7 @@ function ListView:update()
 				list.portalToPlayerTex:SetHandler("OnMouseEnter", function(self) list.portalToPlayerTex:SetTexture(texture_over) BMU.pauseAutoRefresh = true end)
 				list.portalToPlayerTex:SetHandler("OnMouseExit", function(self) list.portalToPlayerTex:SetTexture(texture_normal) BMU.pauseAutoRefresh = false end)
 				list.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) BMU.clickOnTeleportToPlayerButton(list.portalToPlayerTex, button, message) end)
-			
+
 			elseif BMU.savedVarsAcc.showZonesWithoutPlayers2 and message.displayName == "" and message.zoneWithoutPlayer and CanLeaveCurrentLocationViaTeleport() and message.zoneWayshrineDiscovered and message.zoneWayshrineDiscovered > 0 then
 				-- zones without players (fast travel for gold)
 				list.portalToPlayerTex:SetHidden(false)
@@ -1588,23 +1588,35 @@ end
 
 
 function BMU.clickOnTeleportToOwnHouseButton_2(button, message, jumpOutside)
+	-- debug: entry + params + state
+	if BMU.debugMode then
+		local state = tostring(BMU.state)
+		d(string.format("[BMU] clickOnTeleportToOwnHouseButton_2 -> state=%s, button=%s, jumpOutside=%s, houseId=%s, forceOutside=%s, parentZoneId=%s, parentZoneName=%s, zoneId=%s",
+			state,
+			tostring(button),
+			tostring(jumpOutside),
+			tostring(message and message.houseId),
+			tostring(message and message.forceOutside),
+			tostring(message and message.parentZoneId),
+			tostring(message and message.parentZoneName),
+			tostring(message and message.zoneId)))
+	end
+
 	-- porting outside of a house cant be shared
 	if button == MOUSE_BUTTON_INDEX_RIGHT and IsPlayerInGroup(GetDisplayName()) and not jumpOutside then
+		if BMU.debugMode then d("[BMU] share-link branch taken (right-click inside)") end
 		-- create and share link to the group channel
 		local linkType = "book"
 		local data1 = 190 -- bookId
 		local data2 = "BMU_S_H" -- signature
 		local data3 = GetDisplayName() -- player
 		local data4 = message.houseId -- houseId
-		local text = "Follow me!" -- currently not working because linkType "book" does not allow custom text
-		
+		local text = "Follow me!"
 		local link = "|H1:" .. linkType .. ":" .. data1 .. ":" .. data2 .. ":" .. data3 .. ":" .. data4 .. "|h[" .. text .. "]|h"
 		local preText = "Click to follow me to " .. BMU.formatName(GetZoneNameById(message.zoneId), false) .. ": "
-
-		-- print link into group channel - player has to press Enter manually!
 		StartChatInput(preText .. link, CHAT_CHANNEL_PARTY)
 	end
-	
+
 	-- port to own house anyway
 	BMU.portToOwnHouse(false, message.houseId, jumpOutside, message.parentZoneName)
 end
@@ -1813,7 +1825,8 @@ function BMU.clickOnZoneName(button, record)
 				local toSearch = record.zoneNameUnformatted
 				if record.forceOutside then
 					toSearch = record.houseNameUnformatted
-				end	
+				end
+
 				-- find out coordinates in order to Ping on Map (e.g. Delves, Public Dungeons)
 				local coordinate_x = 0
 				local coordinate_z = 0

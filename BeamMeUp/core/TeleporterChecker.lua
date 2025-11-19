@@ -1114,9 +1114,7 @@ function BMU.checkOnceOnly(activ, record)
 	if allZoneIds[record.zoneId] and record.zoneWithoutPlayer then
 		return false
 	end
-	
 
-	
 	if activ then
 		if not allZoneIds[record.zoneId] then
 			-- zone is not added yet
@@ -1130,16 +1128,23 @@ function BMU.checkOnceOnly(activ, record)
 			-- increment counter
 			allZoneIds[record.zoneId] = allZoneIds[record.zoneId] + 1
 			return true
-		elseif BMU.decidePrioDisplay(record, BMU.getExistingEntry(record.zoneId)) then -- returns true, if first record is preferred
-			-- zone already added, but prio is higher
-			-- clean existing entry (when existing one is not favorite and not group member)
+		elseif (record.isOwnHouse and BMU.getExistingEntry(record.zoneId).isOwnHouse) and BMU.has_value(BMU.savedVarsServ.zoneSpecificHouses, record.houseId) then
+			-- zone already added, compare house with house
+			-- house has higher prio because it is a preferred house
+			-- clean existing entry and use this house instead
 			BMU.removeExistingEntry(record.zoneId)
 			-- increment counter
 			allZoneIds[record.zoneId] = allZoneIds[record.zoneId] + 1
 			return true
-		elseif record.isOwnHouse and BMU.getExistingEntry(record.zoneId).isOwnHouse and record.nickName < BMU.getExistingEntry(record.zoneId).nickName then
-			-- for this zone exists already an own house, but prio is higher (compare nicknames)
-			-- clean existing entry and use this house instead
+		elseif (record.isOwnHouse and BMU.getExistingEntry(record.zoneId).isOwnHouse) and BMU.has_value(BMU.savedVarsServ.zoneSpecificHouses, BMU.getExistingEntry(record.zoneId).houseId) then
+			-- zone already added, compare house with house
+			-- existing record (house) is preferred house, so it has to stay (dont check further cases)
+			-- increment counter
+			allZoneIds[record.zoneId] = allZoneIds[record.zoneId] + 1
+			return false
+		elseif BMU.decidePrioDisplay(record, BMU.getExistingEntry(record.zoneId)) then -- returns true, if first record is preferred
+			-- zone already added, but prio is higher
+			-- clean existing entry (when existing one is not favorite and not group member)
 			BMU.removeExistingEntry(record.zoneId)
 			-- increment counter
 			allZoneIds[record.zoneId] = allZoneIds[record.zoneId] + 1

@@ -62,6 +62,7 @@ BMU_GUILD_DATA = {
             832098,         -- "Only Fun"                   |@RIVVV Discord panolirandom
             783860,         -- "Zenithar's Artisans"        |@CassieAeri - discord cassieaeri
             829144,         -- "La Taverne du Poulpe"       |@SecundaHyadum - discord nebuleuse_du_sablier
+            852144,         -- "Standing Ovation Society"   |@EliTheDramaQueen - discord pankromka
         },
         ["NA Megaserver"] = {
             698893,			-- "The Descendants"			|@ravenzwind
@@ -96,7 +97,9 @@ BMU_GUILD_DATA = {
             761629,         -- "The Chill Syndicate"        |@bluberrygamingyt
             960355,         -- "HuckleBerry's Posse"        |@I'mUrHuckleBerry / Discord craigcasnerconsulting
             971015,         -- "DIY"                        |@Loralye Discord: notloralye
-            982001,         -- "Chances We're High Too      |@GYATT [main] @BeardsAndBongs [GM account for this guild]
+            982001,         -- "Chances We're High Too"     |@GYATT [main] @BeardsAndBongs [GM account for this guild]
+            986137,         -- "Don't Talk to Me"           |@Cadence_Nightingale discord neurotopia
+            978203,         -- "The Daedric Wastelanders"   |@K1LL3R-Cfrags discord shade_k1ller
         },
     }
 

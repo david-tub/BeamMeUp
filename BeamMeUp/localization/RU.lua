@@ -55,6 +55,8 @@ mkstr(SI.TELE_UI_TOGGLE_SORT_RELEASE, "Сортировать по дате вы
 mkstr(SI.TELE_UI_TOGGLE_ACRONYM, "Показать аббревиатуру")
 mkstr(SI.TELE_UI_TOOGLE_DUNGEON_NAME, "Показать название инстанса")
 mkstr(SI.TELE_UI_TRAVEL_PARENT_ZONE, "Port to parent zone")
+mkstr(SI.TELE_UI_SET_PREFERRED_HOUSE, "Set as preferred house")
+mkstr(SI.TELE_UI_UNSET_PREFERRED_HOUSE, "Unset preferred house")
 
 
 

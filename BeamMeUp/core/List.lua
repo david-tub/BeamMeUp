@@ -1891,6 +1891,18 @@ function BMU.clickOnZoneName(button, record)
 		
 		if inOwnHouseTab then
 			
+			-- manage preferred houses
+			local preferredHouseId = BMU.getZoneSpecificHouse(record.zoneId)
+			if preferredHouseId and preferredHouseId == record.houseId then
+				-- current house is set as preferred
+				-- clear zone to unset the house
+				AddCustomMenuItem(SI.get(SI.TELE_UI_UNSET_PREFERRED_HOUSE), function() BMU.clearZoneSpecificHouse(record.zoneId) end)
+			else
+				-- current house is not preferred
+				-- set house as preferred
+				AddCustomMenuItem(SI.get(SI.TELE_UI_SET_PREFERRED_HOUSE), function() BMU.setZoneSpecificHouse(record.zoneId, record.houseId) end)
+			end
+
 			-- rename own houses
 			AddCustomMenuItem(SI.get(SI.TELE_UI_RENAME_HOUSE_NICKNAME), function() ZO_CollectionsBook.ShowRenameDialog(record.collectibleId) end)
 			

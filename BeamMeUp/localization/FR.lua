@@ -55,6 +55,8 @@ mkstr(SI.TELE_UI_TOGGLE_SORT_RELEASE     , "Trier par édition")
 mkstr(SI.TELE_UI_TOGGLE_ACRONYM          , "Afficher les acronymes")
 mkstr(SI.TELE_UI_TOOGLE_DUNGEON_NAME     , "Afficher le nom de l'instance")
 mkstr(SI.TELE_UI_TRAVEL_PARENT_ZONE      , "Port to parent zone")
+mkstr(SI.TELE_UI_SET_PREFERRED_HOUSE     , "Set as preferred house")
+mkstr(SI.TELE_UI_UNSET_PREFERRED_HOUSE   , "Unset preferred house")
 
 
 

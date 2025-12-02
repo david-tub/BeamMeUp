@@ -355,7 +355,7 @@ function BMU.sc_clearZoneHouse(option)
 	end
 
 	local zoneId = tonumber(option) or BMU.getZoneIdFromZoneName(option)
-	local zoneName = GetZoneNameById(zoneId)
+	local zoneName = BMU.formatName(GetZoneNameById(zoneId))
 	if not zoneId or not zoneName or zoneName == "" then
 		BMU.printToChat("Invalid zone: " .. option)
 		return
@@ -367,7 +367,7 @@ function BMU.sc_clearZoneHouse(option)
 		return
 	end
 
-	local houseName = BMU.getHouseNameByHouseId(currentHouseId)
+	local houseName = BMU.formatName(BMU.getHouseNameByHouseId(currentHouseId))
 	BMU.clearZoneSpecificHouse(zoneId)
 	BMU.printToChat("Zone-specific house cleared: " .. zoneName .. " (was " .. houseName .. ")")
 end

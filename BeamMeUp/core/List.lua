@@ -1890,41 +1890,12 @@ function BMU.clickOnZoneName(button, record)
 		ClearMenu()
 		
 		if inOwnHouseTab then
-			
-			-- manage preferred houses
-			local preferredHouseId = BMU.getZoneSpecificHouse(record.zoneId)
-			if preferredHouseId and preferredHouseId == record.houseId then
-				-- current house is set as preferred
-				-- clear zone to unset the house
-				AddCustomMenuItem(SI.get(SI.TELE_UI_UNSET_PREFERRED_HOUSE), function() BMU.clearZoneSpecificHouse(record.zoneId) end)
-			else
-				-- current house is not preferred
-				-- set house as preferred
-				AddCustomMenuItem(SI.get(SI.TELE_UI_SET_PREFERRED_HOUSE), function() BMU.setZoneSpecificHouse(record.zoneId, record.houseId) end)
-			end
 
-			-- rename own houses
-			AddCustomMenuItem(SI.get(SI.TELE_UI_RENAME_HOUSE_NICKNAME), function() ZO_CollectionsBook.ShowRenameDialog(record.collectibleId) end)
-			
-			-- make primary residence
-			if record.prio ~= 1 then
-				-- prio = 1 -> is primary house
-				-- make primary and refresh with delay
-				AddCustomMenuItem(GetString(SI_HOUSING_FURNITURE_SETTINGS_GENERAL_PRIMARY_RESIDENCE_BUTTON_TEXT), function()
-					SetHousingPrimaryHouse(record.houseId)
-					zo_callLater(function()
-						BMU.createTableHouses()
-					end, 500)
-				 end)
-			end
-
-			-- paste link to chat
-			AddCustomMenuItem(GetString(SI_HOUSING_LINK_IN_CHAT), function() ZO_HousingBook_LinkHouseInChat(record.houseId, GetDisplayName()) end)
-			
-			-- custom sorting (not for primary residence which is always on top)
+			-- 1. custom sorting (not for primary residence which is always on top)
 			if record.prio ~= 1 then
 				-- divider
 				AddCustomMenuItem("-", function() end)
+				
 				-- button to increase sorting ("move up")
 				AddCustomMenuItem(BMU.textures.arrowUp, function()
 					
@@ -1948,10 +1919,7 @@ function BMU.clickOnZoneName(button, record)
 					BMU.createTableHouses()
 				
 				end)
-				
-				-- current position
-				-- AddCustomMenuItem("   " .. (BMU.savedVarsServ.houseCustomSorting[record.houseId] or "-"), function() end)
-				
+
 				-- button to decrease sorting ("move down")
 				-- show only if the entry is already in order
 				if BMU.savedVarsServ.houseCustomSorting[record.houseId] then
@@ -1970,6 +1938,36 @@ function BMU.clickOnZoneName(button, record)
 				end
 				AddCustomMenuItem("-", function() end)
 			end
+			
+			-- 2. manage preferred houses
+			local preferredHouseId = BMU.getZoneSpecificHouse(record.zoneId)
+			if preferredHouseId and preferredHouseId == record.houseId then
+				-- current house is set as preferred
+				-- clear zone to unset the house
+				AddCustomMenuItem(SI.get(SI.TELE_UI_UNSET_PREFERRED_HOUSE), function() BMU.clearZoneSpecificHouse(record.zoneId) end)
+			else
+				-- current house is not preferred
+				-- set house as preferred
+				AddCustomMenuItem(SI.get(SI.TELE_UI_SET_PREFERRED_HOUSE), function() BMU.setZoneSpecificHouse(record.zoneId, record.houseId) end)
+			end
+			
+			-- 3. make primary residence
+			if record.prio ~= 1 then
+				-- prio = 1 -> is primary house
+				-- make primary and refresh with delay
+				AddCustomMenuItem(GetString(SI_HOUSING_FURNITURE_SETTINGS_GENERAL_PRIMARY_RESIDENCE_BUTTON_TEXT), function()
+					SetHousingPrimaryHouse(record.houseId)
+					zo_callLater(function()
+						BMU.createTableHouses()
+					end, 500)
+				 end)
+			end
+
+			-- 4. rename own houses
+			AddCustomMenuItem(SI.get(SI.TELE_UI_RENAME_HOUSE_NICKNAME), function() ZO_CollectionsBook.ShowRenameDialog(record.collectibleId) end)
+
+			-- 5. paste link to chat
+			AddCustomMenuItem(GetString(SI_HOUSING_LINK_IN_CHAT), function() ZO_HousingBook_LinkHouseInChat(record.houseId, GetDisplayName()) end)
 		end
 		
 		-- show quest marker

@@ -1940,15 +1940,15 @@ function BMU.clickOnZoneName(button, record)
 			end
 			
 			-- 2. manage preferred houses
-			local preferredHouseId = BMU.getZoneSpecificHouse(record.zoneId)
+			local preferredHouseId = BMU.getZoneSpecificHouse(record.parentZoneId)
 			if preferredHouseId and preferredHouseId == record.houseId then
 				-- current house is set as preferred
 				-- clear zone to unset the house
-				AddCustomMenuItem(SI.get(SI.TELE_UI_UNSET_PREFERRED_HOUSE), function() BMU.clearZoneSpecificHouse(record.zoneId) end)
+				AddCustomMenuItem(SI.get(SI.TELE_UI_UNSET_PREFERRED_HOUSE), function() BMU.clearZoneSpecificHouse(record.parentZoneId) end)
 			else
 				-- current house is not preferred
 				-- set house as preferred
-				AddCustomMenuItem(SI.get(SI.TELE_UI_SET_PREFERRED_HOUSE), function() BMU.setZoneSpecificHouse(record.zoneId, record.houseId) end)
+				AddCustomMenuItem(SI.get(SI.TELE_UI_SET_PREFERRED_HOUSE), function() BMU.setZoneSpecificHouse(record.parentZoneId, record.houseId) end)
 			end
 			
 			-- 3. make primary residence

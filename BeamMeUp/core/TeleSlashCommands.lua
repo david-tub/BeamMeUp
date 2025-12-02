@@ -227,6 +227,154 @@ function BMU.sc_customVoteSimplemajority(option)
 	end
 end
 
+----- SET PREFERRED HOUSES -----
+
+-- Examples:
+-- "/bmu/house/set/current_zone 12345"
+function BMU.sc_setCurrentZoneHouse(option)
+	local inputId = tonumber(option)
+	if not inputId then
+		BMU.printToChat("Usage: /bmu/house/set/current_zone <houseId|collectibleId>")
+		BMU.printToChat("Sets preferred house for current zone")
+		return
+	end
+
+	local houseId = BMU.resolveHouseId(inputId)
+	if not houseId or houseId == 0 then
+		BMU.printToChat("Invalid house ID: " .. tostring(inputId))
+		return
+	end
+
+	local currentZoneId = GetCurrentMapZoneIndex()
+	local parentZoneId = BMU.getParentZoneId(GetZoneId(currentZoneId))
+	local zoneName = BMU.formatName(getZoneNameWithFallback(parentZoneId), false)
+	local houseName = BMU.formatName(BMU.getHouseNameByHouseId(houseId), false)
+
+	BMU.setZoneSpecificHouse(parentZoneId, houseId)
+	BMU.printToChat("Zone-specific house set: " .. zoneName .. " (ID: " .. parentZoneId .. ") -> " .. houseName)
+end
+
+function BMU.sc_setCurrentHouse(option)
+	local currentHouseId = GetCurrentZoneHouseId()
+	if not currentHouseId or currentHouseId == 0 then
+		BMU.printToChat("You are not currently in a house")
+		return
+	end
+
+	local currentZoneId = GetCurrentMapZoneIndex()
+	local parentZoneId = BMU.getParentZoneId(GetZoneId(currentZoneId))
+	local zoneName = BMU.formatName(getZoneNameWithFallback(parentZoneId), false)
+	local houseName = BMU.formatName(BMU.getHouseNameByHouseId(currentHouseId), false)
+
+	BMU.setZoneSpecificHouse(parentZoneId, currentHouseId)
+	BMU.printToChat("Current house set as preferred for " .. zoneName .. " (ID: " .. parentZoneId .. "): " .. houseName)
+end
+
+-- Helpers to resolve house IDs and names
+function BMU.resolveHouseId(idOrCollectible)
+	local id = tonumber(idOrCollectible)
+	if not id then return nil end
+	-- If the value looks like a collectible, try to map it to a houseId (if API is available)
+	if GetHouseIdFromCollectibleId and (IsCollectibleUnlocked(id) or (GetCollectibleCategoryType and GetCollectibleCategoryType(id) == COLLECTIBLE_CATEGORY_TYPE_HOUSE)) then
+		local hId = GetHouseIdFromCollectibleId(id)
+		if hId and hId > 0 then return hId end
+	end
+	return id
+end
+
+function BMU.sc_setZoneHouse(option)
+	local parts = {}
+	for part in string.gmatch(option, "%S+") do table.insert(parts, part) end
+	if #parts < 2 then
+		BMU.printToChat("Usage: /bmu/house/set/zone <zone> <houseId|collectibleId>")
+		BMU.printToChat("<zone> can be zone ID or zone name")
+		return
+	end
+
+	-- Last parameter is house id or collectible id
+	local inputId = tonumber(parts[#parts])
+	if not inputId then
+		BMU.printToChat("Invalid house ID: " .. (parts[#parts] or "nil"))
+		return
+	end
+	local houseId = BMU.resolveHouseId(inputId)
+	if not houseId or houseId == 0 then
+		BMU.printToChat("Invalid house ID: " .. tostring(inputId))
+		return
+	end
+
+	-- Zone can be multi-word
+	local zoneStr = table.concat(parts, " ", 1, #parts - 1)
+	local zoneId = tonumber(zoneStr) or BMU.getZoneIdFromZoneName(zoneStr)
+	local zoneName = BMU.formatName(GetZoneNameById(zoneId), false)
+	if not zoneId or not zoneName or zoneName == "" then
+		BMU.printToChat("Invalid zone: " .. zoneStr)
+		return
+	end
+
+	local houseName = BMU.formatName(BMU.getHouseNameByHouseId(houseId), false)
+	BMU.setZoneSpecificHouse(zoneId, houseId)
+	BMU.printToChat("Zone-specific house set: " .. zoneName .. " -> " .. houseName)
+end
+
+function BMU.sc_clearCurrentZoneHouse(option)
+	local currentZoneId = GetCurrentMapZoneIndex()
+	local parentZoneId = BMU.getParentZoneId(GetZoneId(currentZoneId))
+	local zoneName = BMU.formatName(getZoneNameWithFallback(parentZoneId), false)
+	local currentHouseId = BMU.getZoneSpecificHouse(parentZoneId)
+
+	if not currentHouseId then
+		BMU.printToChat("No zone-specific house set for " .. zoneName)
+		return
+	end
+
+	local houseName = BMU.formatName(BMU.getHouseNameByHouseId(currentHouseId), false)
+	BMU.clearZoneSpecificHouse(parentZoneId)
+	BMU.printToChat("Zone-specific house cleared: " .. zoneName .. " (ID: " .. parentZoneId .. ") (was '" .. houseName .. "')")
+end
+
+function BMU.sc_listZoneHouses()
+	if not BMU.savedVarsServ.zoneSpecificHouses or next(BMU.savedVarsServ.zoneSpecificHouses) == nil then
+		BMU.printToChat("No zone-specific houses configured")
+		return
+	end
+
+	BMU.printToChat("Zone-specific house mappings:")
+	for zoneId, houseId in pairs(BMU.savedVarsServ.zoneSpecificHouses) do
+		local zoneName = BMU.formatName(getZoneNameWithFallback(zoneId), false)
+		local houseName = BMU.formatName(BMU.getHouseNameByHouseId(houseId), false)
+		BMU.printToChat("  " .. zoneName .. " (ID: " .. tostring(zoneId) .. ") -> " .. houseName .. " (House ID: " .. tostring(houseId) .. ")")
+	end
+end
+
+function BMU.sc_clearZoneHouse(option)
+	if not option or option == "" then
+		BMU.printToChat("Usage: /bmu/house/clear/zone <zone>")
+		BMU.printToChat("<zone> can be zone ID or zone name")
+		return
+	end
+
+	local zoneId = tonumber(option) or BMU.getZoneIdFromZoneName(option)
+	local zoneName = GetZoneNameById(zoneId)
+	if not zoneId or not zoneName or zoneName == "" then
+		BMU.printToChat("Invalid zone: " .. option)
+		return
+	end
+
+	local currentHouseId = BMU.getZoneSpecificHouse(zoneId)
+	if not currentHouseId then
+		BMU.printToChat("No zone-specific house set for " .. zoneName)
+		return
+	end
+
+	local houseName = BMU.getHouseNameByHouseId(currentHouseId)
+	BMU.clearZoneSpecificHouse(zoneId)
+	BMU.printToChat("Zone-specific house cleared: " .. zoneName .. " (was " .. houseName .. ")")
+end
+
+-----
+
+
 
 function BMU.sc_initializeSlashPorting()
 
@@ -481,147 +629,4 @@ function BMU.sc_printQuests(option)
 		d("Starting ZoneIndex: " .. GetJournalQuestStartingZone(i))
 		d("Steps: " .. GetJournalQuestNumSteps(i))
 	end
-end
-
--- Examples:
--- "/bmu/house/set/current_zone 12345"
-function BMU.sc_setCurrentZoneHouse(option)
-	local inputId = tonumber(option)
-	if not inputId then
-		BMU.printToChat("Usage: /bmu/house/set/current_zone <houseId|collectibleId>")
-		BMU.printToChat("Sets preferred house for current zone")
-		return
-	end
-
-	local houseId = BMU.resolveHouseId(inputId)
-	if not houseId or houseId == 0 then
-		BMU.printToChat("Invalid house ID: " .. tostring(inputId))
-		return
-	end
-
-	local currentZoneId = GetCurrentMapZoneIndex()
-	local parentZoneId = BMU.getParentZoneId(GetZoneId(currentZoneId))
-	local zoneName = BMU.formatName(getZoneNameWithFallback(parentZoneId), false)
-	local houseName = BMU.formatName(BMU.getHouseNameByHouseId(houseId), false)
-
-	BMU.setZoneSpecificHouse(parentZoneId, houseId)
-	BMU.printToChat("Zone-specific house set: " .. zoneName .. " (ID: " .. parentZoneId .. ") -> " .. houseName)
-end
-
-function BMU.sc_setCurrentHouse(option)
-	local currentHouseId = GetCurrentZoneHouseId()
-	if not currentHouseId or currentHouseId == 0 then
-		BMU.printToChat("You are not currently in a house")
-		return
-	end
-
-	local currentZoneId = GetCurrentMapZoneIndex()
-	local parentZoneId = BMU.getParentZoneId(GetZoneId(currentZoneId))
-	local zoneName = BMU.formatName(getZoneNameWithFallback(parentZoneId), false)
-	local houseName = BMU.formatName(BMU.getHouseNameByHouseId(currentHouseId), false)
-
-	BMU.setZoneSpecificHouse(parentZoneId, currentHouseId)
-	BMU.printToChat("Current house set as preferred for " .. zoneName .. " (ID: " .. parentZoneId .. "): " .. houseName)
-end
-
--- Helpers to resolve house IDs and names
-function BMU.resolveHouseId(idOrCollectible)
-	local id = tonumber(idOrCollectible)
-	if not id then return nil end
-	-- If the value looks like a collectible, try to map it to a houseId (if API is available)
-	if GetHouseIdFromCollectibleId and (IsCollectibleUnlocked(id) or (GetCollectibleCategoryType and GetCollectibleCategoryType(id) == COLLECTIBLE_CATEGORY_TYPE_HOUSE)) then
-		local hId = GetHouseIdFromCollectibleId(id)
-		if hId and hId > 0 then return hId end
-	end
-	return id
-end
-
-function BMU.sc_setZoneHouse(option)
-	local parts = {}
-	for part in string.gmatch(option, "%S+") do table.insert(parts, part) end
-	if #parts < 2 then
-		BMU.printToChat("Usage: /bmu/house/set/zone <zone> <houseId|collectibleId>")
-		BMU.printToChat("<zone> can be zone ID or zone name")
-		return
-	end
-
-	-- Last parameter is house id or collectible id
-	local inputId = tonumber(parts[#parts])
-	if not inputId then
-		BMU.printToChat("Invalid house ID: " .. (parts[#parts] or "nil"))
-		return
-	end
-	local houseId = BMU.resolveHouseId(inputId)
-	if not houseId or houseId == 0 then
-		BMU.printToChat("Invalid house ID: " .. tostring(inputId))
-		return
-	end
-
-	-- Zone can be multi-word
-	local zoneStr = table.concat(parts, " ", 1, #parts - 1)
-	local zoneId = tonumber(zoneStr) or BMU.getZoneIdFromZoneName(zoneStr)
-	local zoneName = BMU.formatName(GetZoneNameById(zoneId), false)
-	if not zoneId or not zoneName or zoneName == "" then
-		BMU.printToChat("Invalid zone: " .. zoneStr)
-		return
-	end
-
-	local houseName = BMU.formatName(BMU.getHouseNameByHouseId(houseId), false)
-	BMU.setZoneSpecificHouse(zoneId, houseId)
-	BMU.printToChat("Zone-specific house set: " .. zoneName .. " -> " .. houseName)
-end
-
-function BMU.sc_clearCurrentZoneHouse(option)
-	local currentZoneId = GetCurrentMapZoneIndex()
-	local parentZoneId = BMU.getParentZoneId(GetZoneId(currentZoneId))
-	local zoneName = BMU.formatName(getZoneNameWithFallback(parentZoneId), false)
-	local currentHouseId = BMU.getZoneSpecificHouse(parentZoneId)
-
-	if not currentHouseId then
-		BMU.printToChat("No zone-specific house set for " .. zoneName)
-		return
-	end
-
-	local houseName = BMU.formatName(BMU.getHouseNameByHouseId(currentHouseId), false)
-	BMU.clearZoneSpecificHouse(parentZoneId)
-	BMU.printToChat("Zone-specific house cleared: " .. zoneName .. " (ID: " .. parentZoneId .. ") (was '" .. houseName .. "')")
-end
-
-function BMU.sc_listZoneHouses()
-	if not BMU.savedVarsServ.zoneSpecificHouses or next(BMU.savedVarsServ.zoneSpecificHouses) == nil then
-		BMU.printToChat("No zone-specific houses configured")
-		return
-	end
-
-	BMU.printToChat("Zone-specific house mappings:")
-	for zoneId, houseId in pairs(BMU.savedVarsServ.zoneSpecificHouses) do
-		local zoneName = BMU.formatName(getZoneNameWithFallback(zoneId), false)
-		local houseName = BMU.formatName(BMU.getHouseNameByHouseId(houseId), false)
-		BMU.printToChat("  " .. zoneName .. " (ID: " .. tostring(zoneId) .. ") -> " .. houseName .. " (House ID: " .. tostring(houseId) .. ")")
-	end
-end
-
-function BMU.sc_clearZoneHouse(option)
-	if not option or option == "" then
-		BMU.printToChat("Usage: /bmu/house/clear/zone <zone>")
-		BMU.printToChat("<zone> can be zone ID or zone name")
-		return
-	end
-
-	local zoneId = tonumber(option) or BMU.getZoneIdFromZoneName(option)
-	local zoneName = GetZoneNameById(zoneId)
-	if not zoneId or not zoneName or zoneName == "" then
-		BMU.printToChat("Invalid zone: " .. option)
-		return
-	end
-
-	local currentHouseId = BMU.getZoneSpecificHouse(zoneId)
-	if not currentHouseId then
-		BMU.printToChat("No zone-specific house set for " .. zoneName)
-		return
-	end
-
-	local houseName = BMU.getHouseNameByHouseId(currentHouseId)
-	BMU.clearZoneSpecificHouse(zoneId)
-	BMU.printToChat("Zone-specific house cleared: " .. zoneName .. " (was " .. houseName .. ")")
 end

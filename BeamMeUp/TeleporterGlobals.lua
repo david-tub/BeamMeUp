@@ -184,6 +184,28 @@ BMU.textures = {
 	declineRed = "|t16:16:esoui/art/interaction/goodbye.dds|t",
 }
 
+
+function BMU.getItemTypeIcon(itemType, dimension)
+	local itemTypeIcons = {
+		["alchemist"] = "esoui/art/icons/servicemappins/servicepin_alchemy.dds",
+		["enchanter"] = "esoui/art/icons/servicemappins/servicepin_enchanting.dds",
+		["woodworker"] = "esoui/art/icons/servicemappins/servicepin_woodworking.dds",
+		["blacksmith"] = "esoui/art/icons/servicemappins/servicepin_smithy.dds",
+		["clothier"] = "esoui/art/icons/servicemappins/servicepin_clothier.dds",
+		["jewelry"] = "esoui/art/icons/servicemappins/servicepin_jewelrycrafting.dds",
+		["treasure"] = "esoui/art/icons/servicemappins/servicepin_bank.dds",
+		["leads"] = "esoui/art/icons/servicemappins/servicepin_antiquities.dds"
+	}
+
+	local iconPath = itemTypeIcons[itemType]
+	if iconPath ~= nil and tonumber(dimension) ~= nil then
+		return string.format("|t<%f>:<%f>:%s|t", dimension, dimension, iconPath)
+	else
+		return ""
+	end
+end
+
+
 -- Special textures for event days
 local ld = os.date("*t")
 if ld.month == 2 and ld.day >= 11 and ld.day <= 14 then

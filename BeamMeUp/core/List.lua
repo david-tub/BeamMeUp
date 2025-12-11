@@ -1276,6 +1276,16 @@ function ListView:update()
 					if totalItemsCountBank > 0 then
 						message.zoneName = message.zoneName .. BMU.colorizeText(" (" .. totalItemsCountBank .. ")", "gray")
 					end
+					
+					-- add item type icons
+					message.zoneName = message.zoneName .. " "
+					for _, itemType in ipairs(message.relatedItemsTypes) do
+						if itemType ~= nil then
+							-- add dimensionized icon (same size as BMU.font1)
+							message.zoneName = message.zoneName .. BMU.getItemTypeIcon(itemType, BMU.round(17*BMU.savedVarsAcc.Scale, 0))
+						end
+					end
+					
 					message.addedTotalItems = true
 				end
 				

@@ -55,6 +55,8 @@ mkstr(SI.TELE_UI_TOGGLE_SORT_RELEASE, "Nach Erscheinung sortieren")
 mkstr(SI.TELE_UI_TOGGLE_ACRONYM, "Zeige Kürzel")
 mkstr(SI.TELE_UI_TOOGLE_DUNGEON_NAME, "Zeige Instanz Name")
 mkstr(SI.TELE_UI_TRAVEL_PARENT_ZONE, "Schnellreise in die Eltern-Zone")
+mkstr(SI.TELE_UI_SET_PREFERRED_HOUSE, "Als bevorzugtes Haus festlegen")
+mkstr(SI.TELE_UI_UNSET_PREFERRED_HOUSE, "Bevorzugtes Haus freigeben")
 
 
 

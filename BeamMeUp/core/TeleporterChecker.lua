@@ -697,6 +697,7 @@ end
 function BMU.addInfo_2(e)
 	-- inititialize more values
 	e.relatedItems = {}
+	e.relatedItemsTypes = {}
 	e.relatedQuests = {}
 	e.countRelatedItems = 0
 	e.relatedQuestsSlotIndex = {}
@@ -1380,6 +1381,8 @@ function BMU.addItemInformation(record, bagId, slotIndex)
 	local color = GetItemQualityColor(quality)
 	local itemName = color:Colorize(BMU.formatName(GetItemName(bagId, slotIndex), false))
 	local itemTooltip = itemName
+	local itemId = GetItemId(bagId, slotIndex)
+	local itemType, _ = BMU.getDataMapInfo(itemId)
 	
 	if itemCount > 1 then
 		-- change item name (add itemCount of this item)
@@ -1406,7 +1409,13 @@ function BMU.addItemInformation(record, bagId, slotIndex)
 	
 	table.insert(record.relatedItems, itemData)
 	
+	-- update counter in record
 	record.countRelatedItems = record.countRelatedItems + itemCount
+
+	-- add item type to record (treasure/survey map)
+	if not BMU.has_value(record.relatedItemsTypes, itemType) then
+		table.insert(record.relatedItemsTypes, itemType)
+	end
 	
 	return record
 end
@@ -1444,7 +1453,15 @@ function BMU.addLeadInformation(record, antiquityId)
 	leadData.numEntriesAcquired = numEntriesAcquired
 	
 	table.insert(record.relatedItems, leadData)
+
+	-- update counter in record
 	record.countRelatedItems = record.countRelatedItems + 1
+
+	-- add lead type to record
+	if not BMU.has_value(record.relatedItemsTypes, "leads") then
+		table.insert(record.relatedItemsTypes, "leads")
+	end
+
 	return record
 end
 
@@ -2487,6 +2504,7 @@ function BMU.createBlankRecord()
 	record.countRelatedQuests = 0
 	record.countRelatedItems = 0
 	record.relatedItems = {}
+	record.relatedItemsTypes = {}
 	record.relatedQuests = {}
 	record.relatedQuestsSlotIndex = {}
 	return record

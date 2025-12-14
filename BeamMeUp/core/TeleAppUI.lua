@@ -1194,18 +1194,25 @@ function BMU.updateRelatedItemsCounterPanel()
 		end
 		antiquityId = GetNextAntiquityId(antiquityId)
 	end
+
+	-- set dimension of the icons accordingly to the scale level
+	local dimension = 28 * BMU.savedVarsAcc.Scale
+
+	-- build argument list
+	local arguments_list = {
+		BMU.getItemTypeIcon("alchemist", dimension), counter_table["alchemist"],
+		BMU.getItemTypeIcon("enchanter", dimension), counter_table["enchanter"],
+		BMU.getItemTypeIcon("woodworker", dimension), counter_table["woodworker"],
+		BMU.getItemTypeIcon("blacksmith", dimension), counter_table["blacksmith"],
+		BMU.getItemTypeIcon("clothier", dimension), counter_table["clothier"],
+		BMU.getItemTypeIcon("jewelry", dimension), counter_table["jewelry"],
+		BMU.getItemTypeIcon("treasure", dimension), counter_table["treasure"],
+		BMU.getItemTypeIcon("leads", dimension), counter_table["leads"]
+	}
 	
-	local list_counters = {counter_table["alchemist"], counter_table["enchanter"], counter_table["woodworker"], counter_table["blacksmith"], counter_table["clothier"], counter_table["jewelry"], counter_table["treasure"], counter_table["leads"]}
-	local text = string.format("|t<dim>:<dim>:esoui/art/icons/servicemappins/servicepin_alchemy.dds|t: %d   |t<dim>:<dim>:esoui/art/icons/servicemappins/servicepin_enchanting.dds|t: %d   " ..
-	"|t<dim>:<dim>:esoui/art/icons/servicemappins/servicepin_woodworking.dds|t: %d   |t<dim>:<dim>:esoui/art/icons/servicemappins/servicepin_smithy.dds|t: %d   " ..
-	"|t<dim>:<dim>:esoui/art/icons/servicemappins/servicepin_clothier.dds|t: %d   |t<dim>:<dim>:esoui/art/icons/servicemappins/servicepin_jewelrycrafting.dds|t: %d   " ..
-	"|t<dim>:<dim>:esoui/art/icons/servicemappins/servicepin_bank.dds|t: %d   |t<dim>:<dim>:esoui/art/icons/servicemappins/servicepin_antiquities.dds|t: %d", unpack(list_counters))
-	
-	-- scale the icons accordingly to the scale level
-	text = string.gsub(text, "<dim>", tostring(28*BMU.savedVarsAcc.Scale))
+	local text = string.format("%s: %d   %s: %d   %s: %d   %s: %d   %s: %d   %s: %d   %s: %d   %s: %d", unpack(arguments_list))
 	
 	BMU.counterPanel:SetText(text)
-
 	-- update position (number of lines may have changed)
 	BMU.counterPanel:ClearAnchors()
 	BMU.counterPanel:SetAnchor(TOP, BMU.win.Main_Control, TOP, 1*BMU.savedVarsAcc.Scale, (90*BMU.savedVarsAcc.Scale)+((BMU.savedVarsAcc.numberLines*40)*BMU.savedVarsAcc.Scale))

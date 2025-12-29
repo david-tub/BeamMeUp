@@ -5,6 +5,8 @@ local teleporterVars    = BMU.var
 local appName           = teleporterVars.appName
 local wm                = WINDOW_MANAGER
 
+local zo_Menu = ZO_Menu --INS251229 Baertram ZO_Menu speed-up variable (so _G is not searched each time context menus are used)
+
 -- list of tuples (guildId & displayname) for invite queue (only for admin)
 local inviteQueue = {}
 
@@ -1783,7 +1785,7 @@ local function SetupUI()
 				ClearMenu()
 				local menuIndex = AddCustomMenuItem(SI.get(SI.TELE_UI_TOOGLE_ZONE_NAME), function() BMU.savedVarsChar.ptfHouseZoneNames = not BMU.savedVarsChar.ptfHouseZoneNames BMU.clearInputFields() BMU.createTablePTF() end, MENU_ADD_OPTION_CHECKBOX)
 				if BMU.savedVarsChar.ptfHouseZoneNames then
-					ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+					ZO_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 				end
 				ShowMenu()
 			else
@@ -1838,7 +1840,7 @@ local function SetupUI()
 		-- toggle between nicknames and standard names
 		local menuIndex = AddCustomMenuItem(SI.get(SI.TELE_UI_TOGGLE_HOUSE_NICKNAME), function() BMU.savedVarsChar.houseNickNames = not BMU.savedVarsChar.houseNickNames BMU.clearInputFields() BMU.createTableHouses() end, MENU_ADD_OPTION_CHECKBOX)
 		if BMU.savedVarsChar.houseNickNames then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+			ZO_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 		end
 
 		-- divider
@@ -1847,7 +1849,7 @@ local function SetupUI()
 		-- make default tab
 		menuIndex = AddCustomMenuItem(SI.get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU.savedVarsChar.defaultTab == BMU.indexListOwnHouses then BMU.savedVarsChar.defaultTab = BMU.indexListMain else BMU.savedVarsChar.defaultTab = BMU.indexListOwnHouses end end, MENU_ADD_OPTION_CHECKBOX)
 		if BMU.savedVarsChar.defaultTab == BMU.indexListOwnHouses then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+			ZO_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 		end
 
 		ShowMenu()
@@ -1888,7 +1890,7 @@ local function SetupUI()
 		-- make default tab
 		local menuIndex = AddCustomMenuItem(SI.get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU.savedVarsChar.defaultTab == BMU.indexListQuests then BMU.savedVarsChar.defaultTab = BMU.indexListMain else BMU.savedVarsChar.defaultTab = BMU.indexListQuests end end, MENU_ADD_OPTION_CHECKBOX)
 		if BMU.savedVarsChar.defaultTab == BMU.indexListQuests then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+			ZO_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 		end
 		ShowMenu()
 	else
@@ -1920,13 +1922,19 @@ local function SetupUI()
   teleporterWin.Main_Control.ItemTexture:SetMouseEnabled(true)
   teleporterWin.Main_Control.ItemTexture:SetDrawLayer(2)
 
+  -- -v- INS251229 Baertram BEGIN 1 Variables for the relevant submenu opening controls
+  local submenuIndicesToAddCallbackTo = {}      --INS251229 Baertram
+  local BMU_ItemTexture                         --INS251229 Baertram
+  -- -^- INS251229 Baertram END 1
   teleporterWin.Main_Control.ItemTexture:SetHandler("OnMouseUp", function(self, button)
-	if button == MOUSE_BUTTON_INDEX_RIGHT then
+      BMU_ItemTexture = BMU_ItemTexture or teleporterWin.Main_Control.ItemTexture   --INS251229 Baertram
+	  submenuIndicesToAddCallbackTo = {}                                            --INS251229 Baertram
+      if button == MOUSE_BUTTON_INDEX_RIGHT then
 		-- show filter menu
 		ClearMenu()
 
 		-- Add submenu for antiquity leads
-		AddCustomSubMenuItem(GetString(SI_GAMEPAD_VENDOR_ANTIQUITY_LEAD_GROUP_HEADER),
+		submenuIndicesToAddCallbackTo[#submenuIndicesToAddCallbackTo+1] = AddCustomSubMenuItem(GetString(SI_GAMEPAD_VENDOR_ANTIQUITY_LEAD_GROUP_HEADER), --INS251229 Baertram
 			{
 				{
 					label = GetString(SI_ANTIQUITY_SCRYABLE),
@@ -1958,19 +1966,19 @@ local function SetupUI()
 		-- Clues
 		local menuIndex = AddCustomMenuItem(GetString(SI_SPECIALIZEDITEMTYPE113), function() BMU.savedVarsChar.displayMaps.clue = not BMU.savedVarsChar.displayMaps.clue BMU.createTable({index=BMU.indexListItems}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.displayMaps.clue then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+			ZO_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 		end
 		
 		-- Treasure Maps
 		menuIndex = AddCustomMenuItem(GetString(SI_SPECIALIZEDITEMTYPE100), function() BMU.savedVarsChar.displayMaps.treasure = not BMU.savedVarsChar.displayMaps.treasure BMU.createTable({index=BMU.indexListItems}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.displayMaps.treasure then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+			ZO_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 		end
 		
 		-- All Survey Maps
 		BMU.menuIndexSurveyAll = AddCustomMenuItem(GetString(SI_SPECIALIZEDITEMTYPE101) .. BMU.getContextMenuEntrySurveyAllAppendix(),
 			function()
-				if ZO_CheckButton_IsChecked(ZO_Menu.items[BMU.menuIndexSurveyAll].checkbox) then
+				if ZO_CheckButton_IsChecked(zo_Menu.items[BMU.menuIndexSurveyAll].checkbox) then
 					-- check all subTypes
 					BMU.updateCheckboxSurveyMap(1)
 				else
@@ -1981,11 +1989,11 @@ local function SetupUI()
 			end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 4)
 			
 		if BMU.numOfSurveyTypesChecked() > 0 then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[BMU.menuIndexSurveyAll].checkbox)
+			ZO_CheckButton_SetChecked(zo_Menu.items[BMU.menuIndexSurveyAll].checkbox)
 		end
 		
 		-- Add submenu for survey types filter
-		AddCustomSubMenuItem(GetString(SI_GAMEPAD_BANK_FILTER_HEADER),
+		submenuIndicesToAddCallbackTo[#submenuIndicesToAddCallbackTo+1] = AddCustomSubMenuItem(GetString(SI_GAMEPAD_BANK_FILTER_HEADER), --INS251229 Baertram
 			{
 				{
 					label = GetString(SI_ITEMTYPEDISPLAYCATEGORY14),
@@ -2050,13 +2058,13 @@ local function SetupUI()
 		-- include bank items
 		menuIndex = AddCustomMenuItem(GetString(SI_CRAFTING_INCLUDE_BANKED), function() BMU.savedVarsChar.scanBankForMaps = not BMU.savedVarsChar.scanBankForMaps BMU.createTable({index=BMU.indexListItems}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.scanBankForMaps then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+			ZO_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 		end
 
 		-- enable/disable counter panel
 		menuIndex = AddCustomMenuItem(GetString(SI_ENDLESS_DUNGEON_BUFF_TRACKER_SWITCH_TO_SUMMARY_KEYBIND), function() BMU.savedVarsChar.displayCounterPanel = not BMU.savedVarsChar.displayCounterPanel BMU.createTable({index=BMU.indexListItems}) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.displayCounterPanel then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+			ZO_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 		end
 
 		-- divider
@@ -2065,7 +2073,7 @@ local function SetupUI()
 		-- make default tab
 		menuIndex = AddCustomMenuItem(SI.get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU.savedVarsChar.defaultTab == BMU.indexListItems then BMU.savedVarsChar.defaultTab = BMU.indexListMain else BMU.savedVarsChar.defaultTab = BMU.indexListItems end end, MENU_ADD_OPTION_CHECKBOX)
 		if BMU.savedVarsChar.defaultTab == BMU.indexListItems then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+			ZO_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 		end
 		
 		ShowMenu()
@@ -2074,6 +2082,86 @@ local function SetupUI()
 		BMU.showNotification(true)
 	end
   end)
+  -- -v- INS251229 Baertram BEGIN 2 - Variables for the submenu OnMouseUp click handler -> Clicking the submenu opening controls toggles all checkboxes in the submenu to checked/unchecked
+  BMU_ItemTexture = BMU_ItemTexture or teleporterWin.Main_Control.ItemTexture
+  local zoPlainStrFind = zo_plainstrfind
+  local zo_IsTableEmpty = ZO_IsTableEmpty
+  local zo_CheckButton_IsChecked = ZO_CheckButton_IsChecked
+  local zo_CheckButton_SetCheckState = ZO_CheckButton_SetCheckState
+  local zo_CheckButton_IsEnabled = ZO_CheckButton_IsEnabled
+  local libCustomMenuSubmenu = LibCustomMenuSubmenu --The control holding the currently shown submenu control entries (as a submenu is opened)
+  local LCM_SubmenuEntryNamePrefix = "ZO_SubMenuItem" --row name of a ZO_Menu's submenu entrxy added by LibCustomMenu to the parent control LibCustomMenuSubmenu
+  local zo_MenuSubmenuItemsHooked = {} --Items hooked by this code, to add a special OnMouseUp handler.
+  local checkboxesAtSubmenuCurrentState = {} --Save the current checkboxes state (on/off) for a submenu opening control, so we can toggle all checkboxes in the submenu properly
+
+  --Called from ZO_Menu_OnHide callback
+  local function cleanUpzo_MenuItemsSubmenuSpecialCallbacks()
+--d("[BMU]cleanUpzo_MenuItemsSubmenuSpecialCallbacks")
+      if zo_IsTableEmpty(submenuIndicesToAddCallbackTo) or zo_IsTableEmpty(zo_MenuSubmenuItemsHooked) then return end
+      submenuIndicesToAddCallbackTo = {}
+      zo_MenuSubmenuItemsHooked = {}
+  end
+
+  --Check if LibCustomMenuSubmenu is shown and if any enabled and shown checkboxes are in the submenu, then change the clicked state of them
+  --> Called from clicking the ZO_Menu entry which opens the submenu
+  local function checkIfLibCustomMenuSubmenuShownAndToggleCheckboxes(itemCtrl, mouseButton, upInside)
+--d("[BMU]checkIfLibCustomMenuSubmenuShownAndToggleCheckboxes-mouseButton: " .. tostring(mouseButton) .. ", upInside: " ..tostring(upInside))
+      --LibCustomMenuSubmenu got entries?
+      if not upInside or mouseButton ~= MOUSE_BUTTON_INDEX_LEFT or not libCustomMenuSubmenu or zo_MenuSubmenuItemsHooked[itemCtrl] == nil then return end
+      --Get the current state of the submenu (if not set yet it is assumed to be "all unchecked", and invert it
+      local checkboxesAtSubmenuNewState = checkboxesAtSubmenuCurrentState[itemCtrl] or false
+      checkboxesAtSubmenuNewState = not checkboxesAtSubmenuNewState
+
+      --Check all child controls of the submenu for any checkbox entry and set the new state and calling the toggle function of the checkbox
+      for childIndex=1, libCustomMenuSubmenu:GetNumChildren(), 1 do
+        local childCtrl = libCustomMenuSubmenu:GetChild(childIndex)
+--d(">found childCtrl: " ..tostring(childCtrl:GetName()))
+          --Child is a subMenuItem?
+          if childCtrl ~= nil then
+            local checkBox = childCtrl.checkbox
+            if childCtrl.IsHidden and childCtrl.IsMouseEnabled and not childCtrl:IsHidden() and childCtrl:IsMouseEnabled()
+                  and checkBox and checkBox.toggleFunction and zo_CheckButton_IsEnabled(checkBox)
+                  and childCtrl.GetName and zoPlainStrFind(childCtrl:GetName(), LCM_SubmenuEntryNamePrefix) ~= nil then
+--d(">>set new state to: " ..tostring(checkboxesAtSubmenuNewState))
+              zo_CheckButton_SetCheckState(checkBox, (checkboxesAtSubmenuNewState == false and BSTATE_NORMAL) or BSTATE_PRESSED)
+              checkBox:toggleFunction(checkboxesAtSubmenuNewState)
+            end
+          end
+      end
+  end
+
+  --Add the PreHook for handler OnMouseUp, on the submenu opening ZO_Menu item control row
+  local function AddToggleAllSubmenuCheckboxEntriesCallback(submenuIndex)
+      --d("[BMU]AddToggleAllSubmenuCheckboxEntriesCallback-index: " .. tostring(submenuIndex))
+      if not submenuIndex then return end
+      local submenuItem = zo_Menu.items[submenuIndex]
+      local itemCtrl = submenuItem and submenuItem.item or nil
+      --d(">found the itemCtrl: " .. tostring(itemCtrl))
+      --Found the zo_Menu submenu opening control?
+      if not itemCtrl then return end
+      --Add the OnEffectivelyShown handler to the submenu opening control of zo_Menu (if not already in it)
+      if zo_MenuSubmenuItemsHooked[itemCtrl] ~= nil then return end
+      zo_MenuSubmenuItemsHooked[itemCtrl] = true
+      ZO_PreHookHandler(itemCtrl, "OnMouseUp", checkIfLibCustomMenuSubmenuShownAndToggleCheckboxes)
+  end
+
+  --Add a prehook to the OnMouseUp handler of the relevant submenu opening ZO_Menu controls (saved into table submenuIndicesToAddCallbackTo)
+  ZO_PostHook("ShowMenu", function(owner, initialRefCount, menuType)
+      owner = owner or moc()
+      menuType = menuType or MENU_TYPE_DEFAULT
+--d("[BMU]ShowMenu-owner: " .. tostring(owner) .. "/" .. tostring(BMU_ItemTexture) .. "; menuType: " ..tostring(menuType))
+      --Check if the menu is our at the BMU panel's itemTexture, if it got entries, if special submenu items have been defined -> Else abort
+      if menuType ~= MENU_TYPE_DEFAULT or (owner == nil or owner ~= BMU_ItemTexture) or zo_IsTableEmpty(submenuIndicesToAddCallbackTo)
+              or next(zo_Menu.items) == nil then return end
+      zo_MenuSubmenuItemsHooked = {}
+      --Add the OnMouseUp handler to the submenu's "opening control" so clicking them will enable/disable (toggle) all the checkboxes inside the submenu
+      for _, indexToAddTo in ipairs(submenuIndicesToAddCallbackTo) do
+          AddToggleAllSubmenuCheckboxEntriesCallback(indexToAddTo)
+      end
+      --Called at zo_Menu_OnHide, and cleaned automatically at ClearMenu()
+      SetMenuHiddenCallback(cleanUpzo_MenuItemsSubmenuSpecialCallbacks)
+  end)
+  -- -^- INS251229 Baertram - END 2
   
   teleporterWin.Main_Control.ItemTexture:SetHandler("OnMouseEnter", function(self)
 	-- set tooltip accordingly to the selected filter
@@ -2141,7 +2229,7 @@ local function SetupUI()
 			-- make default tab
 			local menuIndex = AddCustomMenuItem(SI.get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU.savedVarsChar.defaultTab == BMU.indexListCurrentZone then BMU.savedVarsChar.defaultTab = BMU.indexListMain else BMU.savedVarsChar.defaultTab = BMU.indexListCurrentZone end end, MENU_ADD_OPTION_CHECKBOX)
 			if BMU.savedVarsChar.defaultTab == BMU.indexListCurrentZone then
-				ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+				ZO_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 			end
 			ShowMenu()
 		else
@@ -2180,7 +2268,7 @@ local function SetupUI()
 		-- show all or only in current zone
 		local menuIndex = AddCustomMenuItem(GetString(SI_GAMEPAD_GUILD_HISTORY_SUBCATEGORY_ALL), function() BMU.savedVarsChar.showAllDelves = not BMU.savedVarsChar.showAllDelves BMU.createTable({index=BMU.indexListDelves}) end, MENU_ADD_OPTION_CHECKBOX)
 		if BMU.savedVarsChar.showAllDelves then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+			ZO_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 		end
 
 		-- divider
@@ -2189,7 +2277,7 @@ local function SetupUI()
 		-- make default tab
 		menuIndex = AddCustomMenuItem(SI.get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU.savedVarsChar.defaultTab == BMU.indexListDelves then BMU.savedVarsChar.defaultTab = BMU.indexListMain else BMU.savedVarsChar.defaultTab = BMU.indexListDelves end end, MENU_ADD_OPTION_CHECKBOX)
 		if BMU.savedVarsChar.defaultTab == BMU.indexListDelves then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+			ZO_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 		end
 		ShowMenu()
 	else
@@ -2345,7 +2433,7 @@ local function SetupUI()
 		if CanPlayerChangeGroupDifficulty() then
 			local menuIndex = AddCustomMenuItem(BMU.textures.dungeonDifficultyVeteran .. GetString(SI_DUNGEONDIFFICULTY2), function() BMU.setDungeonDifficulty(not ZO_ConvertToIsVeteranDifficulty(ZO_GetEffectiveDungeonDifficulty())) zo_callLater(function() BMU.createTableDungeons() end, 300) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 			if ZO_ConvertToIsVeteranDifficulty(ZO_GetEffectiveDungeonDifficulty()) then
-				ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+				ZO_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 			end
 		end
 
@@ -2355,7 +2443,7 @@ local function SetupUI()
 		-- make default tab
 		local menuIndex = AddCustomMenuItem(SI.get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU.savedVarsChar.defaultTab == BMU.indexListDungeons then BMU.savedVarsChar.defaultTab = BMU.indexListMain else BMU.savedVarsChar.defaultTab = BMU.indexListDungeons end end, MENU_ADD_OPTION_CHECKBOX)
 		if BMU.savedVarsChar.defaultTab == BMU.indexListDungeons then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[menuIndex].checkbox)
+			ZO_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 		end
 
 		ShowMenu()
@@ -2385,10 +2473,10 @@ function BMU.updateCheckboxSurveyMap(action)
 	if action == 3 then
 		-- check if at least one of the subTypes is checked
 		if BMU.numOfSurveyTypesChecked() > 0 then
-			ZO_CheckButton_SetChecked(ZO_Menu.items[BMU.menuIndexSurveyAll].checkbox)
+			ZO_CheckButton_SetChecked(zo_Menu.items[BMU.menuIndexSurveyAll].checkbox)
 		else
 			-- no survey type is checked
-			ZO_CheckButton_SetUnchecked(ZO_Menu.items[BMU.menuIndexSurveyAll].checkbox)
+			ZO_CheckButton_SetUnchecked(zo_Menu.items[BMU.menuIndexSurveyAll].checkbox)
 		end
 	else
 		-- if action == 1 --> all are checked
@@ -2414,8 +2502,8 @@ end
 
 function BMU.updateContextMenuEntrySurveyAll()
 	local num = BMU.numOfSurveyTypesChecked()
-	local baseString = string.sub(ZO_Menu.items[BMU.menuIndexSurveyAll].item.nameLabel:GetText(), 1, -7)
-	ZO_Menu.items[BMU.menuIndexSurveyAll].item.nameLabel:SetText(baseString .. BMU.getContextMenuEntrySurveyAllAppendix())
+	local baseString = string.sub(zo_Menu.items[BMU.menuIndexSurveyAll].item.nameLabel:GetText(), 1, -7)
+	zo_Menu.items[BMU.menuIndexSurveyAll].item.nameLabel:SetText(baseString .. BMU.getContextMenuEntrySurveyAllAppendix())
 end
 
 

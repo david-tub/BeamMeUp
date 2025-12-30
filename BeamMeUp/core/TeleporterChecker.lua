@@ -50,7 +50,8 @@ local BMU_getParentZoneId, BMU_getMapIndex, BMU_categorizeZone, BMU_getCurrentZo
 	  BMU_has_value, BMU_has_value_special, BMU_getExistingEntry, BMU_removeExistingEntry, BMU_addInfo_1, BMU_addInfo_2,
 	  BMU_filterAndDecide, BMU_sortByStringFindPosition, BMU_syncWithQuests, BMU_syncWithItems, BMU_numOfSurveyTypesChecked,
       BMU_getDataMapInfo, BMU_itemIsRelated, BMU_createZoneLessItemsInfo, BMU_createClickableZoneRecord, BMU_addItemInformation,
-   	 BMU_addLeadInformation, BMU_cleanUnrelatedRecords, BMU_cleanUnrelatedRecords2, BMU_findExactQuestLocation, BMU_createNoResultsInfo
+   	  BMU_addLeadInformation, BMU_cleanUnrelatedRecords, BMU_cleanUnrelatedRecords2, BMU_findExactQuestLocation, BMU_createNoResultsInfo,
+      BMU_decidePrioDisplay, BMU_addNumberPlayers, BMU_getZoneGuideDiscoveryInfo
 ----functions (defined inline in code below, upon first usage, as they are still nil at this line)
 
 --String text variables
@@ -150,18 +151,22 @@ BMU_getCurrentZoneId = BMU.getCurrentZoneId
 -- dontResetSlider: flag if the slider/scroll bar should not be reset (reset to top of the list)
 -- noOwnHouses: flag if the owned houses shall not appear in result list
 function BMU.createTable(args)
-	BMU_getMapIndex = BMU_getMapIndex or BMU.getMapIndex 										    --INS251229 Baertram
-	BMU_getParentZoneId = BMU_getParentZoneId or BMU.getParentZoneId                                --INS251229 Baertram
-	BMU_checkOnceOnly = BMU_checkOnceOnly or BMU.checkOnceOnly                                		--INS251229 Baertram
-	BMU_has_value = BMU_has_value or BMU.has_value                                					--INS251229 Baertram
-	BMU_has_value_special = BMU_has_value_special or BMU.has_value_special        					--INS251229 Baertram
-	BMU_addInfo_2 = BMU_addInfo_2 or BMU.addInfo_2        											--INS251229 Baertram
-	BMU_filterAndDecide = BMU_filterAndDecide or BMU.filterAndDecide								--INS251229 Baertram
-	BMU_sortByStringFindPosition = BMU_sortByStringFindPosition or BMU.sortByStringFindPosition		--INS251229 Baertram
-	BMU_syncWithItems = BMU_syncWithItems or BMU.syncWithItems										--INS251229 Baertram
-	BMU_syncWithQuests = BMU_syncWithQuests or BMU.syncWithQuests									--INS251229 Baertram
-	BMU_createNoResultsInfo = BMU_createNoResultsInfo or BMU.createNoResultsInfo					--INS251229 Baertram
-	local BMU_savedVarsAcc = BMU.savedVarsAcc														--INS251229 Baertram
+	-- -v- INS251229 Baertram Local reference updates for functions further down below in the file
+	BMU_getMapIndex = BMU_getMapIndex or BMU.getMapIndex
+	BMU_getParentZoneId = BMU_getParentZoneId or BMU.getParentZoneId
+	BMU_checkOnceOnly = BMU_checkOnceOnly or BMU.checkOnceOnly
+	BMU_has_value = BMU_has_value or BMU.has_value
+	BMU_has_value_special = BMU_has_value_special or BMU.has_value_special
+	BMU_addInfo_2 = BMU_addInfo_2 or BMU.addInfo_2
+	BMU_filterAndDecide = BMU_filterAndDecide or BMU.filterAndDecide
+	BMU_sortByStringFindPosition = BMU_sortByStringFindPosition or BMU.sortByStringFindPosition
+	BMU_syncWithItems = BMU_syncWithItems or BMU.syncWithItems
+	BMU_syncWithQuests = BMU_syncWithQuests or BMU.syncWithQuests
+	BMU_createNoResultsInfo = BMU_createNoResultsInfo or BMU.createNoResultsInfo
+	BMU_addNumberPlayers = BMU_addNumberPlayers or BMU.addNumberPlayers
+	BMU_decidePrioDisplay = BMU_decidePrioDisplay or BMU.decidePrioDisplay
+	local BMU_savedVarsAcc = BMU.savedVarsAcc
+	-- -^- INS251229 Baertram
 
 	local index = args.index or 0
 	local inputString = args.inputString or ""
@@ -381,7 +386,7 @@ function BMU.createTable(args)
 	-- display number of hits (port alternatives)
 	-- not needed in case of only current zone and favorite zoneId
 	if BMU_savedVarsAcc.showNumberPlayers and not (index == BMU.indexListCurrentZone or index == BMU.indexListZoneHidden or index == BMU.indexListZone) then
-		portalPlayers = BMU.addNumberPlayers(portalPlayers)
+		portalPlayers = BMU_addNumberPlayers(portalPlayers)
 	end
 
 	if index == BMU.indexListItems then
@@ -416,7 +421,7 @@ function BMU.createTable(args)
 					return a.zoneName < b.zoneName
 				end
 				-- prio by source
-				return BMU.decidePrioDisplay(a, b)
+				return BMU_decidePrioDisplay(a, b)
 			end)
 
 		elseif BMU.savedVarsChar.sorting == 3 then
@@ -437,7 +442,7 @@ function BMU.createTable(args)
 					return a.zoneName < b.zoneName
 				end
 				-- prio by source
-				return BMU.decidePrioDisplay(a, b)
+				return BMU_decidePrioDisplay(a, b)
 			end)
 
 		elseif BMU.savedVarsChar.sorting == 4 then
@@ -462,7 +467,7 @@ function BMU.createTable(args)
 					return a.zoneName < b.zoneName
 				end
 				-- prio by source
-				return BMU.decidePrioDisplay(a, b)
+				return BMU_decidePrioDisplay(a, b)
 			end)
 
 		elseif BMU.savedVarsChar.sorting == 5 then
@@ -483,7 +488,7 @@ function BMU.createTable(args)
 					return a.zoneName < b.zoneName
 				end
 				-- prio by source
-				return BMU.decidePrioDisplay(a, b)
+				return BMU_decidePrioDisplay(a, b)
 			end)
 
 		elseif BMU.savedVarsChar.sorting == 6 then
@@ -512,7 +517,7 @@ function BMU.createTable(args)
 					return a.zoneName < b.zoneName
 				end
 				-- prio by source
-				return BMU.decidePrioDisplay(a, b)
+				return BMU_decidePrioDisplay(a, b)
 			end)
 
 		elseif BMU.savedVarsChar.sorting == 7 then
@@ -541,7 +546,7 @@ function BMU.createTable(args)
 					return a.zoneName < b.zoneName
 				end
 				-- prio by source
-				return BMU.decidePrioDisplay(a, b)
+				return BMU_decidePrioDisplay(a, b)
 			end)
 
 		elseif BMU.savedVarsChar.sorting == 8 then
@@ -562,7 +567,7 @@ function BMU.createTable(args)
 					return a.zoneName < b.zoneName
 				end
 				-- prio by source
-				return BMU.decidePrioDisplay(a, b)
+				return BMU_decidePrioDisplay(a, b)
 			end)
 
 		elseif BMU.savedVarsChar.sorting == 9 then
@@ -587,7 +592,7 @@ function BMU.createTable(args)
 					return a.zoneName < b.zoneName
 				end
 				-- prio by source
-				return BMU.decidePrioDisplay(a, b)
+				return BMU_decidePrioDisplay(a, b)
 			end)
 
 		elseif BMU.savedVarsChar.sorting == 10 then
@@ -622,7 +627,7 @@ function BMU.createTable(args)
 					return a.zoneName < b.zoneName
 				end
 				-- prio by source
-				return BMU.decidePrioDisplay(a, b)
+				return BMU_decidePrioDisplay(a, b)
 			end)
 
 		elseif BMU.savedVarsChar.sorting == 11 then
@@ -647,7 +652,7 @@ function BMU.createTable(args)
 					return a.zoneName < b.zoneName
 				end
 				-- prio by source
-				return BMU.decidePrioDisplay(a, b)
+				return BMU_decidePrioDisplay(a, b)
 			end)
 
 		else -- BMU.savedVarsChar.sorting == 1
@@ -662,7 +667,7 @@ function BMU.createTable(args)
 					return a.zoneName < b.zoneName
 				end
 				-- prio by source
-				return BMU.decidePrioDisplay(a, b)
+				return BMU_decidePrioDisplay(a, b)
 			end)
 		end
 	end
@@ -770,9 +775,12 @@ BMU_addInfo_1 = BMU.addInfo_1				--INS251229 Baertram
 
 -- adds second bunch of information after filterAndDecide
 function BMU.addInfo_2(e)
-	BMU_getMapIndex = BMU_getMapIndex or BMU.getMapIndex				--INS251229 Baertram
-	BMU_getParentZoneId = BMU_getParentZoneId or BMU.getParentZoneId	--INS251229 Baertram
-	BMU_categorizeZone = BMU_categorizeZone or BMU.categorizeZone		--INS251229 Baertram
+	-- -v- INS251229 Baertram local references to functions defined later in this file
+	BMU_getMapIndex = BMU_getMapIndex or BMU.getMapIndex
+	BMU_getParentZoneId = BMU_getParentZoneId or BMU.getParentZoneId
+	BMU_categorizeZone = BMU_categorizeZone or BMU.categorizeZone
+	BMU_getZoneGuideDiscoveryInfo = BMU_getZoneGuideDiscoveryInfo or BMU.getZoneGuideDiscoveryInfo
+	-- -^- INS251229 Baertram
 
 	-- inititialize more values
 	e.relatedItems = {}
@@ -791,13 +799,13 @@ function BMU.addInfo_2(e)
 	end
 
 	-- add wayshrine discovery info (for zone tooltip)
-	e.zoneWayhsrineDiscoveryInfo, e.zoneWayshrineDiscovered, e.zoneWayshrineTotal = BMU.getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_WAYSHRINES)
+	e.zoneWayhsrineDiscoveryInfo, e.zoneWayshrineDiscovered, e.zoneWayshrineTotal = BMU_getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_WAYSHRINES)
 	-- add skyshard discovery info (for zone tooltip)
-	e.zoneSkyshardDiscoveryInfo, e.zoneSkyshardDiscovered, e.zoneSkyshardTotal = BMU.getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_SKYSHARDS)
+	e.zoneSkyshardDiscoveryInfo, e.zoneSkyshardDiscovered, e.zoneSkyshardTotal = BMU_getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_SKYSHARDS)
 	-- add public dungeon completeness info (for zone tooltip)
-	-- e.zonePublicDungeonDiscoveryInfo, e.zonePublicDungeonDiscovered, e.zonePublicDungeonTotal = BMU.getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_PUBLIC_DUNGEONS)
+	-- e.zonePublicDungeonDiscoveryInfo, e.zonePublicDungeonDiscovered, e.zonePublicDungeonTotal = BMU_getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_PUBLIC_DUNGEONS)
 	-- add delve completeness info (for zone tooltip)
-	-- e.zoneDelveDiscoveryInfo, e.zoneDelveDiscovered, e.zoneDelveTotal = BMU.getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_DELVES)
+	-- e.zoneDelveDiscoveryInfo, e.zoneDelveDiscovered, e.zoneDelveTotal = BMU_getZoneGuideDiscoveryInfo(e.zoneId, ZONE_COMPLETION_TYPE_DELVES)
 
 	-- categorize zone
 	e.category = BMU_categorizeZone(e.zoneId)
@@ -1198,9 +1206,12 @@ end
 -- increments counter according to case
 -- returns if the record can be used
 function BMU.checkOnceOnly(activ, record)
-	BMU_has_value = BMU_has_value or BMU.has_value                                 					--INS251229 Baertram
-	BMU_getExistingEntry = BMU_getExistingEntry or BMU.getExistingEntry           					--INS251229 Baertram
-	BMU_removeExistingEntry = BMU_removeExistingEntry or BMU.removeExistingEntry  					--INS251229 Baertram
+	-- -v- INS251229 Baertram local reference updates for functions further down in this file
+	BMU_has_value = BMU_has_value or BMU.has_value
+	BMU_getExistingEntry = BMU_getExistingEntry or BMU.getExistingEntry
+	BMU_removeExistingEntry = BMU_removeExistingEntry or BMU.removeExistingEntry
+	BMU_decidePrioDisplay = BMU_decidePrioDisplay or BMU.decidePrioDisplay
+	-- -^- INS251229 Baertram
 
 	-- in general: dont add a record without player (dark red) if there is already another record for this zone
 	if allZoneIds[record.zoneId] and record.zoneWithoutPlayer then
@@ -1234,7 +1245,7 @@ function BMU.checkOnceOnly(activ, record)
 			-- increment counter
 			allZoneIds[record.zoneId] = allZoneIds[record.zoneId] + 1
 			return false
-		elseif BMU.decidePrioDisplay(record, BMU.getExistingEntry(record.zoneId)) then -- returns true, if first record is preferred
+		elseif BMU_decidePrioDisplay(record, BMU.getExistingEntry(record.zoneId)) then -- returns true, if first record is preferred
 			-- zone already added, but prio is higher
 			-- clean existing entry (when existing one is not favorite and not group member)
 			BMU_removeExistingEntry(record.zoneId)
@@ -1973,6 +1984,7 @@ function BMU.decidePrioDisplay(record1, record2)
 		return false
 	end
 end
+BMU_decidePrioDisplay = BMU.decidePrioDisplay 			--INS251229 Baertram
 
 
 function BMU.addNumberPlayers(oldTable)
@@ -1990,6 +2002,7 @@ function BMU.addNumberPlayers(oldTable)
 
 	return newTable
 end
+BMU_addNumberPlayers = BMU.addNumberPlayers 			--INS251229 Baertram
 
 
 -- find itemId in global list and return subType and zoneId
@@ -2749,6 +2762,30 @@ function BMU.setMapToQuest(questIndex)
 	return result
 end
 
+-- exception handling
+-- check if the zone belongs to another (main) zone which holds the map completion information
+-- returns the corresponding zoneId if the input zone is part of a zone realtionship
+function BMU.getMainZoneId(zoneId)
+	if zoneId == 1011 or zoneId == 1027 then
+		-- Summerset/Artaeum
+		return 1011
+	elseif zoneId == 1160 or zoneId == 1161 then
+		-- Blackreach/Western Skyrim
+		return 1160
+	elseif zoneId == 1207 or zoneId == 1208 then
+		-- Reach/Blackreach(Arkthzand)
+		return 1207
+	elseif zoneId == 1286 or zoneId == 1282 or zoneId == 1283 then
+		-- Deadlands/Fargrave(City)/The Shambles
+		return 1286
+	elseif zoneId == 1413 or zoneId == 1414 then
+		-- Telvanni Peninsula/Apocrypha
+		return 1413
+	else
+		return false
+	end
+end
+local BMU_getMainZoneId = BMU.getMainZoneId  	--INS251229 Baertram
 
 -- get completion info for specific zone and completionType
 function BMU.getZoneGuideDiscoveryInfo(zoneId, completionType)
@@ -2757,7 +2794,7 @@ function BMU.getZoneGuideDiscoveryInfo(zoneId, completionType)
 	local _
 
 	-- check for any zone mapping exceptions
-	local mainZoneId = BMU.getMainZoneId(zoneId)
+	local mainZoneId = BMU_getMainZoneId(zoneId)
 	if mainZoneId then
 		zoneId = mainZoneId
 	end
@@ -2800,29 +2837,4 @@ function BMU.getZoneGuideDiscoveryInfo(zoneId, completionType)
 
 	return infoString, numCompletedActivities, totalActivities
 end
-
-
--- exception handling
--- check if the zone belongs to another (main) zone which holds the map completion information
--- returns the corresponding zoneId if the input zone is part of a zone realtionship
-function BMU.getMainZoneId(zoneId)
-	if zoneId == 1011 or zoneId == 1027 then
-		-- Summerset/Artaeum
-		return 1011
-	elseif zoneId == 1160 or zoneId == 1161 then
-		-- Blackreach/Western Skyrim
-		return 1160
-	elseif zoneId == 1207 or zoneId == 1208 then
-		-- Reach/Blackreach(Arkthzand)
-		return 1207
-	elseif zoneId == 1286 or zoneId == 1282 or zoneId == 1283 then
-		-- Deadlands/Fargrave(City)/The Shambles
-		return 1286
-	elseif zoneId == 1413 or zoneId == 1414 then
-		-- Telvanni Peninsula/Apocrypha
-		return 1413
-	else
-		return false
-	end
-end
-
+BMU_getZoneGuideDiscoveryInfo = BMU.getZoneGuideDiscoveryInfo --INS251229 Baertram

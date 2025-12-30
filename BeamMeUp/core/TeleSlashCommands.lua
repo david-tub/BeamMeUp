@@ -1,3 +1,5 @@
+local BMU = BMU --INS251229 Baertram Performancee gain, not searching _G for BMU each time again!
+
 -- all functions which are reachable via slash commands
 local SI = BMU.SI
 

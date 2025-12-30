@@ -1,3 +1,5 @@
+local BMU = BMU --INS251229 Baertram Performancee gain, not searching _G for BMU each time again!
+
 local SI = {}
 
 -- Switch language ingame (chat command)

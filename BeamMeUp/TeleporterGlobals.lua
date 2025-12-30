@@ -1,4 +1,7 @@
 BMU = {}
+local BMU = BMU --INS251229 Baertram Performancee gain, not searching _G for BMU each time again!
+
+local string_lower = string.lower
 
 BMU.win =   {
       Main_Control = {},
@@ -9,6 +12,7 @@ BMU.var = {
   appNameAbbr			= "BMU",
   version				= "", -- Will be set by help of function GetAddonVersionFromManifest(), see file BeamMeUp.lua event_add_on_loaded
   author				= "DeadSoon, Gamer1986PAN",
+  feedbackContact		= "@Deadsoon", --INS251229 Baertram Used account for email feedback
   website				= "https://www.esoui.com/downloads/info2143-BeamMeUp-TeleporterFastTravel.html",
   feedback				= "https://www.esoui.com/portal.php?id=283&a=faq", -- FAQ link
   controls              = {},
@@ -34,6 +38,17 @@ BMU.var = {
   numFavoriteZones = 10,
   numFavoritePlayers = 5,
   numFavoriteWayshrines = 3,
+
+  --INS251229 Baertram Special zone names to check for, see file TeleporterChecker.lua function BMU.tryMatchZoneToMatchStr(matchStr, zoneId)
+  -->(lowercased already so they aren't reformatetd on each search -> Performance gain)
+	specialZoneNameMatches = {
+		[string_lower("Alik'r")] = "", 			--leave "" if key = value
+		[string_lower("Morneroc")] = "", 		--leave "" if key = value
+		[string_lower("Bleakrock")] = "", 		--leave "" if key = value
+		[string_lower("Orsinium")] = string_lower("Wrothgar"),	--Special zoneName Wrothgar here
+		[string_lower("Graumoorkaverne")] = "",	--leave "" if key = value
+		[string_lower("Griselande")] = "",		--leave "" if key = value
+	},
 }
 
 -- necessary libraries

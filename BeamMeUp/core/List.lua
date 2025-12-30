@@ -1,3 +1,5 @@
+local BMU = BMU --INS251229 Baertram Performancee gain, not searching _G for BMU each time again!
+
 local wm = WINDOW_MANAGER
 
 local LINES_OFFSET = 45
@@ -2341,7 +2343,6 @@ end
 function BMU.isFavoritePlayer(displayName)
 	return BMU.has_value(BMU.savedVarsServ.favoriteListPlayers, displayName)
 end
-
 
 -- save the new favorite zone
 function BMU.addFavoriteZone(position, zoneId, zoneName)

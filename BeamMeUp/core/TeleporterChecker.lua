@@ -18,7 +18,13 @@ local stringType = "string"
 local tableType = "table"
 --Other addon variables
 --BMU variables
+local  BMU_SourceIndex_Friend 				= BMU.SOURCE_INDEX_FRIEND
+local  BMU_SourceIndex_Group 				= BMU.SOURCE_INDEX_GROUP
+local  BMU_SourceIndex_Guild 				= BMU.SOURCE_INDEX_GUILD
 local BMU_textures                          = BMU.textures
+local textureAcceptGreen = BMU_textures.acceptGreen
+local textureDeclineRed = BMU_textures.declineRed
+local textureTooltipSeparator = BMU.textures.tooltipSeperator
 local subTypeClue 							= "clue"
 local colorOrange 							= "orange"
 local colorWhite 							= "white"
@@ -29,15 +35,13 @@ local colorBlue 							= "blue"
 local colorRed 								= "red"
 local colorGray 							= "gray"
 local BMU_LibZoneGivenZoneData				= BMU.LibZoneGivenZoneData
-local textureAcceptGreen = BMU_textures.acceptGreen
-local textureDeclineRed = BMU_textures.declineRed
-local textureTooltipSeparator = BMU.textures.tooltipSeperator
 ----functions
 --ZOs functions
 local string = string
 local string_sub = string.sub
 local string_match = string.match
 local string_lower = string.lower
+local string_upper = string.upper
 local string_gsub = string.gsub
 local zo_strformat = zo_strformat
 local zo_plainstrfind = zo_plainstrfind
@@ -55,6 +59,7 @@ local BMU_colorizeText 						= BMU.colorizeText
 local BMU_changeState 						= BMU.changeState
 local BMU_isFavoriteZone 					= BMU.isFavoriteZone
 local BMU_isFavoritePlayer 					= BMU.isFavoritePlayer
+local BMU_updateRelatedItemsCounterPanel 	= BMU.updateRelatedItemsCounterPanel
 
 ----variables (defined inline in code below, upon first usage, as they are still nil at this line)
 --BMU functions
@@ -274,7 +279,7 @@ function BMU.createTable(args)
 				-- save displayName
 				consideredPlayers[e.displayName] = true
 				-- add bunch of information to the record
-				e = BMU_addInfo_1(e, currentZoneId, playersZoneId, BMU.SOURCE_INDEX_GROUP)
+				e = BMU_addInfo_1(e, currentZoneId, playersZoneId, BMU_SourceIndex_Group)
 
 				-- second big filter level
 				if BMU_filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filterSourceIndex) then
@@ -302,7 +307,7 @@ function BMU.createTable(args)
 			-- save displayName
 			consideredPlayers[e.displayName] = true
 			-- do some formating stuff
-			e = BMU_addInfo_1(e, currentZoneId, playersZoneId, BMU.SOURCE_INDEX_FRIEND)
+			e = BMU_addInfo_1(e, currentZoneId, playersZoneId, BMU_SourceIndex_Friend)
 
 			-- second big filter level
 			if BMU_filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filterSourceIndex) then
@@ -332,7 +337,7 @@ function BMU.createTable(args)
 				-- save displayName
 				consideredPlayers[e.displayName] = true
 				-- do some formating stuff
-				e = BMU_addInfo_1(e, currentZoneId, playersZoneId, BMU.SOURCE_INDEX_GUILD[i])
+				e = BMU_addInfo_1(e, currentZoneId, playersZoneId, BMU_SourceIndex_Guild[i])
 
 				-- second big filter level
 				if BMU_filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filterSourceIndex) then
@@ -708,7 +713,7 @@ function BMU.createTable(args)
 		BMU.TeleporterList:add_messages(portalPlayers, dontResetSlider)
 		if index == BMU.indexListItems and BMU.savedVarsChar.displayCounterPanel then
 			-- update counter panel for related items
-			BMU.updateRelatedItemsCounterPanel()
+			BMU_updateRelatedItemsCounterPanel()
 		end
 	end
 end
@@ -788,14 +793,14 @@ function BMU.addInfo_1(e, currentZoneId, playersZoneId, sourceIndexLeading)
 		e.sourceIndexLeading = sourceIndexLeading -- first source where the player was found
 
 		-- is in Group?
-		if sourceIndexLeading == BMU.SOURCE_INDEX_GROUP then
-			table_insert(e.sources, BMU.SOURCE_INDEX_GROUP)
+		if sourceIndexLeading == BMU_SourceIndex_Group then
+			table_insert(e.sources, BMU_SourceIndex_Group)
 			table_insert(e.sourcesText, BMU_colorizeText(groupStr, colorOrange))
 		end
 
 		-- is Friend?
-		if sourceIndexLeading == BMU.SOURCE_INDEX_FRIEND or IsFriend(e.displayName) then
-			table_insert(e.sources, BMU.SOURCE_INDEX_FRIEND)
+		if sourceIndexLeading == BMU_SourceIndex_Friend or IsFriend(e.displayName) then
+			table_insert(e.sources, BMU_SourceIndex_Friend)
 			table_insert(e.sourcesText, BMU_colorizeText(friendStr, colorGreen))
 		end
 
@@ -804,7 +809,7 @@ function BMU.addInfo_1(e, currentZoneId, playersZoneId, sourceIndexLeading)
 		for i = 1, numGuilds do
 			local guildId = GetGuildId(i)
 			if GetGuildMemberIndexFromDisplayName(guildId, e.displayName) ~= nil then
-				table_insert(e.sources, BMU.SOURCE_INDEX_GUILD[i])
+				table_insert(e.sources, BMU_SourceIndex_Guild[i])
 				table_insert(e.sourcesText, BMU_colorizeText(GetGuildName(guildId), colorWhite))
 			end
 		end
@@ -870,13 +875,13 @@ function BMU.addInfo_2(e)
 	e.setCollectionProgress = BMU.getSetCollectionProgressString(e.zoneId, e.category, e.parentZoneId)
 
 	-- set colors
-	if e.sourceIndexLeading == BMU.SOURCE_INDEX_GROUP then
+	if e.sourceIndexLeading == BMU_SourceIndex_Group then
 		e.textColorDisplayName = colorOrange
 		e.textColorZoneName = colorOrange
 	elseif e.playersZone then
 		e.textColorDisplayName = colorBlue
 		e.textColorZoneName = colorBlue
-	elseif e.sourceIndexLeading == BMU.SOURCE_INDEX_FRIEND then
+	elseif e.sourceIndexLeading == BMU_SourceIndex_Friend then
 		e.textColorDisplayName = colorGreen
 		e.textColorZoneName = colorGreen
 	else
@@ -893,10 +898,10 @@ function BMU.addInfo_2(e)
 	elseif BMU.savedVarsAcc.currentZoneAlwaysTop and e.playersZone then
 		-- current zone (players location)
 		e.prio = 1
-	elseif e.sourceIndexLeading == BMU.SOURCE_INDEX_GROUP and e.isLeader then
+	elseif e.sourceIndexLeading == BMU_SourceIndex_Group and e.isLeader then
 		-- group leader
 		e.prio = 2
-	elseif e.sourceIndexLeading == BMU.SOURCE_INDEX_GROUP and (e.category == BMU.ZONE_CATEGORY_GRPDUNGEON or e.category == BMU.ZONE_CATEGORY_TRAIL or e.category == BMU.ZONE_CATEGORY_GRPZONES or e.category == BMU.ZONE_CATEGORY_GRPARENA or e.category == BMU.ZONE_CATEGORY_ENDLESSD) then
+	elseif e.sourceIndexLeading == BMU_SourceIndex_Group and (e.category == BMU.ZONE_CATEGORY_GRPDUNGEON or e.category == BMU.ZONE_CATEGORY_TRAIL or e.category == BMU.ZONE_CATEGORY_GRPZONES or e.category == BMU.ZONE_CATEGORY_GRPARENA or e.category == BMU.ZONE_CATEGORY_ENDLESSD) then
 		-- group member is in 4 men Group Dungeons | 12 men Raids (Trials) | Group Zones | Group Arenas | Endless Dungeons
 		e.prio = 3
 	elseif BMU_isFavoritePlayer(e.displayName) and BMU_isFavoriteZone(e.zoneId) then
@@ -1122,7 +1127,7 @@ function BMU.isBlacklisted(zoneId, sourceIndex, onlyMaps)
 			return false
 		else
 			-- seperate filtering, if group member (whitelisting)
-			if sourceIndex == BMU.SOURCE_INDEX_GROUP then
+			if sourceIndex == BMU_SourceIndex_Group then
 				--return true
 				return not BMU.isWhitelisted(BMU.whitelistGroupMembers, zoneId, false)
 			end
@@ -1140,7 +1145,7 @@ function BMU.isBlacklisted(zoneId, sourceIndex, onlyMaps)
 
 	if BMU.blacklist[zoneId] then
 		-- separate filtering, if group member (whitelisting)
-		if sourceIndex == BMU.SOURCE_INDEX_GROUP then
+		if sourceIndex == BMU_SourceIndex_Group then
 			--return true
 			return not BMU.isWhitelisted(BMU.whitelistGroupMembers, zoneId, false)
 		end
@@ -1971,7 +1976,7 @@ BMU_createNoResultsInfo = BMU.createNoResultsInfo  --INS251229 Baertram
 -- removes an existing entry (already added zoneId) from table (TeleportAllPlayersTable) if it is not a player favorite or group member
 function BMU.removeExistingEntry(zoneId)
 	for index, record in pairs(TeleportAllPlayersTable) do
-		if record.zoneId == zoneId and not BMU_isFavoritePlayer(record.displayName) and record.sourceIndexLeading ~= BMU.SOURCE_INDEX_GROUP then
+		if record.zoneId == zoneId and not BMU_isFavoritePlayer(record.displayName) and record.sourceIndexLeading ~= BMU_SourceIndex_Group then
 			table_remove(TeleportAllPlayersTable, index)
 		end
 	end
@@ -1999,10 +2004,10 @@ function BMU.decidePrioDisplay(record1, record2)
 		return true
 	elseif record2.isLeader and not record1.isLeader then
 		return false
-	elseif record1.sourceIndexLeading == BMU.SOURCE_INDEX_GROUP and record2.sourceIndexLeading ~= BMU.SOURCE_INDEX_GROUP then
+	elseif record1.sourceIndexLeading == BMU_SourceIndex_Group and record2.sourceIndexLeading ~= BMU_SourceIndex_Group then
 		-- group is always comes first
 		return true
-	elseif record1.sourceIndexLeading ~= BMU.SOURCE_INDEX_GROUP and record2.sourceIndexLeading == BMU.SOURCE_INDEX_GROUP then
+	elseif record1.sourceIndexLeading ~= BMU_SourceIndex_Group and record2.sourceIndexLeading == BMU_SourceIndex_Group then
 		-- group is always comes first
 		return false
 	elseif BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, record1.sourceIndexLeading) < BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, record2.sourceIndexLeading) then
@@ -2486,7 +2491,7 @@ function BMU.createTableDungeons(args)
 		-- add headline
 		if #resultListEndlessDungeons > 0 then
 			local entry = BMU_createBlankRecord()
-			entry.zoneName = "-- " .. string.upper(BMU_SI_get(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS)) .. " --"
+			entry.zoneName = "-- " .. string_upper(BMU_SI_get(SI.TELE_UI_TOGGLE_ENDLESS_DUNGEONS)) .. " --"
 			entry.textColorZoneName = colorGray
 			table_insert(resultListEndlessDungeons, 1, entry)
 		end
@@ -2522,8 +2527,8 @@ function BMU.createTableDungeons(args)
 
 		-- add headline
 		if #resultListArenas > 0 then
-			local entry = BMU.createBlankRecord()
-			entry.zoneName = "-- " .. string.upper(BMU_SI_get(SI.TELE_UI_TOGGLE_ARENAS)) .. " --"
+			local entry = BMU_createBlankRecord()
+			entry.zoneName = "-- " .. string_upper(BMU_SI_get(SI.TELE_UI_TOGGLE_ARENAS)) .. " --"
 			entry.textColorZoneName = colorGray
 			table_insert(resultListArenas, 1, entry)
 		end
@@ -2559,8 +2564,8 @@ function BMU.createTableDungeons(args)
 
 		-- add headline
 		if #resultListGroupArenas > 0 then
-			local entry = BMU.createBlankRecord()
-			entry.zoneName = "-- " .. string.upper(BMU_SI_get(SI.TELE_UI_TOGGLE_GROUP_ARENAS)) .. " --"
+			local entry = BMU_createBlankRecord()
+			entry.zoneName = "-- " .. string_upper(BMU_SI_get(SI.TELE_UI_TOGGLE_GROUP_ARENAS)) .. " --"
 			entry.textColorZoneName = colorGray
 			table_insert(resultListGroupArenas, 1, entry)
 		end
@@ -2596,8 +2601,8 @@ function BMU.createTableDungeons(args)
 
 		-- add headline
 		if #resultListTrials > 0 then
-			local entry = BMU.createBlankRecord()
-			entry.zoneName = "-- " .. string.upper(BMU_SI_get(SI.TELE_UI_TOGGLE_TRIALS)) .. " --"
+			local entry = BMU_createBlankRecord()
+			entry.zoneName = "-- " .. string_upper(BMU_SI_get(SI.TELE_UI_TOGGLE_TRIALS)) .. " --"
 			entry.textColorZoneName = colorGray
 			table_insert(resultListTrials, 1, entry)
 		end
@@ -2633,8 +2638,8 @@ function BMU.createTableDungeons(args)
 
 		-- add headline
 		if #resultListGroupDungeons > 0 then
-			local entry = BMU.createBlankRecord()
-			entry.zoneName = "-- " .. string.upper(BMU_SI_get(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS)) .. " --"
+			local entry = BMU_createBlankRecord()
+			entry.zoneName = "-- " .. string_upper(BMU_SI_get(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS)) .. " --"
 			entry.textColorZoneName = colorGray
 			table_insert(resultListGroupDungeons, 1, entry)
 		end
@@ -2643,17 +2648,19 @@ function BMU.createTableDungeons(args)
 	-- merge all lists together
 	local resultList = {}
 	if inputString and inputString ~= "" then
-		for _, v in pairs(resultListEndlessDungeons) do if string.find(v.zoneName:lower(), inputString:lower()) then table_insert(resultList, v) end end
-		for _, v in pairs(resultListArenas) do if string.find(v.zoneName:lower(), inputString:lower()) then table_insert(resultList, v) end end
-		for _, v in pairs(resultListGroupArenas) do if string.find(v.zoneName:lower(), inputString:lower()) then table_insert(resultList, v) end end
-		for _, v in pairs(resultListTrials) do if string.find(v.zoneName:lower(), inputString:lower()) then table_insert(resultList, v) end end
-		for _, v in pairs(resultListGroupDungeons) do if string.find(v.zoneName:lower(), inputString:lower()) then table_insert(resultList, v) end end
+		local inputStringLower = inputString:lower() 												--INS251229 Baertram
+		local zoneNameLower = v.zoneName:lower()													--INS251229 Baertram
+		for _, v in pairs(resultListEndlessDungeons) do if zo_plainstrfind(zoneNameLower, inputStringLower) then 	table_insert(resultList, v) end end
+		for _, v in pairs(resultListArenas) do 			if zo_plainstrfind(zoneNameLower, inputStringLower) then 	table_insert(resultList, v) end end
+		for _, v in pairs(resultListGroupArenas) do 	if zo_plainstrfind(zoneNameLower, inputStringLower) then	table_insert(resultList, v) end end
+		for _, v in pairs(resultListTrials) do 			if zo_plainstrfind(zoneNameLower, inputStringLower) then 	table_insert(resultList, v) end end
+		for _, v in pairs(resultListGroupDungeons) do 	if zo_plainstrfind(zoneNameLower, inputStringLower) then 	table_insert(resultList, v) end end
 	else
 		for _, v in pairs(resultListEndlessDungeons) do table_insert(resultList, v) end
-		for _, v in pairs(resultListArenas) do table_insert(resultList, v) end
-		for _, v in pairs(resultListGroupArenas) do table_insert(resultList, v) end
-		for _, v in pairs(resultListTrials) do table_insert(resultList, v) end
-		for _, v in pairs(resultListGroupDungeons) do table_insert(resultList, v) end
+		for _, v in pairs(resultListArenas) do 			table_insert(resultList, v) end
+		for _, v in pairs(resultListGroupArenas) do 	table_insert(resultList, v) end
+		for _, v in pairs(resultListTrials) do 			table_insert(resultList, v) end
+		for _, v in pairs(resultListGroupDungeons) do 	table_insert(resultList, v) end
 	end
 	-- add no results info if player disabled all categories
 	if #resultList == 0 then

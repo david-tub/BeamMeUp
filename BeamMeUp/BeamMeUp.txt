@@ -21,6 +21,7 @@ localization/EN.lua
 localization/$(language).lua
 
 core/List.lua
+core/SettingsMenu.lua
 core/TeleAppUI.lua
 core/TeleSlashCommands.lua
 core/TeleporterChecker.lua

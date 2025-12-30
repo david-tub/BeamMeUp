@@ -40,24 +40,27 @@ local BMU_tooltipTextEnter                  = BMU.tooltipTextEnter
 ----variables (defined inline in code below, upon first usage, as they are still nil at this line)
 ----functions (defined inline in code below, upon first usage, as they are still nil at this line)
 local BMU_getItemTypeIcon, BMU_getDataMapInfo, BMU_OpenTeleporter, BMU_updateContextMenuEntrySurveyAll,
-      BMU_getContextMenuEntrySurveyAllAppendix, BMU_clearInputFields
+      BMU_getContextMenuEntrySurveyAllAppendix, BMU_clearInputFields, BMU_getIndexFromValue
 -- -^- INS251229 Baertram END 0
 
 -- list of tuples (guildId & displayname) for invite queue (only for admin)
 local inviteQueue = {}
 
-local function SetupOptionsMenu(index) --index == Addon name
-    local BMU_DefaultsPerCharacter = BMU.DefaultsCharacter  --INS251229 Baertram performance improvement for multiple used variable reference
-    local BMU_DefaultsPerAccount   = BMU.DefaultsAccount    --INS251229 Baertram performance improvement for multiple used variable reference
-    local BMU_SVAcc = BMU.savedVarsAcc                      --INS251229 Baertram performance improvement for multiple used variable reference
+local function SetupOptionsMenu(addonName) --index == Addon name                        --CHG251229 Baertram renamed because index is also used in the loop at line 78 and within several setFunc/getFunc of some entries below and the variable is shadowed then
+    -- -v- INS251229 Baertram performance improvement for multiple used variable reference
+    local BMU_DefaultsPerCharacter = BMU.DefaultsCharacter
+    local BMU_DefaultsPerAccount   = BMU.DefaultsAccount
+    BMU_getIndexFromValue = BMU_getIndexFromValue or BMU.getIndexFromValue
+    local BMU_SVAcc = BMU.savedVarsAcc
+    -- -^- INS251229 Baertram
 
     local teleporterWin     = BMU.win
 
 
     local panelData = {
             type 				= 'panel',
-            name 				= index,
-            displayName 		= BMU_colorizeText(index, "gold"),                      --CHG251229 Baertram
+            name 				= addonName,
+            displayName 		= BMU_colorizeText(addonName, "gold"),                  --CHG251229 Baertram
             author 				= BMU_colorizeText(teleporterVars.author, "teal"),      --CHG251229 Baertram
             version 			= BMU_colorizeText(teleporterVars.version, "teal"),     --CHG251229 Baertram -> Also changed in this function at another 48 places! No comments were added there, onlya t the first of the 48 ;-)
             website             = teleporterVars.website,
@@ -420,7 +423,7 @@ local function SetupOptionsMenu(index) --index == Addon name
 		{
 			type = "dropdown",
 			name = BMU_SI_get(SI.TELE_SETTINGS_DEFAULT_TAB),
-			tooltip = BMU_SI_get(SI.TELE_SETTINGS_DEFAULT_TAB_TOOLTIP) .. " [DEFAULT: " .. BMU.dropdownDefaultTabChoices[BMU.getIndexFromValue(BMU.dropdownDefaultTabValues, BMU_DefaultsPerCharacter["defaultTab"])] .. "]",
+			tooltip = BMU_SI_get(SI.TELE_SETTINGS_DEFAULT_TAB_TOOLTIP) .. " [DEFAULT: " .. BMU.dropdownDefaultTabChoices[BMU_getIndexFromValue(BMU.dropdownDefaultTabValues, BMU_DefaultsPerCharacter["defaultTab"])] .. "]",
 			choices = BMU.dropdownDefaultTabChoices,
 			choicesValues = BMU.dropdownDefaultTabValues,
 			getFunc = function() return BMU.savedVarsChar.defaultTab end,
@@ -597,7 +600,7 @@ local function SetupOptionsMenu(index) --index == Addon name
               getFunc = function() return BMU.savedVarsServ.prioritizationSource[1] end,
 			  setFunc = function(value)
 				-- swap positions
-				local index = BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
+				local index = BMU_getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
 				BMU.savedVarsServ.prioritizationSource[index] = BMU.savedVarsServ.prioritizationSource[1]
 				BMU.savedVarsServ.prioritizationSource[1] = value
 			  end,
@@ -614,7 +617,7 @@ local function SetupOptionsMenu(index) --index == Addon name
               getFunc = function() return BMU.savedVarsServ.prioritizationSource[2] end,
 			  setFunc = function(value)
 				-- swap positions
-				local index = BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
+				local index = BMU_getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
 				BMU.savedVarsServ.prioritizationSource[index] = BMU.savedVarsServ.prioritizationSource[2]
 				BMU.savedVarsServ.prioritizationSource[2] = value
 			  end,
@@ -638,7 +641,7 @@ local function SetupOptionsMenu(index) --index == Addon name
               getFunc = function() return BMU.savedVarsServ.prioritizationSource[3] end,
 			  setFunc = function(value)
 			  	-- swap positions
-				local index = BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
+				local index = BMU_getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
 				BMU.savedVarsServ.prioritizationSource[index] = BMU.savedVarsServ.prioritizationSource[3]
 				BMU.savedVarsServ.prioritizationSource[3] = value
 			  end,
@@ -662,7 +665,7 @@ local function SetupOptionsMenu(index) --index == Addon name
               getFunc = function() return BMU.savedVarsServ.prioritizationSource[4] end,
 			  setFunc = function(value)
 				-- swap positions
-				local index = BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
+				local index = BMU_getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
 				BMU.savedVarsServ.prioritizationSource[index] = BMU.savedVarsServ.prioritizationSource[4]
 				BMU.savedVarsServ.prioritizationSource[4] = value
 			  end,
@@ -686,7 +689,7 @@ local function SetupOptionsMenu(index) --index == Addon name
               getFunc = function() return BMU.savedVarsServ.prioritizationSource[5] end,
 			  setFunc = function(value)
 			  			  	-- swap positions
-				local index = BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
+				local index = BMU_getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
 				BMU.savedVarsServ.prioritizationSource[index] = BMU.savedVarsServ.prioritizationSource[5]
 				BMU.savedVarsServ.prioritizationSource[5] = value
 			  end,
@@ -710,7 +713,7 @@ local function SetupOptionsMenu(index) --index == Addon name
               getFunc = function() return BMU.savedVarsServ.prioritizationSource[6] end,
 			  setFunc = function(value)
 			  	-- swap positions
-				local index = BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
+				local index = BMU_getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
 				BMU.savedVarsServ.prioritizationSource[index] = BMU.savedVarsServ.prioritizationSource[6]
 				BMU.savedVarsServ.prioritizationSource[6] = value
 			  end,
@@ -767,7 +770,9 @@ local function SetupOptionsMenu(index) --index == Addon name
 			  choices = BMU.dropdownSecLangChoices,
 			  choicesValues = BMU.dropdownSecLangValues,
               getFunc = function() return BMU_SVAcc.secondLanguage end,
-			  setFunc = function(value) BMU_SVAcc.secondLanguage = value end,
+			  setFunc = function(value) BMU_SVAcc.secondLanguage = value
+                  BMU.secondLanguageChanged = true                                                  --INS251229 Baertram
+              end,
 			  default = BMU_DefaultsPerAccount["secondLanguage"],
 			  submenu = "adv",
         },

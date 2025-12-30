@@ -1083,6 +1083,7 @@ end
 
 -- update the ListView
 -- Goes through each line control and either shows a message or hides it
+local cachedSavedVarsAccountSecondLanguage = nil													--INS251229 Baertram
 function ListView:update()
 	-- suggestion by otac0n (Discord, 2022_10)
 	-- To make it robust, you may want to create a unique ID per ListView.  This assumes a singleton.
@@ -1187,7 +1188,12 @@ function ListView:update()
 			
 			-- Second language for zone names
 			-- if second language is selected & entry is a real zone & zoneNameSecondLanguage exists
-			if BMU.savedVarsAcc.secondLanguage ~= 1 and message.zoneNameClickable == true and message.zoneNameSecondLanguage ~= nil then
+			-- check if enabled
+			if cachedSavedVarsAccountSecondLanguage == nil or BMU.secondLanguageChanged then
+				cachedSavedVarsAccountSecondLanguage = BMU.savedVarsAcc.secondLanguage  			--INS251229 Baertram Cache the SavedVariables 2nd language until next reloadui or LAm settings changed (which will be checked against BMU.secondLanguageChanged)
+				BMU.secondLanguageChanged = nil
+			end
+			if cachedSavedVarsAccountSecondLanguage ~= 1 and message.zoneNameClickable == true and message.zoneNameSecondLanguage ~= nil then --CHG251229 Baertram
 				if #tooltipTextZone > 0 then
 					-- add separator
 					table.insert(tooltipTextZone, BMU.textures.tooltipSeperator)

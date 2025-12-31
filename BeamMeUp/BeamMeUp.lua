@@ -696,21 +696,19 @@ local function OnAddOnLoaded(eventCode, addOnName)
 
 	--Add the LibZone datatable to Teleporter -> See event_add_on_loaded as LibZone will be definitely loaded then
 	--due to the ##DependsOn: LibZone entry in this addon's manifest file BeamMeUp.txt
-	BMU.LibZoneGivenZoneData = {}
+	local BMU_LibZoneGivenZoneData = {} 															--INS251229 Baertram
 	local libZone = BMU.LibZone
 	if libZone then
 		-- LibZone >= v6
 		if libZone.GetAllZoneData then
-			BMU.LibZoneGivenZoneData = libZone:GetAllZoneData()
-		-- LibZone <= v5 (backup)
-		elseif libZone.givenZoneData then
-			BMU.LibZoneGivenZoneData = libZone.givenZoneData
+			BMU_LibZoneGivenZoneData = libZone:GetAllZoneData()
 		else
-			d("[" .. appName .. " - ERROR] LibZone zone data is missing!")
+			d("[" .. appName .. " - ERROR] LibZone zone data is missing. Please update the library!")
 		end
 	else
 		d("[" .. appName .. " - ERROR] Error when accessing LibZone library!")
 	end
+	BMU.LibZoneGivenZoneData = BMU_LibZoneGivenZoneData
 
 	--[[
 		February 2022

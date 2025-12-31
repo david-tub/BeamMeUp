@@ -275,7 +275,7 @@ end
 -- Helpers to resolve house IDs and names
 function BMU.resolveHouseId(idOrCollectible)
 	local id = tonumber(idOrCollectible)
-	if not id then return nil end
+	if not id then return end
 	-- If the value looks like a collectible, try to map it to a houseId (if API is available)
 	if GetHouseIdFromCollectibleId and (IsCollectibleUnlocked(id) or (GetCollectibleCategoryType and GetCollectibleCategoryType(id) == COLLECTIBLE_CATEGORY_TYPE_HOUSE)) then
 		local hId = GetHouseIdFromCollectibleId(id)

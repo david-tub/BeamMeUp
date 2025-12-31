@@ -34,7 +34,6 @@ local colorGreen 							= "green"
 local colorBlue 							= "blue"
 local colorRed 								= "red"
 local colorGray 							= "gray"
-local BMU_LibZoneGivenZoneData				= BMU.LibZoneGivenZoneData
 ----functions
 --ZOs functions
 local string = string
@@ -62,6 +61,7 @@ local BMU_isFavoritePlayer 					= BMU.isFavoritePlayer
 local BMU_updateRelatedItemsCounterPanel 	= BMU.updateRelatedItemsCounterPanel
 
 ----variables (defined inline in code below, upon first usage, as they are still nil at this line)
+local BMU_LibZoneGivenZoneData
 --BMU functions
 local BMU_getParentZoneId, BMU_getMapIndex, BMU_categorizeZone, BMU_getCurrentZoneId, BMU_isBlacklisted, BMU_checkOnceOnly,
 	  BMU_has_value, BMU_has_value_special, BMU_getExistingEntry, BMU_removeExistingEntry, BMU_addInfo_1, BMU_addInfo_2,
@@ -732,6 +732,7 @@ end
 -- add alternative zone name (second language) if feature active (see translation array)
 local cachedSavedVarsAccountSecondLanguage = nil													--INS251229 Baertram
 function BMU.getZoneNameSecondLanguage(zoneId)
+	BMU_LibZoneGivenZoneData = BMU_LibZoneGivenZoneData or BMU.LibZoneGivenZoneData					--INS251229 Baertram
 	-- check if enabled
 	if cachedSavedVarsAccountSecondLanguage == nil or BMU.secondLanguageChanged then
 		cachedSavedVarsAccountSecondLanguage = BMU.savedVarsAcc.secondLanguage  					--INS251229 Baertram Cache the SavedVariables 2nd language until next reloadui or LAm settings changed (which will be checked against BMU.secondLanguageChanged)

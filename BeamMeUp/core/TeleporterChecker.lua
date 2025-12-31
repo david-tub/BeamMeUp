@@ -12,7 +12,6 @@ local allZoneIds = {} -- stores the number of hits of a zoneId at index (allzone
 ----variables (defined now, as they were loaded before this file -> see manifest .txt)
 --ZOs variables
 local SM = SCENE_MANAGER
-local worldName = GetWorldName()
 local numberType = "number"
 local stringType = "string"
 local tableType = "table"
@@ -69,7 +68,7 @@ local BMU_getParentZoneId, BMU_getMapIndex, BMU_categorizeZone, BMU_getCurrentZo
       BMU_getDataMapInfo, BMU_itemIsRelated, BMU_createZoneLessItemsInfo, BMU_createClickableZoneRecord, BMU_addItemInformation,
    	  BMU_addLeadInformation, BMU_cleanUnrelatedRecords, BMU_cleanUnrelatedRecords2, BMU_findExactQuestLocation, BMU_createNoResultsInfo,
       BMU_decidePrioDisplay, BMU_addNumberPlayers, BMU_getZoneGuideDiscoveryInfo, BMU_createPublicDungeonAchiementInfo,
-	  BMU_createBlankRecord, BMU_createDungeonRecord, BMU_createTableGuilds
+	  BMU_createBlankRecord, BMU_createDungeonRecord, BMU_createTableGuilds, BMU_getIndexFromValue
 ----functions (defined inline in code below, upon first usage, as they are still nil at this line)
 
 --String text variables
@@ -728,6 +727,7 @@ function BMU.getIndexFromValue(myTable, v)
 	end
 	return 99 -- special case, just return high value (low priority for houses), SORRY
 end
+BMU_getIndexFromValue = BMU.getIndexFromValue														--INS251229 Baertram
 
 -- add alternative zone name (second language) if feature active (see translation array)
 local cachedSavedVarsAccountSecondLanguage = nil													--INS251229 Baertram
@@ -802,7 +802,7 @@ function BMU.addInfo_1(e, currentZoneId, playersZoneId, sourceIndexLeading)
 		-- is Friend?
 		if sourceIndexLeading == BMU_SourceIndex_Friend or IsFriend(e.displayName) then
 			table_insert(e.sources, BMU_SourceIndex_Friend)
-			table_insert(e.sourcesText, BMU_colorizeText(friendStr, colorGreen))
+			table_insert(e.sourcesText, BMU_colorizeText(friendsStr, colorGreen))
 		end
 
 		-- is in Guild?
@@ -2011,7 +2011,7 @@ function BMU.decidePrioDisplay(record1, record2)
 	elseif record1.sourceIndexLeading ~= BMU_SourceIndex_Group and record2.sourceIndexLeading == BMU_SourceIndex_Group then
 		-- group is always comes first
 		return false
-	elseif BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, record1.sourceIndexLeading) < BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, record2.sourceIndexLeading) then
+	elseif BMU_getIndexFromValue(BMU.savedVarsServ.prioritizationSource, record1.sourceIndexLeading) < BMU_getIndexFromValue(BMU.savedVarsServ.prioritizationSource, record2.sourceIndexLeading) then
 		-- source of record1 has lower index in prioritization table (higher priority)
 		return true
 	elseif record1.isOwnHouse and record2.isOwnHouse then

@@ -12,19 +12,13 @@ local wm                = WINDOW_MANAGER
 ----variables (defined now, as they were loaded before this file -> see manifest .txt)
 --ZOs variables
 local string 								= string
-local string_sub 							= string.sub
-local string_match 							= string.match
 local string_lower 							= string.lower
-local string_upper 							= string.upper
-local string_gsub 							= string.gsub
 local string_len							= string.len
 local string_format							= string.format
-local zo_strformat 							= zo_strformat
 local zo_plainstrfind 						= zo_plainstrfind
 local table 								= table
 local table_insert 							= table.insert
 local table_remove 							= table.remove
-local table_sort 							= table.sort
 local unpack 								= unpack
 local worldName 							= GetWorldName()
 local zo_Menu                               = ZO_Menu     --ZO_Menu speed-up variable (so _G is not searched each time context menus are used)
@@ -77,7 +71,7 @@ local BMU_chatButtonTex, teleporterWin_appTitle, teleporterWin_Main_Control, tel
 
 -------functions (defined inline in code below, upon first usage, as they are still nil at this line)
 local BMU_getItemTypeIcon, BMU_getDataMapInfo, BMU_OpenTeleporter, BMU_updateContextMenuEntrySurveyAll,
-      BMU_getContextMenuEntrySurveyAllAppendix, BMU_clearInputFields, BMU_getIndexFromValue, BMU_createTable,
+      BMU_getContextMenuEntrySurveyAllAppendix, BMU_clearInputFields, BMU_createTable,
       BMU_createTableDungeons, BMU_createTableGuilds, BMU_numOfSurveyTypesChecked
 -- -^- INS251229 Baertram END 0
 
@@ -320,7 +314,7 @@ local function SetupUI()
   teleporterWin_Main_Control:SetDimensions(500*scale,400*scale) --CHG251229 Baertram
   teleporterWin_Main_Control:SetHidden(true) --CHG251229 Baertram
 
-  local teleporterWin_appTitle = wm:CreateControl("Teleporter_appTitle", teleporterWin_Main_Control, CT_LABEL) --CHG251229 Baertram
+  teleporterWin_appTitle = wm:CreateControl("Teleporter_appTitle", teleporterWin_Main_Control, CT_LABEL) --CHG251229 Baertram
   teleporterWin.appTitle = teleporterWin_appTitle
   teleporterWin_appTitle:SetFont(BMU.font1) --CHG251229 Baertram
   teleporterWin_appTitle:SetColor(255, 255, 255, 1) --CHG251229 Baertram
@@ -948,7 +942,6 @@ local function SetupUI()
 
   -- -v- INS251229 Baertram BEGIN 1 Variables for the relevant submenu opening controls
   local submenuIndicesToAddCallbackTo = {}
-  local BMU_ItemTexture
   --reference variables for performance etc.
   local BMU_updateCheckboxSurveyMap
   local function BMU_CreateTable_IndexListItems() --local function which is not redefined each contextMenu open again and again and again -> memory and performance drain!
@@ -956,7 +949,6 @@ local function SetupUI()
   end
   -- -^- INS251229 Baertram END 1
   teleporterWin_Main_Control_ItemTexture:SetHandler("OnMouseUp", function(ctrl, button)
-      BMU_ItemTexture = BMU_ItemTexture or teleporterWin_Main_Control_ItemTexture               --INS251229 Baertram
       BMU_updateCheckboxSurveyMap = BMU_updateCheckboxSurveyMap or BMU.updateCheckboxSurveyMap  --INS251229 Baertram
 	  submenuIndicesToAddCallbackTo = {}                                                        --INS251229 Baertram
       if button == MOUSE_BUTTON_INDEX_RIGHT then
@@ -1174,7 +1166,7 @@ local function SetupUI()
       menuType = menuType or MENU_TYPE_DEFAULT
 --d("[BMU]ShowMenu-owner: " .. tostring(owner) .. "/" .. tostring(BMU_ItemTexture) .. "; menuType: " ..tostring(menuType))
       --Check if the menu is our at the BMU panel's itemTexture, if it got entries, if special submenu items have been defined -> Else abort
-      if menuType ~= MENU_TYPE_DEFAULT or (owner == nil or owner ~= BMU_ItemTexture) or zo_IsTableEmpty(submenuIndicesToAddCallbackTo)
+      if menuType ~= MENU_TYPE_DEFAULT or (owner == nil or owner ~= teleporterWin_Main_Control_ItemTexture) or zo_IsTableEmpty(submenuIndicesToAddCallbackTo)
               or next(zo_Menu.items) == nil then return end
       zo_MenuSubmenuItemsHooked = {}
       --Add the OnMouseUp handler to the submenu's "opening control" so clicking them will enable/disable (toggle) all the checkboxes inside the submenu

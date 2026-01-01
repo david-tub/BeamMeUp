@@ -1770,7 +1770,7 @@ function BMU.showDialogCustom(dialogName, dialogInfoObject)
 	local dialogInfo = dialogInfoObject
 	
 	-- register dialog globally
-	local globalDialogName = teleporterVars.appName .. dialogName
+	local globalDialogName = appName .. dialogName
 	
 	ESO_Dialogs[globalDialogName] = dialogInfo
 	local dialogReference = ZO_Dialogs_ShowDialog(globalDialogName)

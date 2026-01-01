@@ -32,6 +32,9 @@ local BMU_ZONE_CATEGORY_OVERLAND = BMU.ZONE_CATEGORY_OVERLAND
 
 ----functions
 --ZOs functions
+local GetZoneNameById = GetZoneNameById
+local GetCurrentMapZoneIndex = GetCurrentMapZoneIndex
+local GetZoneId = GetZoneId
 --BMU functions
 local BMU_SI_get 							= SI.get
 local BMU_updatePosition					= BMU.updatePosition
@@ -47,6 +50,7 @@ local BMU_portToOwnHouse 					= BMU.portToOwnHouse
 local BMU_showDialogAutoUnlock				= BMU.showDialogAutoUnlock
 local BMU_PortalToPlayer 					= BMU.PortalToPlayer
 local BMU_refreshListAuto 					= BMU.refreshListAuto
+local BMU_journalUpdated					= BMU.journalUpdated
 
 
 ----variables (defined inline in code below, upon first usage, as they are still nil at this line)
@@ -56,18 +60,19 @@ local BMU_win, BMU_win_Main_Control
 local BMU_HideTeleporter, BMU_toggleZoneGuide, BMU_getZoneSpecificHouse, BMU_getAllPublicDungeons, BMU_getAllDelves,
       BMU_joinBlacklist, BMU_formatName, BMU_startCountdownAutoRefresh, BMU_showNotification, BMU_initializeBlacklist,
       BMU_OpenTeleporter, BMU_clearInputFields, BMU_createTable, BMU_createTableHouses, BMU_createTableDungeons,
-	  BMU_requestGuildData, BMU_createTableGuilds
+	  BMU_requestGuildData, BMU_createTableGuilds, BMU_closeBtnSwitchTexture, BMU_getParentZoneId
 -- -^- INS251229 Baertram END 0
 
 --Old code from TeleUnicorn -> Moved directly to Teleporter to strip the library
 BMU.throttled = {}
+local BMU_throttled = BMU.throttled
 local current_ms, last_render_ms
 function BMU.throttle(key, frequency)
 	current_ms = GetFrameTimeMilliseconds() / 1000.0
-	last_render_ms = BMU.throttled[key] or 0
+	last_render_ms = BMU_throttled[key] or 0
 
 	if current_ms > (last_render_ms + frequency) then
-		BMU.throttled[key] = current_ms
+		BMU_throttled[key] = current_ms
 		return false
 	end
 
@@ -160,7 +165,7 @@ function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 		elseif firstRecord.isOwnHouse then
 			BMU_portToOwnHouse(false, firstRecord.houseId, true, firstRecord.parentZoneName)
 		else
-			BMU_printToChat(BMU.formatName(GetZoneNameById(fZoneId), BMU.savedVarsAcc.formatZoneName) .. " - " .. BMU_SI_get(SI.TELE_CHAT_NO_FAST_TRAVEL))
+			BMU_printToChat(BMU_formatName(GetZoneNameById(fZoneId), BMU.savedVarsAcc.formatZoneName) .. " - " .. BMU_SI_get(SI.TELE_CHAT_NO_FAST_TRAVEL))
 		end
 		return
 	end
@@ -192,7 +197,7 @@ function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 		local _, name, _, _, _, _, _, _, _ = GetFastTravelNodeInfo(nodeIndex)
 		if GetInteractionType() ~= INTERACTION_FAST_TRAVEL then
 			-- only show info message if the player is not interacting with a wayshrine
-			BMU_printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(name) .. " (" .. zo_strformat(SI_MONEY_FORMAT, GetRecallCost()) .. ")", BMU.MSG_FT)
+			BMU_printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU_formatName(name) .. " (" .. zo_strformat(SI_MONEY_FORMAT, GetRecallCost()) .. ")", BMU.MSG_FT)
 		end
 		FastTravelToNode(nodeIndex)
 		return
@@ -223,7 +228,8 @@ function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 		if keyPressIndex == 11 then -- Refresh list
 			BMU_refreshListAuto()
 		else
-			if keyPressIndex ~= BMU.state and BMU.state ~= BMU.indexListDungeons and BMU.state ~= BMU.indexListOwnHouses then
+			local BMU_state = BMU.state
+			if keyPressIndex ~= BMU_state and BMU_state ~= BMU.indexListDungeons and BMU_state ~= BMU.indexListOwnHouses then
 				-- index is different -> switch tab but bypass the special states (Dungeon Finder, Own Houses)
 				if keyPressIndex == 6 then
 					-- dungeon finder
@@ -321,6 +327,8 @@ function BMU.OpenTeleporter(refresh)
 	BMU_createTable = BMU_createTable or BMU.createTable											--INS251229 Baertram
 	BMU_createTableHouses = BMU_createTableHouses or BMU.createTableHouses							--INS251229 Baertram
 	BMU_createTableDungeons = BMU_createTableDungeons or BMU.createTableDungeons					--INS251229 Baertram
+	BMU_closeBtnSwitchTexture = BMU_closeBtnSwitchTexture or BMU.closeBtnSwitchTexture 				--INS251229 Baertram
+	BMU_startCountdownAutoRefresh = BMU_startCountdownAutoRefresh or BMU.startCountdownAutoRefresh	--INS251229 Baertram
 
 	-- show notification (in case)
 	BMU_showNotification()
@@ -329,10 +337,10 @@ function BMU.OpenTeleporter(refresh)
 		--hide ZoneGuide
 		BMU_toggleZoneGuide(false)
 		-- show swap button
-		BMU.closeBtnSwitchTexture(true)
+		BMU_closeBtnSwitchTexture(true)
 	else
 		--show normal close button
-		BMU.closeBtnSwitchTexture(false)
+		BMU_closeBtnSwitchTexture(false)
 	end
 	
 	-- positioning window
@@ -347,19 +355,20 @@ function BMU.OpenTeleporter(refresh)
 	if BMU.savedVarsAcc.autoRefresh and refresh then
 		-- reset input and load default tab
 		BMU_clearInputFields()
-		
-		if BMU.savedVarsChar.defaultTab == BMU.indexListOwnHouses then
+
+		local defaultSVCharTab = BMU.savedVarsChar.defaultTab
+		if defaultSVCharTab == BMU.indexListOwnHouses then
 			BMU_createTableHouses()
-		elseif BMU.savedVarsChar.defaultTab == BMU.indexListDungeons then
+		elseif defaultSVCharTab == BMU.indexListDungeons then
 			BMU_createTableDungeons()
 		else
-			BMU_createTable({index=BMU.savedVarsChar.defaultTab})
+			BMU_createTable({index=defaultSVCharTab})
 		end
 	end
 	
 	-- start auto refresh
 	if BMU.savedVarsAcc.autoRefreshFreq ~= 0 then
-		zo_callLater(function() BMU.startCountdownAutoRefresh() end, BMU.savedVarsAcc.autoRefreshFreq*1000)
+		zo_callLater(function() BMU_startCountdownAutoRefresh() end, BMU.savedVarsAcc.autoRefreshFreq*1000)
 	end
 	
 	-- focus search box if enabled
@@ -548,6 +557,7 @@ function BMU.initializeCategoryMap()
 		BMU_CategoryMap[parentZoneId] = BMU_ZONE_CATEGORY_OVERLAND
 	end
 end
+local BMU_initializeCategoryMap = BMU.initializeCategoryMap
 
 ----------------------------
 
@@ -569,6 +579,19 @@ function BMU.startCountdownAutoRefresh()
 	end
 end
 BMU_startCountdownAutoRefresh = BMU.startCountdownAutoRefresh
+
+function BMU.isPlayerInBMUGuild()
+	if teleporterVars.BMUGuilds[GetWorldName()] ~= nil then
+		for _, guildId in pairs(teleporterVars.BMUGuilds[GetWorldName()]) do
+			if IsPlayerInGuild(guildId) then
+				return true
+			end
+		end
+	end
+	return false
+end
+local BMU_isPlayerInBMUGuild = BMU.isPlayerInBMUGuild
+
 
 -- displays notifications
 -- itemTabClicked = true -> Tab for treasure and survey maps was clicked
@@ -604,7 +627,7 @@ function BMU.showNotification(itemTabClicked)
 		--]]
 	else	-- normal case - when BMU window is opened		
 		-- BeamMeUp guild notification
-		if not BMU.savedVarsAcc.infoBMUGuild and not BMU.isPlayerInBMUGuild() and teleporterVars.BMUGuilds[GetWorldName()] ~= nil then
+		if not BMU.savedVarsAcc.infoBMUGuild and not BMU_isPlayerInBMUGuild() and teleporterVars.BMUGuilds[GetWorldName()] ~= nil then
 			BMU_showDialogSimple("NotificationBMUGuild", "BeamMeUp: Guilds", BMU_SI_get(SI.TELE_DIALOG_INFO_BMU_GUILD_BODY),
 				function()
 					BMU_requestGuildData()
@@ -619,18 +642,6 @@ function BMU.showNotification(itemTabClicked)
 	end
 end
 BMU_showNotification = BMU.showNotification  --INS251229 Baertram
-
-
-function BMU.isPlayerInBMUGuild()
-	if teleporterVars.BMUGuilds[GetWorldName()] ~= nil then
-		for _, guildId in pairs(teleporterVars.BMUGuilds[GetWorldName()]) do
-			if IsPlayerInGuild(guildId) then
-				return true
-			end
-		end
-	end
-	return false
-end
 
 
 -- Helper functions for zone-specific house preferences
@@ -662,10 +673,14 @@ end
 --   jumpOutside      (boolean|nil) nil defaults to true, false forces inside
 --   fallbackHouseId  (number|nil) houseId to use if no mapping exists for the zone
 function BMU.portToOwnHouseWithZonePreference(useCurrentZone, explicitZoneId, jumpOutside, fallbackHouseId)
+	BMU_formatName = BMU_formatName or BMU.formatName												--INS251229 Baertram
+	BMU_getParentZoneId = BMU_getParentZoneId or BMU.getParentZoneId								--INS251229 Baertram
+	BMU_portToOwnHouse = BMU_portToOwnHouse or BMU.portToOwnHouse									--INS251229 Baertram
+
 	-- resolve zone to use
 	local resolvedZoneId = explicitZoneId or GetZoneId(GetCurrentMapZoneIndex())
-	local parentZoneId = BMU.getParentZoneId(resolvedZoneId)
-	local zoneName = BMU.formatName(GetZoneNameById(parentZoneId), false)
+	local parentZoneId = BMU_getParentZoneId(resolvedZoneId)
+	local zoneName = BMU_formatName(GetZoneNameById(parentZoneId), false)
 	-- default outside unless explicitly false
 	local goOutside = (jumpOutside ~= false)
 
@@ -673,19 +688,19 @@ function BMU.portToOwnHouseWithZonePreference(useCurrentZone, explicitZoneId, ju
 		BMU_getZoneSpecificHouse = BMU_getZoneSpecificHouse or BMU.getZoneSpecificHouse		 		--INS251229 Baertram
 		local preferredHouseId = BMU_getZoneSpecificHouse(parentZoneId)
 		if preferredHouseId then
-			BMU.portToOwnHouse(false, preferredHouseId, goOutside, (zoneName ~= "" and zoneName) or nil)
+			BMU_portToOwnHouse(false, preferredHouseId, goOutside, (zoneName ~= "" and zoneName) or nil)
 			return
 		end
 	end
 
 	-- no mapping -> try fallback house (e.g., the clicked house)
 	if fallbackHouseId then
-		BMU.portToOwnHouse(false, fallbackHouseId, goOutside, (zoneName ~= "" and zoneName) or nil)
+		BMU_portToOwnHouse(false, fallbackHouseId, goOutside, (zoneName ~= "" and zoneName) or nil)
 		return
 	end
 
 	-- final fallback -> primary residence
-	BMU.portToOwnHouse(true, nil, goOutside, nil)
+	BMU_portToOwnHouse(true, nil, goOutside, nil)
 end
 
 local function OnAddOnLoaded(eventCode, addOnName)
@@ -821,15 +836,14 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	--Add the LibZone datatable to Teleporter -> See event_add_on_loaded as LibZone will be definitely loaded then
 	--due to the ##DependsOn: LibZone entry in this addon's manifest file BeamMeUp.txt
 	local BMU_LibZoneGivenZoneData = {} 															--INS251229 Baertram
-	if BMU_LibZone then
+	if BMU_LibZone and BMU_LibZone.GetAllZoneData then
 		-- LibZone >= v6
-		if BMU_LibZone.GetAllZoneData then
-			BMU_LibZoneGivenZoneData = BMU_LibZone:GetAllZoneData()
-		else
+		BMU_LibZoneGivenZoneData = BMU_LibZone:GetAllZoneData()
+		if ZO_IsTableEmpty(BMU_LibZoneGivenZoneData) then
 			d("[" .. appName .. " - ERROR] LibZone zone data is missing. Please update the library!")
 		end
 	else
-		d("[" .. appName .. " - ERROR] Error when accessing LibZone library!")
+		d("[" .. appName .. " - ERROR] Error when accessing LibZone library: Please update & enable the library!")
 	end
 	BMU.LibZoneGivenZoneData = BMU_LibZoneGivenZoneData
 
@@ -839,10 +853,10 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		July 2022
 		Removed addon capability to detect and transfer old saved vars (before Feb. 2022 and version 2.6.0)
 	--]]
-	BMU.savedVarsAcc = ZO_SavedVars:NewAccountWide(SVTabName, 			2, nil, BMU.DefaultsAccount, 	nil)
+	BMU.savedVarsAcc =  ZO_SavedVars:NewAccountWide(SVTabName, 			2, nil, BMU.DefaultsAccount, 	nil)
 	BMU.savedVarsServ = ZO_SavedVars:NewAccountWide(SVTabName, 			3, nil, BMU.DefaultsServer, 	GetWorldName())
 	BMU.savedVarsChar = ZO_SavedVars:NewCharacterIdSettings(SVTabName, 	3, nil, BMU.DefaultsCharacter, 	nil)
-	
+	local BMU_savedVarsAcc = BMU.savedVarsAcc
 	
 	BMU.TeleporterSetupUI(addOnName)
 	
@@ -863,32 +877,32 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	BMU.activateSlashCommands()
 
 	-- initialize category map
-	BMU.initializeCategoryMap()
+	BMU_initializeCategoryMap()
 	
 	-- refresh quest location data cache
-	EM:RegisterForEvent(appName, EVENT_QUEST_ADDED, BMU.journalUpdated)
-	EM:RegisterForEvent(appName, EVENT_QUEST_REMOVED, BMU.journalUpdated)
-	EM:RegisterForEvent(appName, EVENT_QUEST_CONDITION_COUNTER_CHANGED, BMU.journalUpdated)
+	EM:RegisterForEvent(appName, EVENT_QUEST_ADDED, 					BMU_journalUpdated)
+	EM:RegisterForEvent(appName, EVENT_QUEST_REMOVED, 					BMU_journalUpdated)
+	EM:RegisterForEvent(appName, EVENT_QUEST_CONDITION_COUNTER_CHANGED, BMU_journalUpdated)
 	
 	-- if necessary show center screen message that the player is still offline -> cannot receive any whisper messages
-	if BMU.savedVarsAcc.showOfflineReminder then
-		EM:RegisterForEvent(appName, EVENT_PLAYER_STATUS_CHANGED, function(_, _, newStatus) if (newStatus == 4) then BMU.playerStatusChangedToOffline = true end end)
+	if BMU_savedVarsAcc.showOfflineReminder then
+		EM:RegisterForEvent(appName, EVENT_PLAYER_STATUS_CHANGED, function(_, _, newStatus) if (newStatus == PLAYER_STATUS_OFFLINE) then BMU.playerStatusChangedToOffline = true end end)
 		EM:RegisterForEvent(appName, EVENT_CHAT_MESSAGE_CHANNEL, BMU.showOfflineNote)
 	end
 
 	-- Show Note, when a favorite player goes online
-	if BMU.savedVarsAcc.FavoritePlayerStatusNotification then
+	if BMU_savedVarsAcc.FavoritePlayerStatusNotification then
 		EM:RegisterForEvent(appName, EVENT_GUILD_MEMBER_PLAYER_STATUS_CHANGED, BMU.FavoritePlayerStatusNotification)
 		EM:RegisterForEvent(appName, EVENT_FRIEND_PLAYER_STATUS_CHANGED, BMU.FavoritePlayerStatusNotification)
 	end
 	
 	-- Show Note, when survey map is mined and there are still some identical maps left
-	if BMU.savedVarsAcc.surveyMapsNotification then
+	if BMU_savedVarsAcc.surveyMapsNotification then
 		SharedInv:RegisterCallback("SingleSlotInventoryUpdate", BMU.surveyMapUsed)
 	end
 	
 	-- Auto confirm dailog when using wayshrines
-	if BMU.savedVarsAcc.wayshrineTravelAutoConfirm then
+	if BMU_savedVarsAcc.wayshrineTravelAutoConfirm then
 		BMU_activateWayshrineTravelAutoConfirm()
 	end
 	

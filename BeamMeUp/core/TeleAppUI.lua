@@ -56,6 +56,7 @@ local BMU_SI_get                            = SI.get
 local BMU_colorizeText                      = BMU.colorizeText
 local BMU_round                             = BMU.round
 local BMU_tooltipTextEnter                  = BMU.tooltipTextEnter
+local BMU_mergeTables						= BMU.mergeTables
 
 ----variables (defined inline in code below, upon first usage, as they are still nil at this line)
 --BMU UI variables
@@ -1975,6 +1976,19 @@ function BMU.activateWayshrineTravelAutoConfirm()
 end
 
 
+-- request all guilds in queue
+local BMU_requestGuildDataRecursive
+function BMU.requestGuildDataRecursive(guildIds)
+	BMU_requestGuildDataRecursive = BMU_requestGuildDataRecursive or BMU.requestGuildDataRecursive
+	if #guildIds > 0 then
+		GUILD_BROWSER_MANAGER:RequestGuildData(table_remove(guildIds))
+		zo_callLater(function() BMU_requestGuildDataRecursive(guildIds) end, 800)
+	else
+		BMU.isCurrentlyRequestingGuildData = false
+	end
+end
+BMU_requestGuildDataRecursive = BMU.requestGuildDataRecursive
+
 --Request all BMU and partner guilds information
 function BMU.requestGuildData()
 	BMU.isCurrentlyRequestingGuildData = true
@@ -1985,20 +1999,10 @@ function BMU.requestGuildData()
 	end
 	-- partner guilds
 	if teleporterVars.partnerGuilds[worldName] ~= nil then
-		guildsQueue = BMU.mergeTables(guildsQueue, teleporterVars.partnerGuilds[worldName])
+		guildsQueue = BMU_mergeTables(guildsQueue, teleporterVars.partnerGuilds[worldName])
 	end
 
-	BMU.requestGuildDataRecursive(guildsQueue)
-end
-
--- request all guilds in queue
-function BMU.requestGuildDataRecursive(guildIds)
-	if #guildIds > 0 then
-		GUILD_BROWSER_MANAGER:RequestGuildData(table_remove(guildIds))
-		zo_callLater(function() BMU.requestGuildDataRecursive(guildIds) end, 800)
-	else
-		BMU.isCurrentlyRequestingGuildData = false
-	end
+	BMU_requestGuildDataRecursive(guildsQueue)
 end
 
 

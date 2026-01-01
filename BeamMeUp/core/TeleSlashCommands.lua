@@ -27,6 +27,8 @@ local teleporterVars = BMU.var --INS251229 Baertram
 local appName = teleporterVars.appName
 
 local searchPatternSC = "^(%S*)%s*(.-)$"
+local gsubPattern1 = "[\n\r]"
+local gsubPattern2 = "%s+$"
 local fallbackLang = teleporterVars.fallbackLang
 local clientLanguage = string_lower(GetCVar("language.2") or fallbackLang)
 local BMU_LibZoneGivenZoneData
@@ -46,7 +48,6 @@ local BMU_printToChat = BMU.printToChat
 local allowedLanguages = teleporterVars.allowedLanguages
 local BMU_addFavoriteZone = BMU.addFavoriteZone
 local BMU_getZoneIdFromZoneName  = BMU.getZoneIdFromZoneName
-local BMU_formatName = BMU.formatName
 local BMU_addFavoritePlayer = BMU.addFavoritePlayer
 local BMU_portToParentZone = BMU.portToParentZone
 local BMU_portToCurrentZone = BMU.portToCurrentZone
@@ -60,7 +61,7 @@ local BMU_PortalToPlayer = BMU.PortalToPlayer
 
 ----variables (defined inline in code below, upon first usage, as they are still nil at this line)
 local BMU_LibZone, BMU_LibZone_GetZoneGeographicalParentZoneId, BMU_setZoneSpecificHouse, BMU_getZoneSpecificHouse, BMU_clearZoneSpecificHouse,
-	  BMU_sc_checkPartnerGuilds_2, BMU_createTable
+	  BMU_sc_checkPartnerGuilds_2, BMU_createTable, BMU_formatName
 
 --BMU functions
 ----functions (defined inline in code below, upon first usage, as they are still nil at this line)
@@ -141,13 +142,13 @@ end
 
 
 local function BMU_sc_switchLanguage(option)
-	if allowedLanguages[option] then
+	if allowedLanguages[option] then																--CHG251229 Baertram Usage of dynamic languaes allowed table, tor educe redundancy and manual code changes if languages get added
 		SetCVar("language.2",option)
 	else
 		BMU_printToChat("invalid language code: " ..tos(option))
 		local allowedLanguagesStr = ""
 		for langStr, _ in pairs(allowedLanguages) do
-			allowedLanguagesStr = (allowedLanguagesStr ~= "" and (allowedLanguagesStr .. ", " .. langStr)) or langStr
+			allowedLanguagesStr = (allowedLanguagesStr ~= "" and (allowedLanguagesStr .. ", " .. langStr)) or langStr   --CHG251229 Baertram
 		end
 		BMU_printToChat("only " .. allowedLanguagesStr .. " allowed")
 	end
@@ -161,7 +162,7 @@ local function BMU_sc_addFavoritePlayer(option)
 	local position = ton(options[1])
 	local displayName = options[2]
 	
-	if displayName ~= nil and string_sub(displayName, 1, 1) == "@" and position ~= nil and position >= 1 and position <= teleporterVars.numFavoritePlayers then
+	if position ~= nil and displayName ~= nil and position >= 1 and position <= teleporterVars.numFavoritePlayers and string_sub(displayName, 1, 1) == "@" then --CHG251229 Baertram Switched string checks to the lastest -> performance gain
 		BMU_addFavoritePlayer(position, displayName)
 	else
 		BMU_printToChat("invalid input")
@@ -174,6 +175,7 @@ end
 -- "/bmu/favorites/add/zone 1 57"
 -- "/bmu/favorites/add/zone 1 Deshaan"
 local function BMU_sc_addFavoriteZone(option)
+	BMU_formatName = BMU_formatName or BMU.formatName 												--INS251229 Baertram
 	local options = BMU_sc_parseOptions(option)
 	local position = ton(options[1])
 	-- second parameter is number -> zoneId
@@ -195,6 +197,7 @@ end
 -- Examples:
 -- "/bmu/favorites/add/wayshrine 1"
 local function BMU_sc_addFavoriteWayshrine(option)
+	BMU_formatName = BMU_formatName or BMU.formatName 												--INS251229 Baertram
 	local function updateWayshrineInteraction(eventCode, nodeIndex)
 		--End the interactione vent here so we cannot repeat the same twice!
 		EVENT_MANAGER:UnregisterForEvent(appName, EVENT_START_FAST_TRAVEL_INTERACTION)   			--INS251229 Baertram
@@ -276,8 +279,8 @@ function BMU.getHouseNameByHouseId(houseId)
 	if collectibleId and collectibleId > 0 then
 		local houseName = GetCollectibleName(collectibleId)
 		if houseName and houseName ~= "" then
-			houseName = string_gsub(houseName, "[\n\r]", "")
-			houseName = string_gsub(houseName, "%s+$", "")
+			houseName = string_gsub(houseName, gsubPattern1, "")
+			houseName = string_gsub(houseName, gsubPattern2, "")
 			return houseName
 		end
 	end
@@ -288,6 +291,7 @@ local BMU_getHouseNameByHouseId = BMU.getHouseNameByHouseId
 -- Examples:
 -- "/bmu/house/set/current_zone 12345"
 local function BMU_sc_setCurrentZoneHouse(option)
+	BMU_formatName = BMU_formatName or BMU.formatName 												--INS251229 Baertram
 	BMU_setZoneSpecificHouse = BMU_setZoneSpecificHouse or BMU.setZoneSpecificHouse					--INS251229 Baertram
 	local inputId = ton(option)
 	if not inputId then
@@ -312,6 +316,7 @@ local function BMU_sc_setCurrentZoneHouse(option)
 end
 
 local function BMU_sc_setCurrentHouse(option)
+	BMU_formatName = BMU_formatName or BMU.formatName 												--INS251229 Baertram
 	BMU_setZoneSpecificHouse = BMU_setZoneSpecificHouse or BMU.setZoneSpecificHouse					--INS251229 Baertram
 	local currentHouseId = GetCurrentZoneHouseId()
 	if not currentHouseId or currentHouseId == 0 then
@@ -329,6 +334,7 @@ local function BMU_sc_setCurrentHouse(option)
 end
 
 local function BMU_sc_setZoneHouse(option)
+	BMU_formatName = BMU_formatName or BMU.formatName 												--INS251229 Baertram
 	BMU_setZoneSpecificHouse = BMU_setZoneSpecificHouse or BMU.setZoneSpecificHouse					--INS251229 Baertram
 	local parts = {}
 	for part in string_gmatch(option, "%S+") do table_insert(parts, part) end
@@ -365,6 +371,7 @@ local function BMU_sc_setZoneHouse(option)
 end
 
 local function BMU_sc_clearCurrentZoneHouse(option)
+	BMU_formatName = BMU_formatName or BMU.formatName 												--INS251229 Baertram
 	BMU_getZoneSpecificHouse = BMU_getZoneSpecificHouse or BMU.getZoneSpecificHouse					--INS251229 Baertram
 	BMU_clearZoneSpecificHouse = BMU_clearZoneSpecificHouse or BMU.clearZoneSpecificHouse		 	--INS251229 Baertram
 
@@ -384,6 +391,7 @@ local function BMU_sc_clearCurrentZoneHouse(option)
 end
 
 local function BMU_sc_listZoneHouses()
+	BMU_formatName = BMU_formatName or BMU.formatName 												--INS251229 Baertram
 	if not BMU.savedVarsServ.zoneSpecificHouses or next(BMU.savedVarsServ.zoneSpecificHouses) == nil then
 		BMU_printToChat("No zone-specific houses configured")
 		return
@@ -398,6 +406,7 @@ local function BMU_sc_listZoneHouses()
 end
 
 local function BMU_sc_clearZoneHouse(option)
+	BMU_formatName = BMU_formatName or BMU.formatName 												--INS251229 Baertram
 	BMU_clearZoneSpecificHouse = BMU_clearZoneSpecificHouse or BMU.clearZoneSpecificHouse		 	--INS251229 Baertram
 	if not option or option == "" then
 		BMU_printToChat("Usage: /bmu/house/clear/zone <zone>")
@@ -453,6 +462,7 @@ end
 local BMU_sc_porting = BMU.sc_porting
 
 local function BMU_sc_initializeSlashPorting()
+	BMU_formatName = BMU_formatName or BMU.formatName 												--INS251229 Baertram
 
 	-- create static blacklist (add everything where the player can not port to)
 	BMU.blacklistForSlashPorting = {}

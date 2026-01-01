@@ -447,7 +447,7 @@ end
 -- zoneId: optional, if not set use current zone (where the player actually is)
 function BMU.showDialogAutoUnlock(zoneId)
 	-- use player's zone if no specific zoneId is given
-	local zoneId = zoneId or GetZoneId(GetUnitZoneIndex("player"))
+	zoneId = zoneId or GetZoneId(GetUnitZoneIndex("player"))
 	
 	-- approach: create seperate control and anchor it to the default dialog control (ZO_Dialog1Text) (used by many dialogs)
 	-- via the dialog's update function we can interact (show, hide etc.) with the control

@@ -3,6 +3,7 @@ local BMU = BMU --INS251229 Baertram Performancee gain, not searching _G for BMU
 local SI = BMU.SI
 local teleporterVars = BMU.var
 local appName = teleporterVars.appName
+local SVTabName = teleporterVars.savedVariablesName
 
 -- -v- INS251229 Baertram BEGIN 0
 --Performance reference
@@ -16,6 +17,7 @@ local worldMapScene_Keyboard				= WORLD_MAP_SCENE
 local worldMapScene_Gamepad					= GAMEPAD_WORLD_MAP_SCENE
 local worldMapZoneStoryTLC_Keyboard			= ZO_WorldMapZoneStoryTopLevel_Keyboard
 --Other addon variables
+local BMU_LibZone = BMU.LibZone
 --BMU variables
 local BMU_ZONE_CATEGORY_UNKNOWN = BMU.ZONE_CATEGORY_UNKNOWN
 local BMU_ZONE_CATEGORY_DELVE = BMU.ZONE_CATEGORY_DELVE
@@ -32,18 +34,26 @@ local BMU_ZONE_CATEGORY_OVERLAND = BMU.ZONE_CATEGORY_OVERLAND
 ----functions
 --ZOs functions
 --BMU functions
-local BMU_SI_get                            = SI.get
-local BMU_colorizeText                      = BMU.colorizeText
-local BMU_round                             = BMU.round
-local BMU_tooltipTextEnter                  = BMU.tooltipTextEnter
+local BMU_SI_get 							= SI.get
 local BMU_updatePosition					= BMU.updatePosition
-local BMU_activateWayshrineTravelAutoConfirm = BMU.activateWayshrineTravelAutoConfirm
+local BMU_activateWayshrineTravelAutoConfirm= BMU.activateWayshrineTravelAutoConfirm
+local BMU_printToChat 						= BMU.printToChat
+local BMU_showDialogSimple 					= BMU.showDialogSimple
+local BMU_portToAnyZone 					= BMU.portToAnyZone
+local BMU_portToTrackedQuestZone 			= BMU.portToTrackedQuestZone
+local BMU_portToCurrentZone 				= BMU.portToCurrentZone
+local BMU_portToBMUGuildHouse 				= BMU.portToBMUGuildHouse
+local BMU_portToGroupLeader 				= BMU.portToGroupLeader
+local BMU_portToOwnHouse 					= BMU.portToOwnHouse
+local BMU_showDialogAutoUnlock				= BMU.showDialogAutoUnlock
+local BMU_PortalToPlayer 					= BMU.PortalToPlayer
+
 ----variables (defined inline in code below, upon first usage, as they are still nil at this line)
 --BMU UI variables
 
 -------functions (defined inline in code below, upon first usage, as they are still nil at this line)
 local BMU_HideTeleporter, BMU_toggleZoneGuide, BMU_getZoneSpecificHouse, BMU_getAllPublicDungeons, BMU_getAllDelves,
-      BMU_joinBlacklist
+      BMU_joinBlacklist, BMU_formatName
 -- -^- INS251229 Baertram END 0
 
 --Old code from TeleUnicorn -> Moved directly to Teleporter to strip the library
@@ -77,51 +87,53 @@ end
 ----------------------------------- KeyBinds
 function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 	BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter									--INS251229 Baertram
+	BMU_formatName = BMU_formatName or BMU.formatName												--INS251229 Baertram
+
 	-- Port to Group Leader
 	if keyPressIndex == 12 then
-		BMU.portToGroupLeader()
+		BMU_portToGroupLeader()
 		return
 	end
 	
 	-- Port to current zone
 	if keyPressIndex == 17 then
-		BMU.portToCurrentZone()
+		BMU_portToCurrentZone()
 		return
 	end
 	
 	-- Port to currently tracked/focused quest
 	if keyPressIndex == 19 then
-		BMU.portToTrackedQuestZone()
+		BMU_portToTrackedQuestZone()
 		return
 	end
 	
 	-- Port to any available zone (first entry from main list)
 	if keyPressIndex == 20 then
-		BMU.portToAnyZone()
+		BMU_portToAnyZone()
 		return
 	end
 
 	-- Port into own Primary Residence
 	if keyPressIndex == 13 then
-		BMU.portToOwnHouse(true, nil, false, nil)
+		BMU_portToOwnHouse(true, nil, false, nil)
 		return
 	end
 	
 	-- Port outside own Primary Residence
 	if keyPressIndex == 18 then
-		BMU.portToOwnHouse(true, nil, true, nil)
+		BMU_portToOwnHouse(true, nil, true, nil)
 		return
 	end
 	
 	-- Port to BMU guild house
 	if keyPressIndex == 14 then
-		BMU.portToBMUGuildHouse()
+		BMU_portToBMUGuildHouse()
 		return
 	end
 	
 	-- Unlock Wayshrines
 	if keyPressIndex == 10 then
-		BMU.showDialogAutoUnlock()
+		BMU_showDialogAutoUnlock()
 		return
 	end
 	
@@ -129,17 +141,17 @@ function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 	if keyPressIndex == 15 then
 		local fZoneId = BMU.savedVarsServ.favoriteListZones[favorite]
 			if fZoneId == nil then
-				BMU.printToChat(SI.get(SI.TELE_CHAT_FAVORITE_UNSET))
+				BMU_printToChat(BMU_SI_get(SI.TELE_CHAT_FAVORITE_UNSET))
 				return
 			end
 		local result = BMU.createTable({index=BMU.indexListZoneHidden, fZoneId=fZoneId, dontDisplay=true})
 		local firstRecord = result[1]
 		if firstRecord.displayName ~= "" then
-			BMU.PortalToPlayer(firstRecord.displayName, firstRecord.sourceIndexLeading, firstRecord.zoneName, firstRecord.zoneId, firstRecord.category, true, true, true)
+			BMU_PortalToPlayer(firstRecord.displayName, firstRecord.sourceIndexLeading, firstRecord.zoneName, firstRecord.zoneId, firstRecord.category, true, true, true)
 		elseif firstRecord.isOwnHouse then
-			BMU.portToOwnHouse(false, firstRecord.houseId, true, firstRecord.parentZoneName)
+			BMU_portToOwnHouse(false, firstRecord.houseId, true, firstRecord.parentZoneName)
 		else
-			BMU.printToChat(BMU.formatName(GetZoneNameById(fZoneId), BMU.savedVarsAcc.formatZoneName) .. " - " .. SI.get(SI.TELE_CHAT_NO_FAST_TRAVEL))
+			BMU_printToChat(BMU.formatName(GetZoneNameById(fZoneId), BMU.savedVarsAcc.formatZoneName) .. " - " .. BMU_SI_get(SI.TELE_CHAT_NO_FAST_TRAVEL))
 		end
 		return
 	end
@@ -148,13 +160,13 @@ function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 	if keyPressIndex == 16 then
 		local displayName = BMU.savedVarsServ.favoriteListPlayers[favorite]
 			if displayName == nil then
-				BMU.printToChat(SI.get(SI.TELE_CHAT_FAVORITE_UNSET))
+				BMU_printToChat(BMU_SI_get(SI.TELE_CHAT_FAVORITE_UNSET))
 				return
 			end
 		local result = BMU.createTable({index=BMU.indexListSearchPlayer, inputString=displayName, dontDisplay=true})
 		local firstRecord = result[1]
 		if firstRecord.displayName == "" then
-			BMU.printToChat(displayName .. " - " .. SI.get(SI.TELE_CHAT_FAVORITE_PLAYER_NO_FAST_TRAVEL))
+			BMU_printToChat(displayName .. " - " .. BMU_SI_get(SI.TELE_CHAT_FAVORITE_PLAYER_NO_FAST_TRAVEL))
 		else
 			BMU.PortalToPlayer(firstRecord.displayName, firstRecord.sourceIndexLeading, firstRecord.zoneName, firstRecord.zoneId, firstRecord.category, true, false, true)
 		end
@@ -165,13 +177,13 @@ function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 	if keyPressIndex == 21 then
 		local nodeIndex = BMU.savedVarsServ.favoriteListWayshrines[favorite]
 		if nodeIndex == nil then
-			BMU.printToChat(SI.get(SI.TELE_CHAT_FAVORITE_UNSET))
+			BMU_printToChat(BMU_SI_get(SI.TELE_CHAT_FAVORITE_UNSET))
 			return
 		end
 		local _, name, _, _, _, _, _, _, _ = GetFastTravelNodeInfo(nodeIndex)
 		if GetInteractionType() ~= INTERACTION_FAST_TRAVEL then
 			-- only show info message if the player is not interacting with a wayshrine
-			BMU.printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(name) .. " (" .. zo_strformat(SI_MONEY_FORMAT, GetRecallCost()) .. ")", BMU.MSG_FT)
+			BMU_printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(name) .. " (" .. zo_strformat(SI_MONEY_FORMAT, GetRecallCost()) .. ")", BMU.MSG_FT)
 		end
 		FastTravelToNode(nodeIndex)
 		return
@@ -519,9 +531,9 @@ end
 function BMU.showNotification(itemTabClicked)
 	-- 2022_08_29
 	-- check if the latest LibZone version is installed
-	if not BMU.LibZone.GetZoneMapPinInfo or not BMU.LibZone.GetZoneGeographicalParentZoneId then
+	if not BMU_LibZone.GetZoneMapPinInfo or not BMU_LibZone.GetZoneGeographicalParentZoneId then
 		-- show dialog
-		BMU.showDialogSimple("LibZoneOutdated", "Outdated LibZone version", "The installed version of LibZone is outdated. Please update the LibZone library, otherwise BeamMeUp will not work properly.\n\nIf you dont use Minion Addon Manager, you can open the LibZone website by accepting this dialog.", function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info2171-LibZone.html") end, nil)
+		BMU_showDialogSimple("LibZoneOutdated", "Outdated LibZone version", "The installed version of LibZone is outdated. Please update the LibZone library, otherwise BeamMeUp will not work properly.\n\nIf you dont use Minion Addon Manager, you can open the LibZone website by accepting this dialog.", function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info2171-LibZone.html") end, nil)
 	end
 
 	-- only if treasure and survey map tab was clicked
@@ -529,7 +541,7 @@ function BMU.showNotification(itemTabClicked)
 		-- new feature: Survey Maps Notification
 		--[[ TEMPORARILY DEACTIVATED UNTIL FEATURE IS WORKING PROPERLY (notification comes also when moving maps to bank or chest)
 		if not BMU.savedVarsAcc.infoSurveyMapsNotification and not BMU.savedVarsAcc.surveyMapsNotification then
-			BMU.showDialogSimple("NotificationBMUNewFeatureSMN", "NEW FEATURE", SI.get(SI.TELE_DIALOG_INFO_NEW_FEATURE_SURVEY_MAP_NOTIFICATION),
+			BMU_showDialogSimple("NotificationBMUNewFeatureSMN", "NEW FEATURE", BMU_SI_get(SI.TELE_DIALOG_INFO_NEW_FEATURE_SURVEY_MAP_NOTIFICATION),
 				function()
 					-- enable feature
 					BMU.savedVarsAcc.surveyMapsNotification = true
@@ -544,8 +556,8 @@ function BMU.showNotification(itemTabClicked)
 		--]]
 	else	-- normal case - when BMU window is opened		
 		-- BeamMeUp guild notification
-		if not BMU.savedVarsAcc.infoBMUGuild and not BMU.isPlayerInBMUGuild() and BMU.var.BMUGuilds[GetWorldName()] ~= nil then
-			BMU.showDialogSimple("NotificationBMUGuild", "BeamMeUp: Guilds", SI.get(SI.TELE_DIALOG_INFO_BMU_GUILD_BODY),
+		if not BMU.savedVarsAcc.infoBMUGuild and not BMU.isPlayerInBMUGuild() and teleporterVars.BMUGuilds[GetWorldName()] ~= nil then
+			BMU_showDialogSimple("NotificationBMUGuild", "BeamMeUp: Guilds", BMU_SI_get(SI.TELE_DIALOG_INFO_BMU_GUILD_BODY),
 				function()
 					BMU.requestGuildData()
 					BMU.clearInputFields()
@@ -561,8 +573,8 @@ end
 
 
 function BMU.isPlayerInBMUGuild()
-	if BMU.var.BMUGuilds[GetWorldName()] ~= nil then
-		for _, guildId in pairs(BMU.var.BMUGuilds[GetWorldName()]) do
+	if teleporterVars.BMUGuilds[GetWorldName()] ~= nil then
+		for _, guildId in pairs(teleporterVars.BMUGuilds[GetWorldName()]) do
 			if IsPlayerInGuild(guildId) then
 				return true
 			end
@@ -760,11 +772,10 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	--Add the LibZone datatable to Teleporter -> See event_add_on_loaded as LibZone will be definitely loaded then
 	--due to the ##DependsOn: LibZone entry in this addon's manifest file BeamMeUp.txt
 	local BMU_LibZoneGivenZoneData = {} 															--INS251229 Baertram
-	local libZone = BMU.LibZone
-	if libZone then
+	if BMU_LibZone then
 		-- LibZone >= v6
-		if libZone.GetAllZoneData then
-			BMU_LibZoneGivenZoneData = libZone:GetAllZoneData()
+		if BMU_LibZone.GetAllZoneData then
+			BMU_LibZoneGivenZoneData = BMU_LibZone:GetAllZoneData()
 		else
 			d("[" .. appName .. " - ERROR] LibZone zone data is missing. Please update the library!")
 		end
@@ -779,9 +790,9 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		July 2022
 		Removed addon capability to detect and transfer old saved vars (before Feb. 2022 and version 2.6.0)
 	--]]
-	BMU.savedVarsAcc = ZO_SavedVars:NewAccountWide("BeamMeUp_SV", 2, nil, BMU.DefaultsAccount, nil)
-	BMU.savedVarsServ = ZO_SavedVars:NewAccountWide("BeamMeUp_SV", 3, nil, BMU.DefaultsServer, GetWorldName())
-	BMU.savedVarsChar = ZO_SavedVars:NewCharacterIdSettings("BeamMeUp_SV", 3, nil, BMU.DefaultsCharacter, nil)
+	BMU.savedVarsAcc = ZO_SavedVars:NewAccountWide(SVTabName, 			2, nil, BMU.DefaultsAccount, 	nil)
+	BMU.savedVarsServ = ZO_SavedVars:NewAccountWide(SVTabName, 			3, nil, BMU.DefaultsServer, 	GetWorldName())
+	BMU.savedVarsChar = ZO_SavedVars:NewCharacterIdSettings(SVTabName, 	3, nil, BMU.DefaultsCharacter, 	nil)
 	
 	
 	BMU.TeleporterSetupUI(addOnName)

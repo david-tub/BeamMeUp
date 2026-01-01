@@ -16,10 +16,11 @@ local numberType = "number"
 local stringType = "string"
 local tableType = "table"
 --Other addon variables
+local BMU_LibZone = BMU.LibZone
 --BMU variables
-local  BMU_SourceIndex_Friend 				= BMU.SOURCE_INDEX_FRIEND
-local  BMU_SourceIndex_Group 				= BMU.SOURCE_INDEX_GROUP
-local  BMU_SourceIndex_Guild 				= BMU.SOURCE_INDEX_GUILD
+local BMU_SourceIndex_Friend 				= BMU.SOURCE_INDEX_FRIEND
+local BMU_SourceIndex_Group 				= BMU.SOURCE_INDEX_GROUP
+local BMU_SourceIndex_Guild 				= BMU.SOURCE_INDEX_GUILD
 local BMU_textures                          = BMU.textures
 local textureAcceptGreen = BMU_textures.acceptGreen
 local textureDeclineRed = BMU_textures.declineRed
@@ -2062,7 +2063,7 @@ BMU_getDataMapInfo = BMU.getDataMapInfo
 -- return (geographical) parent zone id (if parent zone id can not be found -> parentZoneId = zoneId)
 function BMU.getParentZoneId(zoneId)
 	-- use LibZone function that already handles exceptions and returns true geographical parent zone
-	local parentZoneId = BMU.LibZone:GetZoneGeographicalParentZoneId(zoneId)
+	local parentZoneId = BMU_LibZone:GetZoneGeographicalParentZoneId(zoneId)
 
 	-- fallback: use API to get parent zone
 	if not parentZoneId or parentZoneId == 0 then

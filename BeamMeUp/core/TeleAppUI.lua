@@ -15,11 +15,9 @@ local string 								= string
 local string_lower 							= string.lower
 local string_len							= string.len
 local string_format							= string.format
-local zo_plainstrfind 						= zo_plainstrfind
 local table 								= table
 local table_insert 							= table.insert
 local table_remove 							= table.remove
-local unpack 								= unpack
 local worldName 							= GetWorldName()
 local zo_Menu                               = ZO_Menu     --ZO_Menu speed-up variable (so _G is not searched each time context menus are used)
 local zo_WorldMapZoneStoryTopLevel_Keyboard = ZO_WorldMapZoneStoryTopLevel_Keyboard
@@ -46,12 +44,13 @@ local subType_Treasure 						= "treasure"
 local subType_Leads 						= "leads"
 ----functions
 --ZOs functions
-local zoPlainStrFind = zo_plainstrfind
-local zo_IsTableEmpty = ZO_IsTableEmpty
-local zo_CheckButton_IsChecked = ZO_CheckButton_IsChecked
-local zo_CheckButton_SetCheckState = ZO_CheckButton_SetCheckState
-local zo_CheckButton_IsEnabled = ZO_CheckButton_IsEnabled
-local zo_CheckButton_SetChecked = ZO_CheckButton_SetChecked
+local zoPlainStrFind 						= zo_plainstrfind
+local zo_IsTableEmpty 						= ZO_IsTableEmpty
+local zo_CheckButton_IsChecked 				= ZO_CheckButton_IsChecked
+local zo_CheckButton_SetCheckState 			= ZO_CheckButton_SetCheckState
+local zo_CheckButton_IsEnabled 				= ZO_CheckButton_IsEnabled
+local zo_CheckButton_SetChecked 			= ZO_CheckButton_SetChecked
+local unpack 								= unpack
 --BMU functions
 local BMU_SI_get                            = SI.get
 local BMU_colorizeText                      = BMU.colorizeText
@@ -72,7 +71,7 @@ local BMU_chatButtonTex, teleporterWin_appTitle, teleporterWin_Main_Control, tel
 -------functions (defined inline in code below, upon first usage, as they are still nil at this line)
 local BMU_getItemTypeIcon, BMU_getDataMapInfo, BMU_OpenTeleporter, BMU_updateContextMenuEntrySurveyAll,
       BMU_getContextMenuEntrySurveyAllAppendix, BMU_clearInputFields, BMU_createTable,
-      BMU_createTableDungeons, BMU_createTableGuilds, BMU_numOfSurveyTypesChecked
+      BMU_createTableDungeons, BMU_createTableGuilds, BMU_numOfSurveyTypesChecked, 	BMU_updateCheckboxSurveyMap
 -- -^- INS251229 Baertram END 0
 
 -- list of tuples (guildId & displayname) for invite queue (only for admin)
@@ -213,14 +212,17 @@ function BMU.updateRelatedItemsCounterPanel()
 	counterPanel:SetAnchor(TOP, BMU.win.Main_Control, TOP, 1*scale, (90*scale)+((svAcc.numberLines*40)*scale))  --CHG251229 Baertram
 end
 
-
+--------------------------------------------------------------------------------------------------------------------
+-- -v- SetupUI
+--------------------------------------------------------------------------------------------------------------------
 local function SetupUI()
     local BMU_svAcc = BMU.savedVarsAcc                                  							--INS251229 Baertram
     local scale = BMU_svAcc.Scale                                       							--INS251229 Baertram
     BMU_clearInputFields = BMU_clearInputFields or BMU.clearInputFields 							--INS251229 Baertram
 	BMU_createTable = BMU_createTable or BMU.createTable											--INS251229 Baertram
 	BMU_createTableGuilds = BMU_createTableGuilds or BMU.createTableGuilds							--INS251229 Baertram
-	BMU_createTableDungeons = BMU_createTableDungeons or BMU.createTableDungeons						--INS251229 Baertram
+	BMU_createTableDungeons = BMU_createTableDungeons or BMU.createTableDungeons					--INS251229 Baertram
+	BMU_numOfSurveyTypesChecked = BMU_numOfSurveyTypesChecked or BMU.numOfSurveyTypesChecked   	    --INS251229 Baertram
 	-----------------------------------------------
 	-- Fonts
 	
@@ -240,9 +242,9 @@ local function SetupUI()
 	-----------------------------------------------
     local teleporterWin = BMU.win
 
-    -----------------------------------------------
-	
+    --------------------------------------------------------------------------------------------------------------------
 	-- Button on Chat Window
+    --------------------------------------------------------------------------------------------------------------------
 	if BMU_svAcc.chatButton then
         local BMU_textures_wayshrineBtn = BMU_textures.wayshrineBtn --INS251229 Baertram performance improvement for multiple used variable reference
         local BMU_textures_wayshrineBtnOver = BMU_textures.wayshrineBtnOver --INS251229 Baertram performance improvement for multiple used variable reference
@@ -280,10 +282,9 @@ local function SetupUI()
 		end
 	end
 	
-	-----------------------------------------------
-	
-	-----------------------------------------------
+    --------------------------------------------------------------------------------------------------------------------
 	-- Bandits Integration -> Add custom button to the side bar (with delay to ensure, that BUI is loaded)
+    --------------------------------------------------------------------------------------------------------------------
 	zo_callLater(function()
         local BUI = BUI --INS251229 Baertram Performance improvement for multiple called same variable
 		if BUI and BUI.PanelAdd then
@@ -302,10 +303,9 @@ local function SetupUI()
 			BUI.PanelAdd(content)
 		end
 	end,1000)
-	-----------------------------------------------
 
   --------------------------------------------------------------------------------------------------------------
-  --Main Controller. Please notice that teleporterWin comes from our globals variables, as does wm
+  --Main Controller. Please notice that teleporterWin comes from our globals variables, as does WindowManager
   --------------------------------------------------------------------------------------------------------------
   teleporterWin_Main_Control = wm:CreateTopLevelWindow("Teleporter_Location_MainController") --INS251229 Baertram performance improvement for multiple used variable reference
   teleporterWin.Main_Control = teleporterWin_Main_Control --INS251229 Baertram
@@ -321,25 +321,26 @@ local function SetupUI()
   teleporterWin_appTitle:SetText(BMU_colorizeText(appName, "gold") .. BMU_colorizeText(" - Teleporter", "white")) --CHG251229 Baertram
   --teleporterWin_appTitle:SetAnchor(TOP, teleporterWin_Main_Control, TOP, -31*BMU_svAcc.Scale, -62*BMU_svAcc.Scale) --CHG251229 Baertram
   teleporterWin_appTitle:SetAnchor(CENTER, teleporterWin_Main_Control, TOP, nil, -62*scale) --CHG251229 Baertram
-  
+
   ----- This is where we create the list element for TeleUnicorn/ List
   BMU.TeleporterList = BMU.ListView.new(teleporterWin_Main_Control,  {
     width = 750*scale, --CHG251229 Baertram
     height = 500*scale, --CHG251229 Baertram
   })
-  
+
   ---------
 
-  
-    -------------------------------------------------------------------
+
+  --------------------------------------------------------------------------------------------------------------------
   -- Switch BUTTON ON ZoneGuide window
+  --------------------------------------------------------------------------------------------------------------------
   teleporterWin_zoneGuideSwapTexture = wm:CreateControl(nil, zo_WorldMapZoneStoryTopLevel_Keyboard, CT_TEXTURE) --CHG251229 Baertram Performance improvement
   teleporterWin.zoneGuideSwapTexture = teleporterWin_zoneGuideSwapTexture --CHG251229 Baertram Performance improvement
   teleporterWin_zoneGuideSwapTexture:SetDimensions(50*scale, 50*scale) --CHG251229 Baertram Performance improvement
   teleporterWin_zoneGuideSwapTexture:SetAnchor(TOPRIGHT, zo_WorldMapZoneStoryTopLevel_Keyboard, TOPRIGHT, TOPRIGHT -10*scale, -35*scale) --CHG251229 Baertram Performance improvement
   teleporterWin_zoneGuideSwapTexture:SetTexture(BMU_textures.swapBtn) --CHG251229 Baertram Performance improvement
   teleporterWin_zoneGuideSwapTexture:SetMouseEnabled(true) --CHG251229 Baertram Performance improvement
-  
+
   teleporterWin_zoneGuideSwapTexture:SetHandler("OnMouseUp", function()
       BMU_OpenTeleporter = BMU_OpenTeleporter or BMU.OpenTeleporter --INS251229 Baertram performance improvement for multiple used variable reference
 	  BMU_OpenTeleporter(true) ----CHG251229 Baertram Performance improvement by using local
@@ -356,20 +357,20 @@ local function SetupUI()
       BMU_tooltipTextEnter(BMU, teleporterWinZoneGuideSwapTextureCtrl) --CHG251229 Baertram Performance improvement
   end)
 
-  ---------------------------------------------------------------------------------------------------------------
-    -------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------------------------
   -- Feedback BUTTON
+  --------------------------------------------------------------------------------------------------------------------
   teleporterWin_feedbackTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)  --INS251229 Baertram
   teleporterWin.feedbackTexture = teleporterWin_feedbackTexture --INS251229 Baertram
   teleporterWin_feedbackTexture:SetDimensions(50*scale, 50*scale) --CHG251229 Baertram
   teleporterWin_feedbackTexture:SetAnchor(TOPLEFT, teleporterWin_Main_Control, TOPLEFT, TOPLEFT-35*scale, -75*scale) --CHG251229 Baertram
   teleporterWin_feedbackTexture:SetTexture(BMU_textures.feedbackBtn) --CHG251229 Baertram
   teleporterWin_feedbackTexture:SetMouseEnabled(true) --CHG251229 Baertram
-  
+
   teleporterWin_feedbackTexture:SetHandler("OnMouseUp", function() --CHG251229 Baertram
       BMU.createMail(teleporterVars.feedbackContact, "Feedback - BeamMeUp", "") --CHG251229 Baertram
 	end)
-	  
+
   teleporterWin_feedbackTexture:SetHandler("OnMouseEnter", function(teleporterWin_feedbackTextureCtrl) --CHG251229 Baertram
       teleporterWin_feedbackTextureCtrl:SetTexture(BMU_textures.feedbackBtnOver) --CHG251229 Baertram
       BMU_tooltipTextEnter(BMU, teleporterWin_feedbackTextureCtrl, --CHG251229 Baertram
@@ -380,10 +381,11 @@ local function SetupUI()
       teleporterWin_feedbackTextureCtrl:SetTexture(BMU_textures.feedbackBtn) --CHG251229 Baertram
       BMU_tooltipTextEnter(BMU, teleporterWin_feedbackTextureCtrl) --CHG251229 Baertram
   end)
-  
-      -------------------------------------------------------------------
+
+  --------------------------------------------------------------------------------------------------------------------
   -- Guild BUTTON
   -- display button only if guilds are available on players game server
+  --------------------------------------------------------------------------------------------------------------------
 	if teleporterVars.BMUGuilds[worldName] ~= nil then --CHG251229 Baertram
 		teleporterWin_guildTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)
         teleporterWin.guildTexture = teleporterWin_guildTexture
@@ -391,7 +393,7 @@ local function SetupUI()
 		teleporterWin_guildTexture:SetAnchor(TOPLEFT, teleporterWin_Main_Control, TOPLEFT, TOPLEFT+10*scale, -75*scale)
 		teleporterWin_guildTexture:SetTexture(BMU_textures.guildBtn)
 		teleporterWin_guildTexture:SetMouseEnabled(true)
-	  
+
 		teleporterWin_guildTexture:SetHandler("OnMouseUp", function(self, button)
 			if not BMU.isCurrentlyRequestingGuildData then
 				BMU.requestGuildData()
@@ -399,7 +401,7 @@ local function SetupUI()
             BMU_clearInputFields()
 			zo_callLater(function() BMU_createTableGuilds() end, 350)
 		end)
-			  
+
 		teleporterWin_guildTexture:SetHandler("OnMouseEnter", function(self)
 		  teleporterWin_guildTexture:SetTexture(BMU_textures.guildBtnOver)
 		  BMU_tooltipTextEnter(BMU, teleporterWin_guildTexture,
@@ -413,11 +415,12 @@ local function SetupUI()
 		  end
 		end)
 	end
-  
-  
-      -------------------------------------------------------------------
+
+
+  --------------------------------------------------------------------------------------------------------------------
   -- Guild House BUTTON
   -- display button only if guild house is available on players game server
+  --------------------------------------------------------------------------------------------------------------------
   if teleporterVars.guildHouse[worldName] ~= nil then
 	  teleporterWin_guildHouseTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)
 	  teleporterWin.guildHouseTexture = teleporterWin_guildHouseTexture
@@ -425,11 +428,11 @@ local function SetupUI()
 	  teleporterWin_guildHouseTexture:SetAnchor(TOPLEFT, teleporterWin_Main_Control, TOPLEFT, TOPLEFT+55*scale, -75*scale)
 	  teleporterWin_guildHouseTexture:SetTexture(BMU_textures.guildHouseBtn)
 	  teleporterWin_guildHouseTexture:SetMouseEnabled(true)
-  
+
 	  teleporterWin_guildHouseTexture:SetHandler("OnMouseUp", function()
 		  BMU.portToBMUGuildHouse()
 		end)
-		  
+
 	  teleporterWin_guildHouseTexture:SetHandler("OnMouseEnter", function(teleporterWin_guildHouseTextureCtrl)
 		  teleporterWin_guildHouseTextureCtrl:SetTexture(BMU_textures.guildHouseBtnOver)
 		  BMU_tooltipTextEnter(BMU, teleporterWin_guildHouseTextureCtrl,
@@ -441,10 +444,11 @@ local function SetupUI()
 		  BMU_tooltipTextEnter(BMU, teleporterWin_guildHouseTextureCtrl)
 	  end)
   end
-  
-  
-  -------------------------------------------------------------------
+
+
+    --------------------------------------------------------------------------------------------------------------------
 	-- Lock/Fix window BUTTON
+    --------------------------------------------------------------------------------------------------------------------
 	local lockTexture
 	teleporterWin_fixWindowTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)
 	teleporterWin.fixWindowTexture = teleporterWin_fixWindowTexture
@@ -458,7 +462,7 @@ local function SetupUI()
 	end
 	teleporterWin_fixWindowTexture:SetTexture(lockTexture)
 	teleporterWin_fixWindowTexture:SetMouseEnabled(true)
- 
+
 	teleporterWin_fixWindowTexture:SetHandler("OnMouseUp", function(teleporterWin_fixWindowTextureCtrl)
 		-- change setting
 		BMU_svAcc.fixedWindow = not BMU_svAcc.fixedWindow
@@ -474,7 +478,7 @@ local function SetupUI()
 		end
 		teleporterWin_fixWindowTextureCtrl:SetTexture(lockTexture)
 	end)
-	
+
 	teleporterWin_fixWindowTexture:SetHandler("OnMouseEnter", function(teleporterWin_fixWindowTextureCtrl)
 		if BMU_svAcc.fixedWindow then
 			-- show closed lock over
@@ -500,20 +504,21 @@ local function SetupUI()
 	end)
 
 
-  ---------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------------------------
   -- ANCHOR BUTTON
+  --------------------------------------------------------------------------------------------------------------------
   teleporterWin_anchorTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)
   teleporterWin.anchorTexture = teleporterWin_anchorTexture
   teleporterWin_anchorTexture:SetDimensions(50*scale, 50*scale)
   teleporterWin_anchorTexture:SetAnchor(TOPRIGHT, teleporterWin_Main_Control, TOPRIGHT, TOPRIGHT-20*scale, -75*scale)
   teleporterWin_anchorTexture:SetTexture(BMU_textures.anchorMapBtn)
   teleporterWin_anchorTexture:SetMouseEnabled(true)
-  
+
   teleporterWin_anchorTexture:SetHandler("OnMouseUp", function()
 	BMU_svAcc.anchorOnMap = not BMU_svAcc.anchorOnMap
     BMU.updatePosition()
   end)
-	  
+
   teleporterWin_anchorTexture:SetHandler("OnMouseEnter", function(teleporterWin_anchorTextureCtrl)
 	teleporterWin_anchorTextureCtrl:SetTexture(BMU_textures.anchorMapBtnOver)
       BMU_tooltipTextEnter(BMU, teleporterWin_anchorTextureCtrl,
@@ -527,9 +532,10 @@ local function SetupUI()
       BMU_tooltipTextEnter(BMU, teleporterWin_anchorTextureCtrl)
   end)
 
-  
-  -------------------------------------------------------------------
+
+  --------------------------------------------------------------------------------------------------------------------
   -- CLOSE / SWAP BUTTON
+  --------------------------------------------------------------------------------------------------------------------
   teleporterWin_closeTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)
   teleporterWin.closeTexture = teleporterWin_closeTexture
   teleporterWin_closeTexture:SetDimensions(50*scale, 50*scale)
@@ -540,7 +546,7 @@ local function SetupUI()
 
   teleporterWin_closeTexture:SetHandler("OnMouseUp", function()
       BMU.HideTeleporter()  end)
-	  
+
   teleporterWin_closeTexture:SetHandler("OnMouseEnter", function(teleporterWin_closeTextureCtrl)
 	teleporterWin_closeTextureCtrl:SetTexture(BMU_textures.closeBtnOver)
       BMU_tooltipTextEnter(BMU, teleporterWin_closeTextureCtrl,
@@ -552,9 +558,9 @@ local function SetupUI()
   end)
 
 
-  -------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------------------------
   -- OPEN BUTTON ON MAP (upper left corner)
-  
+  --------------------------------------------------------------------------------------------------------------------
 	if BMU_svAcc.showOpenButtonOnMap then
 		teleporterWin_MapOpen = CreateControlFromVirtual("TeleporterReopenButon", ZO_WorldMap, "ZO_DefaultButton")
 		teleporterWin.MapOpen = teleporterWin_MapOpen
@@ -562,21 +568,22 @@ local function SetupUI()
 		teleporterWin_MapOpen:SetWidth(200)
 		teleporterWin_MapOpen:SetText(appName)
 		teleporterWin_MapOpen:SetHidden(true)
-  
+
 		teleporterWin_MapOpen:SetHandler("OnClicked",function()
 			BMU.OpenTeleporter(true)
 		end)
 	end
 
-   ---------------------------------------------------------------------------------------------------------------
-   -- Search Symbol (no button)
+  --------------------------------------------------------------------------------------------------------------------
+  -- Search Symbol (no button)
+  --------------------------------------------------------------------------------------------------------------------
   teleporterWin_SearchTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)
   teleporterWin.SearchTexture = teleporterWin_SearchTexture
   teleporterWin_SearchTexture:SetDimensions(25*scale, 25*scale)
   teleporterWin_SearchTexture:SetAnchor(TOPLEFT, teleporterWin_Main_Control, TOPLEFT, TOPLEFT-35*scale, -10*scale)
 
   teleporterWin_SearchTexture:SetTexture(BMU_textures.searchBtn)
-  
+
   ---------------------------------------------------------------------------------------------------------------
   -- Searcher (Search for Players)
    teleporterWin_Searcher_Player = CreateControlFromVirtual("Teleporter_SEARCH_EDITBOX",  teleporterWin_Main_Control, "ZO_DefaultEditForBackdrop")
@@ -593,7 +600,7 @@ local function SetupUI()
     teleporterWin_Searcher_Player_Placeholder:SetSimpleAnchorParent(4*scale,0)
 	teleporterWin_Searcher_Player_Placeholder:SetFont(BMU.font1)
 	teleporterWin_Searcher_Player_Placeholder:SetText(BMU_colorizeText(GetString(SI_PLAYER_MENU_PLAYER), "lgray"))
-    
+
   -- BackGround
   teleporterWin_SearchBG = wm:CreateControlFromVirtual(" teleporterWin.SearchBG",  teleporterWin_Searcher_Player, "ZO_DefaultBackdrop")
   teleporterWin.SearchBG = teleporterWin_SearchBG
@@ -606,7 +613,7 @@ local function SetupUI()
   teleporterWin_SearchBG:SetMouseEnabled(false)
   teleporterWin_SearchBG:SetMovable(false)
   teleporterWin_SearchBG:SetClampedToScreen(true)
-  
+
   -- Handlers
   ZO_PreHookHandler(teleporterWin_Searcher_Player, "OnTextChanged", function(teleporterWin_Searcher_PlayerCtrl)
 	if teleporterWin_Searcher_PlayerCtrl:HasFocus() and (teleporterWin_Searcher_Player:GetText() ~= "" or (teleporterWin_Searcher_Player:GetText() == "" and BMU.state == BMU.indexListSearchPlayer)) then
@@ -619,19 +626,20 @@ local function SetupUI()
 		BMU_createTable({index=BMU.indexListSearchPlayer, inputString=teleporterWin_Searcher_Player:GetText()})
 	end
   end)
-  
+
   teleporterWin_Searcher_Player:SetHandler("OnFocusGained", function(self)
 	teleporterWin_Searcher_Player_Placeholder:SetHidden(true)
   end)
-  
+
   teleporterWin_Searcher_Player:SetHandler("OnFocusLost", function(self)
 	if teleporterWin_Searcher_Player:GetText() == "" then
 		teleporterWin_Searcher_Player_Placeholder:SetHidden(false)
 	end
   end)
 
-  ---------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------------------------
   -- Searcher (Search for zones)
+  --------------------------------------------------------------------------------------------------------------------
   teleporterWin_Searcher_Zone = CreateControlFromVirtual("Teleporter_Searcher_Player_EDITBOX1",  teleporterWin_Main_Control, "ZO_DefaultEditForBackdrop")
   teleporterWin.Searcher_Zone = teleporterWin_Searcher_Zone
   teleporterWin_Searcher_Zone:SetParent(teleporterWin_Main_Control)
@@ -639,7 +647,7 @@ local function SetupUI()
   teleporterWin_Searcher_Zone:SetDimensions(105*scale,25*scale)
   teleporterWin_Searcher_Zone:SetResizeToFitDescendents(false)
   teleporterWin_Searcher_Zone:SetFont(BMU.font1)
-  
+
   -- Placeholder
   teleporterWin_Searcher_Zone_Placeholder = wm:CreateControl("TTeleporter_Searcher_Player_EDITBOX1_Placeholder", teleporterWin_Searcher_Zone, CT_LABEL)
   teleporterWin_Searcher_Zone.Placeholder = teleporterWin_Searcher_Zone_Placeholder
@@ -659,7 +667,7 @@ local function SetupUI()
   teleporterWin_SearchBG_Player:SetMouseEnabled(false)
   teleporterWin_SearchBG_Player:SetMovable(false)
   teleporterWin_SearchBG_Player:SetClampedToScreen(true)
-  
+
   -- Handlers
     ZO_PreHookHandler(teleporterWin_Searcher_Zone, "OnTextChanged", function(self)
 		if self:HasFocus() and (teleporterWin_Searcher_Zone:GetText() ~= "" or (teleporterWin_Searcher_Zone:GetText() == "" and BMU.state == BMU.indexListSearchZone)) then
@@ -676,11 +684,11 @@ local function SetupUI()
 			end
 		end
 	end)
-	
+
 	teleporterWin_Searcher_Zone:SetHandler("OnFocusGained", function(teleporterWin_Searcher_Zone_PlaceholderCtrl)
 		teleporterWin_Searcher_Zone_PlaceholderCtrl:SetHidden(true)
 	end)
-  
+
 	teleporterWin_Searcher_Zone:SetHandler("OnFocusLost", function(teleporterWin_Searcher_Zone_PlaceholderCtrl)
 		if teleporterWin_Searcher_Zone_PlaceholderCtrl:GetText() == "" then
 			teleporterWin_Searcher_Zone_Placeholder:SetHidden(false)
@@ -688,8 +696,9 @@ local function SetupUI()
 	end)
 
 
-  ---------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------------------------
   -- Refresh Button
+  --------------------------------------------------------------------------------------------------------------------
   teleporterWin_Main_Control_RefreshTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)
   teleporterWin_Main_Control.RefreshTexture = teleporterWin_Main_Control_RefreshTexture
   teleporterWin_Main_Control_RefreshTexture:SetDimensions(50*scale, 50*scale)
@@ -706,7 +715,7 @@ local function SetupUI()
 			BMU_createTable({index=BMU.indexListMain})
 		end
   end)
-  
+
   teleporterWin_Main_Control_RefreshTexture:SetHandler("OnMouseEnter", function(teleporterWin_Main_Control_RefreshTextureCtrl)
       BMU_tooltipTextEnter(BMU, teleporterWin_Main_Control_RefreshTextureCtrl,
           BMU_SI_get(SI.TELE_UI_BTN_REFRESH_ALL))
@@ -717,8 +726,9 @@ local function SetupUI()
       teleporterWin_Main_Control_RefreshTextureCtrl:SetTexture(BMU_textures.refreshBtn)end)
 
 
-  ---------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------------------------
   -- Unlock wayshrines
+  --------------------------------------------------------------------------------------------------------------------
   teleporterWin_Main_Control_portalToAllTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)
   teleporterWin_Main_Control.portalToAllTexture = teleporterWin_Main_Control_portalToAllTexture
   teleporterWin_Main_Control_portalToAllTexture:SetDimensions(50*scale, 50*scale)
@@ -726,11 +736,11 @@ local function SetupUI()
   teleporterWin_Main_Control_portalToAllTexture:SetTexture(BMU_textures.wayshrineBtn2)
   teleporterWin_Main_Control_portalToAllTexture:SetMouseEnabled(true)
   teleporterWin_Main_Control_portalToAllTexture:SetDrawLayer(2)
-  
+
 	teleporterWin_Main_Control_portalToAllTexture:SetHandler("OnMouseUp", function(self, button)
 		BMU.showDialogAutoUnlock()
 	end)
-  
+
   teleporterWin_Main_Control_portalToAllTexture:SetHandler("OnMouseEnter", function(teleporterWin_Main_Control_portalToAllTextureCtrl)
 	teleporterWin_Main_Control_portalToAllTextureCtrl:SetTexture(BMU_textures.wayshrineBtnOver2)
 		local tooltipTextCompletion = ""
@@ -754,10 +764,11 @@ local function SetupUI()
 	teleporterWin_Main_Control_portalToAllTextureCtrl:SetTexture(BMU_textures.wayshrineBtn2)
 	BMU_tooltipTextEnter(BMU, teleporterWin_Main_Control_portalToAllTextureCtrl)
   end)
-  
-  
-  ---------------------------------------------------------------------------------------------------------------
+
+
+  --------------------------------------------------------------------------------------------------------------------
   -- Settings
+  --------------------------------------------------------------------------------------------------------------------
   teleporterWin_Main_Control_SettingsTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)
   teleporterWin_Main_Control.SettingsTexture = teleporterWin_Main_Control_SettingsTexture
   teleporterWin_Main_Control_SettingsTexture:SetDimensions(50*scale, 50*scale)
@@ -770,7 +781,7 @@ local function SetupUI()
 	BMU.HideTeleporter()
 	LAM2:OpenToPanel(BMU.SettingsPanel)
   end)
-  
+
   teleporterWin_Main_Control_SettingsTexture:SetHandler("OnMouseEnter", function(teleporterWin_Main_Control_SettingsTextureCtrl)
       BMU_tooltipTextEnter(BMU, teleporterWin_Main_Control_SettingsTextureCtrl,
           GetString(SI_GAME_MENU_SETTINGS))
@@ -781,10 +792,11 @@ local function SetupUI()
       BMU_tooltipTextEnter(BMU, teleporterWin_Main_Control_SettingsTextureCtrl)
       teleporterWin_Main_Control_SettingsTextureCtrl:SetTexture(BMU_textures.settingsBtn)
   end)
-	  
 
-  ---------------------------------------------------------------------------------------------------------------
+
+  --------------------------------------------------------------------------------------------------------------------
   -- "Port to Friends House" Integration
+  --------------------------------------------------------------------------------------------------------------------
   teleporterWin_Main_Control_PTFTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)
   teleporterWin_Main_Control_PTFTexture = teleporterWin_Main_Control_PTFTexture
   teleporterWin_Main_Control_PTFTexture:SetDimensions(50*scale, 50*scale)
@@ -794,7 +806,7 @@ local function SetupUI()
   teleporterWin_Main_Control_PTFTexture:SetDrawLayer(2)
     local PortToFriend = PortToFriend --INS251229 Baertram performance improvement for 2 same used global variables
 	if PortToFriend and PortToFriend.GetFavorites then
-		-- enable tab	
+		-- enable tab
 		teleporterWin_Main_Control_PTFTexture:SetHandler("OnMouseUp", function(self, button, upInside) --CHG251229 Baertram Usage of upInside to properly check the user releaased the mouse on the control!!!
 			if upInside and button == MOUSE_BUTTON_INDEX_RIGHT then --CHG251229 Baertram Usage of upInside to properly check the user releaased the mouse on the control!!!
 				-- toggle between zone names and house names
@@ -810,7 +822,7 @@ local function SetupUI()
 				BMU.createTablePTF()
 			end
 		end)
-  
+
 		teleporterWin_Main_Control_PTFTexture:SetHandler("OnMouseEnter", function(teleporterWin_Main_Control_PTFTextureCtrl)
 			BMU_tooltipTextEnter(BMU, teleporterWin_Main_Control_PTFTextureCtrl,
 				BMU_SI_get(SI.TELE_UI_BTN_PTF_INTEGRATION) .. BMU_SI_get(SI.TELE_UI_BTN_TOOLTIP_CONTEXT_MENU))
@@ -826,22 +838,23 @@ local function SetupUI()
 	else
 		-- disable tab
 		teleporterWin_Main_Control_PTFTexture:SetAlpha(0.4)
-		
+
 		teleporterWin_Main_Control_PTFTexture:SetHandler("OnMouseUp", function()
 			BMU.showDialogSimple("PTFIntegrationMissing", BMU_SI_get(SI.TELE_DIALOG_PTF_INTEGRATION_MISSING_TITLE), BMU_SI_get(SI.TELE_DIALOG_PTF_INTEGRATION_MISSING_BODY), function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info1758-PorttoFriendsHouse.html") end, nil)
 		end)
-		
+
 		teleporterWin_Main_Control_PTFTexture:SetHandler("OnMouseEnter", function(teleporterWin_Main_Control_PTFTextureCtrl)
 			BMU_tooltipTextEnter(BMU, teleporterWin_Main_Control_PTFTextureCtrl, BMU_SI_get(SI.TELE_UI_BTN_PTF_INTEGRATION))
 		end)
-		
+
 		teleporterWin_Main_Control_PTFTexture:SetHandler("OnMouseExit", function(teleporterWin_Main_Control_PTFTextureCtrl)
 			BMU_tooltipTextEnter(BMU, teleporterWin_Main_Control_PTFTextureCtrl)
 		end)
 	end
-	  
-  ---------------------------------------------------------------------------------------------------------------
+
+  --------------------------------------------------------------------------------------------------------------------
   -- Own Houses
+  --------------------------------------------------------------------------------------------------------------------
   teleporterWin_Main_Control_OwnHouseTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)
   teleporterWin_Main_Control.OwnHouseTexture = teleporterWin_Main_Control_OwnHouseTexture
   teleporterWin_Main_Control_OwnHouseTexture:SetDimensions(50*scale, 50*scale)
@@ -875,7 +888,7 @@ local function SetupUI()
 		BMU.createTableHouses()
 	end
   end)
-  
+
   teleporterWin_Main_Control_OwnHouseTexture:SetHandler("OnMouseEnter", function(teleporterWin_Main_Control_OwnHouseTextureCtrl)
     BMU_tooltipTextEnter(BMU, teleporterWin_Main_Control_OwnHouseTextureCtrl,
 		BMU_SI_get(SI.TELE_UI_BTN_PORT_TO_OWN_HOUSE) .. BMU_SI_get(SI.TELE_UI_BTN_TOOLTIP_CONTEXT_MENU))
@@ -889,9 +902,10 @@ local function SetupUI()
 	end
   end)
 
-  
-    ---------------------------------------------------------------------------------------------------------------
+
+  --------------------------------------------------------------------------------------------------------------------
   -- Related Quests
+  --------------------------------------------------------------------------------------------------------------------
   teleporterWin_Main_Control_QuestTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)
   teleporterWin_Main_Control.QuestTexture = teleporterWin_Main_Control_QuestTexture
   teleporterWin_Main_Control_QuestTexture:SetDimensions(50*scale, 50*scale)
@@ -915,7 +929,7 @@ local function SetupUI()
 		BMU_createTable({index=BMU.indexListQuests})
 	end
   end)
-  
+
   teleporterWin_Main_Control_QuestTexture:SetHandler("OnMouseEnter", function(teleporterWin_Main_Control_QuestTextureCtrl)
     BMU_tooltipTextEnter(BMU, teleporterWin_Main_Control_QuestTextureCtrl,
 		GetString(SI_JOURNAL_MENU_QUESTS) .. BMU_SI_get(SI.TELE_UI_BTN_TOOLTIP_CONTEXT_MENU))
@@ -928,10 +942,11 @@ local function SetupUI()
 		teleporterWin_Main_Control_QuestTextureCtrl:SetTexture(BMU_textures.questBtn)
 	end
   end)
- 
- 
- ---------------------------------------------------------------------------------------------------------------
-  -- Related Items
+
+
+  --------------------------------------------------------------------------------------------------------------------
+  -- Related Items (Antiquities, Surveys, ...)
+  --------------------------------------------------------------------------------------------------------------------
   teleporterWin_Main_Control_ItemTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)
   teleporterWin_Main_Control.ItemTexture = teleporterWin_Main_Control_ItemTexture
   teleporterWin_Main_Control_ItemTexture:SetDimensions(50*scale, 50*scale)
@@ -943,7 +958,6 @@ local function SetupUI()
   -- -v- INS251229 Baertram BEGIN 1 Variables for the relevant submenu opening controls
   local submenuIndicesToAddCallbackTo = {}
   --reference variables for performance etc.
-  local BMU_updateCheckboxSurveyMap
   local function BMU_CreateTable_IndexListItems() --local function which is not redefined each contextMenu open again and again and again -> memory and performance drain!
     BMU_createTable({index=BMU.indexListItems})
   end
@@ -990,13 +1004,13 @@ local function SetupUI()
 		if BMU.savedVarsChar.displayMaps.clue then
 			zo_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 		end
-		
+
 		-- Treasure Maps
 		menuIndex = AddCustomMenuItem(GetString(SI_SPECIALIZEDITEMTYPE100), function() BMU.savedVarsChar.displayMaps.treasure = not BMU.savedVarsChar.displayMaps.treasure BMU_CreateTable_IndexListItems() end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.displayMaps.treasure then
 			zo_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 		end
-		
+
 		-- All Survey Maps
         BMU_getContextMenuEntrySurveyAllAppendix = BMU_getContextMenuEntrySurveyAllAppendix or BMU.getContextMenuEntrySurveyAllAppendix --INS251229 Baertram
 		BMU.menuIndexSurveyAll = AddCustomMenuItem(GetString(SI_SPECIALIZEDITEMTYPE101) .. BMU_getContextMenuEntrySurveyAllAppendix(), --CHG251229 Baertram
@@ -1010,11 +1024,11 @@ local function SetupUI()
 				end
 				BMU_CreateTable_IndexListItems()
 			end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 4)
-			
-		if BMU.numOfSurveyTypesChecked() > 0 then
+
+		if BMU_numOfSurveyTypesChecked() > 0 then
 			zo_CheckButton_SetChecked(zo_Menu.items[BMU.menuIndexSurveyAll].checkbox)
 		end
-		
+
 		-- Add submenu for survey types filter
 		submenuIndicesToAddCallbackTo[#submenuIndicesToAddCallbackTo+1] = AddCustomSubMenuItem(GetString(SI_GAMEPAD_BANK_FILTER_HEADER), --INS251229 Baertram
 			{
@@ -1074,10 +1088,10 @@ local function SetupUI()
 				},
 			}, nil, nil, nil, 5
 		)
-		
+
 		-- divider
 		AddCustomMenuItem("-", function() end, nil, nil, nil, nil, 5)
-		
+
 		-- include bank items
 		menuIndex = AddCustomMenuItem(GetString(SI_CRAFTING_INCLUDE_BANKED), function() BMU.savedVarsChar.scanBankForMaps = not BMU.savedVarsChar.scanBankForMaps BMU_CreateTable_IndexListItems() end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
 		if BMU.savedVarsChar.scanBankForMaps then
@@ -1098,7 +1112,7 @@ local function SetupUI()
 		if BMU.savedVarsChar.defaultTab == BMU.indexListItems then
 			zo_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 		end
-		
+
 		ShowMenu()
 	else
 		BMU_CreateTable_IndexListItems()
@@ -1106,8 +1120,6 @@ local function SetupUI()
 	end
   end)
   -- -v- INS251229 Baertram BEGIN 2 - Variables for the submenu OnMouseUp click handler -> Clicking the submenu opening controls toggles all checkboxes in the submenu to checked/unchecked
-  BMU_ItemTexture = BMU_ItemTexture or teleporterWin_Main_Control_ItemTexture
-
   --Called from ZO_Menu_OnHide callback
   local function cleanUpzo_MenuItemsSubmenuSpecialCallbacks()
 --d("[BMU]cleanUpzo_MenuItemsSubmenuSpecialCallbacks")
@@ -1177,7 +1189,7 @@ local function SetupUI()
       SetMenuHiddenCallback(cleanUpzo_MenuItemsSubmenuSpecialCallbacks)
   end)
   -- -^- INS251229 Baertram - END 2
-  
+
   teleporterWin_Main_Control_ItemTexture:SetHandler("OnMouseEnter", function(teleporterWin_Main_Control_ItemTextureCtrl)
 	-- set tooltip accordingly to the selected filter
 	local tooltip = ""
@@ -1199,7 +1211,7 @@ local function SetupUI()
 			tooltip = GetString(SI_SPECIALIZEDITEMTYPE100)
 		end
 	end
-	if BMU.numOfSurveyTypesChecked() > 0 then
+	if BMU_numOfSurveyTypesChecked() > 0 then
 		if tooltip ~= "" then
 			tooltip = tooltip .. " + " .. GetString(SI_SPECIALIZEDITEMTYPE101)
 		else
@@ -1208,7 +1220,7 @@ local function SetupUI()
 	end
 	-- add right-click info
 	tooltip = tooltip .. BMU_SI_get(SI.TELE_UI_BTN_TOOLTIP_CONTEXT_MENU)
-	
+
 	-- show tooltip
     BMU_tooltipTextEnter(BMU, teleporterWin_Main_Control_ItemTextureCtrl, tooltip)
     -- button highlight
@@ -1222,14 +1234,17 @@ local function SetupUI()
 	end
   end)
 
+  --------------------------------------------------------------------------------------------------------------------
   -- Create counter panel that displays the counter for each type
+  --------------------------------------------------------------------------------------------------------------------
   BMU_counterPanel = WINDOW_MANAGER:CreateControl(nil, BMU.win.Main_Control, CT_LABEL)
   BMU.counterPanel = BMU_counterPanel
   BMU_counterPanel:SetFont(BMU.font1)
   BMU_counterPanel:SetHidden(true)
 
-  ---------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------------------------
   -- Only current zone
+  --------------------------------------------------------------------------------------------------------------------
   teleporterWin_Main_Control_OnlyYourzoneTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)
   teleporterWin_Main_Control.OnlyYourzoneTexture = teleporterWin_Main_Control_OnlyYourzoneTexture
   teleporterWin_Main_Control_OnlyYourzoneTexture:SetDimensions(50*scale, 50*scale)
@@ -1237,7 +1252,7 @@ local function SetupUI()
   teleporterWin_Main_Control_OnlyYourzoneTexture:SetTexture(BMU_textures.currentZoneBtn)
   teleporterWin_Main_Control_OnlyYourzoneTexture:SetMouseEnabled(true)
   teleporterWin_Main_Control_OnlyYourzoneTexture:SetDrawLayer(2)
-  
+
 	teleporterWin_Main_Control_OnlyYourzoneTexture:SetHandler("OnMouseUp", function(self, button)
 		if button == MOUSE_BUTTON_INDEX_RIGHT then
 			-- show context menu
@@ -1253,23 +1268,24 @@ local function SetupUI()
 			BMU_createTable({index=BMU.indexListCurrentZone})
 		end
 	end)
-  
+
     teleporterWin_Main_Control_OnlyYourzoneTexture:SetHandler("OnMouseEnter", function(teleporterWin_Main_Control_OnlyYourzoneTextureCtrl)
 		BMU_tooltipTextEnter(BMU, teleporterWin_Main_Control_OnlyYourzoneTextureCtrl,
 			GetString(SI_ANTIQUITY_SCRYABLE_CURRENT_ZONE_SUBCATEGORY) .. BMU_SI_get(SI.TELE_UI_BTN_TOOLTIP_CONTEXT_MENU))
 		teleporterWin_Main_Control_OnlyYourzoneTextureCtrl:SetTexture(BMU_textures.currentZoneBtnOver)
 	end)
-	
+
 	teleporterWin_Main_Control_OnlyYourzoneTexture:SetHandler("OnMouseExit", function(teleporterWin_Main_Control_OnlyYourzoneTextureCtrl)
 		BMU_tooltipTextEnter(BMU, teleporterWin_Main_Control_OnlyYourzoneTextureCtrl)
 		if BMU.state ~= BMU.indexListCurrentZone then
 			teleporterWin_Main_Control_OnlyYourzoneTextureCtrl:SetTexture(BMU_textures.currentZoneBtn)
 		end
 	end)
-	
-	
-  ---------------------------------------------------------------------------------------------------------------
+
+
+  --------------------------------------------------------------------------------------------------------------------
   -- Delves in current zone
+  --------------------------------------------------------------------------------------------------------------------
   teleporterWin_Main_Control_DelvesTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)
   teleporterWin_Main_Control.DelvesTexture = teleporterWin_Main_Control_DelvesTexture
   teleporterWin_Main_Control_DelvesTexture:SetDimensions(50*scale, 50*scale)
@@ -1291,7 +1307,7 @@ local function SetupUI()
 
 		-- divider
 		AddCustomMenuItem("-", function() end, nil, nil, nil, nil, 5)
-		
+
 		-- make default tab
 		menuIndex = AddCustomMenuItem(BMU_SI_get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU_savedVarsChar.defaultTab == BMU.indexListDelves then BMU_savedVarsChar.defaultTab = BMU.indexListMain else BMU_savedVarsChar.defaultTab = BMU.indexListDelves end end, MENU_ADD_OPTION_CHECKBOX)
 		if BMU_savedVarsChar.defaultTab == BMU.indexListDelves then
@@ -1302,7 +1318,7 @@ local function SetupUI()
 		BMU_createTable({index=BMU.indexListDelves})
 	end
   end)
-  
+
   teleporterWin_Main_Control_DelvesTexture:SetHandler("OnMouseEnter", function(teleporterWin_Main_Control_DelvesTextureCtrl)
 	local text = GetString(SI_ZONECOMPLETIONTYPE5)
 	if not BMU.savedVarsChar.showAllDelves then
@@ -1319,10 +1335,11 @@ local function SetupUI()
 		teleporterWin_Main_Control_DelvesTextureCtrl:SetTexture(BMU_textures.delvesBtn)
 	end
   end)
-  
-  
-    ---------------------------------------------------------------------------------------------------------------
+
+
+  --------------------------------------------------------------------------------------------------------------------
   -- DUNGEON FINDER
+  --------------------------------------------------------------------------------------------------------------------
   teleporterWin_Main_Control_DungeonTexture = wm:CreateControl(nil, teleporterWin_Main_Control, CT_TEXTURE)
   teleporterWin_Main_Control.DungeonTexture = teleporterWin_Main_Control_DungeonTexture
   teleporterWin_Main_Control_DungeonTexture:SetDimensions(50*scale, 50*scale)
@@ -1449,7 +1466,7 @@ local function SetupUI()
 				},
 			}, nil, nil, nil, 5
 		)
-			
+
 		-- add dungeon difficulty toggle
 		if CanPlayerChangeGroupDifficulty() then
 			local menuIndex = AddCustomMenuItem(BMU_textures.dungeonDifficultyVeteran .. GetString(SI_DUNGEONDIFFICULTY2), function() BMU.setDungeonDifficulty(not ZO_ConvertToIsVeteranDifficulty(ZO_GetEffectiveDungeonDifficulty())) zo_callLater(function() BMU_createTableDungeons() end, 300) end, MENU_ADD_OPTION_CHECKBOX, nil, nil, nil, 5)
@@ -1473,7 +1490,7 @@ local function SetupUI()
 		BMU_createTableDungeons()
 	end
   end)
-  
+
   teleporterWin_Main_Control_DungeonTexture:SetHandler("OnMouseEnter", function(teleporterWin_Main_Control_DungeonTextureCtrl)
 	BMU_tooltipTextEnter(BMU, teleporterWin_Main_Control_DungeonTextureCtrl,
 		BMU_SI_get(SI.TELE_UI_BTN_DUNGEON_FINDER) .. BMU_SI_get(SI.TELE_UI_BTN_TOOLTIP_CONTEXT_MENU))
@@ -1488,6 +1505,9 @@ local function SetupUI()
   end)
 	  
 end
+--------------------------------------------------------------------------------------------------------------------
+-- -^- SetupUI
+--------------------------------------------------------------------------------------------------------------------
 
 
 function BMU.updateCheckboxSurveyMap(action)
@@ -1510,6 +1530,7 @@ function BMU.updateCheckboxSurveyMap(action)
 	end
     BMU_updateContextMenuEntrySurveyAll() --CHG251229 Baertram
 end
+BMU_updateCheckboxSurveyMap = BMU.updateCheckboxSurveyMap
 
 
 function BMU.numOfSurveyTypesChecked()

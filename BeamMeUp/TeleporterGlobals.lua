@@ -15,6 +15,10 @@ BMU.var = {
   feedbackContact		= "@Deadsoon", --INS251229 Baertram Used account for email feedback
   website				= "https://www.esoui.com/downloads/info2143-BeamMeUp-TeleporterFastTravel.html",
   feedback				= "https://www.esoui.com/portal.php?id=283&a=faq", -- FAQ link
+  -------------------------------------
+  allowedLanguages		= {de=true,en=true,fr=true,ru=true,es=true,pl=true,it=true,jp=true,br=true,kr=true,zh=true,}, --INS251229 Baertram
+  fallbackLang			= "en",																		--INS251229 Baertram
+  -------------------------------------
   controls              = {},
   isAddonLoaded         = false,
   color                 = {

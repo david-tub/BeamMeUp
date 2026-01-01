@@ -4,6 +4,48 @@ local SI = BMU.SI
 local teleporterVars = BMU.var
 local appName = teleporterVars.appName
 
+-- -v- INS251229 Baertram BEGIN 0
+--Performance reference
+----variables (defined now, as they were loaded before this file -> see manifest .txt)
+--ZOs variables
+local EM = EVENT_MANAGER
+local CM = CALLBACK_MANAGER
+local LH = LINK_HANDLER
+local SharedInv = SHARED_INVENTORY
+local worldMapScene_Keyboard				= WORLD_MAP_SCENE
+local worldMapScene_Gamepad					= GAMEPAD_WORLD_MAP_SCENE
+local worldMapZoneStoryTLC_Keyboard			= ZO_WorldMapZoneStoryTopLevel_Keyboard
+--Other addon variables
+--BMU variables
+local BMU_ZONE_CATEGORY_UNKNOWN = BMU.ZONE_CATEGORY_UNKNOWN
+local BMU_ZONE_CATEGORY_DELVE = BMU.ZONE_CATEGORY_DELVE
+local BMU_ZONE_CATEGORY_PUBDUNGEON = BMU.ZONE_CATEGORY_PUBDUNGEON
+local BMU_ZONE_CATEGORY_HOUSE = BMU.ZONE_CATEGORY_HOUSE
+local BMU_ZONE_CATEGORY_GRPDUNGEON = BMU.ZONE_CATEGORY_GRPDUNGEON
+local BMU_ZONE_CATEGORY_TRAIL = BMU.ZONE_CATEGORY_TRAIL
+local BMU_ZONE_CATEGORY_ENDLESSD = BMU.ZONE_CATEGORY_ENDLESSD
+local BMU_ZONE_CATEGORY_GRPZONES = BMU.ZONE_CATEGORY_GRPZONES
+local BMU_ZONE_CATEGORY_GRPARENA = BMU.ZONE_CATEGORY_GRPARENA
+local BMU_ZONE_CATEGORY_SOLOARENA = BMU.ZONE_CATEGORY_SOLOARENA
+local BMU_ZONE_CATEGORY_OVERLAND = BMU.ZONE_CATEGORY_OVERLAND
+
+----functions
+--ZOs functions
+--BMU functions
+local BMU_SI_get                            = SI.get
+local BMU_colorizeText                      = BMU.colorizeText
+local BMU_round                             = BMU.round
+local BMU_tooltipTextEnter                  = BMU.tooltipTextEnter
+local BMU_updatePosition					= BMU.updatePosition
+local BMU_activateWayshrineTravelAutoConfirm = BMU.activateWayshrineTravelAutoConfirm
+----variables (defined inline in code below, upon first usage, as they are still nil at this line)
+--BMU UI variables
+
+-------functions (defined inline in code below, upon first usage, as they are still nil at this line)
+local BMU_HideTeleporter, BMU_toggleZoneGuide, BMU_getZoneSpecificHouse, BMU_getAllPublicDungeons, BMU_getAllDelves,
+      BMU_joinBlacklist
+-- -^- INS251229 Baertram END 0
+
 --Old code from TeleUnicorn -> Moved directly to Teleporter to strip the library
 BMU.throttled = {}
 local current_ms, last_render_ms
@@ -20,10 +62,10 @@ function BMU.throttle(key, frequency)
 end
 
 local function alertTeleporterLoaded()
-    EVENT_MANAGER:UnregisterForEvent(appName, EVENT_PLAYER_ACTIVATED)
+    EM:UnregisterForEvent(appName, EVENT_PLAYER_ACTIVATED)
 	-- register events for own houses furniture count update
-	EVENT_MANAGER:RegisterForEvent(appName, EVENT_PLAYER_ACTIVATED, BMU.updateHouseFurnitureCount)
-	EVENT_MANAGER:RegisterForEvent(appName, EVENT_HOUSE_FURNITURE_COUNT_UPDATED, BMU.updateHouseFurnitureCount)
+	EM:RegisterForEvent(appName, EVENT_PLAYER_ACTIVATED, BMU.updateHouseFurnitureCount)
+	EM:RegisterForEvent(appName, EVENT_HOUSE_FURNITURE_COUNT_UPDATED, BMU.updateHouseFurnitureCount)
 end
 
 
@@ -34,6 +76,7 @@ end
 
 ----------------------------------- KeyBinds
 function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
+	BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter									--INS251229 Baertram
 	-- Port to Group Leader
 	if keyPressIndex == 12 then
 		BMU.portToGroupLeader()
@@ -172,7 +215,7 @@ function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 				end
 			else
 				-- same index -> hide UI
-				BMU.HideTeleporter()
+				BMU_HideTeleporter()
 				SetGameCameraUIMode(false)
 			end
 		end
@@ -195,26 +238,29 @@ function BMU.onMapShow()
 		end
 	else
 		-- BMU is open -> update position
-		BMU.updatePosition()
+		BMU_updatePosition()
 	end
 end
 
 
 function BMU.onMapHide()
+	BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter									--INS251229 Baertram
+	BMU_toggleZoneGuide = BMU_toggleZoneGuide or BMU.toggleZoneGuide								--INS251229 Baertram
 	-- hide button
-	if BMU.win.MapOpen then
-		BMU.win.MapOpen:SetHidden(true)
+	local mapOpenButton = BMU.win.MapOpen
+	if mapOpenButton then
+		mapOpenButton:SetHidden(true)
 	end
 	
 	-- decide if it stays
 	if BMU.savedVarsAcc.HideOnMapClose then
-		BMU.HideTeleporter()
+		BMU_HideTeleporter()
 	else
-		BMU.updatePosition()
+		BMU_updatePosition()
 	end
 	
 	-- hide ZoneGuide (just to be on the safe side)
-	BMU.toggleZoneGuide(false)
+	BMU_toggleZoneGuide(false)
 end
 
 
@@ -235,12 +281,13 @@ end
 
 
 function BMU.OpenTeleporter(refresh)
+	BMU_toggleZoneGuide = BMU_toggleZoneGuide or BMU.toggleZoneGuide								--INS251229 Baertram
 	-- show notification (in case)
 	BMU.showNotification()
 	
-	if not ZO_WorldMapZoneStoryTopLevel_Keyboard:IsHidden() then
+	if not worldMapZoneStoryTLC_Keyboard:IsHidden() then
 		--hide ZoneGuide
-		BMU.toggleZoneGuide(false)
+		BMU_toggleZoneGuide(false)
 		-- show swap button
 		BMU.closeBtnSwitchTexture(true)
 	else
@@ -249,7 +296,7 @@ function BMU.OpenTeleporter(refresh)
 	end
 	
 	-- positioning window
-	BMU.updatePosition()
+	BMU_updatePosition()
 
 	if BMU.win.MapOpen then
 		 -- hide open button
@@ -283,6 +330,7 @@ end
 
 
 function BMU.HideTeleporter()
+	BMU_toggleZoneGuide = BMU_toggleZoneGuide or BMU.toggleZoneGuide								--INS251229 Baertram
     BMU.win.Main_Control:SetHidden(true) -- hide main window
 	ClearMenu() -- close all submenus
 	ZO_Tooltips_HideTextTooltip() -- close all tooltips
@@ -294,9 +342,10 @@ function BMU.HideTeleporter()
 		end
 		
 		-- show ZoneGuide
-		BMU.toggleZoneGuide(true)
+		BMU_toggleZoneGuide(true)
 	end
 end
+BMU_HideTeleporter = BMU.HideTeleporter
 
 
 
@@ -313,10 +362,11 @@ end
 
 -- triggered when ZoneGuide will be displayed (e.g. when worldMap is open and zone changed)
 function BMU.onZoneGuideShow()
+	BMU_toggleZoneGuide = BMU_toggleZoneGuide or BMU.toggleZoneGuide								--INS251229 Baertram
 	--check if Teleporter is displayed
 	if not BMU.win.Main_Control:IsHidden() then
 		-- Teleporter is displayed -> hide ZoneGuide
-		BMU.toggleZoneGuide(false)
+		BMU_toggleZoneGuide(false)
 	end
 end
 
@@ -327,113 +377,124 @@ function BMU.toggleZoneGuide(show)
 		-- show ZoneGuide
 		--ZO_WorldMapZoneStoryTopLevel_Keyboard:SetHidden(false)
 		--ZO_SharedMediumLeftPanelBackground:SetHidden(false)
-		WORLD_MAP_SCENE:AddFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
+		worldMapScene_Keyboard:AddFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
 	else
 		-- hide ZoneGuide
 		--ZO_WorldMapZoneStoryTopLevel_Keyboard:SetHidden(true)
 		--ZO_SharedMediumLeftPanelBackground:SetHidden(true)
-		WORLD_MAP_SCENE:RemoveFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
+		worldMapScene_Keyboard:RemoveFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
 	end
 end
+BMU_toggleZoneGuide = BMU.toggleZoneGuide
 
 
 ----------------------------
 function BMU.initializeBlacklist()
+	BMU_joinBlacklist = BMU_joinBlacklist or BMU.joinBlacklist 										--INS251229 Baertram
+	BMU_getAllPublicDungeons = BMU_getAllPublicDungeons or BMU.getAllPublicDungeons					--INS251229 Baertram
+	BMU_getAllDelves = BMU_getAllDelves or BMU.getAllDelves											--INS251229 Baertram
+	local BMU_savedVarsAcc = BMU.savedVarsAcc 														--INS251229 Baertram
+
 	-- check which blacklists are activated and merge them together to one HashMap
 	BMU.blacklist = {}
 	
 	-- hide Others (inaccessible zones)
-	if BMU.savedVarsAcc.hideOthers then
-		BMU.joinBlacklist(BMU.blacklistOthers)
-		BMU.joinBlacklist(BMU.blacklistRefuges)
-		BMU.joinBlacklist(BMU.blacklistSoloArenas)
+	if BMU_savedVarsAcc.hideOthers then
+		BMU_joinBlacklist(BMU.blacklistOthers)
+		BMU_joinBlacklist(BMU.blacklistRefuges)
+		BMU_joinBlacklist(BMU.blacklistSoloArenas)
 	end
 	
 	-- hide PVP zones
-	if BMU.savedVarsAcc.hidePVP then
-		BMU.joinBlacklist(BMU.blacklistCyro)
-		BMU.joinBlacklist(BMU.blacklistImpCity)
-		BMU.joinBlacklist(BMU.blacklistBattlegrounds)
+	if BMU_savedVarsAcc.hidePVP then
+		BMU_joinBlacklist(BMU.blacklistCyro)
+		BMU_joinBlacklist(BMU.blacklistImpCity)
+		BMU_joinBlacklist(BMU.blacklistBattlegrounds)
 	end
 
 	-- hide 4 men Dungeons, 12 men Raids, Group Zones, Group Arenas & Endless Dungeons
-	if BMU.savedVarsAcc.hideClosedDungeons then
-		BMU.joinBlacklist(BMU.blacklistGroupDungeons)
-		BMU.joinBlacklist(BMU.blacklistRaids)
-		BMU.joinBlacklist(BMU.blacklistGroupZones)
-		BMU.joinBlacklist(BMU.blacklistGroupArenas)
-		BMU.joinBlacklist(BMU.blacklistEndlessDungeons)
+	if BMU_savedVarsAcc.hideClosedDungeons then
+		BMU_joinBlacklist(BMU.blacklistGroupDungeons)
+		BMU_joinBlacklist(BMU.blacklistRaids)
+		BMU_joinBlacklist(BMU.blacklistGroupZones)
+		BMU_joinBlacklist(BMU.blacklistGroupArenas)
+		BMU_joinBlacklist(BMU.blacklistEndlessDungeons)
 	end
 	
 	-- hide Houses
-	if BMU.savedVarsAcc.hideHouses then
-		BMU.joinBlacklist(BMU.blacklistHouses)
+	if BMU_savedVarsAcc.hideHouses then
+		BMU_joinBlacklist(BMU.blacklistHouses)
 	end
 	
 	-- hide Delves
-	if BMU.savedVarsAcc.hideDelves then
-		BMU.joinBlacklist(BMU.getAllDelves())
+	if BMU_savedVarsAcc.hideDelves then
+		BMU_joinBlacklist(BMU_getAllDelves())
 	end
 	
 	-- hide Public Dungeons
-	if BMU.savedVarsAcc.hidePublicDungeons then
-		BMU.joinBlacklist(BMU.getAllPublicDungeons())
+	if BMU_savedVarsAcc.hidePublicDungeons then
+		BMU_joinBlacklist(BMU_getAllPublicDungeons())
 	end
 end
 
 
 function BMU.initializeCategoryMap()
+	BMU_joinBlacklist = BMU_joinBlacklist or BMU.joinBlacklist 										--INS251229 Baertram
+	BMU_getAllPublicDungeons = BMU_getAllPublicDungeons or BMU.getAllPublicDungeons					--INS251229 Baertram
+	BMU_getAllDelves = BMU_getAllDelves or BMU.getAllDelves											--INS251229 Baertram
+
 	BMU.CategoryMap = {}
+	local BMU_CategoryMap = BMU.CategoryMap
 	-- go over each category list and add to hash map
 	
 	-- Delves
-	for index, value in pairs(BMU.getAllDelves()) do
-		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_DELVE
+	for index, value in pairs(BMU_getAllDelves()) do
+		BMU_CategoryMap[value] = BMU_ZONE_CATEGORY_DELVE
 	end
 	
 	-- Public Dungeons
-	for index, value in pairs(BMU.getAllPublicDungeons()) do
-		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_PUBDUNGEON
+	for index, value in pairs(BMU_getAllPublicDungeons()) do
+		BMU_CategoryMap[value] = BMU_ZONE_CATEGORY_PUBDUNGEON
 	end
 
 	-- Houses
 	for index, value in pairs(BMU.blacklistHouses) do
-		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_HOUSE
+		BMU_CategoryMap[value] = BMU_ZONE_CATEGORY_HOUSE
 	end
 	
 	-- 4 men Group Dungeons
 	for index, value in pairs(BMU.blacklistGroupDungeons) do
-		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_GRPDUNGEON
+		BMU_CategoryMap[value] = BMU_ZONE_CATEGORY_GRPDUNGEON
 	end
 	
 	-- 12 men Raids (Trials)
 	for index, value in pairs(BMU.blacklistRaids) do
-		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_TRAIL
+		BMU_CategoryMap[value] = BMU_ZONE_CATEGORY_TRAIL
 	end
 
 	-- Endless Dungeons
 	for index, value in pairs(BMU.blacklistEndlessDungeons) do
-		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_ENDLESSD
+		BMU_CategoryMap[value] = BMU_ZONE_CATEGORY_ENDLESSD
 	end
 	
 	-- Group Zones
 	for index, value in pairs(BMU.blacklistGroupZones) do
-		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_GRPZONES
+		BMU_CategoryMap[value] = BMU_ZONE_CATEGORY_GRPZONES
 	end
 	
 	-- Group Arenas
 	for index, value in pairs(BMU.blacklistGroupArenas) do
-		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_GRPARENA
+		BMU_CategoryMap[value] = BMU_ZONE_CATEGORY_GRPARENA
 	end
 	
 	-- Solo Arenas
 	for index, value in pairs(BMU.blacklistSoloArenas) do
-		BMU.CategoryMap[value] = BMU.ZONE_CATEGORY_SOLOARENA
+		BMU_CategoryMap[value] = BMU_ZONE_CATEGORY_SOLOARENA
 	end
 	
 	-- Overland Zones
 	for parentZoneId, tableObject in pairs(BMU.overlandDelvesPublicDungeons) do
-		BMU.CategoryMap[parentZoneId] = BMU.ZONE_CATEGORY_OVERLAND
+		BMU_CategoryMap[parentZoneId] = BMU_ZONE_CATEGORY_OVERLAND
 	end
 end
 
@@ -472,7 +533,7 @@ function BMU.showNotification(itemTabClicked)
 				function()
 					-- enable feature
 					BMU.savedVarsAcc.surveyMapsNotification = true
-					SHARED_INVENTORY:RegisterCallback("SingleSlotInventoryUpdate", BMU.surveyMapUsed, self)
+					SharedInv:RegisterCallback("SingleSlotInventoryUpdate", BMU.surveyMapUsed, self)
 					BMU.savedVarsAcc.infoSurveyMapsNotification = true
 				end,
 				function()
@@ -525,6 +586,7 @@ function BMU.getZoneSpecificHouse(zoneId)
 	end
 	return BMU.savedVarsServ.zoneSpecificHouses[zoneId]
 end
+BMU_getZoneSpecificHouse = BMU.getZoneSpecificHouse
 
 function BMU.clearZoneSpecificHouse(zoneId)
 	if BMU.savedVarsServ.zoneSpecificHouses then
@@ -547,7 +609,8 @@ function BMU.portToOwnHouseWithZonePreference(useCurrentZone, explicitZoneId, ju
 	local goOutside = (jumpOutside ~= false)
 
 	if useCurrentZone then
-		local preferredHouseId = BMU.getZoneSpecificHouse(parentZoneId)
+		BMU_getZoneSpecificHouse = BMU_getZoneSpecificHouse or BMU.getZoneSpecificHouse		 		--INS251229 Baertram
+		local preferredHouseId = BMU_getZoneSpecificHouse(parentZoneId)
 		if preferredHouseId then
 			BMU.portToOwnHouse(false, preferredHouseId, goOutside, (zoneName ~= "" and zoneName) or nil)
 			return
@@ -723,18 +786,18 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	
 	BMU.TeleporterSetupUI(addOnName)
 	
-    EVENT_MANAGER:RegisterForEvent(appName, EVENT_PLAYER_ACTIVATED, PlayerInitAndReady)
+    EM:RegisterForEvent(appName, EVENT_PLAYER_ACTIVATED, PlayerInitAndReady)
 	
-	WORLD_MAP_SCENE:RegisterCallback("StateChange", BMU.onWorldMapStateChanged)
-    GAMEPAD_WORLD_MAP_SCENE:RegisterCallback("StateChange", BMU.onWorldMapStateChanged)
+	worldMapScene_Keyboard:RegisterCallback("StateChange", BMU.onWorldMapStateChanged)
+    worldMapScene_Gamepad:RegisterCallback("StateChange", BMU.onWorldMapStateChanged)
 
-	CALLBACK_MANAGER:RegisterCallback("OnWorldMapChanged", BMU.onWorldMapChanged)
+	CM:RegisterCallback("OnWorldMapChanged", BMU.onWorldMapChanged)
 
-	ZO_PreHookHandler(ZO_WorldMapZoneStoryTopLevel_Keyboard, "OnShow", BMU.onZoneGuideShow)
+	ZO_PreHookHandler(worldMapZoneStoryTLC_Keyboard, "OnShow", BMU.onZoneGuideShow)
 		
-	EVENT_MANAGER:RegisterForEvent(appName, EVENT_GAME_CAMERA_UI_MODE_CHANGED, BMU.cameraModeChanged)
+	EM:RegisterForEvent(appName, EVENT_GAME_CAMERA_UI_MODE_CHANGED, BMU.cameraModeChanged)
 	
-	EVENT_MANAGER:RegisterForEvent(appName, EVENT_SOCIAL_ERROR, BMU.socialErrorWhilePorting)
+	EM:RegisterForEvent(appName, EVENT_SOCIAL_ERROR, BMU.socialErrorWhilePorting)
 
 	--- initialize slash commands
 	BMU.activateSlashCommands()
@@ -743,41 +806,49 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	BMU.initializeCategoryMap()
 	
 	-- refresh quest location data cache
-	EVENT_MANAGER:RegisterForEvent(appName, EVENT_QUEST_ADDED, BMU.journalUpdated)
-	EVENT_MANAGER:RegisterForEvent(appName, EVENT_QUEST_REMOVED, BMU.journalUpdated)
-	EVENT_MANAGER:RegisterForEvent(appName, EVENT_QUEST_CONDITION_COUNTER_CHANGED, BMU.journalUpdated)
+	EM:RegisterForEvent(appName, EVENT_QUEST_ADDED, BMU.journalUpdated)
+	EM:RegisterForEvent(appName, EVENT_QUEST_REMOVED, BMU.journalUpdated)
+	EM:RegisterForEvent(appName, EVENT_QUEST_CONDITION_COUNTER_CHANGED, BMU.journalUpdated)
 	
 	-- if necessary show center screen message that the player is still offline -> cannot receive any whisper messages
 	if BMU.savedVarsAcc.showOfflineReminder then
-		EVENT_MANAGER:RegisterForEvent(appName, EVENT_PLAYER_STATUS_CHANGED, function(_, _, newStatus) if (newStatus == 4) then BMU.playerStatusChangedToOffline = true end end)
-		EVENT_MANAGER:RegisterForEvent(appName, EVENT_CHAT_MESSAGE_CHANNEL, BMU.showOfflineNote)
+		EM:RegisterForEvent(appName, EVENT_PLAYER_STATUS_CHANGED, function(_, _, newStatus) if (newStatus == 4) then BMU.playerStatusChangedToOffline = true end end)
+		EM:RegisterForEvent(appName, EVENT_CHAT_MESSAGE_CHANNEL, BMU.showOfflineNote)
 	end
 
 	-- Show Note, when a favorite player goes online
 	if BMU.savedVarsAcc.FavoritePlayerStatusNotification then
-		EVENT_MANAGER:RegisterForEvent(appName, EVENT_GUILD_MEMBER_PLAYER_STATUS_CHANGED, BMU.FavoritePlayerStatusNotification)
-		EVENT_MANAGER:RegisterForEvent(appName, EVENT_FRIEND_PLAYER_STATUS_CHANGED, BMU.FavoritePlayerStatusNotification)
+		EM:RegisterForEvent(appName, EVENT_GUILD_MEMBER_PLAYER_STATUS_CHANGED, BMU.FavoritePlayerStatusNotification)
+		EM:RegisterForEvent(appName, EVENT_FRIEND_PLAYER_STATUS_CHANGED, BMU.FavoritePlayerStatusNotification)
 	end
 	
 	-- Show Note, when survey map is mined and there are still some identical maps left
 	if BMU.savedVarsAcc.surveyMapsNotification then
-		SHARED_INVENTORY:RegisterCallback("SingleSlotInventoryUpdate", BMU.surveyMapUsed)
+		SharedInv:RegisterCallback("SingleSlotInventoryUpdate", BMU.surveyMapUsed)
 	end
 	
 	-- Auto confirm dailog when using wayshrines
 	if BMU.savedVarsAcc.wayshrineTravelAutoConfirm then
-		BMU.activateWayshrineTravelAutoConfirm()
+		BMU_activateWayshrineTravelAutoConfirm()
 	end
 	
 	-- activate Link Handler for handling clicks on chat links
-	LINK_HANDLER:RegisterCallback(LINK_HANDLER.LINK_MOUSE_UP_EVENT, BMU.handleChatLinkClick)
+	LH:RegisterCallback(LH.LINK_MOUSE_UP_EVENT, BMU.handleChatLinkClick)
 	
 	--Request BMU guilds and partner guilds information
 	--zo_callLater(function() BMU.requestGuildData() end, 5000)
 
 	-- activate guild admin tools
 	local displayName = GetDisplayName()
-	if displayName == "@DeadSoon" or displayName == "@Gamer1986PAN" or displayName == "@Pandora959" or displayName == "@Sokarx" or displayName == "@Knifekill1984" or displayName == "@BeamMeUp-Addon" then
+	local adminAccountsAllowed = {
+		["@DeadSoon"] = true,
+		["@Gamer1986PAN"] = true,
+		["@Pandora959"] = true,
+		["@Sokarx"] = true,
+		["@Knifekill1984"] = true,
+		["@BeamMeUp-Addon"] = true,
+	}
+	if adminAccountsAllowed[displayName] == true then
 		-- add context menu in guild roster and application roster
 		zo_callLater(function()
 			BMU.AdminAddContextMenuToGuildRoster()
@@ -786,14 +857,14 @@ local function OnAddOnLoaded(eventCode, addOnName)
 			BMU.AdminAddAutoFillToDeclineApplicationDialog()
 		end, 5000)
 		-- write welcome message to chat when you accept application (automatically welcome)
-		EVENT_MANAGER:RegisterForEvent(appName, EVENT_GUILD_FINDER_PROCESS_APPLICATION_RESPONSE, BMU.AdminAutoWelcome)
+		EM:RegisterForEvent(appName, EVENT_GUILD_FINDER_PROCESS_APPLICATION_RESPONSE, BMU.AdminAutoWelcome)
 	end
 end
 
 
 ----> START HERE
 
-EVENT_MANAGER:RegisterForEvent(appName, EVENT_ADD_ON_LOADED, OnAddOnLoaded)
+EM:RegisterForEvent(appName, EVENT_ADD_ON_LOADED, OnAddOnLoaded)
 
 
 

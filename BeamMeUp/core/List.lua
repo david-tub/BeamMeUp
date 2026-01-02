@@ -16,14 +16,15 @@ local SM = SCENE_MANAGER
 local worldMapManager = WORLD_MAP_MANAGER
 local playerTag = "player"
 local worldName = GetWorldName()
-
+local tos = tostring
+local ton = tonumber
 local string = string
 local string_match = string.match
 local string_lower = string.lower
 local string_gsub = string.gsub
 local string_format = string.format
 local table = table
-local table_inseert = table.insert
+local table_insert = table.insert
 local table_remove = table.remove
 --Other addon variables
 local BMU_LibZone = BMU.LibZone
@@ -54,6 +55,46 @@ local select = select
 local RequestJumpToHouse = RequestJumpToHouse
 local CancelCast = CancelCast
 local FastTravelToNode = FastTravelToNode
+local ShowMenu = ShowMenu
+local ClearMenu = ClearMenu
+local IsPlayerInGroup = IsPlayerInGroup
+local GetGroupSize = GetGroupSize
+local GetGroupUnitTagByIndex = GetGroupUnitTagByIndex
+local GetUnitDisplayName = GetUnitDisplayName
+local IsUnitGrouped = IsUnitGrouped
+local IsUnitGroupLeader = IsUnitGroupLeader
+local IsUnitSoloOrGroupLeader = IsUnitSoloOrGroupLeader
+local GroupInviteByName = GroupInviteByName
+local GroupPromote = GroupPromote
+local GroupKick = GroupKick
+local GroupLeave = GroupLeave
+local BeginGroupElection = BeginGroupElection
+local StartChatInput = StartChatInput
+local JumpToHouse = JumpToHouse
+local RemoveFriend = RemoveFriend
+local RequestFriend = RequestFriend
+local InviteToTributeByDisplayName = InviteToTributeByDisplayName
+local IsPlayerInGuild = IsPlayerInGuild
+local GetGuildMemberIndexFromDisplayName = GetGuildMemberIndexFromDisplayName
+local GetInteractionType = GetInteractionType
+local GetNumFastTravelNodes = GetNumFastTravelNodes
+local UseCollectible = UseCollectible
+local GetCollectibleCooldownAndDuration = GetCollectibleCooldownAndDuration
+local IsCollectibleUsable = IsCollectibleUsable
+local IsCollectibleUnlocked = IsCollectibleUnlocked
+local JumpToGuildMember = JumpToGuildMember
+local JumpToFriend = JumpToFriend
+local JumpToGroupMember = JumpToGroupMember
+local IsMounted = IsMounted
+local CanLeaveCurrentLocationViaTeleport = CanLeaveCurrentLocationViaTeleport
+local IsUnitDead = IsUnitDead
+local GetUnitZoneIndex = GetUnitZoneIndex
+local GetNormalizedPositionForZoneStoryActivityId = GetNormalizedPositionForZoneStoryActivityId
+local GetZoneActivityIdForZoneCompletionType = GetZoneActivityIdForZoneCompletionType
+local IsZoneStoryActivityComplete = IsZoneStoryActivityComplete
+local GetNumZoneActivitiesForZoneCompletionType = GetNumZoneActivitiesForZoneCompletionType
+local zo_callLater = zo_callLater
+local CanJumpToPlayerInZone = CanJumpToPlayerInZone
 
 --BMU functions
 local BMU_SI_get 							= SI.get
@@ -305,10 +346,10 @@ function BMU.showAutoUnlockProceedDialog(record)
 	
 	local body =
 		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART) .. "\n\n" ..
-		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_DISCOVERY) .. " " .. tostring(unlockedWayshrinesString) .. " (" .. tostring(allUnlockedWayshrines) .. "/" .. tostring(totalWayhsrines) .. ")" .. "\n" ..
-		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_XP) .. " " .. tostring(gainedXPString) .. "\n\n" ..
-		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_PROGRESS) .. " " .. tostring(currentStep) .."/" .. tostring(totalSteps) .. "\n" ..
-		GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. tostring(record.displayName)
+		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_DISCOVERY) .. " " .. tos(unlockedWayshrinesString) .. " (" .. tos(allUnlockedWayshrines) .. "/" .. tos(totalWayhsrines) .. ")" .. "\n" ..
+		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_XP) .. " " .. tos(gainedXPString) .. "\n\n" ..
+		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_PROGRESS) .. " " .. tos(currentStep) .."/" .. tos(totalSteps) .. "\n" ..
+		GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. tos(record.displayName)
 	
 	local countdown = GetTimeStamp() + 8
 	local globalDialogName
@@ -329,7 +370,7 @@ function BMU.showAutoUnlockProceedDialog(record)
 			ZO_Dialogs_ReleaseDialog(globalDialogName)
 			BMU_finishedAutoUnlock("timeout")
 		else
-			setTextParameter(BMU_colorizeText(tostring(math.max(remainingSec, 0)), "red"))
+			setTextParameter(BMU_colorizeText(tos(math.max(remainingSec, 0)), "red"))
 		end
 	end
 	
@@ -419,16 +460,16 @@ function BMU.finishedAutoUnlock(reason)
 	local finishDialogTitle = BMU.uwData.fZoneName
 	local finishDialogBody =
 		BMU_SI_get(SI.TELE_DIALOG_FINISH_AUTO_UNLOCK_BODY_PART) .. "\n\n" ..
-		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_DISCOVERY) .. " " .. tostring(unlockedWayshrinesString) .. " (" .. tostring(totalWayshrinesString) .. ")" .. "\n" ..
-		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_XP) .. " " .. tostring(gainedXPString)
+		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_DISCOVERY) .. " " .. tos(unlockedWayshrinesString) .. " (" .. tos(totalWayshrinesString) .. ")" .. "\n" ..
+		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_XP) .. " " .. tos(gainedXPString)
 	
 	local globalDialogName, dialogReference = BMU_showDialogSimple("AutoUnlockFinished", finishDialogTitle, finishDialogBody, nil, nil)
 
 	-- print summary into chat
 	BMU_printToChat(
 		BMU.uwData.fZoneName .. ": " ..
-		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_DISCOVERY) .. " " .. tostring(unlockedWayshrinesString) .. " (" .. tostring(totalWayshrinesString) .. ")  " ..
-		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_XP) .. " " .. tostring(gainedXPString), BMU.MSG_UL)
+		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_DISCOVERY) .. " " .. tos(unlockedWayshrinesString) .. " (" .. tos(totalWayshrinesString) .. ")  " ..
+		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_XP) .. " " .. tos(gainedXPString), BMU.MSG_UL)
 
 	-- if continuing with next zones and process finished successfully
 	local loopType = BMU.uwData.loopType
@@ -491,6 +532,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType)
 	BMU_getZoneWayshrineCompletion = BMU_getZoneWayshrineCompletion or BMU.getZoneWayshrineCompletion
 	BMU_startAutoUnlockLoopSorted = BMU_startAutoUnlockLoopSorted or BMU.startAutoUnlockLoopSorted
 	BMU_showDialogSimple = BMU_showDialogSimple or BMU.showDialogSimple
+	BMU_prepareAutoUnlock = BMU_prepareAutoUnlock or BMU.prepareAutoUnlock
 
 	if not zoneRecordList or #zoneRecordList == 0 then
 		local overlandZoneIds = {}
@@ -544,7 +586,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType)
 		if #resultList > 0 and resultList[1] and resultList[1].displayName ~= "" then
 			table_remove(zoneRecordList, index)
 			zo_callLater(function()
-				BMU.prepareAutoUnlock(zoneRecord.zoneId, loopType, zoneRecordList)
+				BMU_prepareAutoUnlock(zoneRecord.zoneId, loopType, zoneRecordList)
 			end, 400)
 			return
 		end
@@ -1303,7 +1345,7 @@ function ListView:update()
 				local favSlot = BMU.isFavoritePlayer(message.displayName)
 				if favSlot then
 					table_insert(tooltipTextPlayer, BMU_textures.tooltipSeperator)
-					table_insert(tooltipTextPlayer, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. tostring(favSlot), "gold"))
+					table_insert(tooltipTextPlayer, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. tos(favSlot), "gold"))
 				end
 
 
@@ -1492,7 +1534,7 @@ function ListView:update()
 			local favSlot = BMU.isFavoriteZone(message.zoneId)
 			if favSlot then
 				table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
-				table_insert(tooltipTextZone, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. tostring(favSlot), "gold"))
+				table_insert(tooltipTextZone, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. tos(favSlot), "gold"))
 			end
 			------------------
 			
@@ -1762,16 +1804,16 @@ function BMU.clickOnTeleportToOwnHouseButton_2(button, message, jumpOutside)
 
 	-- debug: entry + params + state
 	if BMU.debugMode then
-		local state = tostring(BMU.state)
+		local state = tos(BMU.state)
 		d(string_format("[BMU] clickOnTeleportToOwnHouseButton_2 -> state=%s, button=%s, jumpOutside=%s, houseId=%s, forceOutside=%s, parentZoneId=%s, parentZoneName=%s, zoneId=%s",
 			state,
-			tostring(button),
-			tostring(jumpOutside),
-			tostring(message and message.houseId),
-			tostring(message and message.forceOutside),
-			tostring(message and message.parentZoneId),
-			tostring(message and message.parentZoneName),
-			tostring(message and message.zoneId)))
+			tos(button),
+			tos(jumpOutside),
+			tos(message and message.houseId),
+			tos(message and message.forceOutside),
+			tos(message and message.parentZoneId),
+			tos(message and message.parentZoneName),
+			tos(message and message.zoneId)))
 	end
 
 	-- porting outside of a house cant be shared
@@ -2227,7 +2269,7 @@ function BMU.clickOnZoneName(button, record)
 					favName = BMU_formatName(GetZoneNameById(BMU_savedVarsServ.favoriteListZones[i]), BMU_savedVarsAcc.formatZoneName)
 				end
 				local entry = {
-					label = tostring(i) .. ": " .. favName,
+					label = tos(i) .. ": " .. favName,
 					callback = function(state) BMU_addFavoriteZone(i, record.zoneId, record.zoneName) end,
 				}			
 				table_insert(entries_favorites, entry)
@@ -2480,7 +2522,7 @@ function BMU.clickOnPlayerName(button, record)
 				favName = BMU.savedVarsServ.favoriteListPlayers[i]
 			end
 			local entry = {
-				label = tostring(i) .. ": " .. favName,
+				label = tos(i) .. ": " .. favName,
 				callback = function(state) BMU_addFavoritePlayer(i, record.displayName) end,
 			}			
 			table_insert(entries_favorites, entry)
@@ -2613,7 +2655,7 @@ function BMU.removeFavoritePlayer(displayName)
 end
 
 function BMU.round(num, numDecimalPlaces)
-  return tonumber(string_format("%." .. (numDecimalPlaces or 0) .. "f", num))
+  return ton(string_format("%." .. (numDecimalPlaces or 0) .. "f", num))
 end
 BMU_round = BMU.round
 
@@ -2624,7 +2666,7 @@ function BMU.formatGold(number)
 	elseif number >= 1000 then
 		return BMU_round((number/1000), 1) .. " " .. BMU_SI_get(SI.TELE_UI_GOLD_ABBR)
 	else
-		return tostring(number)
+		return tos(number)
 	end
 end
 BMU_formatGold = BMU.formatGold

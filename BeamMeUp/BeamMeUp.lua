@@ -79,6 +79,7 @@ function BMU.throttle(key, frequency)
 	return true
 end
 
+
 local function alertTeleporterLoaded()
     EM:UnregisterForEvent(appName, EVENT_PLAYER_ACTIVATED)
 	-- register events for own houses furniture count update

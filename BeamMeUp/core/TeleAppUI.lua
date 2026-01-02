@@ -603,7 +603,7 @@ local function SetupUI()
 	teleporterWin_Searcher_Player_Placeholder:SetText(BMU_colorizeText(GetString(SI_PLAYER_MENU_PLAYER), "lgray"))
 
   -- BackGround
-  teleporterWin_SearchBG = wm:CreateControlFromVirtual(" teleporterWin.SearchBG",  teleporterWin_Searcher_Player, "ZO_DefaultBackdrop")
+  teleporterWin_SearchBG = wm:CreateControlFromVirtual("Teleporter_SearchBG",  teleporterWin_Searcher_Player, "ZO_DefaultBackdrop")
   teleporterWin.SearchBG = teleporterWin_SearchBG
   teleporterWin_SearchBG:ClearAnchors()
   teleporterWin_SearchBG:SetAnchorFill(teleporterWin_Searcher_Player)
@@ -617,14 +617,17 @@ local function SetupUI()
 
   -- Handlers
   ZO_PreHookHandler(teleporterWin_Searcher_Player, "OnTextChanged", function(teleporterWin_Searcher_PlayerCtrl)
-	if teleporterWin_Searcher_PlayerCtrl:HasFocus() and (teleporterWin_Searcher_Player:GetText() ~= "" or (teleporterWin_Searcher_Player:GetText() == "" and BMU.state == BMU.indexListSearchPlayer)) then
-		-- make sure player placeholder is hidden
-		teleporterWin_Searcher_Player_Placeholder:SetHidden(true)
-		-- clear zone input field
-		teleporterWin.Searcher_Zone:SetText("")
-		-- show zone placeholder
-		teleporterWin.Searcher_Zone.Placeholder:SetHidden(false)
-		BMU_createTable({index=BMU.indexListSearchPlayer, inputString=teleporterWin_Searcher_Player:GetText()})
+	  if teleporterWin_Searcher_PlayerCtrl:HasFocus() then
+		  local searchPlayerText = teleporterWin_Searcher_PlayerCtrl:GetText()
+		  if (searchPlayerText ~= "" or BMU.state == BMU.indexListSearchPlayer) then
+			  -- make sure player placeholder is hidden
+			  teleporterWin_Searcher_Player_Placeholder:SetHidden(true)
+			  -- clear zone input field
+			  teleporterWin_Searcher_Zone:SetText("")
+			  -- show zone placeholder
+			  teleporterWin_Searcher_Zone.Placeholder:SetHidden(false)
+			  BMU_createTable({index=BMU.indexListSearchPlayer, inputString=searchPlayerText})
+		  end
 	end
   end)
 
@@ -632,8 +635,8 @@ local function SetupUI()
 	teleporterWin_Searcher_Player_Placeholder:SetHidden(true)
   end)
 
-  teleporterWin_Searcher_Player:SetHandler("OnFocusLost", function(self)
-	if teleporterWin_Searcher_Player:GetText() == "" then
+  teleporterWin_Searcher_Player:SetHandler("OnFocusLost", function(teleporterWin_Searcher_PlayerCtrl)
+	if teleporterWin_Searcher_PlayerCtrl:GetText() == "" then
 		teleporterWin_Searcher_Player_Placeholder:SetHidden(false)
 	end
   end)
@@ -650,18 +653,18 @@ local function SetupUI()
   teleporterWin_Searcher_Zone:SetFont(BMU.font1)
 
   -- Placeholder
-  teleporterWin_Searcher_Zone_Placeholder = wm:CreateControl("TTeleporter_Searcher_Player_EDITBOX1_Placeholder", teleporterWin_Searcher_Zone, CT_LABEL)
+  teleporterWin_Searcher_Zone_Placeholder = wm:CreateControl("Teleporter_Searcher_Player_EDITBOX1_Placeholder", teleporterWin_Searcher_Zone, CT_LABEL)
   teleporterWin_Searcher_Zone.Placeholder = teleporterWin_Searcher_Zone_Placeholder
   teleporterWin_Searcher_Zone_Placeholder:SetSimpleAnchorParent(4*scale,0*scale)
   teleporterWin_Searcher_Zone_Placeholder:SetFont(BMU.font1)
   teleporterWin_Searcher_Zone_Placeholder:SetText(BMU_colorizeText(GetString(SI_CHAT_CHANNEL_NAME_ZONE), "lgray"))
 
   -- BG
-  teleporterWin_SearchBG_Player = wm:CreateControlFromVirtual(" teleporterWin_SearchBG_Zone",  teleporterWin_Searcher_Zone, "ZO_DefaultBackdrop")
+  teleporterWin_SearchBG_Player = wm:CreateControlFromVirtual("Teleporter_SearchBG_Zone", teleporterWin_Searcher_Zone, "ZO_DefaultBackdrop")
   teleporterWin.SearchBG_Player = teleporterWin_SearchBG_Player
   teleporterWin_SearchBG_Player:ClearAnchors()
-  teleporterWin_SearchBG_Player:SetAnchorFill( teleporterWin_Searcher_Zone)
-  teleporterWin_SearchBG_Player:SetDimensions( teleporterWin_Searcher_Zone:GetWidth(),  teleporterWin_Searcher_Zone:GetHeight())
+  teleporterWin_SearchBG_Player:SetAnchorFill(teleporterWin_Searcher_Zone)
+  teleporterWin_SearchBG_Player:SetDimensions(teleporterWin_Searcher_Zone:GetWidth(), teleporterWin_Searcher_Zone:GetHeight())
   teleporterWin_SearchBG_Player.controlType = CT_CONTROL
   teleporterWin_SearchBG_Player.system = SETTING_TYPE_UI
   teleporterWin_SearchBG_Player:SetHidden(false)
@@ -670,28 +673,31 @@ local function SetupUI()
   teleporterWin_SearchBG_Player:SetClampedToScreen(true)
 
   -- Handlers
-    ZO_PreHookHandler(teleporterWin_Searcher_Zone, "OnTextChanged", function(self)
-		if self:HasFocus() and (teleporterWin_Searcher_Zone:GetText() ~= "" or (teleporterWin_Searcher_Zone:GetText() == "" and BMU.state == BMU.indexListSearchZone)) then
-			-- make sure zone placeholder is hidden
-			teleporterWin_Searcher_Zone_Placeholder:SetHidden(true)
-			-- clear player input field
-			teleporterWin_Searcher_Player:SetText("")
-			-- show player placeholder
-			teleporterWin_Searcher_Player_Placeholder:SetHidden(false)
-			if BMU.state == BMU.indexListDungeons then
-				BMU_createTableDungeons({inputString=teleporterWin_Searcher_Zone:GetText()})
-			else
-				BMU_createTable({index=BMU.indexListSearchZone, inputString=teleporterWin_Searcher_Zone:GetText()})
+    ZO_PreHookHandler(teleporterWin_Searcher_Zone, "OnTextChanged", function(teleporterWin_Searcher_ZoneCtrl)
+		if teleporterWin_Searcher_ZoneCtrl:HasFocus() then
+			local searchZoneText = teleporterWin_Searcher_ZoneCtrl:GetText()
+			if (searchZoneText ~= "" or BMU.state == BMU.indexListSearchZone) then
+				-- make sure zone placeholder is hidden
+				teleporterWin_Searcher_Zone_Placeholder:SetHidden(true)
+				-- clear player input field
+				teleporterWin_Searcher_Player:SetText("")
+				-- show player placeholder
+				teleporterWin_Searcher_Player_Placeholder:SetHidden(false)
+				if BMU.state == BMU.indexListDungeons then
+					BMU_createTableDungeons({inputString=searchZoneText})
+				else
+					BMU_createTable({index=BMU.indexListSearchZone, inputString=searchZoneText})
+				end
 			end
 		end
 	end)
 
-	teleporterWin_Searcher_Zone:SetHandler("OnFocusGained", function(teleporterWin_Searcher_Zone_PlaceholderCtrl)
-		teleporterWin_Searcher_Zone_PlaceholderCtrl:SetHidden(true)
+	teleporterWin_Searcher_Zone:SetHandler("OnFocusGained", function(teleporterWin_Searcher_ZoneCtrl)
+		teleporterWin_Searcher_Zone_Placeholder:SetHidden(true)
 	end)
 
-	teleporterWin_Searcher_Zone:SetHandler("OnFocusLost", function(teleporterWin_Searcher_Zone_PlaceholderCtrl)
-		if teleporterWin_Searcher_Zone_PlaceholderCtrl:GetText() == "" then
+	teleporterWin_Searcher_Zone:SetHandler("OnFocusLost", function(teleporterWin_Searcher_ZoneCtrl)
+		if teleporterWin_Searcher_ZoneCtrl:GetText() == "" then
 			teleporterWin_Searcher_Zone_Placeholder:SetHidden(false)
 		end
 	end)

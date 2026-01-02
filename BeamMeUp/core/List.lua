@@ -36,6 +36,7 @@ local GetZoneId = GetZoneId
 local BMU_SI_get 							= SI.get
 local BMU_colorizeText 						= BMU.colorizeText
 local BMU_printToChat 						= BMU.printToChat
+local BMU_getItemTypeIcon 					= BMU.getItemTypeIcon
 
 
 ----variables (defined inline in code below, upon first usage, as they are still nil at this line)
@@ -45,7 +46,7 @@ local BMU_win, BMU_win_Main_Control
 local BMU_isZoneOverlandZone, BMU_showDialogSimple, BMU_prepareAutoUnlock, BMU_formatName, BMU_getZoneWayshrineCompletion,
       BMU_startAutoUnlock, BMU_proceedAutoUnlock, BMU_finishedAutoUnlock, BMU_createTable, BMU_shuffle_table, BMU_has_value,
 	  BMU_PortalToPlayer, BMU_showAutoUnlockProceedDialog, BMU_formatGold, BMU_showDialogCustom, BMU_startAutoUnlockLoopSorted,
-	  BMU_startAutoUnlockLoopRandom
+	  BMU_startAutoUnlockLoopRandom, BMU_round
 -- -^- INS251229 Baertram END 0
 
 
@@ -974,6 +975,7 @@ end
 
 
 local function _on_resize(self)
+	BMU_round = BMU_round or BMU.round
     BMU.control_global_2 = self.control
 
     -- Need to calculate num_visible_lines etc. for the rest of this function.
@@ -987,7 +989,7 @@ local function _on_resize(self)
 	-- on initialization #self.lines can be 0 -> prevent division with 0
 	local viewable_lines_pct = 1
 	if #self.lines > 0 then
-		viewable_lines_pct = BMU.round(self.num_visible_lines / #self.lines, 1) or 1
+		viewable_lines_pct = BMU_round(self.num_visible_lines / #self.lines, 1) or 1
 	end
 	
     -- Can we see all the lines?
@@ -1179,6 +1181,8 @@ end
 -- Goes through each line control and either shows a message or hides it
 local cachedSavedVarsAccountSecondLanguage = nil													--INS251229 Baertram
 function ListView:update()
+	BMU_round = BMU_round or BMU.round
+
 	-- suggestion by otac0n (Discord, 2022_10)
 	-- To make it robust, you may want to create a unique ID per ListView.  This assumes a singleton.
 	EM:UnregisterForUpdate("TeleportList_Update")
@@ -1386,7 +1390,7 @@ function ListView:update()
 					for _, itemType in ipairs(message.relatedItemsTypes) do
 						if itemType ~= nil then
 							-- add dimensionized icon (same size as BMU.font1)
-							message.zoneName = message.zoneName .. BMU.getItemTypeIcon(itemType, BMU.round(17*scale, 0))
+							message.zoneName = message.zoneName .. BMU_getItemTypeIcon(itemType, BMU_round(17*scale, 0))
 						end
 					end
 					
@@ -2543,10 +2547,11 @@ end
 
 
 function BMU.formatGold(number)
+	BMU_round = BMU_round or BMU.round
 	if number >= 1000000 then
-		return BMU.round((number/1000000), 3) .. " " .. BMU_SI_get(SI.TELE_UI_GOLD_ABBR2)
+		return BMU_round((number/1000000), 3) .. " " .. BMU_SI_get(SI.TELE_UI_GOLD_ABBR2)
 	elseif number >= 1000 then
-		return BMU.round((number/1000), 1) .. " " .. BMU_SI_get(SI.TELE_UI_GOLD_ABBR)
+		return BMU_round((number/1000), 1) .. " " .. BMU_SI_get(SI.TELE_UI_GOLD_ABBR)
 	else
 		return tostring(number)
 	end
@@ -2557,6 +2562,7 @@ BMU_formatGold = BMU.formatGold
 function BMU.round(num, numDecimalPlaces)
   return tonumber(string.format("%." .. (numDecimalPlaces or 0) .. "f", num))
 end
+BMU_round = BMU.round
 
 
 -- calculate the height of the main control depending on the number of lines

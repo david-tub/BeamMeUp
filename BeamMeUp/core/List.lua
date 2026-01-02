@@ -15,12 +15,16 @@ local wm = WINDOW_MANAGER
 local SM = SCENE_MANAGER
 local worldMapManager = WORLD_MAP_MANAGER
 local playerTag = "player"
+local worldName = GetWorldName()
 
 local string = string
 local string_match = string.match
 local string_lower = string.lower
 local string_gsub = string.gsub
-
+local string_format = string.format
+local table = table
+local table_inseert = table.insert
+local table_remove = table.remove
 --Other addon variables
 local BMU_LibZone = BMU.LibZone
 local BMU_LibSets = BMU.LibSets
@@ -38,6 +42,8 @@ local BMU_ZONE_CATEGORY_GRPARENA = BMU.ZONE_CATEGORY_GRPARENA
 local BMU_ZONE_CATEGORY_SOLOARENA = BMU.ZONE_CATEGORY_SOLOARENA
 local BMU_ZONE_CATEGORY_OVERLAND = BMU.ZONE_CATEGORY_OVERLAND
 local colorLegendary = ZO_ColorDef:New(teleporterVars.color.colLegendary)
+local guildHousesAtServer = teleporterVars.guildHouse[worldName]
+local BMUGuildsAtServer = teleporterVars.BMUGuilds[worldName]
 
 ----functions
 --ZOs functions
@@ -45,6 +51,10 @@ local GetZoneNameById = GetZoneNameById
 local GetCurrentMapZoneIndex = GetCurrentMapZoneIndex
 local GetZoneId = GetZoneId
 local select = select
+local RequestJumpToHouse = RequestJumpToHouse
+local CancelCast = CancelCast
+local FastTravelToNode = FastTravelToNode
+
 --BMU functions
 local BMU_SI_get 							= SI.get
 local BMU_colorizeText 						= BMU.colorizeText
@@ -62,8 +72,9 @@ local BMU_isZoneOverlandZone, BMU_showDialogSimple, BMU_prepareAutoUnlock, BMU_f
 	  BMU_startAutoUnlockLoopRandom, BMU_round, BMU_createTablePTF, BMU_OpenTeleporter, BMU_getMapIndex, BMU_createTableHouses,
       BMU_isWholeWordInString, BMU_clearZoneSpecificHouse, BMU_setZoneSpecificHouse, BMU_getZoneSpecificHouse, BMU_getLowestNumber,
 	  BMU_createTableDungeons, BMU_refreshListAuto, BMU_getNumSetCollectionProgressPieces, BMU_showDialogAutoUnlock, BMU_addFavoriteZone,
-	  BMU_removeFavoriteZone, BMU_isFavoriteZone, BMU_createMail, BMU_portToOwnHouse
-
+	  BMU_removeFavoriteZone, BMU_isFavoriteZone, BMU_createMail, BMU_portToOwnHouse, BMU_HideTeleporter, BMU_showTeleportAnimation,
+      BMU_PortalToZone, BMU_portToParentZone, BMU_isFavoritePlayer, BMU_removeFavoritePlayer, BMU_addFavoritePlayer,
+	  BMU_findExactQuestLocation, BMU_sc_porting, BMU_getParentZoneId
 -- -^- INS251229 Baertram END 0
 
 
@@ -105,10 +116,11 @@ end
 -- closing interface and starting auto unlock core process
 function BMU.prepareAutoUnlock(zoneId, loopType, loopZoneList)
 	BMU_startAutoUnlock = BMU_startAutoUnlock or BMU.startAutoUnlock
+	BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter
 	-- hide world map if open
 	SM:Hide("worldMap")
 	-- hide UI if open
-	BMU.HideTeleporter()
+	BMU_HideTeleporter()
 	-- delay function call, otherwise the auto-unlock-dialog fails (for whatever reason)
 	zo_callLater(function() BMU_startAutoUnlock(zoneId, loopType, loopZoneList) end, 150)
 end
@@ -251,7 +263,7 @@ function BMU.proceedAutoUnlock()
 				-- start travel
 				BMU_PortalToPlayer(nextPlayer.displayName, nextPlayer.sourceIndexLeading, nextPlayer.zoneName, nextPlayer.zoneId, nextPlayer.category, false, false, false)
 				-- add player to list
-				table.insert(BMU.uwData.displayNameList, nextPlayer.displayName)
+				table_insert(BMU.uwData.displayNameList, nextPlayer.displayName)
 				-- NOTE: handling of fast travel error in function BMU.finishedAutoUnlock() in case of timeout
 				-- show dialog with all infos
 				BMU_showAutoUnlockProceedDialog(nextPlayer)
@@ -445,7 +457,7 @@ function BMU.startAutoUnlockLoopRandom(prevZoneId, loopType)
 	for overlandZoneId, _ in pairs(BMU.overlandDelvesPublicDungeons) do
 		-- consider only zones the user has access to (DLC)
 		if CanJumpToPlayerInZone(overlandZoneId) then
-			table.insert(overlandZoneIds, overlandZoneId)
+			table_insert(overlandZoneIds, overlandZoneId)
 		end
 	end
 	
@@ -487,7 +499,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType)
 		for overlandZoneId, _ in pairs(BMU.overlandDelvesPublicDungeons) do
 			-- consider only zones the user has access to (DLC)
 			if CanJumpToPlayerInZone(overlandZoneId) then
-				--table.insert(overlandZoneIds, overlandZoneId)
+				--table_insert(overlandZoneIds, overlandZoneId)
 				local resultList = BMU_createTable({index=BMU.indexListZone, fZoneId=overlandZoneId, noOwnHouses=true, dontDisplay=true})
 				if #resultList > 0 and resultList[1] and resultList[1].displayName ~= "" then
 					local numWayshrines, numWayshrinesDiscovered = BMU_getZoneWayshrineCompletion(overlandZoneId)
@@ -501,7 +513,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType)
 						else
 							record.ratioWayshrines = numWayshrinesDiscovered/numWayshrines
 						end
-						table.insert(cleanZoneList, record)
+						table_insert(cleanZoneList, record)
 					end
 				end
 			end
@@ -530,7 +542,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType)
 	for index, zoneRecord in pairs(zoneRecordList) do
 		local resultList = BMU_createTable({index=BMU.indexListZone, fZoneId=zoneRecord.zoneId, noOwnHouses=true, dontDisplay=true})
 		if #resultList > 0 and resultList[1] and resultList[1].displayName ~= "" then
-			table.remove(zoneRecordList, index)
+			table_remove(zoneRecordList, index)
 			zo_callLater(function()
 				BMU.prepareAutoUnlock(zoneRecord.zoneId, loopType, zoneRecordList)
 			end, 400)
@@ -840,8 +852,13 @@ end
 
 -- jump directly to wayshrine node in given zone (for gold)
 function BMU.PortalToZone(zoneId)
+	BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter
+	BMU_getMapIndex = BMU_getMapIndex or BMU_getMapIndex
+	BMU_showTeleportAnimation = BMU_showTeleportAnimation or BMU.showTeleportAnimation
+	BMU_formatName = BMU_formatName or BMU.formatName
+
 	-- set map and find wayshrine node
-	local mapIndex = BMU.getMapIndex(zoneId)
+	local mapIndex = BMU_getMapIndex(zoneId)
 	worldMapManager:SetMapByIndex(mapIndex)
 	for nodeIndex = 1, GetNumFastTravelNodes() do
 		local known, name, normalizedX, normalizedY, icon, glowIcon, poiType, isShownInCurrentMap, linkedCollectibleIsLocked = GetFastTravelNodeInfo(nodeIndex)
@@ -852,10 +869,10 @@ function BMU.PortalToZone(zoneId)
 				FastTravelToNode(nodeIndex)
 				return
 			else
-				BMU_printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(GetZoneNameById(zoneId)) .. " (" .. zo_strformat(SI_MONEY_FORMAT, GetRecallCost()) .. ")", BMU.MSG_FT)
+				BMU_printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU_formatName(GetZoneNameById(zoneId)) .. " (" .. zo_strformat(SI_MONEY_FORMAT, GetRecallCost()) .. ")", BMU.MSG_FT)
 				-- show additional animation
 				if BMU.savedVarsAcc.showTeleportAnimation then
-					BMU.showTeleportAnimation()
+					BMU_showTeleportAnimation()
 				end
 				-- start travel to node
 				FastTravelToNode(nodeIndex)
@@ -863,7 +880,7 @@ function BMU.PortalToZone(zoneId)
 					-- hide world map if open
 					SM:Hide("worldMap")
 					-- hide UI if open
-					BMU.HideTeleporter()
+					BMU_HideTeleporter()
 				end
 				return
 			end
@@ -1276,17 +1293,17 @@ function ListView:update()
 				
 				----
 				-- add source text
-				table.insert(tooltipTextPlayer, BMU_textures.tooltipSeperator)
+				table_insert(tooltipTextPlayer, BMU_textures.tooltipSeperator)
 				for _, sourceText in pairs(message.sourcesText) do
-					table.insert(tooltipTextPlayer, sourceText)
+					table_insert(tooltipTextPlayer, sourceText)
 				end
 
 				----
 				-- add favorite player text
 				local favSlot = BMU.isFavoritePlayer(message.displayName)
 				if favSlot then
-					table.insert(tooltipTextPlayer, BMU_textures.tooltipSeperator)
-					table.insert(tooltipTextPlayer, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. tostring(favSlot), "gold"))
+					table_insert(tooltipTextPlayer, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextPlayer, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. tostring(favSlot), "gold"))
 				end
 
 
@@ -1326,10 +1343,10 @@ function ListView:update()
 			if cachedSavedVarsAccountSecondLanguage ~= 1 and message.zoneNameClickable == true and message.zoneNameSecondLanguage ~= nil then --CHG251229 Baertram
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table.insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
 				end
 				-- add zone name
-				table.insert(tooltipTextZone, message.zoneNameSecondLanguage)
+				table_insert(tooltipTextZone, message.zoneNameSecondLanguage)
 			end
 			------------------
 			
@@ -1338,10 +1355,10 @@ function ListView:update()
 			if message.category ~= BMU.ZONE_CATEGORY_OVERLAND and message.parentZoneName and not message.houseTooltip then
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table.insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
 				end
 				-- add zone name
-				table.insert(tooltipTextZone, message.parentZoneName)
+				table_insert(tooltipTextZone, message.parentZoneName)
 			end
 			------------------
 
@@ -1349,11 +1366,11 @@ function ListView:update()
 			if message.houseTooltip then
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table.insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
 				end
 				-- add house infos
 				for _, v in pairs(message.houseTooltip) do
-					table.insert(tooltipTextZone, v)
+					table_insert(tooltipTextZone, v)
 				end
 			end
 			------------------
@@ -1362,13 +1379,13 @@ function ListView:update()
 			if message.zoneNameClickable == true and (message.zoneWayhsrineDiscoveryInfo ~= nil or message.zoneSkyshardDiscoveryInfo ~= nil) then
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table.insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
 				end
 				if message.zoneSkyshardDiscoveryInfo ~= nil then
-					table.insert(tooltipTextZone, message.zoneSkyshardDiscoveryInfo)
+					table_insert(tooltipTextZone, message.zoneSkyshardDiscoveryInfo)
 				end
 				if message.zoneWayhsrineDiscoveryInfo ~= nil then
-					table.insert(tooltipTextZone, message.zoneWayhsrineDiscoveryInfo)
+					table_insert(tooltipTextZone, message.zoneWayhsrineDiscoveryInfo)
 				end
 			end
 			------------------
@@ -1377,9 +1394,9 @@ function ListView:update()
 			if message.zoneNameClickable == true and message.publicDungeonAchiementInfo then
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table.insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
 				end
-				table.insert(tooltipTextZone, message.publicDungeonAchiementInfo)
+				table_insert(tooltipTextZone, message.publicDungeonAchiementInfo)
 			end
 			------------------
 
@@ -1387,10 +1404,10 @@ function ListView:update()
 			if message.setCollectionProgress then
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table.insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
 				end
 				-- add set collection info
-				table.insert(tooltipTextZone, message.setCollectionProgress)
+				table_insert(tooltipTextZone, message.setCollectionProgress)
 			end
 			------------------
 			
@@ -1430,10 +1447,10 @@ function ListView:update()
 				-- copy item names to tooltipTextZone
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table.insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
 				end
 				for _, item in ipairs(message.relatedItems) do
-					table.insert(tooltipTextZone, item.itemTooltip)
+					table_insert(tooltipTextZone, item.itemTooltip)
 				end
 				
 			-- if search for related quests
@@ -1448,10 +1465,10 @@ function ListView:update()
 				-- copy quest names to tooltipTextZone
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table.insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
 				end
 				for _, questName in ipairs(message.relatedQuests) do
-					table.insert(tooltipTextZone, questName)
+					table_insert(tooltipTextZone, questName)
 				end
 			end
 			------------------
@@ -1460,13 +1477,13 @@ function ListView:update()
 			if message.groupMemberSameInstance ~= nil then
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table.insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
 				end
 				-- add instance info
 				if message.groupMemberSameInstance == true then
-					table.insert(tooltipTextZone, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_SAME_INSTANCE), "green"))
+					table_insert(tooltipTextZone, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_SAME_INSTANCE), "green"))
 				else
-					table.insert(tooltipTextZone, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_DIFFERENT_INSTANCE), "red"))
+					table_insert(tooltipTextZone, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_DIFFERENT_INSTANCE), "red"))
 				end
 			end
 			------------------
@@ -1474,8 +1491,8 @@ function ListView:update()
 			-- Info if zone is favorite
 			local favSlot = BMU.isFavoriteZone(message.zoneId)
 			if favSlot then
-				table.insert(tooltipTextZone, BMU_textures.tooltipSeperator)
-				table.insert(tooltipTextZone, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. tostring(favSlot), "gold"))
+				table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+				table_insert(tooltipTextZone, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. tostring(favSlot), "gold"))
 			end
 			------------------
 			
@@ -1507,11 +1524,11 @@ function ListView:update()
 			if message.isDungeon then
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table.insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
 				end
 				-- add dungeon infos
 				for _, v in pairs(message.dungeonTooltip) do
-					table.insert(tooltipTextZone, v)
+					table_insert(tooltipTextZone, v)
 				end
 			end
 			------------------
@@ -1632,7 +1649,7 @@ function ListView:update()
 					list.portalToPlayerTex:SetTexture(texture_over)
 					if GetInteractionType() ~= INTERACTION_FAST_TRAVEL then
 						-- show tooltip with costs only if player is not at a wayshrine
-						BMU:tooltipTextEnter(list.portalToPlayerTex, message.difficultyText .. "\n" .. BMU_colorizeText(string.format(GetString(SI_TOOLTIP_RECALL_COST) .. "%d", GetRecallCost()), "red"))
+						BMU:tooltipTextEnter(list.portalToPlayerTex, message.difficultyText .. "\n" .. BMU_colorizeText(string_format(GetString(SI_TOOLTIP_RECALL_COST) .. "%d", GetRecallCost()), "red"))
 					else
 						BMU:tooltipTextEnter(list.portalToPlayerTex, message.difficultyText)
 					end
@@ -1656,7 +1673,7 @@ function ListView:update()
 					list.portalToPlayerTex:SetTexture(texture_over)
 					if GetInteractionType() ~= INTERACTION_FAST_TRAVEL then
 						-- show tooltip with costs only if player is not at a wayshrine
-						BMU:tooltipTextEnter(list.portalToPlayerTex, BMU_colorizeText(string.format(GetString(SI_TOOLTIP_RECALL_COST) .. "%d", GetRecallCost()), "red"))
+						BMU:tooltipTextEnter(list.portalToPlayerTex, BMU_colorizeText(string_format(GetString(SI_TOOLTIP_RECALL_COST) .. "%d", GetRecallCost()), "red"))
 					end
 					BMU.pauseAutoRefresh = true end)
 				list.portalToPlayerTex:SetHandler("OnMouseExit", function(self) list.portalToPlayerTex:SetTexture(texture_normal) BMU:tooltipTextEnter(list.portalToPlayerTex) BMU.pauseAutoRefresh = false end)
@@ -1675,13 +1692,17 @@ end
 
 
 function BMU.clickOnTeleportToPlayerButton(textureControl, button, message)
+	BMU_PortalToPlayer = BMU_PortalToPlayer or BMU.PortalToPlayer
+	BMU_PortalToZone = BMU_PortalToZone or BMU.PortalToZone
+	BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter
+
 	-- click effect
 	textureControl:SetAlpha(0.65)
 	zo_callLater(function() textureControl:SetAlpha(1) end, 200)	
 
 	-- catch the case if the it is a zone without player (fast travel for gold)
 	if message.zoneWithoutPlayer then
-		BMU.PortalToZone(message.zoneId)
+		BMU_PortalToZone(message.zoneId)
 		return
 	end
 	
@@ -1703,7 +1724,7 @@ function BMU.clickOnTeleportToPlayerButton(textureControl, button, message)
 	end
 	
 	-- port to player anyway
-	BMU.PortalToPlayer(message.displayName, message.sourceIndexLeading, message.zoneName, message.zoneId, message.category, true, true, true)
+	BMU_PortalToPlayer(message.displayName, message.sourceIndexLeading, message.zoneName, message.zoneId, message.category, true, true, true)
 	if BMU.savedVarsAcc.closeOnPorting or GetInteractionType() == INTERACTION_FAST_TRAVEL then
 		-- 2025_06
 			-- check additionally if the player is interacting with a wayshrine
@@ -1713,7 +1734,7 @@ function BMU.clickOnTeleportToPlayerButton(textureControl, button, message)
 		-- hide world map if open
 		SM:Hide("worldMap")
 		-- hide UI if open
-		BMU.HideTeleporter()
+		BMU_HideTeleporter()
 	end
 end
 
@@ -1736,10 +1757,13 @@ end
 
 
 function BMU.clickOnTeleportToOwnHouseButton_2(button, message, jumpOutside)
+	BMU_formatName = BMU_formatName or BMU.formatName
+	BMU_portToOwnHouse = BMU_portToOwnHouse or BMU.portToOwnHouse
+
 	-- debug: entry + params + state
 	if BMU.debugMode then
 		local state = tostring(BMU.state)
-		d(string.format("[BMU] clickOnTeleportToOwnHouseButton_2 -> state=%s, button=%s, jumpOutside=%s, houseId=%s, forceOutside=%s, parentZoneId=%s, parentZoneName=%s, zoneId=%s",
+		d(string_format("[BMU] clickOnTeleportToOwnHouseButton_2 -> state=%s, button=%s, jumpOutside=%s, houseId=%s, forceOutside=%s, parentZoneId=%s, parentZoneName=%s, zoneId=%s",
 			state,
 			tostring(button),
 			tostring(jumpOutside),
@@ -1761,16 +1785,20 @@ function BMU.clickOnTeleportToOwnHouseButton_2(button, message, jumpOutside)
 		local data4 = message.houseId -- houseId
 		local text = "Follow me!"
 		local link = "|H1:" .. linkType .. ":" .. data1 .. ":" .. data2 .. ":" .. data3 .. ":" .. data4 .. "|h[" .. text .. "]|h"
-		local preText = "Click to follow me to " .. BMU.formatName(GetZoneNameById(message.zoneId), false) .. ": "
+		local preText = "Click to follow me to " .. BMU_formatName(GetZoneNameById(message.zoneId), false) .. ": "
 		StartChatInput(preText .. link, CHAT_CHANNEL_PARTY)
 	end
 
 	-- port to own house anyway
-	BMU.portToOwnHouse(false, message.houseId, jumpOutside, message.parentZoneName)
+	BMU_portToOwnHouse(false, message.houseId, jumpOutside, message.parentZoneName)
 end
 
 
 function BMU.clickOnTeleportToPTFHouseButton(textureControl, button, message)
+	BMU_formatName = BMU_formatName or BMU.formatName
+	BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter
+	BMU_showTeleportAnimation = BMU_showTeleportAnimation or BMU.showTeleportAnimation
+
 	-- click effect
 	textureControl:SetAlpha(0.65)
 	zo_callLater(function() textureControl:SetAlpha(1) end, 200)
@@ -1792,7 +1820,7 @@ function BMU.clickOnTeleportToPTFHouseButton(textureControl, button, message)
 			local text = "Follow me!" -- currently not working because linkType "book" does not allow custom text
 			
 			local link = "|H1:" .. linkType .. ":" .. data1 .. ":" .. data2 .. ":" .. data3 .. ":" .. data4 .. "|h[" .. text .. "]|h"
-			local preText = "Click to follow me to " .. data3 .. " - ".. BMU.formatName(GetZoneNameById(message.zoneId), false) .. ": "
+			local preText = "Click to follow me to " .. data3 .. " - ".. BMU_formatName(GetZoneNameById(message.zoneId), false) .. ": "
 
 			-- print link into group channel - player has to press Enter manually!
 			StartChatInput(preText .. link, CHAT_CHANNEL_PARTY)
@@ -1800,17 +1828,17 @@ function BMU.clickOnTeleportToPTFHouseButton(textureControl, button, message)
 		
 		-- show additional animation
 		if BMU.savedVarsAcc.showTeleportAnimation then
-			BMU.showTeleportAnimation()
+			BMU_showTeleportAnimation()
 		end
 		
 		-- port to house anyway
 		CancelCast()
 		if message.displayName == GetDisplayName() or message.displayName == nil or zo_strtrim(message.displayName) == "" then
 			-- own house
-			BMU_printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(GetZoneNameById(message.zoneId), false), BMU.MSG_FT)
+			BMU_printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU_formatName(GetZoneNameById(message.zoneId), false), BMU.MSG_FT)
 			RequestJumpToHouse(message.houseId)
 		else
-			BMU_printToChat("Port to PTF House:" .. " " .. message.displayName .. " - " .. BMU.formatName(GetZoneNameById(message.zoneId), false), BMU.MSG_FT)
+			BMU_printToChat("Port to PTF House:" .. " " .. message.displayName .. " - " .. BMU_formatName(GetZoneNameById(message.zoneId), false), BMU.MSG_FT)
 			JumpToSpecificHouse(message.displayName, message.houseId)
 		end
 	
@@ -1818,7 +1846,7 @@ function BMU.clickOnTeleportToPTFHouseButton(textureControl, button, message)
 			-- hide world map if open
 			SM:Hide("worldMap")
 			-- hide UI if open
-			BMU.HideTeleporter()
+			BMU_HideTeleporter()
 		end
 	end
 end
@@ -1854,6 +1882,10 @@ end
 
 
 function BMU.clickOnTeleportToDungeonButton_2(message)
+	BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter
+	BMU_showTeleportAnimation = BMU_showTeleportAnimation or BMU.showTeleportAnimation
+	local BMU_savedVarsAcc = BMU.savedVarsAcc
+
 	if GetInteractionType() == INTERACTION_FAST_TRAVEL then
 		-- player is at wayshrine and travels for free -> dont show any chat printouts
 		-- start travel to node
@@ -1863,15 +1895,15 @@ function BMU.clickOnTeleportToDungeonButton_2(message)
 		-- port for costs
 		BMU_printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. message.zoneName .. " (" .. zo_strformat(SI_MONEY_FORMAT, GetRecallCost()) .. ")", BMU.MSG_FT)
 		-- show additional animation
-		if BMU.savedVarsAcc.showTeleportAnimation then
-			BMU.showTeleportAnimation()
+		if BMU_savedVarsAcc.showTeleportAnimation then
+			BMU_showTeleportAnimation()
 		end
 		FastTravelToNode(message.nodeIndex)
-		if BMU.savedVarsAcc.closeOnPorting then
+		if BMU_savedVarsAcc.closeOnPorting then
 			-- hide world map if open
 			SM:Hide("worldMap")
 			-- hide UI if open
-			BMU.HideTeleporter()
+			BMU_HideTeleporter()
 		end
 		return
 	end
@@ -1956,6 +1988,10 @@ function BMU.clickOnZoneName(button, record)
 	BMU_showDialogAutoUnlock = BMU_showDialogAutoUnlock or BMU.showDialogAutoUnlock
 	BMU_getNumSetCollectionProgressPieces = BMU_getNumSetCollectionProgressPieces or BMU.getNumSetCollectionProgressPieces
 	BMU_refreshListAuto = BMU_refreshListAuto or BMU.refreshListAuto
+	BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter
+	BMU_portToParentZone = BMU_portToParentZone or BMU.portToParentZone
+	local BMU_savedVarsAcc = BMU.savedVarsAcc
+	local BMU_savedVarsServ = BMU.savedVarsServ
 
 
 	if button == MOUSE_BUTTON_INDEX_LEFT then
@@ -1964,7 +2000,7 @@ function BMU.clickOnZoneName(button, record)
 			-- hide world map if open
 			SM:Hide("worldMap")
 			-- hide UI if open
-			BMU.HideTeleporter()
+			BMU_HideTeleporter()
 			zo_callLater(function() PortToFriend.OpenWindow(function() zo_callLater(function() SetGameCameraUIMode(true) BMU_OpenTeleporter(false) BMU_createTablePTF() end, 150) end) end, 150)
 			--SetGameCameraUIMode(true)
 			return
@@ -2031,11 +2067,11 @@ function BMU.clickOnZoneName(button, record)
 			
 			if normalizedX and normalizedZ then
 				-- Map Ping
-				if BMU.savedVarsAcc.useMapPing and BMU.LibMapPing then
+				if BMU_savedVarsAcc.useMapPing and BMU.LibMapPing then
 					PingMap(MAP_PIN_TYPE_RALLY_POINT, MAP_TYPE_LOCATION_CENTERED, normalizedX, normalizedZ)
 				end
 				-- Pan and Zoom
-				if BMU.savedVarsAcc.usePanAndZoom then
+				if BMU_savedVarsAcc.usePanAndZoom then
 					zo_callLater(function() ZO_WorldMap_PanToNormalizedPosition(normalizedX, normalizedZ) end, 200)
 				end
 			end
@@ -2071,21 +2107,21 @@ function BMU.clickOnZoneName(button, record)
 				-- button to increase sorting ("move up")
 				AddCustomMenuItem(BMU_textures.arrowUp, function()
 					
-					if not BMU.savedVarsServ.houseCustomSorting[record.houseId] then
-						if next(BMU.savedVarsServ.houseCustomSorting) == nil then
+					if not BMU_savedVarsServ.houseCustomSorting[record.houseId] then
+						if next(BMU_savedVarsServ.houseCustomSorting) == nil then
 							-- table is empty, just set start value
-							BMU.savedVarsServ.houseCustomSorting[record.houseId] = 99
+							BMU_savedVarsServ.houseCustomSorting[record.houseId] = 99
 						else
 							-- first time: set the entry at the end of the list
-							BMU.savedVarsServ.houseCustomSorting[record.houseId] = BMU_getLowestNumber(BMU.savedVarsServ.houseCustomSorting) - 1
+							BMU_savedVarsServ.houseCustomSorting[record.houseId] = BMU_getLowestNumber(BMU_savedVarsServ.houseCustomSorting) - 1
 						end
 					else
-						local currentValue = BMU.savedVarsServ.houseCustomSorting[record.houseId]
-						local houseIdOfPre = BMU_has_value(BMU.savedVarsServ.houseCustomSorting, currentValue + 1)
+						local currentValue = BMU_savedVarsServ.houseCustomSorting[record.houseId]
+						local houseIdOfPre = BMU_has_value(BMU_savedVarsServ.houseCustomSorting, currentValue + 1)
 						if houseIdOfPre then
 							-- predecessor exists: switch positions
-							BMU.savedVarsServ.houseCustomSorting[record.houseId] = currentValue + 1
-							BMU.savedVarsServ.houseCustomSorting[houseIdOfPre] = currentValue
+							BMU_savedVarsServ.houseCustomSorting[record.houseId] = currentValue + 1
+							BMU_savedVarsServ.houseCustomSorting[houseIdOfPre] = currentValue
 						end
 					end
 					BMU_createTableHouses()
@@ -2094,15 +2130,15 @@ function BMU.clickOnZoneName(button, record)
 
 				-- button to decrease sorting ("move down")
 				-- show only if the entry is already in order
-				if BMU.savedVarsServ.houseCustomSorting[record.houseId] then
+				if BMU_savedVarsServ.houseCustomSorting[record.houseId] then
 					AddCustomMenuItem(BMU_textures.arrowDown, function()
 
-						local currentValue = BMU.savedVarsServ.houseCustomSorting[record.houseId]
-						local houseIdOfSuc = BMU_has_value(BMU.savedVarsServ.houseCustomSorting, currentValue - 1)
+						local currentValue = BMU_savedVarsServ.houseCustomSorting[record.houseId]
+						local houseIdOfSuc = BMU_has_value(BMU_savedVarsServ.houseCustomSorting, currentValue - 1)
 						if houseIdOfSuc then
 							-- successor exists: switch positions
-							BMU.savedVarsServ.houseCustomSorting[record.houseId] = currentValue - 1
-							BMU.savedVarsServ.houseCustomSorting[houseIdOfSuc] = currentValue
+							BMU_savedVarsServ.houseCustomSorting[record.houseId] = currentValue - 1
+							BMU_savedVarsServ.houseCustomSorting[houseIdOfSuc] = currentValue
 						end
 						BMU_createTableHouses()
 
@@ -2160,7 +2196,7 @@ function BMU.clickOnZoneName(button, record)
 						-- hide world map if open
 						SM:Hide("worldMap")
 						-- hide UI if open
-						BMU.HideTeleporter()
+						BMU_HideTeleporter()
 						-- use item delayed
 						zo_callLater(function()
 							CallSecureProtected("UseItem", BAG_BACKPACK, item.slotIndex)
@@ -2187,14 +2223,14 @@ function BMU.clickOnZoneName(button, record)
 			
 			for i=1, teleporterVars.numFavoriteZones, 1 do
 				local favName = ""
-				if BMU.savedVarsServ.favoriteListZones[i] ~= nil then
-					favName = BMU.formatName(GetZoneNameById(BMU.savedVarsServ.favoriteListZones[i]), BMU.savedVarsAcc.formatZoneName)
+				if BMU_savedVarsServ.favoriteListZones[i] ~= nil then
+					favName = BMU_formatName(GetZoneNameById(BMU_savedVarsServ.favoriteListZones[i]), BMU_savedVarsAcc.formatZoneName)
 				end
 				local entry = {
 					label = tostring(i) .. ": " .. favName,
 					callback = function(state) BMU_addFavoriteZone(i, record.zoneId, record.zoneName) end,
 				}			
-				table.insert(entries_favorites, entry)
+				table_insert(entries_favorites, entry)
 			end
 
 			AddCustomSubMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
@@ -2219,28 +2255,28 @@ function BMU.clickOnZoneName(button, record)
 		-- reset port counter (due to force refresh only available in general list)
 		if not inDungeonTab and not inOwnHouseTab and not inQuestTab and not inItemsTab then
 			if BMU.savedVarsChar.sorting == 3 or BMU.savedVarsChar.sorting == 4 then
-				AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_RESET_COUNTER_ZONE), function() BMU.savedVarsAcc.portCounterPerZone[record.zoneId] = nil BMU_refreshListAuto() end)
+				AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_RESET_COUNTER_ZONE), function() BMU_savedVarsAcc.portCounterPerZone[record.zoneId] = nil BMU_refreshListAuto() end)
 			end
 		end
 
 		-- favorite a dungeon
 		if inDungeonTab then
-			if BMU.savedVarsServ.favoriteDungeon == record.zoneId then
-				AddCustomMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), function() BMU.savedVarsServ.favoriteDungeon = 0 BMU_createTableDungeons() end)
+			if BMU_savedVarsServ.favoriteDungeon == record.zoneId then
+				AddCustomMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), function() BMU_savedVarsServ.favoriteDungeon = 0 BMU_createTableDungeons() end)
 			else
-				AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_FAVORITE_ZONE), function() BMU.savedVarsServ.favoriteDungeon = record.zoneId BMU_createTableDungeons() end)
+				AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_FAVORITE_ZONE), function() BMU_savedVarsServ.favoriteDungeon = record.zoneId BMU_createTableDungeons() end)
 			end
 		end
 
 		-- travel to parent zone
 		AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_TRAVEL_PARENT_ZONE), function()
-			BMU.portToParentZone(record.zoneId)
+			BMU_portToParentZone(record.zoneId)
 			-- close UI if enabled
-			if BMU.savedVarsAcc.closeOnPorting then
+			if BMU_savedVarsAcc.closeOnPorting then
 				-- hide world map if open
 				SM:Hide("worldMap")
 				-- hide UI if open
-				BMU.HideTeleporter()
+				BMU_HideTeleporter()
 			end
 		end)
 		
@@ -2255,6 +2291,9 @@ function BMU.clickOnPlayerName(button, record)
 	BMU_removeFavoriteZone = BMU_removeFavoriteZone or BMU.removeFavoriteZone
 	BMU_addFavoriteZone = BMU_addFavoriteZone or BMU.addFavoriteZone
 	BMU_createMail = BMU_createMail or BMU.createMail
+	BMU_addFavoritePlayer = BMU_addFavoritePlayer or BMU.addFavoritePlayer
+	BMU_removeFavoritePlayer = BMU_removeFavoritePlayer or BMU.removeFavoritePlayer
+	BMU_isFavoritePlayer = BMU_isFavoritePlayer or BMU.isFavoritePlayer
 
 	-- Actions for "Invite to Guild" ??
 		-- GetNumGuilds()
@@ -2287,7 +2326,7 @@ function BMU.clickOnPlayerName(button, record)
 		end
 
 		-- generate submenu entries for group
-		local isPlaerInGroup = IsUnitGrouped(playerTag)												--CHG251229 Baertram
+		local isPlayerInGroup = IsUnitGrouped(playerTag)												--CHG251229 Baertram
 		local isGroupPlayerInGroup = IsPlayerInGroup(record.displayName)							--CHG251229 Baertram
 		local isPlayerGroupLeader = IsUnitGroupLeader(playerTag)										--CHG251229 Baertram
 
@@ -2386,8 +2425,8 @@ function BMU.clickOnPlayerName(button, record)
 		pos = pos + 1
 		
 		-- Invite to primary BeamMeUp guild
-		if teleporterVars.BMUGuilds[GetWorldName()] ~= nil then
-			local primaryBMUGuild = teleporterVars.BMUGuilds[GetWorldName()][1]
+		if BMUGuildsAtServer ~= nil then
+			local primaryBMUGuild = BMUGuildsAtServer[1]
 			if IsPlayerInGuild(primaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(primaryBMUGuild, record.displayName) then
 				entries_misc[pos] = {
 					label = BMU_SI_get(SI.TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp",
@@ -2397,7 +2436,7 @@ function BMU.clickOnPlayerName(button, record)
 			end
 		
 			-- Invite to secondary BeamMeUp guild
-			local secondaryBMUGuild = teleporterVars.BMUGuilds[GetWorldName()][2]
+			local secondaryBMUGuild = BMUGuildsAtServer[2]
 			if IsPlayerInGuild(secondaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(secondaryBMUGuild, record.displayName) then
 				entries_misc[pos] = {
 					label = BMU_SI_get(SI.TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp-Two",
@@ -2407,7 +2446,7 @@ function BMU.clickOnPlayerName(button, record)
 			end
 
 			-- Invite to tertiary BeamMeUp guild
-			local tertiaryBMUGuild = teleporterVars.BMUGuilds[GetWorldName()][3]
+			local tertiaryBMUGuild = BMUGuildsAtServer[3]
 			if IsPlayerInGuild(tertiaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(tertiaryBMUGuild, record.displayName) then
 				entries_misc[pos] = {
 					label = BMU_SI_get(SI.TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp-Three",
@@ -2417,7 +2456,7 @@ function BMU.clickOnPlayerName(button, record)
 			end
 			
 			-- Invite to quaternary BeamMeUp guild
-			local quaternaryBMUGuild = teleporterVars.BMUGuilds[GetWorldName()][4]
+			local quaternaryBMUGuild = BMUGuildsAtServer[4]
 			if IsPlayerInGuild(quaternaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(quaternaryBMUGuild, record.displayName) then
 				entries_misc[pos] = {
 					label = BMU_SI_get(SI.TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp-Four",
@@ -2444,7 +2483,7 @@ function BMU.clickOnPlayerName(button, record)
 				label = tostring(i) .. ": " .. favName,
 				callback = function(state) BMU_addFavoritePlayer(i, record.displayName) end,
 			}			
-			table.insert(entries_favorites, entry)
+			table_insert(entries_favorites, entry)
 		end
 
 		AddCustomSubMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
@@ -2477,7 +2516,7 @@ function BMU.clickOnPlayerName(button, record)
 					label = BMU_colorizeText(GetGuildName(guildId), "white"),
 					callback = function() BMU_createTable({index=BMU.indexListSource, filterSourceIndex=2+guildIndex}) end,
 				}
-				table.insert(entries_filter, entry)
+				table_insert(entries_filter, entry)
 		end		
 		
 		AddCustomSubMenuItem(GetString(SI_GAMEPAD_BANK_FILTER_HEADER), entries_filter)
@@ -2508,109 +2547,75 @@ end
 
 -- checks if specific zone is a favorite
 function BMU.isFavoriteZone(zoneId)
-	return BMU.has_value(BMU.savedVarsServ.favoriteListZones, zoneId)
+	BMU_has_value = BMU_has_value or BMU.has_value
+	return BMU_has_value(BMU.savedVarsServ.favoriteListZones, zoneId)
 end
 
 -- checks if specific player is a favorite
 function BMU.isFavoritePlayer(displayName)
-	return BMU.has_value(BMU.savedVarsServ.favoriteListPlayers, displayName)
+	BMU_has_value = BMU_has_value or BMU.has_value
+	return BMU_has_value(BMU.savedVarsServ.favoriteListPlayers, displayName)
 end
 
 -- save the new favorite zone
 function BMU.addFavoriteZone(position, zoneId, zoneName)
-		-- if zone is already favorite -> swap positions
-			-- prevents that you can set the same zone to multiple slots
-			-- allows to swap the slot with existing favorites
-		local oldPos = BMU.isFavoriteZone(zoneId)
-		if oldPos then
-			BMU.savedVarsServ.favoriteListZones[oldPos] = BMU.savedVarsServ.favoriteListZones[position]
-		end
-		BMU.savedVarsServ.favoriteListZones[position] = zoneId
-		BMU_printToChat(BMU_SI_get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. position .. ": " .. zoneName, BMU.MSG_AD)
-		BMU.refreshListAuto()
+	BMU_refreshListAuto = BMU_refreshListAuto or BMU.refreshListAuto
+	-- if zone is already favorite -> swap positions
+		-- prevents that you can set the same zone to multiple slots
+		-- allows to swap the slot with existing favorites
+	local oldPos = BMU.isFavoriteZone(zoneId)
+	if oldPos then
+		BMU.savedVarsServ.favoriteListZones[oldPos] = BMU.savedVarsServ.favoriteListZones[position]
+	end
+	BMU.savedVarsServ.favoriteListZones[position] = zoneId
+	BMU_printToChat(BMU_SI_get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. position .. ": " .. zoneName, BMU.MSG_AD)
+	BMU_refreshListAuto()
 end
 
 -- save the new favorite player
 function BMU.addFavoritePlayer(position, displayName)
-		-- if player is already favorite -> swap positions
-			-- prevents that you can set the same player to multiple slots
-			-- allows to swap the slot with existing favorites
-		local oldPos = BMU.isFavoritePlayer(displayName)
-		if oldPos then
-			BMU.savedVarsServ.favoriteListPlayers[oldPos] = BMU.savedVarsServ.favoriteListPlayers[position]
-		end
-		BMU.savedVarsServ.favoriteListPlayers[position] = displayName
-		BMU_printToChat(BMU_SI_get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. position .. ": " .. displayName, BMU.MSG_AD)
-		BMU.refreshListAuto()
+	BMU_refreshListAuto = BMU_refreshListAuto or BMU.refreshListAuto
+	-- if player is already favorite -> swap positions
+		-- prevents that you can set the same player to multiple slots
+		-- allows to swap the slot with existing favorites
+	local oldPos = BMU.isFavoritePlayer(displayName)
+	if oldPos then
+		BMU.savedVarsServ.favoriteListPlayers[oldPos] = BMU.savedVarsServ.favoriteListPlayers[position]
+	end
+	BMU.savedVarsServ.favoriteListPlayers[position] = displayName
+	BMU_printToChat(BMU_SI_get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. position .. ": " .. displayName, BMU.MSG_AD)
+	BMU_refreshListAuto()
 end
 
 
 -- remove favorite zone
 function BMU.removeFavoriteZone(zoneId)
+	BMU_refreshListAuto = BMU_refreshListAuto or BMU.refreshListAuto
 	-- go over favorite list and remove
 	for index, value in pairs(BMU.savedVarsServ.favoriteListZones) do
         if value == zoneId then
 			BMU.savedVarsServ.favoriteListZones[index] = nil
         end
     end
-	BMU.refreshListAuto()
+	BMU_refreshListAuto()
 end
 
 -- remove favorite player
 function BMU.removeFavoritePlayer(displayName)
+	BMU_refreshListAuto = BMU_refreshListAuto or BMU.refreshListAuto
 	-- go over favorite list and remove
 	for index, value in pairs(BMU.savedVarsServ.favoriteListPlayers) do
         if value == displayName then
 			BMU.savedVarsServ.favoriteListPlayers[index] = nil
         end
     end
-	BMU.refreshListAuto()
+	BMU_refreshListAuto()
 end
 
-
-function BMU.updateStatistic(category, zoneId)
-	-- check for block flag and add manual port cost to statisticGold and also increase total counter
-	if not BMU.blockGold then
-		-- regard only Overland zones for gold statistics
-		if category == BMU.ZONE_CATEGORY_OVERLAND then
-			BMU.savedVarsAcc.savedGold = BMU.savedVarsAcc.savedGold + GetRecallCost()
-			self.control.statisticGold:SetText(BMU_SI_get(SI.TELE_UI_GOLD) .. " " .. BMU.formatGold(BMU.savedVarsAcc.savedGold))
-		end
-		-- increase total port counter
-		BMU.savedVarsAcc.totalPortCounter = BMU.savedVarsAcc.totalPortCounter + 1
-		self.control.statisticTotal:SetText(BMU_SI_get(SI.TELE_UI_TOTAL_PORTS) .. " " .. BMU.formatGold(BMU.savedVarsAcc.totalPortCounter))
-		-- update port counter per zone statistic
-		if BMU.savedVarsAcc.portCounterPerZone[zoneId] == nil then
-			BMU.savedVarsAcc.portCounterPerZone[zoneId] = 1
-		else
-			BMU.savedVarsAcc.portCounterPerZone[zoneId] = BMU.savedVarsAcc.portCounterPerZone[zoneId] + 1
-		end
-		-- update last used zones list
-		table.insert(BMU.savedVarsAcc.lastPortedZones, 1, zoneId)
-		if #BMU.savedVarsAcc.lastPortedZones > 20 then
-			-- drop oldest element
-			table.remove(BMU.savedVarsAcc.lastPortedZones)
-		end
-	end
-	
-	-- start cooldown
-	BMU.coolDownGold()
+function BMU.round(num, numDecimalPlaces)
+  return tonumber(string_format("%." .. (numDecimalPlaces or 0) .. "f", num))
 end
-
--- after click on teleport evrytime a cooldown of 7 seconds starts
--- unlocking after last cooldown finished
-function BMU.coolDownGold()
-	BMU.blockGold = true
-	mutexCounter = mutexCounter + 1
-	
-	zo_callLater(function()
-		mutexCounter = mutexCounter - 1
-		if mutexCounter == 0 then
-			BMU.blockGold = false
-		end
-	end, 7200)
-end
-
+BMU_round = BMU.round
 
 function BMU.formatGold(number)
 	BMU_round = BMU_round or BMU.round
@@ -2625,10 +2630,50 @@ end
 BMU_formatGold = BMU.formatGold
 
 
-function BMU.round(num, numDecimalPlaces)
-  return tonumber(string.format("%." .. (numDecimalPlaces or 0) .. "f", num))
+-- after click on teleport evrytime a cooldown of 7 seconds starts
+-- unlocking after last cooldown finished
+function BMU.coolDownGold()
+	BMU.blockGold = true
+	mutexCounter = mutexCounter + 1
+
+	zo_callLater(function()
+		mutexCounter = mutexCounter - 1
+		if mutexCounter == 0 then
+			BMU.blockGold = false
+		end
+	end, 7200)
 end
-BMU_round = BMU.round
+local BMU_coolDownGold = BMU.coolDownGold
+
+function BMU.updateStatistic(category, zoneId)
+	BMU_formatGold = BMU_formatGold or BMU.formatGold
+	-- check for block flag and add manual port cost to statisticGold and also increase total counter
+	if not BMU.blockGold then
+		-- regard only Overland zones for gold statistics
+		if category == BMU.ZONE_CATEGORY_OVERLAND then
+			BMU.savedVarsAcc.savedGold = BMU.savedVarsAcc.savedGold + GetRecallCost()
+			self.control.statisticGold:SetText(BMU_SI_get(SI.TELE_UI_GOLD) .. " " .. BMU_formatGold(BMU.savedVarsAcc.savedGold))
+		end
+		-- increase total port counter
+		BMU.savedVarsAcc.totalPortCounter = BMU.savedVarsAcc.totalPortCounter + 1
+		self.control.statisticTotal:SetText(BMU_SI_get(SI.TELE_UI_TOTAL_PORTS) .. " " .. BMU_formatGold(BMU.savedVarsAcc.totalPortCounter))
+		-- update port counter per zone statistic
+		if BMU.savedVarsAcc.portCounterPerZone[zoneId] == nil then
+			BMU.savedVarsAcc.portCounterPerZone[zoneId] = 1
+		else
+			BMU.savedVarsAcc.portCounterPerZone[zoneId] = BMU.savedVarsAcc.portCounterPerZone[zoneId] + 1
+		end
+		-- update last used zones list
+		table_insert(BMU.savedVarsAcc.lastPortedZones, 1, zoneId)
+		if #BMU.savedVarsAcc.lastPortedZones > 20 then
+			-- drop oldest element
+			table_remove(BMU.savedVarsAcc.lastPortedZones)
+		end
+	end
+	
+	-- start cooldown
+	BMU_coolDownGold()
+end
 
 
 -- calculate the height of the main control depending on the number of lines
@@ -2663,6 +2708,9 @@ end
 
 -- port to group leader OR to the other group member when group contains only 2 player
 function BMU.portToGroupLeader()
+	BMU_formatName = BMU_formatName or BMU.formatName
+	BMU_PortalToPlayer = BMU_PortalToPlayer or BMU.PortalToPlayer
+
 	local unitTag
 	local leaderUnitTag = GetGroupLeaderUnitTag()
 	
@@ -2688,11 +2736,16 @@ function BMU.portToGroupLeader()
 	
 	local displayName = GetUnitDisplayName(unitTag)
 	local zoneName = GetUnitZone(unitTag)
-	BMU.PortalToPlayer(displayName, 1, BMU.formatName(zoneName, false), 0, 0, false, false, true)
+	BMU_PortalToPlayer(displayName, 1, BMU_formatName(zoneName, false), 0, 0, false, false, true)
 end
 
 
 function BMU.portToOwnHouse(primary, houseId, jumpOutside, parentZoneName)
+	BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter
+	BMU_formatName = BMU_formatName or BMU.formatName
+	BMU_showTeleportAnimation = BMU_showTeleportAnimation or BMU.showTeleportAnimation
+	local BMU_savedVarsAcc = BMU.savedVarsAcc
+
 	-- houseId is nil when primary == true
 	local zoneId = GetHouseZoneId(houseId)
 	
@@ -2706,20 +2759,20 @@ function BMU.portToOwnHouse(primary, houseId, jumpOutside, parentZoneName)
 		end
 		-- get parentZoneName
 		if jumpOutside then
-			parentZoneName = BMU.formatName(GetZoneNameById(BMU.getParentZoneId(zoneId)), false)
+			parentZoneName = BMU_formatName(GetZoneNameById(BMU.getParentZoneId(zoneId)), false)
 		end
 	end
 	
 	-- show additional animation
-	if BMU.savedVarsAcc.showTeleportAnimation then
-		BMU.showTeleportAnimation()
+	if BMU_savedVarsAcc.showTeleportAnimation then
+		BMU_showTeleportAnimation()
 	end
 	
 	-- print info to chat
 	if jumpOutside then
-		BMU_printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. parentZoneName .. " (" .. BMU.formatName(GetZoneNameById(zoneId), false) .. ")", BMU.MSG_FT)
+		BMU_printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. parentZoneName .. " (" .. BMU_formatName(GetZoneNameById(zoneId), false) .. ")", BMU.MSG_FT)
 	else
-		BMU_printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU.formatName(GetZoneNameById(zoneId), false), BMU.MSG_FT)
+		BMU_printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU_formatName(GetZoneNameById(zoneId), false), BMU.MSG_FT)
 	end
 	
 	-- start port process
@@ -2727,55 +2780,65 @@ function BMU.portToOwnHouse(primary, houseId, jumpOutside, parentZoneName)
 	RequestJumpToHouse(houseId, jumpOutside)
 	
 	-- close UI if enabled
-	if BMU.savedVarsAcc.closeOnPorting then
+	if BMU_savedVarsAcc.closeOnPorting then
 		-- hide world map if open
 		SM:Hide("worldMap")
 		-- hide UI if open
-		BMU.HideTeleporter()
+		BMU_HideTeleporter()
 	end
 end
 
 
 function BMU.portToBMUGuildHouse()
-	if teleporterVars.guildHouse[GetWorldName()] == nil then
+	BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter
+	BMU_formatName = BMU_formatName or BMU.formatName
+	BMU_showTeleportAnimation = BMU_showTeleportAnimation or BMU.showTeleportAnimation
+	local BMU_savedVarsAcc = BMU.savedVarsAcc
+
+	if guildHousesAtServer == nil then
 		BMU_printToChat("There is no BMU guild house on this server.")
 		return
 	else
-		local displayName = teleporterVars.guildHouse[GetWorldName()][1]
-		local houseId = teleporterVars.guildHouse[GetWorldName()][2]
+		local displayName = guildHousesAtServer[1]
+		local houseId = guildHousesAtServer[2]
 		-- show additional animation
-		if BMU.savedVarsAcc.showTeleportAnimation then
-			BMU.showTeleportAnimation()
+		if BMU_savedVarsAcc.showTeleportAnimation then
+			BMU_showTeleportAnimation()
 		end
 		CancelCast()
 		JumpToSpecificHouse(displayName, houseId)
 		BMU_printToChat("Porting to BMU guild house (" .. displayName .. ")", BMU.MSG_FT)
-		if BMU.savedVarsAcc.closeOnPorting then
+		if BMU_savedVarsAcc.closeOnPorting then
 			-- hide world map if open
 			SM:Hide("worldMap")
 			-- hide UI if open
-			BMU.HideTeleporter()
+			BMU_HideTeleporter()
 		end
 	end
 end
 
 
 function BMU.portToCurrentZone()
+	BMU_sc_porting = BMU_sc_porting or BMU.sc_porting
 	local playersZoneId = GetZoneId(GetUnitZoneIndex(playerTag))
-	BMU.sc_porting(playersZoneId)
+	BMU_sc_porting(playersZoneId)
 end
 
 
 function BMU.portToParentZone(zoneId)
+	BMU_sc_porting = BMU_sc_porting or BMU.sc_porting
+	BMU_getParentZoneId = BMU_getParentZoneId or BMU.getParentZoneId
 	local startZoneId = zoneId or GetZoneId(GetUnitZoneIndex(playerTag))
-	local parentZoneId = BMU.getParentZoneId(startZoneId)
+	local parentZoneId = BMU_getParentZoneId(startZoneId)
 	-- if parent zone cant be determined the current zone is used
-	BMU.sc_porting(parentZoneId)
+	BMU_sc_porting(parentZoneId)
 end
 
 
 -- identifies the currently tracked/focused quest and start the port
 function BMU.portToTrackedQuestZone()
+	BMU_sc_porting = BMU_sc_porting or BMU.sc_porting
+	BMU_findExactQuestLocation = BMU_findExactQuestLocation or BMU.findExactQuestLocation
 	for slotIndex = 1, GetNumJournalQuests() do
 		local questName, _, _, _, _, _, tracked = GetJournalQuestInfo(slotIndex)
 		if tracked then
@@ -2783,10 +2846,10 @@ function BMU.portToTrackedQuestZone()
 			local questZoneId = GetZoneId(questZoneIndex)
 			if questZoneId ~= 0 then
 				-- get exact quest location
-				questZoneId = BMU.findExactQuestLocation(slotIndex)
+				questZoneId = BMU_findExactQuestLocation(slotIndex)
 			end
 			BMU_printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. questName, BMU.MSG_FT)
-			BMU.sc_porting(questZoneId)
+			BMU_sc_porting(questZoneId)
 			return
 		end
 	end
@@ -2850,6 +2913,7 @@ end
 
 
 -- TOOLTIP (show and hide)
+local InformationTooltip = InformationTooltip
 function BMU:tooltipTextEnter(control, text)
     if type(text) == "string" or (type(text) == "table" and #text > 0) then
         InitializeTooltip(InformationTooltip, control, LEFT, 0, 0, 0)

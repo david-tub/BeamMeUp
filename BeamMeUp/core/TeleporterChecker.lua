@@ -12,6 +12,7 @@ local allZoneIds = {} -- stores the number of hits of a zoneId at index (allzone
 ----variables (defined now, as they were loaded before this file -> see manifest .txt)
 --ZOs variables
 local SM = SCENE_MANAGER
+local tos = tostring
 local numberType = "number"
 local stringType = "string"
 local tableType = "table"
@@ -42,6 +43,7 @@ local string_match = string.match
 local string_lower = string.lower
 local string_upper = string.upper
 local string_gsub = string.gsub
+local string_find = string.find
 local zo_strformat = zo_strformat
 local zo_plainstrfind = zo_plainstrfind
 local table = table
@@ -192,6 +194,7 @@ function BMU.createTable(args)
 	BMU_addNumberPlayers = BMU_addNumberPlayers or BMU.addNumberPlayers
 	BMU_decidePrioDisplay = BMU_decidePrioDisplay or BMU.decidePrioDisplay
 	local BMU_savedVarsAcc = BMU.savedVarsAcc
+	local BMU_savedVarsChar = BMU.savedVarsChar
 	-- -^- INS251229 Baertram
 
 	local index = args.index or 0
@@ -220,7 +223,7 @@ function BMU.createTable(args)
 	end
 
 	-- print status (debug)
-	BMU.printToChat("Refreshed - state: " .. tostring(index) .. " - String: " .. tostring(inputString), BMU.MSG_DB)
+	BMU.printToChat("Refreshed - state: " .. tos(index) .. " - String: " .. tos(inputString), BMU.MSG_DB)
 
 	-- change state for correct persistent MouseOver and for auto refresh
 	if not dontDisplay then -- dont change when result should not be displayed in list
@@ -431,7 +434,7 @@ function BMU.createTable(args)
 		portalPlayers = BMU_sortByStringFindPosition(portalPlayers, inputString, "zoneName", "zoneNameSecondLanguage")
 	else
 		-- SORTING
-		if BMU.savedVarsChar.sorting == 2 then
+		if BMU_savedVarsChar.sorting == 2 then
 			-- sort by prio, category, zoneName, prio by source
 			table_sort(portalPlayers, function(a, b)
 				-- prio
@@ -450,7 +453,7 @@ function BMU.createTable(args)
 				return BMU_decidePrioDisplay(a, b)
 			end)
 
-		elseif BMU.savedVarsChar.sorting == 3 then
+		elseif BMU_savedVarsChar.sorting == 3 then
 			-- sort by prio, most used, zoneName, prio by source
 			table_sort(portalPlayers, function(a, b)
 				-- prio
@@ -471,7 +474,7 @@ function BMU.createTable(args)
 				return BMU_decidePrioDisplay(a, b)
 			end)
 
-		elseif BMU.savedVarsChar.sorting == 4 then
+		elseif BMU_savedVarsChar.sorting == 4 then
 			-- sort by prio, most used, category, zoneName, prio by source
 			table_sort(portalPlayers, function(a, b)
 				-- prio
@@ -496,7 +499,7 @@ function BMU.createTable(args)
 				return BMU_decidePrioDisplay(a, b)
 			end)
 
-		elseif BMU.savedVarsChar.sorting == 5 then
+		elseif BMU_savedVarsChar.sorting == 5 then
 			-- sort by prio, number players, zoneName, prio by source
 			table_sort(portalPlayers, function(a, b)
 				-- prio
@@ -517,7 +520,7 @@ function BMU.createTable(args)
 				return BMU_decidePrioDisplay(a, b)
 			end)
 
-		elseif BMU.savedVarsChar.sorting == 6 then
+		elseif BMU_savedVarsChar.sorting == 6 then
 			-- sort by prio, number of undiscovered wayshrines, zone category, zoneName, prio by source
 			table_sort(portalPlayers, function(a, b)
 				-- prio
@@ -546,7 +549,7 @@ function BMU.createTable(args)
 				return BMU_decidePrioDisplay(a, b)
 			end)
 
-		elseif BMU.savedVarsChar.sorting == 7 then
+		elseif BMU_savedVarsChar.sorting == 7 then
 			-- sort by prio, number of undiscovered skyshards, zone category, zoneName, prio by source
 			table_sort(portalPlayers, function(a, b)
 				-- prio
@@ -575,7 +578,7 @@ function BMU.createTable(args)
 				return BMU_decidePrioDisplay(a, b)
 			end)
 
-		elseif BMU.savedVarsChar.sorting == 8 then
+		elseif BMU_savedVarsChar.sorting == 8 then
 			-- sort by prio, last used, zoneName, prio by source
 			table_sort(portalPlayers, function(a, b)
 				-- prio
@@ -596,7 +599,7 @@ function BMU.createTable(args)
 				return BMU_decidePrioDisplay(a, b)
 			end)
 
-		elseif BMU.savedVarsChar.sorting == 9 then
+		elseif BMU_savedVarsChar.sorting == 9 then
 			-- sort by prio, last used, category, zoneName, prio by source
 			table_sort(portalPlayers, function(a, b)
 				-- prio
@@ -621,7 +624,7 @@ function BMU.createTable(args)
 				return BMU_decidePrioDisplay(a, b)
 			end)
 
-		elseif BMU.savedVarsChar.sorting == 10 then
+		elseif BMU_savedVarsChar.sorting == 10 then
 			-- sort by prio, number of missing set items, category, zoneName, prio by source
 			table_sort(portalPlayers, function(a, b)
 				-- prio
@@ -656,7 +659,7 @@ function BMU.createTable(args)
 				return BMU_decidePrioDisplay(a, b)
 			end)
 
-		elseif BMU.savedVarsChar.sorting == 11 then
+		elseif BMU_savedVarsChar.sorting == 11 then
 			-- sort by prio, category, zones without players, zoneName, prio by source
 			table_sort(portalPlayers, function(a, b)
 				-- prio
@@ -681,7 +684,7 @@ function BMU.createTable(args)
 				return BMU_decidePrioDisplay(a, b)
 			end)
 
-		else -- BMU.savedVarsChar.sorting == 1
+		else -- BMU_savedVarsChar.sorting == 1
 			-- sort by prio, zoneName, prio by source
 			table_sort(portalPlayers, function(a, b)
 				-- prio
@@ -711,7 +714,7 @@ function BMU.createTable(args)
 		return portalPlayers
 	else
 		BMU.TeleporterList:add_messages(portalPlayers, dontResetSlider)
-		if index == BMU.indexListItems and BMU.savedVarsChar.displayCounterPanel then
+		if index == BMU.indexListItems and BMU_savedVarsChar.displayCounterPanel then
 			-- update counter panel for related items
 			BMU_updateRelatedItemsCounterPanel()
 		end
@@ -2286,11 +2289,11 @@ function BMU.sortByStringFindPosition(p_portalPlayers, inputString, key1, key2)	
 		end
 		--]]
 
+		local inputStrLower = string_lower(inputString) 										--INS251229 Baertram
 		-- second, by search match position of key1
 		if key1 then
-			local inputStrLower = string_lower(inputString) 										--INS251229 Baertram
-			local pos1 = zo_plainstrfind(string_lower(tostring(a[key1])), inputStrLower)
-			local pos2 = zo_plainstrfind(string_lower(tostring(b[key1])), inputStrLower)
+			local pos1 = string_find(string_lower(tos(a[key1])), inputStrLower, nil, true)
+			local pos2 = string_find(string_lower(tos(b[key1])), inputStrLower, nil, true)
 			if pos1 and not pos2 then
 				return true
 			elseif pos2 and not pos1 then
@@ -2302,8 +2305,8 @@ function BMU.sortByStringFindPosition(p_portalPlayers, inputString, key1, key2)	
 
 		-- third, by search match position of key2
 		if key2 then
-			local pos1 = zo_plainstrfind(string_lower(tostring(a[key2])), inputStrLower)
-			local pos2 = zo_plainstrfind(string_lower(tostring(b[key2])), inputStrLower)
+			local pos1 = string_find(string_lower(tos(a[key2])), inputStrLower, nil, true)
+			local pos2 = string_find(string_lower(tos(b[key2])), inputStrLower, nil, true)
 			if pos1 and not pos2 then
 				return true
 			elseif pos2 and not pos1 then

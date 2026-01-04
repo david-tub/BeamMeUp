@@ -1,4 +1,4 @@
-﻿local mkstr = ZO_CreateStringId
+local mkstr = ZO_CreateStringId
 local SI = BMU.SI
 
 -----------------------------------------------------------------------------

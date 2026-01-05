@@ -16,6 +16,7 @@ local SharedInv = SHARED_INVENTORY
 local worldMapScene_Keyboard				= WORLD_MAP_SCENE
 local worldMapScene_Gamepad					= GAMEPAD_WORLD_MAP_SCENE
 local worldMapZoneStoryTLC_Keyboard			= ZO_WorldMapZoneStoryTopLevel_Keyboard
+local ClearMenu 							= ClearMenu
 --Other addon variables
 local BMU_LibZone = BMU.LibZone
 --BMU variables

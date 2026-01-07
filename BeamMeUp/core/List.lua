@@ -896,7 +896,7 @@ end
 -- jump directly to wayshrine node in given zone (for gold)
 function BMU.PortalToZone(zoneId)
 	BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter
-	BMU_getMapIndex = BMU_getMapIndex or BMU_getMapIndex
+	BMU_getMapIndex = BMU_getMapIndex or BMU.getMapIndex
 	BMU_showTeleportAnimation = BMU_showTeleportAnimation or BMU.showTeleportAnimation
 	BMU_formatName = BMU_formatName or BMU.formatName
 

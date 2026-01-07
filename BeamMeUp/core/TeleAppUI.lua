@@ -73,7 +73,8 @@ local BMU_chatButtonTex, teleporterWin_appTitle, teleporterWin_Main_Control, tel
 -------functions (defined inline in code below, upon first usage, as they are still nil at this line)
 local BMU_getItemTypeIcon, BMU_getDataMapInfo, BMU_OpenTeleporter, BMU_updateContextMenuEntrySurveyAll,
       BMU_getContextMenuEntrySurveyAllAppendix, BMU_clearInputFields, BMU_createTable,
-      BMU_createTableDungeons, BMU_createTableGuilds, BMU_numOfSurveyTypesChecked, 	BMU_updateCheckboxSurveyMap
+      BMU_createTableDungeons, BMU_createTableGuilds, BMU_numOfSurveyTypesChecked, 	BMU_updateCheckboxSurveyMap,
+ 	  BMU_createTableHouses
 -- -^- INS251229 Baertram END 0
 
 -- list of tuples (guildId & displayname) for invite queue (only for admin)
@@ -225,6 +226,8 @@ local function SetupUI()
 	BMU_createTableGuilds = BMU_createTableGuilds or BMU.createTableGuilds							--INS251229 Baertram
 	BMU_createTableDungeons = BMU_createTableDungeons or BMU.createTableDungeons					--INS251229 Baertram
 	BMU_numOfSurveyTypesChecked = BMU_numOfSurveyTypesChecked or BMU.numOfSurveyTypesChecked   	    --INS251229 Baertram
+	BMU_createTableHouses = BMU_createTableHouses or BMU.createTableHouses 	   	    				--INS251229 Baertram
+
 
 	-----------------------------------------------
 	-- Fonts
@@ -817,10 +820,10 @@ local function SetupUI()
 	if PortToFriend and PortToFriend.GetFavorites then
 		-- enable tab
 		teleporterWin_Main_Control_PTFTexture:SetHandler("OnMouseUp", function(self, button, upInside) --CHG251229 Baertram Usage of upInside to properly check the user releaased the mouse on the control!!!
+			ClearMenu()
 			if upInside and button == MOUSE_BUTTON_INDEX_RIGHT then --CHG251229 Baertram Usage of upInside to properly check the user releaased the mouse on the control!!!
 				-- toggle between zone names and house names
                 local BMU_savedVarsChar = BMU.savedVarsChar --INS251229 Baertram Performance gain for multiple used samed variable
-				ClearMenu()
                 local menuIndex = AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_TOOGLE_ZONE_NAME), function() BMU_savedVarsChar.ptfHouseZoneNames = not BMU_savedVarsChar.ptfHouseZoneNames BMU_clearInputFields() BMU.createTablePTF() end, MENU_ADD_OPTION_CHECKBOX)
 				if BMU_savedVarsChar.ptfHouseZoneNames then
 					zo_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
@@ -873,11 +876,11 @@ local function SetupUI()
   teleporterWin_Main_Control_OwnHouseTexture:SetDrawLayer(2)
 
   teleporterWin_Main_Control_OwnHouseTexture:SetHandler("OnMouseUp", function(self, button)
+	ClearMenu()
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
-		ClearMenu()
 		local BMU_savedVarsChar = BMU.savedVarsChar  --INS251229 Baertram
 		-- toggle between nicknames and standard names
-		local menuIndex = AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_TOGGLE_HOUSE_NICKNAME), function() BMU_savedVarsChar.houseNickNames = not BMU_savedVarsChar.houseNickNames BMU_clearInputFields() BMU.createTableHouses() end, MENU_ADD_OPTION_CHECKBOX)
+		local menuIndex = AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_TOGGLE_HOUSE_NICKNAME), function() BMU_savedVarsChar.houseNickNames = not BMU_savedVarsChar.houseNickNames BMU_clearInputFields() BMU_createTableHouses() end, MENU_ADD_OPTION_CHECKBOX)
 		if BMU_savedVarsChar.houseNickNames then
 			zo_CheckButton_SetChecked(zo_Menu.items[menuIndex].checkbox)
 		end
@@ -894,7 +897,7 @@ local function SetupUI()
 		ShowMenu()
 	else
         BMU_clearInputFields( )
-		BMU.createTableHouses()
+		BMU_createTableHouses()
 	end
   end)
 
@@ -924,9 +927,9 @@ local function SetupUI()
   teleporterWin_Main_Control_QuestTexture:SetDrawLayer(2)
 
   teleporterWin_Main_Control_QuestTexture:SetHandler("OnMouseUp", function(self, button)
+	ClearMenu()
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		-- show context menu
-		ClearMenu()
 		local BMU_savedVarsChar = BMU.savedVarsChar  --INS251229 Baertram
 		-- make default tab
 		local menuIndex = AddCustomMenuItem(BMU_SI_get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU_savedVarsChar.defaultTab == BMU.indexListQuests then BMU_savedVarsChar.defaultTab = BMU.indexListMain else BMU_savedVarsChar.defaultTab = BMU.indexListQuests end end, MENU_ADD_OPTION_CHECKBOX)
@@ -974,9 +977,9 @@ local function SetupUI()
   teleporterWin_Main_Control_ItemTexture:SetHandler("OnMouseUp", function(ctrl, button)
       BMU_updateCheckboxSurveyMap = BMU_updateCheckboxSurveyMap or BMU.updateCheckboxSurveyMap  --INS251229 Baertram
 	  submenuIndicesToAddCallbackTo = {}                                                        --INS251229 Baertram
+	  ClearMenu()
       if button == MOUSE_BUTTON_INDEX_RIGHT then
 		-- show filter menu
-		ClearMenu()
 
 		-- Add submenu for antiquity leads
 		submenuIndicesToAddCallbackTo[#submenuIndicesToAddCallbackTo+1] = AddCustomSubMenuItem(GetString(SI_GAMEPAD_VENDOR_ANTIQUITY_LEAD_GROUP_HEADER), --INS251229 Baertram
@@ -1263,9 +1266,9 @@ local function SetupUI()
   teleporterWin_Main_Control_OnlyYourzoneTexture:SetDrawLayer(2)
 
 	teleporterWin_Main_Control_OnlyYourzoneTexture:SetHandler("OnMouseUp", function(self, button)
+		ClearMenu()
 		if button == MOUSE_BUTTON_INDEX_RIGHT then
 			-- show context menu
-			ClearMenu()
 			local BMU_savedVarsChar = BMU.savedVarsChar   --INS251229 Baertram
 			-- make default tab
 			local menuIndex = AddCustomMenuItem(BMU_SI_get(SI.TELE_SETTINGS_DEFAULT_TAB), function() if BMU_savedVarsChar.defaultTab == BMU.indexListCurrentZone then BMU_savedVarsChar.defaultTab = BMU.indexListMain else BMU_savedVarsChar.defaultTab = BMU.indexListCurrentZone end end, MENU_ADD_OPTION_CHECKBOX)
@@ -1304,9 +1307,9 @@ local function SetupUI()
   teleporterWin_Main_Control_DelvesTexture:SetDrawLayer(2)
 
   teleporterWin_Main_Control_DelvesTexture:SetHandler("OnMouseUp", function(self, button)
+	ClearMenu()
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		-- show context menu
-		ClearMenu()
 		local BMU_savedVarsChar = BMU.savedVarsChar  --INS251229 Baertram
 		-- show all or only in current zone
 		local menuIndex = AddCustomMenuItem(GetString(SI_GAMEPAD_GUILD_HISTORY_SUBCATEGORY_ALL), function() BMU_savedVarsChar.showAllDelves = not BMU_savedVarsChar.showAllDelves BMU_createTable({index=BMU.indexListDelves}) end, MENU_ADD_OPTION_CHECKBOX)
@@ -1358,9 +1361,9 @@ local function SetupUI()
   teleporterWin_Main_Control_DungeonTexture:SetDrawLayer(2)
 
   teleporterWin_Main_Control_DungeonTexture:SetHandler("OnMouseUp", function(self, button)
+	ClearMenu()
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		-- show filter menu
-		ClearMenu()
 		-- add filters
 		AddCustomSubMenuItem(GetString(SI_GAMEPAD_BANK_FILTER_HEADER),
 			{
@@ -2022,7 +2025,7 @@ function BMU.AdminAddContextMenuToGuildRoster()
 	-- add context menu to guild roster
 	local GuildRosterRow_OnMouseUp = GUILD_ROSTER_KEYBOARD.GuildRosterRow_OnMouseUp --ZO_GuildRecruitment_ApplicationsList_Keyboard.Row_OnMouseUp
 	GUILD_ROSTER_KEYBOARD.GuildRosterRow_OnMouseUp = function(self, control, button, upInside)
-
+		ClearMenu()     	    																	--INS251229 Baertram
 		local data = ZO_ScrollList_GetData(control)
 		GuildRosterRow_OnMouseUp(self, control, button, upInside)
 		
@@ -2091,7 +2094,7 @@ function BMU.AdminAddContextMenuToGuildApplicationRoster()
 	-- add context menu to guild recruitment application roster (if player is already in a one of the BMU guilds + redirection to the other guilds)
 	local Row_OnMouseUp = ZO_GuildRecruitment_ApplicationsList_Keyboard.Row_OnMouseUp
 	ZO_GuildRecruitment_ApplicationsList_Keyboard.Row_OnMouseUp = function(self, control, button, upInside)
-
+		ClearMenu()     	    																	--INS251229 Baertram
 		local data = ZO_ScrollList_GetData(control)
 		Row_OnMouseUp(self, control, button, upInside)
 	

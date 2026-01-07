@@ -9,7 +9,6 @@
 ## DependsOn: LibAddonMenu-2.0>=41 LibCustomMenu>=730 LibZone>=0895
 ## OptionalDependsOn: LibSlashCommander LibSets LibMapPing LibChatMenuButton PortToFriendsHouse BanditsUserInterface MorrowindStyleUI
 
-
 ## Globals / data sets
 GuildData.lua
 TeleporterGlobals.lua

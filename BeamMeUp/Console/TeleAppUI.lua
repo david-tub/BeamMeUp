@@ -1,4 +1,5 @@
-local LHAS = BMU.LHAS
+local BG = BMU.BG
+local LHAS = BG.LHAS
 local SI = BMU.SI ---- used for localization
 
 local teleporterVars    = BMU.var
@@ -165,7 +166,7 @@ local function SetupOptionsMenu(index) --index == Addon name
 			  disabled = function() return not BMU.savedVarsAcc.chatButton or not BMU.chatButtonTex end,
          },
 		 {
-              type = LHAS.ST_SLIDER
+              type = LHAS.ST_SLIDER,
               label = SI.get(SI.TELE_SETTINGS_MAP_DOCK_OFFSET_HORIZONTAL),
               tooltip = SI.get(SI.TELE_SETTINGS_MAP_DOCK_OFFSET_HORIZONTAL_TOOLTIP) .. " [DEFAULT: " .. BMU.DefaultsAccount["anchorMapOffset_x"] .. "]",
 			        min = -100,
@@ -221,7 +222,7 @@ local function SetupOptionsMenu(index) --index == Addon name
 			type = LHAS.ST_DROPDOWN,
 			label = SI.get(SI.TELE_SETTINGS_DEFAULT_TAB),
 			tooltip = SI.get(SI.TELE_SETTINGS_DEFAULT_TAB_TOOLTIP) .. " [DEFAULT: " .. BMU.dropdownDefaultTabChoices[BMU.getIndexFromValue(BMU.dropdownDefaultTabValues, BMU.DefaultsCharacter["defaultTab"])] .. "]",
-			items = BMU.dropdownDefaultTabItems(),
+			items = BMU.dropdownDefaultTabItems,
 			getFunc = function() return BMU.savedVarsChar.defaultTab end,
 			setFunc = function(value) BMU.savedVarsChar.defaultTab = value end,
 			default = BMU.DefaultsCharacter["defaultTab"],
@@ -782,13 +783,13 @@ local function SetupUI()
 	
 	-- default font
 	local fontSize = BMU.round(17*BMU.savedVarsAcc.Scale, 0)
-	local fontStyle = ZoFontGame:GetFontInfo()
+	local fontStyle = BG.ZoFontGame:GetFontInfo()
 	local fontWeight = "soft-shadow-thin"
 	BMU.font1 = string.format("%s|$(KB_%s)|%s", fontStyle, fontSize, fontWeight)
 	
 	-- font of statistics
 	fontSize = BMU.round(13*BMU.savedVarsAcc.Scale, 0)
-	fontStyle = ZoFontBookTablet:GetFontInfo()
+	fontStyle = BG.ZoFontGameBookTable:GetFontInfo()
 	--fontStyle = "EsoUI/Common/Fonts/consola.ttf"
 	fontWeight = "soft-shadow-thin"
 	BMU.font2 = string.format("%s|$(KB_%s)|%s", fontStyle, fontSize, fontWeight)
@@ -809,25 +810,27 @@ local function SetupUI()
 			-- do it the old way
 			-- Texture
 			BMU.chatButtonTex = wm:CreateControl("Teleporter_CHAT_MENU_BUTTON", ZO_ChatWindow, CT_TEXTURE)
-			BMU.chatButtonTex:SetDimensions(33, 33)
-			BMU.chatButtonTex:SetAnchor(TOPRIGHT, ZO_ChatWindow, TOPRIGHT, -40 - BMU.savedVarsAcc.chatButtonHorizontalOffset, 6)
-			BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtn)
-			BMU.chatButtonTex:SetMouseEnabled(true)
-			BMU.chatButtonTex:SetDrawLayer(2)
-			--Handlers
-			BMU.chatButtonTex:SetHandler("OnMouseUp", function()
-				BMU.OpenTeleporter(true)
-			end)
-			
-			BMU.chatButtonTex:SetHandler("OnMouseEnter", function(self)
-				BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtnOver)
-				BMU:tooltipTextEnter(BMU.chatButtonTex, appName)
-			end)
-		
-			BMU.chatButtonTex:SetHandler("OnMouseExit", function(self)
-				BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtn)
-				BMU:tooltipTextEnter(BMU.chatButtonTex)
-			end)
+			if BMU.chatButtonTex ~= nil then
+        BMU.chatButtonTex:SetDimensions(33, 33)
+        BMU.chatButtonTex:SetAnchor(TOPRIGHT, ZO_ChatWindow, TOPRIGHT, -40 - BMU.savedVarsAcc.chatButtonHorizontalOffset, 6)
+        BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtn)
+        BMU.chatButtonTex:SetMouseEnabled(true)
+        BMU.chatButtonTex:SetDrawLayer(2)
+        --Handlers
+        BMU.chatButtonTex:SetHandler("OnMouseUp", function()
+          BMU.OpenTeleporter(true)
+        end)
+
+        BMU.chatButtonTex:SetHandler("OnMouseEnter", function(self)
+          BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtnOver)
+          BMU:tooltipTextEnter(BMU.chatButtonTex, appName)
+        end)
+
+        BMU.chatButtonTex:SetHandler("OnMouseExit", function(self)
+          BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtn)
+          BMU:tooltipTextEnter(BMU.chatButtonTex)
+        end)
+			end
 		end
 	end
 	
@@ -881,9 +884,9 @@ local function SetupUI()
     -------------------------------------------------------------------
   -- Switch BUTTON ON ZoneGuide window
 
-  teleporterWin.zoneGuideSwapTexture = wm:CreateControl(nil, ZO_WorldMapZoneStoryTopLevel_Keyboard, CT_TEXTURE)
+  teleporterWin.zoneGuideSwapTexture = wm:CreateControl(nil, BG.ZO_WorldMapZoneStoryTopLevel, CT_TEXTURE)
   teleporterWin.zoneGuideSwapTexture:SetDimensions(50*BMU.savedVarsAcc.Scale, 50*BMU.savedVarsAcc.Scale)
-  teleporterWin.zoneGuideSwapTexture:SetAnchor(TOPRIGHT, ZO_WorldMapZoneStoryTopLevel_Keyboard, TOPRIGHT, TOPRIGHT -10*BMU.savedVarsAcc.Scale, -35*BMU.savedVarsAcc.Scale)
+  teleporterWin.zoneGuideSwapTexture:SetAnchor(TOPRIGHT, BG.ZO_WorldMapZoneStoryTopLevel, TOPRIGHT, TOPRIGHT -10*BMU.savedVarsAcc.Scale, -35*BMU.savedVarsAcc.Scale)
   teleporterWin.zoneGuideSwapTexture:SetTexture(BMU.textures.swapBtn)
   teleporterWin.zoneGuideSwapTexture:SetMouseEnabled(true)
   

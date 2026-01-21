@@ -12,20 +12,11 @@
 
 
 ## Globals / data sets
+PC/GuildData.lua
+Console/GuildData.lua
 TeleporterGlobals.lua
-platform/PC/GuildData.lua
-platform/PC/BaseGlobals.lua
-platform/$(platform)/GuildData.lua
-platform/$(platform)/BaseGlobals.lua
-platform/$(platform)/TeleAppUI.lua
-
-## REMOVE BEFORE MERGING! FOR TESTING ONLY
-platform/$(platform)/libstemp/LibZone
-platform/$(platform)/libstemp/LibZone/LibZone_Constants.lua
-platform/$(platform)/libstemp/LibZone/LibZone.lua
-platform/$(platform)/libstemp/LibZone/LibZone_Data.lua
-platform/$(platform)/libstemp/LibZone/LibZone_GeoData.lua
-## END REMOVE
+PC/BaseGlobals.lua
+Console/BaseGlobals.lua
 
 ## Core
 core/SI.lua
@@ -33,7 +24,8 @@ localization/EN.lua
 localization/$(language).lua
 
 core/List.lua
-core/TeleAppUI.lua
+PC/TeleAppUI.lua
+Console/TeleAppUI.lua
 core/TeleSlashCommands.lua
 core/TeleporterChecker.lua
 

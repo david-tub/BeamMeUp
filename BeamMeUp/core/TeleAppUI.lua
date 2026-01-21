@@ -678,17 +678,24 @@ local function SetupUI()
   teleporterWin_SearchBG_Player:SetClampedToScreen(true)
 
   -- Handlers
+	--Editbox for search (zone search, dungeon search, survey search, lead search, house search, etc.)
+	-->Entries in this table below will update the list if the search editBox is having an empty "" text
+	local searchEditBoxStatesThatShouldUpdateListIfEditboxEmptry = {
+		[BMU.indexListSearchZone] = true,
+		[BMU.indexListDungeons] = true,
+	}
     ZO_PreHookHandler(teleporterWin_Searcher_Zone, "OnTextChanged", function(teleporterWin_Searcher_ZoneCtrl)
 		if teleporterWin_Searcher_ZoneCtrl:HasFocus() then
+			local BMU_state = BMU.state
 			local searchZoneText = teleporterWin_Searcher_ZoneCtrl:GetText()
-			if (searchZoneText ~= "" or BMU.state == BMU.indexListSearchZone) then
+			if (searchZoneText ~= "" or searchEditBoxStatesThatShouldUpdateListIfEditboxEmptry[BMU_state]) then
 				-- make sure zone placeholder is hidden
 				teleporterWin_Searcher_Zone_Placeholder:SetHidden(true)
 				-- clear player input field
 				teleporterWin_Searcher_Player:SetText("")
 				-- show player placeholder
 				teleporterWin_Searcher_Player_Placeholder:SetHidden(false)
-				if BMU.state == BMU.indexListDungeons then
+				if BMU_state == BMU.indexListDungeons then
 					BMU_createTableDungeons({inputString=searchZoneText})
 				else
 					BMU_createTable({index=BMU.indexListSearchZone, inputString=searchZoneText})

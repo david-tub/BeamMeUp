@@ -2454,7 +2454,8 @@ local BMU_createTableGuilds = BMU.createTableGuilds 								--INS251229 Baertram
 local function mergeToResultList(p_newList, p_resultList, p_searchStr) 				--INS260121 Baertram
 	if ZO_IsTableEmpty(p_newList) then return p_resultList end
 	for _, v in pairs(p_newList) do
-		if v.zoneName and p_searchStr == nil or (p_searchStr ~= nil and zo_plainstrfind( v.zoneName:lower(), p_searchStr)) then
+		local zoneName = v.zoneName
+		if zoneName and p_searchStr == nil or (p_searchStr == "" or zo_plainstrfind(zoneName:lower(), p_searchStr)) then
 			table_insert(p_resultList, v)
 		end
 	end
@@ -2660,7 +2661,7 @@ function BMU.createTableDungeons(args)
 		end
 	end
 
-	-- merge all lists together
+	-- merge all lists together into 1 resultsList
 	local resultList = {}
 	if inputString and inputString ~= "" then
 		local inputStringLower = inputString:lower() 												--INS251229 Baertram
@@ -2668,13 +2669,13 @@ function BMU.createTableDungeons(args)
 		resultList = mergeToResultList(resultListArenas, 			resultList, inputStringLower)
 		resultList = mergeToResultList(resultListGroupArenas, 		resultList, inputStringLower)
 		resultList = mergeToResultList(resultListTrials, 			resultList, inputStringLower)
-		resultList = mergeToResultList(resultListGroupDungeons, 		resultList, inputStringLower)
+		resultList = mergeToResultList(resultListGroupDungeons, 	resultList, inputStringLower)
 	else
 		resultList = mergeToResultList(resultListEndlessDungeons, 	resultList)
 		resultList = mergeToResultList(resultListArenas, 			resultList)
 		resultList = mergeToResultList(resultListGroupArenas, 		resultList)
 		resultList = mergeToResultList(resultListTrials, 			resultList)
-		resultList = mergeToResultList(resultListGroupDungeons, 		resultList)
+		resultList = mergeToResultList(resultListGroupDungeons, 	resultList)
 	end
 	-- add no results info if player disabled all categories
 	if ZO_IsTableEmpty(resultList) then

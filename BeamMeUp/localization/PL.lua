@@ -192,6 +192,7 @@ mkstr(SI.TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP, "Technical messages for troubleshoo
 -- KEY BINDING
 -----------------------------------------------------------------------------
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN, "Otwórz BeamMeUp")
+mkstr(SI.TELE_KEYBINDING_CLOSE_MAIN, "Zamknąć BeamMeUp")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_RELATED_ITEMS, "Mapy skarbów, surowców i wskazówki wizji")
 mkstr(SI.TELE_KEYBINDING_REFRESH, "Odśwież listę wyników")
 mkstr(SI.TELE_KEYBINDING_WAYSHRINE_UNLOCK, "Odblokuj kapliczki w obecnej strefie")

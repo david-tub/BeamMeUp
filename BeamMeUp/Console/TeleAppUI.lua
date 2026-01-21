@@ -47,6 +47,14 @@ local function SetupOptionsMenu(index) --index == Addon name
 	end
 
     local optionsData = {
+      {
+              type = LHAS.ST_BUTTON,
+              label = SI.get(SI.TELE_KEYBINDING_TOGGLE_MAIN),
+              clickHandler = function()
+                BMU.OpenTeleporter(true)
+                BMU.useBackToClose(true)
+              end
+      },
 		 {
               type = LHAS.ST_SLIDER,
               label = SI.get(SI.TELE_SETTINGS_NUMBER_LINES),
@@ -799,7 +807,7 @@ local function SetupUI()
     local teleporterWin = BMU.win
 
     -----------------------------------------------
-	
+
 	-- Button on Chat Window
 	if BMU.savedVarsAcc.chatButton then
 		if BMU.LCMB then
@@ -1989,12 +1997,13 @@ end
 
 function BMU.updatePosition()
     local teleporterWin     = BMU.win
-	if SCENE_MANAGER:IsShowing("worldMap") then
-	
-		-- show anchor button
-		teleporterWin.anchorTexture:SetHidden(false)
-		-- show swap button
-		BMU.closeBtnSwitchTexture(true)
+	if SCENE_MANAGER:IsShowing(BG.worldMap) then
+
+--
+-- 		-- show anchor button
+-- 		teleporterWin.anchorTexture:SetHidden(false)
+-- 		-- show swap button
+-- 		BMU.closeBtnSwitchTexture(true)
 		
 		if BMU.savedVarsAcc.anchorOnMap then
 			-- anchor to map
@@ -2294,7 +2303,7 @@ function BMU.handleChatLinkClick(rawLink, mouseButton, linkText, linkStyle, link
 			WORLD_MAP_MANAGER:SetMapByIndex(1)
 			WORLD_MAP_MANAGER:SetMapByIndex(mapIndex)
 			-- start ping
-			if not SCENE_MANAGER:IsShowing("worldMap") then SCENE_MANAGER:Show("worldMap") end
+			if not SCENE_MANAGER:IsShowing(BG.worldMap) then SCENE_MANAGER:Show(BG.worldMap) end
 			PingMap(MAP_PIN_TYPE_RALLY_POINT, MAP_TYPE_LOCATION_CENTERED, coorX, coorY)
 		end
 		

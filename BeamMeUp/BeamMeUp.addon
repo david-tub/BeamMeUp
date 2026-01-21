@@ -24,16 +24,17 @@ core/SI.lua
 localization/EN.lua
 localization/$(language).lua
 
+## Bindings
+PC/bindings/bindings.lua
+PC/bindings/bindings.xml
+Console/panel.xml
+Console/bindings/bindings.lua
+Console/bindings/bindings.xml
+
 core/List.lua
 PC/TeleAppUI.lua
 Console/TeleAppUI.lua
 core/TeleSlashCommands.lua
 core/TeleporterChecker.lua
-
-
-## Bindings
-bindings/bindings.lua
-bindings/bindings.xml
-
 
 BeamMeUp.lua

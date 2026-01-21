@@ -192,6 +192,7 @@ mkstr(SI.TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP, "Technical messages for troubleshoo
 -- KEY BINDING
 -----------------------------------------------------------------------------
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN, "Открыть BeamMeUp")
+mkstr(SI.TELE_KEYBINDING_CLOSE_MAIN, "Закрыть BeamMeUp")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_RELATED_ITEMS, "Карты и зацепки")
 mkstr(SI.TELE_KEYBINDING_REFRESH, "Обновить")
 mkstr(SI.TELE_KEYBINDING_WAYSHRINE_UNLOCK, "Разблокировка дорожных святилищ")

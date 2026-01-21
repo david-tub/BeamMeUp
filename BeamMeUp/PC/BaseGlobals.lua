@@ -16,5 +16,6 @@ BG.AntiquityLore = ANTIQUITY_LORE_KEYBOARD
 BG.ZoFontGame = ZoFontGame
 BG.ZoFontGameBookTable = ZoFontBookTablet
 BG.CollectionsBook = COLLECTIONS_BOOK_SINGLETON
+BG.worldMap = "worldMap"
 
 BMU.BG = BG

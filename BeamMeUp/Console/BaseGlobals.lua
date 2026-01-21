@@ -10,6 +10,7 @@ BG.AntiquityLore = ANTIQUITY_LORE_GAMEPAD
 BG.ZoFontGame = ZoFontGamepad36
 BG.ZoFontGameBookTable = ZoFontGamepadBookTablet
 BG.CollectionsBook = GAMEPAD_COLLECTIONS_BOOK
+BG.worldMap = "gamepad_worldMap"
 
 -- Settings vars
 local function zipDropdownSortedKeys(choices)

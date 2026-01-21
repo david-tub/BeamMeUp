@@ -192,6 +192,7 @@ mkstr(SI.TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP, "Technical messages for troubleshoo
 -- KEY BINDING
 -----------------------------------------------------------------------------
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN, "BeamMeUpを開く")
+mkstr(SI.TELE_KEYBINDING_CLOSE_MAIN, "BeamMeUp閉鎖する")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_RELATED_ITEMS, "宝の地図・調査報告・手掛かり")
 mkstr(SI.TELE_KEYBINDING_REFRESH, "更新")
 mkstr(SI.TELE_KEYBINDING_WAYSHRINE_UNLOCK, "旅の祠を解除する")

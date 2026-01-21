@@ -13,6 +13,8 @@ BMU.var = {
   feedback				= "https://www.esoui.com/portal.php?id=283&a=faq", -- FAQ link
   controls              = {},
   isAddonLoaded         = false,
+  isPanelShown          = false,
+  closeConsoleBtn        = nil,
   color                 = {
     colTrash     = "777777", -- Trash Gray
     colYellow    = "FFFF00" ,-- yellow

@@ -192,6 +192,7 @@ mkstr(SI.TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP, "Technische Chat-Meldungen zur Fehl
 -- KEY BINDING
 -----------------------------------------------------------------------------
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN, "Öffne BeamMeUp")
+mkstr(SI.TELE_KEYBINDING_CLOSE_MAIN, "Schließen BeamMeUp")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_RELATED_ITEMS, "Schatzkarten & Fundberichte & Spuren")
 mkstr(SI.TELE_KEYBINDING_REFRESH, "Trefferliste aktualisieren")
 mkstr(SI.TELE_KEYBINDING_WAYSHRINE_UNLOCK, "Wegschrein-Freischaltung")

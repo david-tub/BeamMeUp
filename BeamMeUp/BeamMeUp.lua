@@ -705,6 +705,7 @@ function BMU.portToOwnHouseWithZonePreference(useCurrentZone, explicitZoneId, ju
 	BMU_portToOwnHouse(true, nil, goOutside, nil)
 end
 
+
 local function OnAddOnLoaded(eventCode, addOnName)
     if (appName ~= addOnName) then return end
 

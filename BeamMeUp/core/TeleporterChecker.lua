@@ -2451,6 +2451,16 @@ local BMU_createTableGuilds = BMU.createTableGuilds 								--INS251229 Baertram
 
 
 -- create table of Dungeons, Trials, Arenas depending on the settings
+local function mergeToResultList(p_newList, p_resultList, p_searchStr) 				--INS260121 Baertram
+	if ZO_IsTableEmpty(p_newList) then return p_resultList end
+	for _, v in pairs(p_newList) do
+		if v.zoneName and p_searchStr == nil or (p_searchStr ~= nil and zo_plainstrfind( v.zoneName:lower(), p_searchStr)) then
+			table_insert(p_resultList, v)
+		end
+	end
+	return p_resultList
+end
+
 function BMU.createTableDungeons(args)
 	BMU_createBlankRecord = BMU_createBlankRecord or BMU.createBlankRecord 							--INS251229 Baertram
 	BMU_createDungeonRecord = BMU_createDungeonRecord or BMU.createDungeonRecord					--INS251229 Baertram
@@ -2654,21 +2664,20 @@ function BMU.createTableDungeons(args)
 	local resultList = {}
 	if inputString and inputString ~= "" then
 		local inputStringLower = inputString:lower() 												--INS251229 Baertram
-		local zoneNameLower = v.zoneName:lower()													--INS251229 Baertram
-		for _, v in pairs(resultListEndlessDungeons) do if zo_plainstrfind(zoneNameLower, inputStringLower) then 	table_insert(resultList, v) end end
-		for _, v in pairs(resultListArenas) do 			if zo_plainstrfind(zoneNameLower, inputStringLower) then 	table_insert(resultList, v) end end
-		for _, v in pairs(resultListGroupArenas) do 	if zo_plainstrfind(zoneNameLower, inputStringLower) then	table_insert(resultList, v) end end
-		for _, v in pairs(resultListTrials) do 			if zo_plainstrfind(zoneNameLower, inputStringLower) then 	table_insert(resultList, v) end end
-		for _, v in pairs(resultListGroupDungeons) do 	if zo_plainstrfind(zoneNameLower, inputStringLower) then 	table_insert(resultList, v) end end
+		resultList = mergeToResultList(resultListEndlessDungeons, 	resultList, inputStringLower)
+		resultList = mergeToResultList(resultListArenas, 			resultList, inputStringLower)
+		resultList = mergeToResultList(resultListGroupArenas, 		resultList, inputStringLower)
+		resultList = mergeToResultList(resultListTrials, 			resultList, inputStringLower)
+		resultList = mergeToResultList(resultListGroupDungeons, 		resultList, inputStringLower)
 	else
-		for _, v in pairs(resultListEndlessDungeons) do table_insert(resultList, v) end
-		for _, v in pairs(resultListArenas) do 			table_insert(resultList, v) end
-		for _, v in pairs(resultListGroupArenas) do 	table_insert(resultList, v) end
-		for _, v in pairs(resultListTrials) do 			table_insert(resultList, v) end
-		for _, v in pairs(resultListGroupDungeons) do 	table_insert(resultList, v) end
+		resultList = mergeToResultList(resultListEndlessDungeons, 	resultList)
+		resultList = mergeToResultList(resultListArenas, 			resultList)
+		resultList = mergeToResultList(resultListGroupArenas, 		resultList)
+		resultList = mergeToResultList(resultListTrials, 			resultList)
+		resultList = mergeToResultList(resultListGroupDungeons, 		resultList)
 	end
 	-- add no results info if player disabled all categories
-	if #resultList == 0 then
+	if ZO_IsTableEmpty(resultList) then
 		table_insert(resultList, BMU_createNoResultsInfo())
 	end
 

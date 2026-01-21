@@ -15,5 +15,6 @@ BG.ZO_WorldMapZoneStoryTopLevel = ZO_WorldMapZoneStoryTopLevel_Keyboard
 BG.AntiquityLore = ANTIQUITY_LORE_KEYBOARD
 BG.ZoFontGame = ZoFontGame
 BG.ZoFontGameBookTable = ZoFontBookTablet
+BG.CollectionsBook = COLLECTIONS_BOOK_SINGLETON
 
 BMU.BG = BG

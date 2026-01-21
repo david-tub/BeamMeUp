@@ -2006,7 +2006,7 @@ function BMU.clickOnZoneName(button, record)
 					end)
 				elseif item.antiquityId then -- lead -> show lead in codex
 					AddCustomMenuItem(GetString(SI_ANTIQUITY_VIEW_IN_CODEX) .. ": \"" .. item.itemName .. "\"", function()
-						ANTIQUITY_LORE_KEYBOARD:ShowAntiquity(item.antiquityId)
+						BMU.AntiquityLore:ShowAntiquity(item.antiquityId)
 					end)
 				end
 				

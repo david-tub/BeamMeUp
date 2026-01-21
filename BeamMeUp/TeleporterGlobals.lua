@@ -36,16 +36,7 @@ BMU.var = {
   numFavoriteWayshrines = 3,
 }
 
--- necessary libraries
 BMU.LibZone = LibZone
-BMU.LAM = LibAddonMenu2
-
--- optional libraries
-BMU.LSC = LibSlashCommander
-BMU.LibSets = LibSets
-BMU.LibMapPing = LibMapPing2
-BMU.LCMB = LibChatMenuButton
-
 
 -------------VERY FIRST FUNCTIONS---------
 function BMU.mergeTables(t, ...)

@@ -8,7 +8,7 @@
 ## IsLibrary: false
 ## DependsOn: LibZone>=0895
 ## PCDependsOn: LibAddonMenu-2.0>=41 LibCustomMenu>=730
-## ConsoleDependsOn: LibHarvensAddonSettings>=2.0.7
+## ConsoleDependsOn: LibHarvensAddonSettings>=2.0.7 LibGPS LibDebugLogger LibChatMessage LibMapPing
 ## OptionalDependsOn: LibSlashCommander LibSets LibMapPing LibChatMenuButton PortToFriendsHouse BanditsUserInterface MorrowindStyleUI
 
 
@@ -24,12 +24,24 @@ core/SI.lua
 localization/EN.lua
 localization/$(language).lua
 
+## Justa
+Console/i18n/en.lua
+Console/i18n/$(language).lua
+
+Console/globals.lua
+
+Console/IsJustaBmuGamepadPlugin.lua
+Console/IsJustaBmuGamepadPlugin.xml
+Console/core/dialogues.lua
+Console/core/listClassShared.lua
+Console/core/entryData.lua
+Console/core/categoryList.lua
+Console/core/telportList.lua
+Console/core/autoUnlock.lua
+
 ## Bindings
 PC/bindings/bindings.lua
 PC/bindings/bindings.xml
-Console/panel.xml
-Console/bindings/bindings.lua
-Console/bindings/bindings.xml
 
 core/List.lua
 PC/TeleAppUI.lua

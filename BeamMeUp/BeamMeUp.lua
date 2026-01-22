@@ -666,6 +666,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["chatOutputFastTravel"] = true,
 		["chatOutputAdditional"] = true,
 		["chatOutputUnlock"] = true,
+		["IJAVars"] = {},
     }
     
 	BMU.DefaultsServer = {
@@ -744,8 +745,11 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	BMU.savedVarsAcc = ZO_SavedVars:NewAccountWide("BeamMeUp_SV", 2, nil, BMU.DefaultsAccount, nil)
 	BMU.savedVarsServ = ZO_SavedVars:NewAccountWide("BeamMeUp_SV", 3, nil, BMU.DefaultsServer, GetWorldName())
 	BMU.savedVarsChar = ZO_SavedVars:NewCharacterIdSettings("BeamMeUp_SV", 3, nil, BMU.DefaultsCharacter, nil)
-	
-	
+
+	if BMU.IJA then
+      BMU.IJA.savedVars = BMU.savedVarsAcc.IJAVars
+	end
+
 	BMU.TeleporterSetupUI(addOnName)
 	
     EVENT_MANAGER:RegisterForEvent(appName, EVENT_PLAYER_ACTIVATED, PlayerInitAndReady)

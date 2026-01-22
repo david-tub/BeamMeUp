@@ -47,14 +47,6 @@ local function SetupOptionsMenu(index) --index == Addon name
 	end
 
     local optionsData = {
-      {
-              type = LHAS.ST_BUTTON,
-              label = SI.get(SI.TELE_KEYBINDING_TOGGLE_MAIN),
-              clickHandler = function()
-                BMU.OpenTeleporter(true)
-                BMU.useBackToClose(true)
-              end
-      },
 		 {
               type = LHAS.ST_SLIDER,
               label = SI.get(SI.TELE_SETTINGS_NUMBER_LINES),
@@ -1117,7 +1109,7 @@ local function SetupUI()
 		teleporterWin.MapOpen:SetWidth(200)
 		teleporterWin.MapOpen:SetText(appName)
 		teleporterWin.MapOpen:SetHidden(true)
-  
+
 		teleporterWin.MapOpen:SetHandler("OnClicked",function()
 			BMU.OpenTeleporter(true)
 		end)

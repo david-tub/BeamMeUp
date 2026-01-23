@@ -2,14 +2,10 @@ local SI = BMU.SI
 local teleporterVars = BMU.var
 local appName = teleporterVars.appName
 local worldMap = "worldMap"
-
-if BMU.IsNotKeyboard() then
-  worldMap = "gamepad_worldMap"
-end
-
 local WorldMapZoneStoryTopLevel = ZO_WorldMapZoneStoryTopLevel_Keyboard
 
 if BMU.IsNotKeyboard() then
+  worldMap = "gamepad_worldMap"
   WorldMapZoneStoryTopLevel = ZO_WorldMapZoneStoryTopLevel_Gamepad
 end
 

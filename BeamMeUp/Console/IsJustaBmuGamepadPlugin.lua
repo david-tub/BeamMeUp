@@ -153,7 +153,7 @@ end
 ---------------------------------------------------------------------------------------------------------------
 --
 ---------------------------------------------------------------------------------------------------------------
-local addon = ZO_InitializingObject:Subclass()
+local addon = ZO_DeferredInitializingObject:Subclass()
 BMU.IJA = addon
 
 function addon:Init(self, control)

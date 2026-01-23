@@ -13,10 +13,6 @@ BMU.var = {
   feedback				= "https://www.esoui.com/portal.php?id=283&a=faq", -- FAQ link
   controls              = {},
   isAddonLoaded         = false,
-  isPanelShown          = false,
-  closeConsoleBtn       = nil,
-  actionLayerActive     = false,
-  editModeFocusId       = nil,
   color                 = {
     colTrash     = "777777", -- Trash Gray
     colYellow    = "FFFF00" ,-- yellow
@@ -40,7 +36,16 @@ BMU.var = {
   numFavoriteWayshrines = 3,
 }
 
+-- necessary libraries
 BMU.LibZone = LibZone
+BMU.LAM = LibAddonMenu2
+
+-- optional libraries
+BMU.LSC = LibSlashCommander
+BMU.LibSets = LibSets
+BMU.LibMapPing = LibMapPing2
+BMU.LCMB = LibChatMenuButton
+
 
 -------------VERY FIRST FUNCTIONS---------
 function BMU.mergeTables(t, ...)
@@ -1847,4 +1852,8 @@ function BMU.GetCurrentMapDisplayFilter()
 		BMU.savedVarsChar.displayMaps.woodworker, BMU.savedVarsChar.displayMaps.blacksmith,
 		BMU.savedVarsChar.displayMaps.clothier, BMU.savedVarsChar.displayMaps.jewelry,
 		BMU.savedVarsChar.displayMaps.treasure
+end
+
+function BMU.IsNotKeyboard()
+  return not (IsInGamepadPreferredMode() or IsConsoleUI())
 end

@@ -1,6 +1,9 @@
-local BG = BMU.BG
-local LHAS = BG.LHAS
+local LAM2 = BMU.LAM
 local SI = BMU.SI ---- used for localization
+
+if BMU.IsNotKeyboard() then
+  local CS = BMU.CS
+end
 
 local teleporterVars    = BMU.var
 local appName           = teleporterVars.appName
@@ -24,10 +27,8 @@ local function SetupOptionsMenu(index) --index == Addon name
             registerForDefaults = true,
         }
 
-    local panel = LHAS:AddAddon(appName .. "Options", {
-      allowDefaults = false,  -- Show "Reset to Defaults" button
-      allowRefresh = false    -- Enable automatic control updates
-    })
+
+    BMU.SettingsPanel = LAM2:RegisterAddonPanel(appName .. "Options", panelData) -- for quick access
 	
 	-- retreive most ported zones for statistic
 	local portCounterPerZoneSorted = {}
@@ -47,150 +48,299 @@ local function SetupOptionsMenu(index) --index == Addon name
 	end
 
     local optionsData = {
+	     {
+              type = "description",
+              text = "Get the most out of BeamMeUp by using it together with the following addons.",
+			  submenu = "deps",
+         },
 		 {
-              type = LHAS.ST_SLIDER,
-              label = SI.get(SI.TELE_SETTINGS_NUMBER_LINES),
+              type = "divider",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
+              title = "Port to Friend's House",
+			  text = BMU.getStringIsInstalledLibrary("ptf"),
+			  width = "half",
+			  submenu = "deps",
+         },
+		 {
+              type = "button",
+              name = "Open addon website",
+			  func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info1758-PorttoFriendsHouse.html") end,
+			  width = "half",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
+              text = "Access your houses and guild halls directly through BeamMeUp. Your houses that are set in PTF will be displayed in a separate list.",
+			  submenu = "deps",
+         },
+		 {
+              type = "divider",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
+			  title = "LibSets",
+              text = BMU.getStringIsInstalledLibrary("libsets"),
+			  width = "half",
+			  submenu = "deps",
+         },
+		 {
+              type = "button",
+              name = "Open addon website",
+			  func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info2241-LibSetsAllsetitemsingameexcellua.html") end,
+			  width = "half",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
+              text = "Check your collection progress of set items in BeamMeUp and sort your fast travel options. The number of the collected set items is displayed in the tooltip of the zone names. Furthermore, you can sort your results according to the number of missing set items.",
+			  submenu = "deps",
+         },
+		 {
+              type = "divider",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
+			  title = "LibMapPing",
+              text = BMU.getStringIsInstalledLibrary("libmapping"),
+			  width = "half",
+			  submenu = "deps",
+         },
+		 {
+              type = "button",
+              name = "Open addon website",
+			  func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info1302-LibMapPing.html") end,
+			  width = "half",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
+              text = "Use pings on the map (rally points) instead of zooming when you click on specific zone names or group members. An option in the 'Extra Features' allows you to toggle between the map ping and the zoom & pan feature.",
+			  submenu = "deps",
+         },
+		 {
+              type = "divider",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
+			  title = "LibSlashCommander",
+              text = BMU.getStringIsInstalledLibrary("lsc"),
+			  width = "half",
+			  submenu = "deps",
+         },
+		 {
+              type = "button",
+              name = "Open addon website",
+			  func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info1508-LibSlashCommander.html") end,
+			  width = "half",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
+              text = "Get comprehensive auto-completion, color coding and short description for chat commands.",
+			  submenu = "deps",
+         },
+		 {
+              type = "divider",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
+			  title = "LibChatMenuButton",
+              text = BMU.getStringIsInstalledLibrary("lcmb"),
+			  width = "half",
+			  submenu = "deps",
+         },
+		 {
+              type = "button",
+              name = "Open addon website",
+			  func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info3805-LibChatMenuButton.html") end,
+			  width = "half",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
+              text = "Leave the positioning of the BMU chat button to an external library. Support the concept of libraries. But you will lose the option to set an individual offset.",
+			  submenu = "deps",
+         },
+		 {
+              type = "divider",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
+              title = "|cFF00FFIsJusta|r Beam Me Up Gamepad Plugin",
+			  text = BMU.getStringIsInstalledLibrary("gamepad"),
+			  width = "half",
+			  submenu = "deps",
+         },
+		 {
+              type = "button",
+              name = "Open addon website",
+			  func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info3624-IsJustaBeamMeUpGamepadPlugin.html") end,
+			  width = "half",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
+              text = "Use BeamMeUp in the gamepad mode. Finally, BeamMeUp gets a dedicated gamepad support. |cFF00FFIsJusta|r Beam Me Up Gamepad Plugin integrates the features of BeamMeUp in the gamepad interface and allows you to travel more comfortable than ever before.",
+			  submenu = "deps",
+         },
+		 {
+              type = "slider",
+              name = SI.get(SI.TELE_SETTINGS_NUMBER_LINES),
               tooltip = SI.get(SI.TELE_SETTINGS_NUMBER_LINES_TOOLTIP) .. " [DEFAULT: " .. BMU.DefaultsAccount["numberLines"] .. "]",
               min = 6,
               max = 16,
-              step = 1,
-              getFunction = function() return BMU.savedVarsAcc.numberLines end,
-              setFunction = function(value) BMU.savedVarsAcc.numberLines = value
+              getFunc = function() return BMU.savedVarsAcc.numberLines end,
+              setFunc = function(value) BMU.savedVarsAcc.numberLines = value
 							teleporterWin.Main_Control:SetHeight(BMU.calculateListHeight())
 							-- add also current height of the counter panel
 							teleporterWin.Main_Control.bd:SetHeight(BMU.calculateListHeight() + 280*BMU.savedVarsAcc.Scale + select(2, BMU.counterPanel:GetTextDimensions()))
 				end,
-			  default = BMU.DefaultsAccount["numberLines"]
+			  default = BMU.DefaultsAccount["numberLines"],
+			  submenu = "ui",
          },
          {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_SHOW_ON_MAP_OPEN),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_SHOW_ON_MAP_OPEN),
               tooltip = SI.get(SI.TELE_SETTINGS_SHOW_ON_MAP_OPEN_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["ShowOnMapOpen"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.ShowOnMapOpen end,
-              setFunction = function(value) BMU.savedVarsAcc.ShowOnMapOpen = value end,
+              getFunc = function() return BMU.savedVarsAcc.ShowOnMapOpen end,
+              setFunc = function(value) BMU.savedVarsAcc.ShowOnMapOpen = value end,
 			  default = BMU.DefaultsAccount["ShowOnMapOpen"],
+			  submenu = "ui",
          },
          {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_HIDE_ON_MAP_CLOSE),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_HIDE_ON_MAP_CLOSE),
               tooltip = SI.get(SI.TELE_SETTINGS_HIDE_ON_MAP_CLOSE_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["HideOnMapClose"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.HideOnMapClose end,
-              setFunction = function(value) BMU.savedVarsAcc.HideOnMapClose = value end,
+              getFunc = function() return BMU.savedVarsAcc.HideOnMapClose end,
+              setFunc = function(value) BMU.savedVarsAcc.HideOnMapClose = value end,
 			  default = BMU.DefaultsAccount["HideOnMapClose"],
+			  submenu = "ui",
          },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_CLOSE_ON_PORTING),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_CLOSE_ON_PORTING),
               tooltip = SI.get(SI.TELE_SETTINGS_CLOSE_ON_PORTING_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["closeOnPorting"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.closeOnPorting end,
-              setFunction = function(value) BMU.savedVarsAcc.closeOnPorting = value end,
+              getFunc = function() return BMU.savedVarsAcc.closeOnPorting end,
+              setFunc = function(value) BMU.savedVarsAcc.closeOnPorting = value end,
 			  default = BMU.DefaultsAccount["closeOnPorting"],
+			  submenu = "ui",
 		 },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_WINDOW_STAY),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_WINDOW_STAY),
               tooltip = SI.get(SI.TELE_SETTINGS_WINDOW_STAY_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["windowStay"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.windowStay end,
-              setFunction = function(value) BMU.savedVarsAcc.windowStay = value end,
+              getFunc = function() return BMU.savedVarsAcc.windowStay end,
+              setFunc = function(value) BMU.savedVarsAcc.windowStay = value end,
 			  default = BMU.DefaultsAccount["windowStay"],
+			  submenu = "ui",
 		 },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_FOCUS_ON_MAP_OPEN),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_FOCUS_ON_MAP_OPEN),
               tooltip = SI.get(SI.TELE_SETTINGS_FOCUS_ON_MAP_OPEN_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["focusZoneSearchOnOpening"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.focusZoneSearchOnOpening end,
-              setFunction = function(value) BMU.savedVarsAcc.focusZoneSearchOnOpening = value end,
+              getFunc = function() return BMU.savedVarsAcc.focusZoneSearchOnOpening end,
+              setFunc = function(value) BMU.savedVarsAcc.focusZoneSearchOnOpening = value end,
 			  default = BMU.DefaultsAccount["focusZoneSearchOnOpening"],
+			  submenu = "ui",
          },
 		 {
-              type = LHAS.ST_SLIDER,
-              label = SI.get(SI.TELE_SETTINGS_AUTO_PORT_FREQ),
+              type = "slider",
+              name = SI.get(SI.TELE_SETTINGS_AUTO_PORT_FREQ),
               tooltip = SI.get(SI.TELE_SETTINGS_AUTO_PORT_FREQ_TOOLTIP) .. " [DEFAULT: " .. BMU.DefaultsAccount["AutoPortFreq"] .. "]",
               min = 50,
               max = 500,
-              getFunction = function() return BMU.savedVarsAcc.AutoPortFreq end,
-              setFunction = function(value) BMU.savedVarsAcc.AutoPortFreq = value end,
+              getFunc = function() return BMU.savedVarsAcc.AutoPortFreq end,
+              setFunc = function(value) BMU.savedVarsAcc.AutoPortFreq = value end,
 			  default = BMU.DefaultsAccount["AutoPortFreq"],
+			  submenu = "ui",
          },
 		 {
-              type = LHAS.ST_SECTION,
-              label = ""
+              type = "divider",
+			  submenu = "ui",
          },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP),
               tooltip = SI.get(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["showOpenButtonOnMap"]) .. "]",
-			        getFunction = function() return BMU.savedVarsAcc.showOpenButtonOnMap end,
-              setFunction = function(value)
-                BMU.savedVarsAcc.showOpenButtonOnMap = value
-                ReloadUI("ingame")
-              end,
+              requiresReload = true,
+			  getFunc = function() return BMU.savedVarsAcc.showOpenButtonOnMap end,
+              setFunc = function(value) BMU.savedVarsAcc.showOpenButtonOnMap = value end,
 			  default = BMU.DefaultsAccount["showOpenButtonOnMap"],
+			  submenu = "ui",
          },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_SHOW_CHAT_BUTTON),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_SHOW_CHAT_BUTTON),
               tooltip = SI.get(SI.TELE_SETTINGS_SHOW_CHAT_BUTTON_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["chatButton"]) .. "]",
-			        getFunction = function() return BMU.savedVarsAcc.chatButton end,
-              setFunction = function(value)
-                BMU.savedVarsAcc.chatButton = value
-                ReloadUI("ingame")
-              end,
+              requiresReload = true,
+			  getFunc = function() return BMU.savedVarsAcc.chatButton end,
+              setFunc = function(value) BMU.savedVarsAcc.chatButton = value end,
 			  default = BMU.DefaultsAccount["chatButton"],
+			  submenu = "ui",
          },
 		 {
-              type = LHAS.ST_SLIDER,
-              label = SI.get(SI.TELE_SETTINGS_SCALE),
+              type = "slider",
+              name = SI.get(SI.TELE_SETTINGS_SCALE),
 			  tooltip = SI.get(SI.TELE_SETTINGS_SCALE_TOOLTIP) .. " [DEFAULT: " .. BMU.DefaultsAccount["Scale"] .. "]",
 			  min = 0.7,
 			  max = 1.4,
 			  step = 0.05,
-			  format = "%.2f",
-              getFunction = function() return BMU.savedVarsAcc.Scale end,
-              setFunction = function(value)
-                BMU.savedVarsAcc.Scale = value
-                ReloadUI("ingame")
-              end,
+			  decimals = 2,
+			  requiresReload = true,
+              getFunc = function() return BMU.savedVarsAcc.Scale end,
+              setFunc = function(value) BMU.savedVarsAcc.Scale = value end,
 			  default = BMU.DefaultsAccount["Scale"],
+			  submenu = "ui",
          },
 		 {
-              type = LHAS.ST_SLIDER,
-              label = SI.get(SI.TELE_SETTINGS_CHAT_BUTTON_OFFSET),
+              type = "slider",
+              name = SI.get(SI.TELE_SETTINGS_CHAT_BUTTON_OFFSET),
               tooltip = SI.get(SI.TELE_SETTINGS_CHAT_BUTTON_OFFSET_TOOLTIP) .. " [DEFAULT: " .. BMU.DefaultsAccount["chatButtonHorizontalOffset"] .. "]",
               min = 0,
               max = 200,
-              getFunction = function() return BMU.savedVarsAcc.chatButtonHorizontalOffset end,
-              setFunction = function(value) BMU.savedVarsAcc.chatButtonHorizontalOffset = value
+              getFunc = function() return BMU.savedVarsAcc.chatButtonHorizontalOffset end,
+              setFunc = function(value) BMU.savedVarsAcc.chatButtonHorizontalOffset = value
 							BMU.chatButtonTex:SetAnchor(TOPRIGHT, ZO_ChatWindow, TOPRIGHT, -40 - BMU.savedVarsAcc.chatButtonHorizontalOffset, 6)
 						end,
 			  default = BMU.DefaultsAccount["chatButtonHorizontalOffset"],
+			  submenu = "ui",
 			  disabled = function() return not BMU.savedVarsAcc.chatButton or not BMU.chatButtonTex end,
          },
 		 {
-              type = LHAS.ST_SLIDER,
-              label = SI.get(SI.TELE_SETTINGS_MAP_DOCK_OFFSET_HORIZONTAL),
+              type = "slider",
+              name = SI.get(SI.TELE_SETTINGS_MAP_DOCK_OFFSET_HORIZONTAL),
               tooltip = SI.get(SI.TELE_SETTINGS_MAP_DOCK_OFFSET_HORIZONTAL_TOOLTIP) .. " [DEFAULT: " .. BMU.DefaultsAccount["anchorMapOffset_x"] .. "]",
-			        min = -100,
+			  min = -100,
               max = 100,
-              getFunction = function() return BMU.savedVarsAcc.anchorMapOffset_x end,
-              setFunction = function(value) BMU.savedVarsAcc.anchorMapOffset_x = value end,
+              getFunc = function() return BMU.savedVarsAcc.anchorMapOffset_x end,
+              setFunc = function(value) BMU.savedVarsAcc.anchorMapOffset_x = value end,
 			  default = BMU.DefaultsAccount["anchorMapOffset_x"],
+			  submenu = "ui",
          },
 		 {
-              type = LHAS.ST_SLIDER,
-              label = SI.get(SI.TELE_SETTINGS_MAP_DOCK_OFFSET_VERTICAL),
+              type = "slider",
+              name = SI.get(SI.TELE_SETTINGS_MAP_DOCK_OFFSET_VERTICAL),
 			  tooltip = SI.get(SI.TELE_SETTINGS_MAP_DOCK_OFFSET_VERTICAL_TOOLTIP) .. " [DEFAULT: " .. BMU.DefaultsAccount["anchorMapOffset_y"] .. "]",
 			  min = -150,
 			  max = 150,
-              getFunction = function() return BMU.savedVarsAcc.anchorMapOffset_y end,
-              setFunction = function(value) BMU.savedVarsAcc.anchorMapOffset_y = value end,
+              getFunc = function() return BMU.savedVarsAcc.anchorMapOffset_y end,
+              setFunc = function(value) BMU.savedVarsAcc.anchorMapOffset_y = value end,
 			  default = BMU.DefaultsAccount["anchorMapOffset_y"],
+			  submenu = "ui",
          },
 		 {
-              type = LHAS.ST_BUTTON,
-              label = SI.get(SI.TELE_SETTINGS_RESET_UI),
+              type = "button",
+              name = SI.get(SI.TELE_SETTINGS_RESET_UI),
 			  tooltip = SI.get(SI.TELE_SETTINGS_RESET_UI_TOOLTIP),
-			  clickHandler = function() BMU.savedVarsAcc.Scale = BMU.DefaultsAccount["Scale"]
+			  func = function() BMU.savedVarsAcc.Scale = BMU.DefaultsAccount["Scale"]
 								BMU.savedVarsAcc.chatButtonHorizontalOffset = BMU.DefaultsAccount["chatButtonHorizontalOffset"]
 								BMU.savedVarsAcc.anchorMapOffset_x = BMU.DefaultsAccount["anchorMapOffset_x"]
 								BMU.savedVarsAcc.anchorMapOffset_y = BMU.DefaultsAccount["anchorMapOffset_y"]
@@ -201,195 +351,227 @@ local function SetupOptionsMenu(index) --index == Addon name
 								BMU.savedVarsAcc.anchorOnMap = BMU.DefaultsAccount["anchorOnMap"]
 								ReloadUI()
 						end,
+			  width = "half",
+			  warning = "This will automatically reload your UI!",
+			  submenu = "ui",
          },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_AUTO_REFRESH),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_AUTO_REFRESH),
               tooltip = SI.get(SI.TELE_SETTINGS_AUTO_REFRESH_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["autoRefresh"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.autoRefresh end,
-              setFunction = function(value) BMU.savedVarsAcc.autoRefresh = value end,
+              getFunc = function() return BMU.savedVarsAcc.autoRefresh end,
+              setFunc = function(value) BMU.savedVarsAcc.autoRefresh = value end,
 			  default = BMU.DefaultsAccount["autoRefresh"],
+			  submenu = "rec",
          },
 		 {
-              type = LHAS.ST_DROPDOWN,
-              label = SI.get(SI.TELE_SETTINGS_SORTING),
+              type = "dropdown",
+              name = SI.get(SI.TELE_SETTINGS_SORTING),
               tooltip = SI.get(SI.TELE_SETTINGS_SORTING_TOOLTIP) .. " [DEFAULT: " .. BMU.dropdownSortChoices[BMU.DefaultsCharacter["sorting"]] .. "]",
-			  items = BMU.dropdownSortItems,
-              getFunction = function() return BMU.savedVarsChar.sorting end,
-			  setFunction = function(value) BMU.savedVarsChar.sorting = value end,
+			  choices = BMU.dropdownSortChoices,
+			  choicesValues = BMU.dropdownSortValues,
+              getFunc = function() return BMU.savedVarsChar.sorting end,
+			  setFunc = function(value) BMU.savedVarsChar.sorting = value end,
 			  default = BMU.DefaultsCharacter["sorting"],
+			  warning = BMU.colorizeText(SI.get(SI.TELE_SETTINGS_INFO_CHARACTER_DEPENDING), "red"),
+			  submenu = "rec",
         },
 		{
-			type = LHAS.ST_DROPDOWN,
-			label = SI.get(SI.TELE_SETTINGS_DEFAULT_TAB),
+			type = "dropdown",
+			name = SI.get(SI.TELE_SETTINGS_DEFAULT_TAB),
 			tooltip = SI.get(SI.TELE_SETTINGS_DEFAULT_TAB_TOOLTIP) .. " [DEFAULT: " .. BMU.dropdownDefaultTabChoices[BMU.getIndexFromValue(BMU.dropdownDefaultTabValues, BMU.DefaultsCharacter["defaultTab"])] .. "]",
-			items = BMU.dropdownDefaultTabItems,
-			getFunction = function() return BMU.savedVarsChar.defaultTab end,
-			setFunction = function(value) BMU.savedVarsChar.defaultTab = value end,
+			choices = BMU.dropdownDefaultTabChoices,
+			choicesValues = BMU.dropdownDefaultTabValues,
+			getFunc = function() return BMU.savedVarsChar.defaultTab end,
+			setFunc = function(value) BMU.savedVarsChar.defaultTab = value end,
 			default = BMU.DefaultsCharacter["defaultTab"],
+			warning = BMU.colorizeText(SI.get(SI.TELE_SETTINGS_INFO_CHARACTER_DEPENDING), "red"),
 			disabled = function() return not BMU.savedVarsAcc.autoRefresh end,
+			submenu = "rec",
 		 },
          {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_SHOW_NUMBER_PLAYERS),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_SHOW_NUMBER_PLAYERS),
               tooltip = SI.get(SI.TELE_SETTINGS_SHOW_NUMBER_PLAYERS_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["showNumberPlayers"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.showNumberPlayers end,
-              setFunction = function(value) BMU.savedVarsAcc.showNumberPlayers = value end,
+              getFunc = function() return BMU.savedVarsAcc.showNumberPlayers end,
+              setFunc = function(value) BMU.savedVarsAcc.showNumberPlayers = value end,
 			  default = BMU.DefaultsAccount["showNumberPlayers"],
-			  		 },
+			  submenu = "rec",
+		 },
          {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_SEARCH_CHARACTERNAMES),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_SEARCH_CHARACTERNAMES),
               tooltip = SI.get(SI.TELE_SETTINGS_SEARCH_CHARACTERNAMES_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["searchCharacterNames"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.searchCharacterNames end,
-              setFunction = function(value) BMU.savedVarsAcc.searchCharacterNames = value end,
+              getFunc = function() return BMU.savedVarsAcc.searchCharacterNames end,
+              setFunc = function(value) BMU.savedVarsAcc.searchCharacterNames = value end,
 			  default = BMU.DefaultsAccount["searchCharacterNames"],
-			  		 },
+			  submenu = "rec",
+		 },		 
          {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_ZONE_ONCE_ONLY),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_ZONE_ONCE_ONLY),
               tooltip = SI.get(SI.TELE_SETTINGS_ZONE_ONCE_ONLY_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["zoneOnceOnly"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.zoneOnceOnly end,
-              setFunction = function(value) BMU.savedVarsAcc.zoneOnceOnly = value end,
+              getFunc = function() return BMU.savedVarsAcc.zoneOnceOnly end,
+              setFunc = function(value) BMU.savedVarsAcc.zoneOnceOnly = value end,
 			  default = BMU.DefaultsAccount["zoneOnceOnly"],
-			  		 },
+			  submenu = "rec",
+		 },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_CURRENT_ZONE_ALWAYS_TOP),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_CURRENT_ZONE_ALWAYS_TOP),
               tooltip = SI.get(SI.TELE_SETTINGS_CURRENT_ZONE_ALWAYS_TOP_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["currentZoneAlwaysTop"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.currentZoneAlwaysTop end,
-              setFunction = function(value) BMU.savedVarsAcc.currentZoneAlwaysTop = value end,
+              getFunc = function() return BMU.savedVarsAcc.currentZoneAlwaysTop end,
+              setFunc = function(value) BMU.savedVarsAcc.currentZoneAlwaysTop = value end,
 			  default = BMU.DefaultsAccount["currentZoneAlwaysTop"],
-			  		 },
+			  submenu = "rec",
+		 },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP),
               tooltip = SI.get(SI.TELE_SETTINGS_VIEWED_ZONE_ALWAYS_TOP_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["currentViewedZoneAlwaysTop"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.currentViewedZoneAlwaysTop end,
-              setFunction = function(value) BMU.savedVarsAcc.currentViewedZoneAlwaysTop = value end,
+              getFunc = function() return BMU.savedVarsAcc.currentViewedZoneAlwaysTop end,
+              setFunc = function(value) BMU.savedVarsAcc.currentViewedZoneAlwaysTop = value end,
 			  default = BMU.DefaultsAccount["currentViewedZoneAlwaysTop"],
-			  		 },
+			  submenu = "rec",
+		 },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_FORMAT_ZONE_NAME),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_FORMAT_ZONE_NAME),
               tooltip = SI.get(SI.TELE_SETTINGS_FORMAT_ZONE_NAME_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["formatZoneName"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.formatZoneName end,
-              setFunction = function(value) BMU.savedVarsAcc.formatZoneName = value end,
+              getFunc = function() return BMU.savedVarsAcc.formatZoneName end,
+              setFunc = function(value) BMU.savedVarsAcc.formatZoneName = value end,
 			  default = BMU.DefaultsAccount["formatZoneName"],
-			           },
+			  submenu = "rec",
+         },
 		 {
-              type = LHAS.ST_SLIDER,
-              label = SI.get(SI.TELE_SETTINGS_AUTO_REFRESH_FREQ),
+              type = "slider",
+              name = SI.get(SI.TELE_SETTINGS_AUTO_REFRESH_FREQ),
               tooltip = SI.get(SI.TELE_SETTINGS_AUTO_REFRESH_FREQ_TOOLTIP) .. " [DEFAULT: " .. BMU.DefaultsAccount["autoRefreshFreq"] .. "]",
               min = 0,
               max = 15,
-              getFunction = function() return BMU.savedVarsAcc.autoRefreshFreq end,
-              setFunction = function(value) BMU.savedVarsAcc.autoRefreshFreq = value end,
+              getFunc = function() return BMU.savedVarsAcc.autoRefreshFreq end,
+              setFunc = function(value) BMU.savedVarsAcc.autoRefreshFreq = value end,
 			  default = BMU.DefaultsAccount["autoRefreshFreq"],
-			           },
+			  submenu = "rec",
+         },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS),
               tooltip = SI.get(SI.TELE_SETTINGS_SHOW_ZONES_WITHOUT_PLAYERS_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["showZonesWithoutPlayers2"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.showZonesWithoutPlayers2 end,
-              setFunction = function(value) BMU.savedVarsAcc.showZonesWithoutPlayers2 = value end,
+              getFunc = function() return BMU.savedVarsAcc.showZonesWithoutPlayers2 end,
+              setFunc = function(value) BMU.savedVarsAcc.showZonesWithoutPlayers2 = value end,
 			  default = BMU.DefaultsAccount["showZonesWithoutPlayers2"],
-			           },
+			  submenu = "bl",
+         },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_ONLY_MAPS),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_ONLY_MAPS),
               tooltip = SI.get(SI.TELE_SETTINGS_ONLY_MAPS_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["onlyMaps"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.onlyMaps end,
-              setFunction = function(value) BMU.savedVarsAcc.onlyMaps = value end,
+              getFunc = function() return BMU.savedVarsAcc.onlyMaps end,
+              setFunc = function(value) BMU.savedVarsAcc.onlyMaps = value end,
 			  default = BMU.DefaultsAccount["onlyMaps"],
-			           },
+			  submenu = "bl",
+         },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_HIDE_OTHERS),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_HIDE_OTHERS),
               tooltip = SI.get(SI.TELE_SETTINGS_HIDE_OTHERS_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["hideOthers"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.hideOthers end,
-              setFunction = function(value) BMU.savedVarsAcc.hideOthers = value end,
+              getFunc = function() return BMU.savedVarsAcc.hideOthers end,
+              setFunc = function(value) BMU.savedVarsAcc.hideOthers = value end,
 			  disabled = function() return BMU.savedVarsAcc.onlyMaps end,
 			  default = BMU.DefaultsAccount["hideOthers"],
-			           },
+			  submenu = "bl",
+         },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_HIDE_PVP),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_HIDE_PVP),
               tooltip = SI.get(SI.TELE_SETTINGS_HIDE_PVP_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["hidePVP"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.hidePVP end,
-              setFunction = function(value) BMU.savedVarsAcc.hidePVP = value end,
+              getFunc = function() return BMU.savedVarsAcc.hidePVP end,
+              setFunc = function(value) BMU.savedVarsAcc.hidePVP = value end,
 			  disabled = function() return BMU.savedVarsAcc.onlyMaps end,
 			  default = BMU.DefaultsAccount["hidePVP"],
-			           },
+			  submenu = "bl",
+         },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_HIDE_CLOSED_DUNGEONS),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_HIDE_CLOSED_DUNGEONS),
               tooltip = SI.get(SI.TELE_SETTINGS_HIDE_CLOSED_DUNGEONS_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["hideClosedDungeons"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.hideClosedDungeons end,
-              setFunction = function(value) BMU.savedVarsAcc.hideClosedDungeons = value end,
+              getFunc = function() return BMU.savedVarsAcc.hideClosedDungeons end,
+              setFunc = function(value) BMU.savedVarsAcc.hideClosedDungeons = value end,
 			  disabled = function() return BMU.savedVarsAcc.onlyMaps end,
 			  default = BMU.DefaultsAccount["hideClosedDungeons"],
-			           },
+			  submenu = "bl",
+         },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_HIDE_DELVES),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_HIDE_DELVES),
               tooltip = SI.get(SI.TELE_SETTINGS_HIDE_DELVES_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["hideDelves"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.hideDelves end,
-              setFunction = function(value) BMU.savedVarsAcc.hideDelves = value end,
+              getFunc = function() return BMU.savedVarsAcc.hideDelves end,
+              setFunc = function(value) BMU.savedVarsAcc.hideDelves = value end,
 			  disabled = function() return BMU.savedVarsAcc.onlyMaps end,
 			  default = BMU.DefaultsAccount["hideDelves"],
-			           },
+			  submenu = "bl",
+         },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_HIDE_PUBLIC_DUNGEONS),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_HIDE_PUBLIC_DUNGEONS),
               tooltip = SI.get(SI.TELE_SETTINGS_HIDE_PUBLIC_DUNGEONS_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["hidePublicDungeons"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.hidePublicDungeons end,
-              setFunction = function(value) BMU.savedVarsAcc.hidePublicDungeons = value end,
+              getFunc = function() return BMU.savedVarsAcc.hidePublicDungeons end,
+              setFunc = function(value) BMU.savedVarsAcc.hidePublicDungeons = value end,
 			  disabled = function() return BMU.savedVarsAcc.onlyMaps end,
 			  default = BMU.DefaultsAccount["hidePublicDungeons"],
-			           },
+			  submenu = "bl",
+         },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_HIDE_HOUSES),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_HIDE_HOUSES),
               tooltip = SI.get(SI.TELE_SETTINGS_HIDE_HOUSES_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["hideHouses"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.hideHouses end,
-              setFunction = function(value) BMU.savedVarsAcc.hideHouses = value end,
+              getFunc = function() return BMU.savedVarsAcc.hideHouses end,
+              setFunc = function(value) BMU.savedVarsAcc.hideHouses = value end,
 			  disabled = function() return BMU.savedVarsAcc.onlyMaps end,
 			  default = BMU.DefaultsAccount["hideHouses"],
-			           },
+			  submenu = "bl",
+         },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_HIDE_OWN_HOUSES),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_HIDE_OWN_HOUSES),
               tooltip = SI.get(SI.TELE_SETTINGS_HIDE_OWN_HOUSES_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["hideOwnHouses"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.hideOwnHouses end,
-              setFunction = function(value) BMU.savedVarsAcc.hideOwnHouses = value end,
+              getFunc = function() return BMU.savedVarsAcc.hideOwnHouses end,
+              setFunc = function(value) BMU.savedVarsAcc.hideOwnHouses = value end,
 			  default = BMU.DefaultsAccount["hideOwnHouses"],
-			           },
+			  submenu = "bl",
+         },
 		 {
-              type = LHAS.ST_LABEL,
-              label = SI.get(SI.TELE_SETTINGS_PRIORITIZATION_DESCRIPTION),
-			           },
+              type = "description",
+              text = SI.get(SI.TELE_SETTINGS_PRIORITIZATION_DESCRIPTION),
+			  submenu = "prio",
+         },
          {
-              type = LHAS.ST_DROPDOWN,
-			  label = "PRIO 1",
+              type = "dropdown",
+			  width = "half",
+              name = "PRIO 1",
               tooltip = "",
-			  items = BMU.dropdownPrioSourceItems,
-              getFunction = function() return BMU.savedVarsServ.prioritizationSource[1] end,
-			  setFunction = function(value)
+			  choices = BMU.dropdownPrioSourceChoices,
+			  choicesValues = BMU.dropdownPrioSourceValues,
+              getFunc = function() return BMU.savedVarsServ.prioritizationSource[1] end,
+			  setFunc = function(value)
 				-- swap positions
 				local index = BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
 				BMU.savedVarsServ.prioritizationSource[index] = BMU.savedVarsServ.prioritizationSource[1]
 				BMU.savedVarsServ.prioritizationSource[1] = value
 			  end,
 			  default = BMU.DefaultsServer["prioritizationSource"][1],
-			          },
+			  submenu = "prio",
+        },
 		{
-              type = LHAS.ST_DROPDOWN,
-			  label = "PRIO 2",
+              type = "dropdown",
+			  width = "half",
+              name = "PRIO 2",
               tooltip = "",
-			  items = BMU.dropdownPrioSourceItems,
-              getFunction = function() return BMU.savedVarsServ.prioritizationSource[2] end,
-			  setFunction = function(value)
+			  choices = BMU.dropdownPrioSourceChoices,
+			  choicesValues = BMU.dropdownPrioSourceValues,
+              getFunc = function() return BMU.savedVarsServ.prioritizationSource[2] end,
+			  setFunc = function(value)
 				-- swap positions
 				local index = BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
 				BMU.savedVarsServ.prioritizationSource[index] = BMU.savedVarsServ.prioritizationSource[2]
@@ -403,14 +585,17 @@ local function SetupOptionsMenu(index) --index == Addon name
 				end
 			  end,
 			  default = BMU.DefaultsServer["prioritizationSource"][2],
-			          },
+			  submenu = "prio",
+        },
 		{
-              type = LHAS.ST_DROPDOWN,
-			  label = "PRIO 3",
+              type = "dropdown",
+			  width = "half",
+              name = "PRIO 3",
               tooltip = "",
-			  items = BMU.dropdownPrioSourceItems,
-              getFunction = function() return BMU.savedVarsServ.prioritizationSource[3] end,
-			  setFunction = function(value)
+			  choices = BMU.dropdownPrioSourceChoices,
+			  choicesValues = BMU.dropdownPrioSourceValues,
+              getFunc = function() return BMU.savedVarsServ.prioritizationSource[3] end,
+			  setFunc = function(value)
 			  	-- swap positions
 				local index = BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
 				BMU.savedVarsServ.prioritizationSource[index] = BMU.savedVarsServ.prioritizationSource[3]
@@ -424,14 +609,17 @@ local function SetupOptionsMenu(index) --index == Addon name
 				end
 			  end,
 			  default = BMU.DefaultsServer["prioritizationSource"][3],
-			          },
+			  submenu = "prio",
+        },
 		{
-              type = LHAS.ST_DROPDOWN,
-			  label = "PRIO 4",
+              type = "dropdown",
+			  width = "half",
+              name = "PRIO 4",
               tooltip = "",
-			  items = BMU.dropdownPrioSourceItems,
-              getFunction = function() return BMU.savedVarsServ.prioritizationSource[4] end,
-			  setFunction = function(value)
+			  choices = BMU.dropdownPrioSourceChoices,
+			  choicesValues = BMU.dropdownPrioSourceValues,
+              getFunc = function() return BMU.savedVarsServ.prioritizationSource[4] end,
+			  setFunc = function(value)
 				-- swap positions
 				local index = BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
 				BMU.savedVarsServ.prioritizationSource[index] = BMU.savedVarsServ.prioritizationSource[4]
@@ -445,14 +633,17 @@ local function SetupOptionsMenu(index) --index == Addon name
 				end
 			  end,
 			  default = BMU.DefaultsServer["prioritizationSource"][4],
-			          },
+			  submenu = "prio",
+        },
 		{
-              type = LHAS.ST_DROPDOWN,
-			  label = "PRIO 5",
+              type = "dropdown",
+			  width = "half",
+              name = "PRIO 5",
               tooltip = "",
-			  items = BMU.dropdownPrioSourceItems,
-              getFunction = function() return BMU.savedVarsServ.prioritizationSource[5] end,
-			  setFunction = function(value)
+			  choices = BMU.dropdownPrioSourceChoices,
+			  choicesValues = BMU.dropdownPrioSourceValues,
+              getFunc = function() return BMU.savedVarsServ.prioritizationSource[5] end,
+			  setFunc = function(value)
 			  			  	-- swap positions
 				local index = BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
 				BMU.savedVarsServ.prioritizationSource[index] = BMU.savedVarsServ.prioritizationSource[5]
@@ -466,14 +657,17 @@ local function SetupOptionsMenu(index) --index == Addon name
 				end
 			  end,
 			  default = BMU.DefaultsServer["prioritizationSource"][5],
-			          },
+			  submenu = "prio",
+        },
 		{
-              type = LHAS.ST_DROPDOWN,
-			  label = "PRIO 6",
+              type = "dropdown",
+			  width = "half",
+              name = "PRIO 6",
               tooltip = "",
-			  items = BMU.dropdownPrioSourceItems,
-              getFunction = function() return BMU.savedVarsServ.prioritizationSource[6] end,
-			  setFunction = function(value)
+			  choices = BMU.dropdownPrioSourceChoices,
+			  choicesValues = BMU.dropdownPrioSourceValues,
+              getFunc = function() return BMU.savedVarsServ.prioritizationSource[6] end,
+			  setFunc = function(value)
 			  	-- swap positions
 				local index = BMU.getIndexFromValue(BMU.savedVarsServ.prioritizationSource, value)
 				BMU.savedVarsServ.prioritizationSource[index] = BMU.savedVarsServ.prioritizationSource[6]
@@ -487,166 +681,417 @@ local function SetupOptionsMenu(index) --index == Addon name
 				end
 			  end,
 			  default = BMU.DefaultsServer["prioritizationSource"][6],
-			          },
+			  submenu = "prio",
+        },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_SHOW_TELEPORT_ANIMATION),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_SHOW_TELEPORT_ANIMATION),
               tooltip = SI.get(SI.TELE_SETTINGS_SHOW_TELEPORT_ANIMATION_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["showTeleportAnimation"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.showTeleportAnimation end,
-              setFunction = function(value) BMU.savedVarsAcc.showTeleportAnimation = value end,
+              getFunc = function() return BMU.savedVarsAcc.showTeleportAnimation end,
+              setFunc = function(value) BMU.savedVarsAcc.showTeleportAnimation = value end,
 			  default = BMU.DefaultsAccount["showTeleportAnimation"],
-			           },
+			  submenu = "adv",
+         },
 		 {
-              type = LHAS.ST_SECTION,
-              label = ""
-			           },
+              type = "divider",
+			  submenu = "adv",
+         },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_USE_PAN_AND_ZOOM),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_USE_PAN_AND_ZOOM),
               tooltip = SI.get(SI.TELE_SETTINGS_USE_PAN_AND_ZOOM_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["usePanAndZoom"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.usePanAndZoom end,
-              setFunction = function(value) BMU.savedVarsAcc.usePanAndZoom = value end,
+              getFunc = function() return BMU.savedVarsAcc.usePanAndZoom end,
+              setFunc = function(value) BMU.savedVarsAcc.usePanAndZoom = value end,
 			  default = BMU.DefaultsAccount["usePanAndZoom"],
-			           },
+			  submenu = "adv",
+         },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_USE_RALLY_POINT),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_USE_RALLY_POINT),
               tooltip = SI.get(SI.TELE_SETTINGS_USE_RALLY_POINT_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["useMapPing"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.useMapPing end,
-              setFunction = function(value) BMU.savedVarsAcc.useMapPing = value end,
+              getFunc = function() return BMU.savedVarsAcc.useMapPing end,
+              setFunc = function(value) BMU.savedVarsAcc.useMapPing = value end,
 			  disabled = function() return not BMU.LibMapPing end,
 			  default = BMU.DefaultsAccount["useMapPing"],
-			           },
+			  submenu = "adv",
+         },
 		 {
-              type = LHAS.ST_SECTION,
-			           },
+              type = "divider",
+			  submenu = "adv",
+         },
          {
-              type = LHAS.ST_DROPDOWN,
-              label = SI.get(SI.TELE_SETTINGS_SECOND_SEARCH_LANGUAGE),
+              type = "dropdown",
+              name = SI.get(SI.TELE_SETTINGS_SECOND_SEARCH_LANGUAGE),
               tooltip = SI.get(SI.TELE_SETTINGS_SECOND_SEARCH_LANGUAGE_TOOLTIP) .. " [DEFAULT: " .. BMU.dropdownSecLangChoices[BMU.DefaultsAccount["secondLanguage"]] .. "]",
-			  items = BMU.dropdownSecLangItems,
-              getFunction = function() return BMU.savedVarsAcc.secondLanguage end,
-			  setFunction = function(value) BMU.savedVarsAcc.secondLanguage = value end,
+			  choices = BMU.dropdownSecLangChoices,
+			  choicesValues = BMU.dropdownSecLangValues,
+              getFunc = function() return BMU.savedVarsAcc.secondLanguage end,
+			  setFunc = function(value) BMU.savedVarsAcc.secondLanguage = value end,
 			  default = BMU.DefaultsAccount["secondLanguage"],
-			          },
+			  submenu = "adv",
+        },
 		 {
-              type = LHAS.ST_SECTION,
-              label = ""
-			           },
+              type = "divider",
+			  submenu = "adv",
+         },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_NOTIFICATION_PLAYER_FAVORITE_ONLINE),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_NOTIFICATION_PLAYER_FAVORITE_ONLINE),
               tooltip = SI.get(SI.TELE_SETTINGS_NOTIFICATION_PLAYER_FAVORITE_ONLINE_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["FavoritePlayerStatusNotification"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.FavoritePlayerStatusNotification end,
-              setFunction = function(value)
-                BMU.savedVarsAcc.FavoritePlayerStatusNotification = value
-                ReloadUI()
-              end,
+              getFunc = function() return BMU.savedVarsAcc.FavoritePlayerStatusNotification end,
+              setFunc = function(value) BMU.savedVarsAcc.FavoritePlayerStatusNotification = value end,
 			  default = BMU.DefaultsAccount["FavoritePlayerStatusNotification"],
-			           },
+			  requiresReload = true,
+			  submenu = "adv",
+         },
 		 {
-              type = LHAS.ST_SECTION,
-              label = ""
-			           },
+              type = "divider",
+			  submenu = "adv",
+         },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION),
               tooltip = SI.get(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["surveyMapsNotification"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.surveyMapsNotification end,
-              setFunction = function(value)
-                BMU.savedVarsAcc.surveyMapsNotification = value
-                ReloadUI()
-              end,
+              getFunc = function() return BMU.savedVarsAcc.surveyMapsNotification end,
+              setFunc = function(value) BMU.savedVarsAcc.surveyMapsNotification = value end,
 			  default = BMU.DefaultsAccount["surveyMapsNotification"],
 			  requiresReload = true,
-			           },
+			  width = "half",
+			  submenu = "adv",
+         },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION_SOUND),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION_SOUND),
               tooltip = SI.get(SI.TELE_SETTINGS_SURVEY_MAP_NOTIFICATION_SOUND_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["surveyMapsNotificationSound"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.surveyMapsNotificationSound end,
-              setFunction = function(value) BMU.savedVarsAcc.surveyMapsNotificationSound = value end,
+              getFunc = function() return BMU.savedVarsAcc.surveyMapsNotificationSound end,
+              setFunc = function(value) BMU.savedVarsAcc.surveyMapsNotificationSound = value end,
 			  default = BMU.DefaultsAccount["surveyMapsNotificationSound"],
 			  disabled = function() return not BMU.savedVarsAcc.surveyMapsNotification end,
-			           },
+			  width = "half",
+			  submenu = "adv",
+         },
 		 {
-              type = LHAS.ST_SECTION,
-              label = ""
-			           },
+              type = "divider",
+			  submenu = "adv",
+         },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_AUTO_CONFIRM_WAYSHRINE_TRAVEL),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_AUTO_CONFIRM_WAYSHRINE_TRAVEL),
               tooltip = SI.get(SI.TELE_SETTINGS_AUTO_CONFIRM_WAYSHRINE_TRAVEL_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["wayshrineTravelAutoConfirm"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.wayshrineTravelAutoConfirm end,
-              setFunction = function(value)
-                BMU.savedVarsAcc.wayshrineTravelAutoConfirm = value
-                ReloadUI()
-              end,
+              getFunc = function() return BMU.savedVarsAcc.wayshrineTravelAutoConfirm end,
+              setFunc = function(value) BMU.savedVarsAcc.wayshrineTravelAutoConfirm = value end,
 			  default = BMU.DefaultsAccount["wayshrineTravelAutoConfirm"],
-			           },
+			  requiresReload = true,
+			  submenu = "adv",
+         },
 		 {
-              type = LHAS.ST_SECTION,
-              label = ""
-			           },
+              type = "divider",
+			  submenu = "adv",
+         },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = SI.get(SI.TELE_SETTINGS_OFFLINE_NOTE),
+              type = "checkbox",
+              name = SI.get(SI.TELE_SETTINGS_OFFLINE_NOTE),
               tooltip = SI.get(SI.TELE_SETTINGS_OFFLINE_NOTE_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["showOfflineReminder"]) .. "]",
-              getFunction = function() return BMU.savedVarsAcc.showOfflineReminder end,
-              setFunction = function(value)
-                BMU.savedVarsAcc.showOfflineReminder = value
-                ReloadUI()
-              end,
+              getFunc = function() return BMU.savedVarsAcc.showOfflineReminder end,
+              setFunc = function(value) BMU.savedVarsAcc.showOfflineReminder = value end,
 			  default = BMU.DefaultsAccount["showOfflineReminder"],
-			           },
+			  requiresReload = true,
+			  submenu = "adv",
+         },
 		 {
-              type = LHAS.ST_SECTION,
-              label = ""
-			           },
+              type = "divider",
+			  submenu = "adv",
+         },
 		 {
-			  type = LHAS.ST_CHECKBOX,
-			  label = SI.get(SI.TELE_SETTINGS_OUTPUT_FAST_TRAVEL),
+			  type = "checkbox",
+			  name = SI.get(SI.TELE_SETTINGS_OUTPUT_FAST_TRAVEL),
 			  tooltip = SI.get(SI.TELE_SETTINGS_OUTPUT_FAST_TRAVEL_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["chatOutputFastTravel"]) .. "]",
-			  getFunction = function() return BMU.savedVarsAcc.chatOutputFastTravel end,
-			  setFunction = function(value) BMU.savedVarsAcc.chatOutputFastTravel = value end,
+			  getFunc = function() return BMU.savedVarsAcc.chatOutputFastTravel end,
+			  setFunc = function(value) BMU.savedVarsAcc.chatOutputFastTravel = value end,
 			  default = BMU.DefaultsAccount["chatOutputFastTravel"],
-			  	     },
+			  submenu = "co",
+	     },
 	     {
-			  type = LHAS.ST_CHECKBOX,
-			  label = SI.get(SI.TELE_SETTINGS_OUTPUT_ADDITIONAL),
+			  type = "checkbox",
+			  name = SI.get(SI.TELE_SETTINGS_OUTPUT_ADDITIONAL),
 			  tooltip = SI.get(SI.TELE_SETTINGS_OUTPUT_ADDITIONAL_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["chatOutputAdditional"]) .. "]",
-			  getFunction = function() return BMU.savedVarsAcc.chatOutputAdditional end,
-			  setFunction = function(value) BMU.savedVarsAcc.chatOutputAdditional = value end,
+			  getFunc = function() return BMU.savedVarsAcc.chatOutputAdditional end,
+			  setFunc = function(value) BMU.savedVarsAcc.chatOutputAdditional = value end,
 			  default = BMU.DefaultsAccount["chatOutputAdditional"],
-			     		 },
+			  submenu = "co",
+   		 },
    		 {
-			  type = LHAS.ST_CHECKBOX,
-			  label = SI.get(SI.TELE_SETTINGS_OUTPUT_UNLOCK),
+			  type = "checkbox",
+			  name = SI.get(SI.TELE_SETTINGS_OUTPUT_UNLOCK),
 		 	  tooltip = SI.get(SI.TELE_SETTINGS_OUTPUT_UNLOCK_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU.DefaultsAccount["chatOutputUnlock"]) .. "]",
-			  getFunction = function() return BMU.savedVarsAcc.chatOutputUnlock end,
-			  setFunction = function(value) BMU.savedVarsAcc.chatOutputUnlock = value end,
+			  getFunc = function() return BMU.savedVarsAcc.chatOutputUnlock end,
+			  setFunc = function(value) BMU.savedVarsAcc.chatOutputUnlock = value end,
 			  default = BMU.DefaultsAccount["chatOutputUnlock"],
-			  		 },
+			  submenu = "co",
+		 },
 		 {
-			  type = LHAS.ST_CHECKBOX,
-			  label = SI.get(SI.TELE_SETTINGS_OUTPUT_DEBUG),
+			  type = "checkbox",
+			  name = SI.get(SI.TELE_SETTINGS_OUTPUT_DEBUG),
 			  tooltip = SI.get(SI.TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP),
-			  getFunction = function() return BMU.debugMode end,
-			  setFunction = function(value) BMU.debugMode = value end,
+			  getFunc = function() return BMU.debugMode end,
+			  setFunc = function(value) BMU.debugMode = value end,
 			  default = false,
-			  	     },
+			  warning = "This option can not be set permanently.",
+			  submenu = "co",
+	     },
 		 {
-              type = LHAS.ST_BUTTON,
-              label = BMU.colorizeText(SI.get(SI.TELE_SETTINGS_RESET_ALL_COUNTERS), "red"),
+              type = "button",
+              name = BMU.colorizeText(SI.get(SI.TELE_SETTINGS_RESET_ALL_COUNTERS), "red"),
 			  tooltip = SI.get(SI.TELE_SETTINGS_RESET_ALL_COUNTERS_TOOLTIP),
-			  clickHandler = function() for zoneId, _ in pairs(BMU.savedVarsAcc.portCounterPerZone) do
+			  func = function() for zoneId, _ in pairs(BMU.savedVarsAcc.portCounterPerZone) do
 									BMU.savedVarsAcc.portCounterPerZone[zoneId] = nil
 								end
 								BMU.printToChat("ALL COUNTERS RESETTET!")
 						end,
-			           }
+			  width = "half",
+			  warning = "All zone counters are reset. Therefore, the sorting by most used and your personal statistics are reset.",
+			  submenu = "adv",
+         },
+	     {
+              type = "description",
+              text = "Port to specific zone\n(Hint: when you start typing /<zone name> the auto completion will appear on top)\n" .. BMU.colorizeText("/bmutp/<zone name>\n", "gold") .. BMU.colorizeText("Example: /bmutp/deshaan", "lgray"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Port to group leader\n" .. BMU.colorizeText("/bmutp/leader", "gold"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Port to currently focused quest\n" .. BMU.colorizeText("/bmutp/quest", "gold"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Port into primary residence\n" .. BMU.colorizeText("/bmutp/house", "gold"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Port outside primary residence\n" .. BMU.colorizeText("/bmutp/house_out", "gold"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Port to current zone\n" .. BMU.colorizeText("/bmutp/current_zone", "gold"),
+			  submenu = "cc",
+         },
+		 {
+              type = "divider",
+			  submenu = "cc",
+         },
+	     {
+			type = "description",
+			text = "Add zone favorite manually\n" .. BMU.colorizeText("/bmu/favorites/add/zone <fav slot> <zoneName or zoneId> \n", "gold") .. BMU.colorizeText("Example: /bmu/favorites/add/zone 1 Deshaan", "lgray"),
+			submenu = "cc",
+	   	 },
+	     {
+              type = "description",
+              text = "Add player favorite manually\n" .. BMU.colorizeText("/bmu/favorites/add/player <fav slot> <player name>\n", "gold") .. BMU.colorizeText("Example: /bmu/favorites/add/player 1 @DeadSoon", "lgray"),
+			  submenu = "cc",
+         },
+	     {
+			  type = "description",
+			  text = "Add wayshrine favorite\nOnce executed, you must interact (`E`) with your favorite wayshrine within 10 seconds. You can assign hotkeys for your favorite wayshrines.\n" .. BMU.colorizeText("/bmu/favorites/add/wayshrine <fav slot>\n", "gold") .. BMU.colorizeText("Example: /bmu/favorites/add/wayshrine 1", "lgray"),
+			  submenu = "cc",
+	     },
+	     {
+			  type = "divider",
+			  submenu = "cc",
+	     },
+	     {
+              type = "description",
+              text = "Add house favorite for zoneID\n" .. BMU.colorizeText("/bmu/house/set/zone <zoneID> <houseID>\n", "gold") .. BMU.colorizeText("Example: /bmu/house/set/zone 1086 68", "lgray"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Add house favorite for current zone\n" .. BMU.colorizeText("/bmu/house/set/current_zone <houseID>\n", "gold") .. BMU.colorizeText("Example: /bmu/house/set/current_zone 68", "lgray"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Add current house as favorite for current zone\n" .. BMU.colorizeText("/bmu/house/set/current_house\n", "gold"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Clear house favorite for current zone\n" .. BMU.colorizeText("/bmu/house/clear/current_zone\n", "gold"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Clear house for zone\n" .. BMU.colorizeText("/bmu/house/clear/zone <zoneID>\n", "gold") .. BMU.colorizeText("Example: /bmu/house/clear/zone 1086", "lgray"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "List house favorites\n" .. BMU.colorizeText("/bmu/house/list\n", "gold"),
+			  submenu = "cc",
+         },
+	     {
+			  type = "divider",
+			  submenu = "cc",
+	     },
+	     {
+              type = "description",
+              text = "Start custom vote in group (100% are necessary)\n" .. BMU.colorizeText("/bmu/vote/custom_vote_unanimous <your text>\n", "gold") .. BMU.colorizeText("Example: /bmu/vote/custom_vote_unanimous Do you like BeamMeUp?", "lgray"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Start custom vote in group (>=60% are necessary)\n" .. BMU.colorizeText("/bmu/vote/custom_vote_supermajority <your text>", "gold"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Start custom vote in group (>50% are necessary)\n" .. BMU.colorizeText("/bmu/vote/custom_vote_simplemajority <your text>", "gold"),
+			  submenu = "cc",
+         },
+		 {
+              type = "divider",
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Promote BeamMeUp by printing short advertising text in the chat\n" .. BMU.colorizeText("/bmu/misc/advertise", "gold"),
+			  submenu = "cc",
+         },
+	     {
+			type = "description",
+			text = "Get current zone id (where the player actually is)\n" .. BMU.colorizeText("/bmu/misc/current_zone_id", "gold"),
+			submenu = "cc",
+	   	 },
+	     {
+              type = "description",
+              text = "Switch client language (instant reload!)\n" .. BMU.colorizeText("/bmu/misc/lang", "gold"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = "Enable debug mode\n" .. BMU.colorizeText("/bmu/misc/debug", "gold"),
+			  submenu = "cc",
+         },
+	     {
+              type = "description",
+              text = SI.get(SI.TELE_SETTINGS_INSTALLED_SCINCE),
+			  width = "half",
+			  submenu = "stats",
+         },
+	     {
+              type = "description",
+              text = tostring(os.date('%Y/%m/%d', BMU.savedVarsAcc.initialTimeStamp)),
+			  width = "half",
+			  submenu = "stats",
+         },
+	     {
+              type = "description",
+              text = SI.get(SI.TELE_UI_TOTAL_PORTS),
+			  width = "half",
+			  submenu = "stats",
+         },
+	     {
+              type = "description",
+			-- NOTE: "text" parameter must always be string since LAM2 do not handle integer values correctly 
+              text = tostring(BMU.formatGold(BMU.savedVarsAcc.totalPortCounter)),
+			  width = "half",
+			  submenu = "stats",
+         },
+	     {
+              type = "description",
+              text = SI.get(SI.TELE_UI_GOLD),
+			  width = "half",
+			  submenu = "stats",
+         },
+	     {
+              type = "description",
+              text = tostring(BMU.formatGold(BMU.savedVarsAcc.savedGold)),
+			  width = "half",
+			  submenu = "stats",
+         },
+	     {
+              type = "description",
+              text = SI.get(SI.TELE_SETTINGS_MOST_PORTED_ZONES),
+			  width = "half",
+			  submenu = "stats",
+         },
+	     {
+              type = "description",
+              text = mostPortedZonesText,
+			  width = "half",
+			  submenu = "stats",
+         },
     }
-    BMU.SettingsPanel = panel:AddSettings(optionsData)
+	
+	--LAM2:RegisterOptionControls(appName .. "Options", optionsData)
+	
+	-- group options by submenu
+	local optionsBySubmenu = {}
+	for _, option in ipairs(optionsData) do
+		if option.submenu ~= nil then
+			if optionsBySubmenu[option.submenu] == nil then
+				optionsBySubmenu[option.submenu] = {}
+			end
+			table.insert(optionsBySubmenu[option.submenu], option)
+		end
+	end
+	
+	-- create submenus
+	local submenu1 = {
+		type = "submenu",
+		name = "Addon Extensions",
+		controls = optionsBySubmenu["deps"],
+	}
+	local submenu2 = {
+		type = "submenu",
+		name = SI.get(SI.TELE_SETTINGS_HEADER_UI),
+		controls = optionsBySubmenu["ui"],
+	}
+	local submenu3 = {
+		type = "submenu",
+		name = SI.get(SI.TELE_SETTINGS_HEADER_RECORDS),
+		controls = optionsBySubmenu["rec"],
+	}
+	local submenu4 = {
+		type = "submenu",
+		name = SI.get(SI.TELE_SETTINGS_HEADER_BLACKLISTING),
+		controls = optionsBySubmenu["bl"],
+	}
+	local submenu5 = {
+		type = "submenu",
+		name = SI.get(SI.TELE_SETTINGS_HEADER_PRIO),
+		controls = optionsBySubmenu["prio"],
+	}
+	local submenu6 = {
+		type = "submenu",
+		name = SI.get(SI.TELE_SETTINGS_HEADER_ADVANCED),
+		controls = optionsBySubmenu["adv"],
+	}
+	local submenu7 = {
+		type = "submenu",
+		name = SI.get(SI.TELE_SETTINGS_HEADER_CHAT_OUTPUT),
+		controls = optionsBySubmenu["co"],
+	}
+	local submenu8 = {
+		type = "submenu",
+		name = SI.get(SI.TELE_SETTINGS_HEADER_CHAT_COMMANDS),
+		controls = optionsBySubmenu["cc"],
+	}
+	local submenu9 = {
+		type = "submenu",
+		name = SI.get(SI.TELE_SETTINGS_HEADER_STATS),
+		controls = optionsBySubmenu["stats"],
+	}
+	
+	-- register all submenus with options
+	-- TODO: add submenu1
+	LAM2:RegisterOptionControls(appName .. "Options", {submenu1, submenu2, submenu3, submenu4, submenu5, submenu6, submenu7, submenu8, submenu9})
 end
 
 
@@ -784,13 +1229,13 @@ local function SetupUI()
 	
 	-- default font
 	local fontSize = BMU.round(17*BMU.savedVarsAcc.Scale, 0)
-	local fontStyle = BG.ZoFontGame:GetFontInfo()
+	local fontStyle = ZoFontGame:GetFontInfo()
 	local fontWeight = "soft-shadow-thin"
 	BMU.font1 = string.format("%s|$(KB_%s)|%s", fontStyle, fontSize, fontWeight)
 	
 	-- font of statistics
 	fontSize = BMU.round(13*BMU.savedVarsAcc.Scale, 0)
-	fontStyle = BG.ZoFontGameBookTable:GetFontInfo()
+	fontStyle = ZoFontBookTablet:GetFontInfo()
 	--fontStyle = "EsoUI/Common/Fonts/consola.ttf"
 	fontWeight = "soft-shadow-thin"
 	BMU.font2 = string.format("%s|$(KB_%s)|%s", fontStyle, fontSize, fontWeight)
@@ -799,7 +1244,7 @@ local function SetupUI()
     local teleporterWin = BMU.win
 
     -----------------------------------------------
-
+	
 	-- Button on Chat Window
 	if BMU.savedVarsAcc.chatButton then
 		if BMU.LCMB then
@@ -811,27 +1256,25 @@ local function SetupUI()
 			-- do it the old way
 			-- Texture
 			BMU.chatButtonTex = wm:CreateControl("Teleporter_CHAT_MENU_BUTTON", ZO_ChatWindow, CT_TEXTURE)
-			if BMU.chatButtonTex ~= nil then
-        BMU.chatButtonTex:SetDimensions(33, 33)
-        BMU.chatButtonTex:SetAnchor(TOPRIGHT, ZO_ChatWindow, TOPRIGHT, -40 - BMU.savedVarsAcc.chatButtonHorizontalOffset, 6)
-        BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtn)
-        BMU.chatButtonTex:SetMouseEnabled(true)
-        BMU.chatButtonTex:SetDrawLayer(2)
-        --Handlers
-        BMU.chatButtonTex:SetHandler("OnMouseUp", function()
-          BMU.OpenTeleporter(true)
-        end)
-
-        BMU.chatButtonTex:SetHandler("OnMouseEnter", function(self)
-          BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtnOver)
-          BMU:tooltipTextEnter(BMU.chatButtonTex, appName)
-        end)
-
-        BMU.chatButtonTex:SetHandler("OnMouseExit", function(self)
-          BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtn)
-          BMU:tooltipTextEnter(BMU.chatButtonTex)
-        end)
-			end
+			BMU.chatButtonTex:SetDimensions(33, 33)
+			BMU.chatButtonTex:SetAnchor(TOPRIGHT, ZO_ChatWindow, TOPRIGHT, -40 - BMU.savedVarsAcc.chatButtonHorizontalOffset, 6)
+			BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtn)
+			BMU.chatButtonTex:SetMouseEnabled(true)
+			BMU.chatButtonTex:SetDrawLayer(2)
+			--Handlers
+			BMU.chatButtonTex:SetHandler("OnMouseUp", function()
+				BMU.OpenTeleporter(true)
+			end)
+			
+			BMU.chatButtonTex:SetHandler("OnMouseEnter", function(self)
+				BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtnOver)
+				BMU:tooltipTextEnter(BMU.chatButtonTex, appName)
+			end)
+		
+			BMU.chatButtonTex:SetHandler("OnMouseExit", function(self)
+				BMU.chatButtonTex:SetTexture(BMU.textures.wayshrineBtn)
+				BMU:tooltipTextEnter(BMU.chatButtonTex)
+			end)
 		end
 	end
 	
@@ -885,9 +1328,9 @@ local function SetupUI()
     -------------------------------------------------------------------
   -- Switch BUTTON ON ZoneGuide window
 
-  teleporterWin.zoneGuideSwapTexture = wm:CreateControl(nil, BG.ZO_WorldMapZoneStoryTopLevel, CT_TEXTURE)
+  teleporterWin.zoneGuideSwapTexture = wm:CreateControl(nil, ZO_WorldMapZoneStoryTopLevel_Keyboard, CT_TEXTURE)
   teleporterWin.zoneGuideSwapTexture:SetDimensions(50*BMU.savedVarsAcc.Scale, 50*BMU.savedVarsAcc.Scale)
-  teleporterWin.zoneGuideSwapTexture:SetAnchor(TOPRIGHT, BG.ZO_WorldMapZoneStoryTopLevel, TOPRIGHT, TOPRIGHT -10*BMU.savedVarsAcc.Scale, -35*BMU.savedVarsAcc.Scale)
+  teleporterWin.zoneGuideSwapTexture:SetAnchor(TOPRIGHT, ZO_WorldMapZoneStoryTopLevel_Keyboard, TOPRIGHT, TOPRIGHT -10*BMU.savedVarsAcc.Scale, -35*BMU.savedVarsAcc.Scale)
   teleporterWin.zoneGuideSwapTexture:SetTexture(BMU.textures.swapBtn)
   teleporterWin.zoneGuideSwapTexture:SetMouseEnabled(true)
   
@@ -1109,7 +1552,7 @@ local function SetupUI()
 		teleporterWin.MapOpen:SetWidth(200)
 		teleporterWin.MapOpen:SetText(appName)
 		teleporterWin.MapOpen:SetHidden(true)
-
+  
 		teleporterWin.MapOpen:SetHandler("OnClicked",function()
 			BMU.OpenTeleporter(true)
 		end)
@@ -1990,12 +2433,11 @@ end
 function BMU.updatePosition()
     local teleporterWin     = BMU.win
 	if SCENE_MANAGER:IsShowing(BG.worldMap) then
-
---
--- 		-- show anchor button
--- 		teleporterWin.anchorTexture:SetHidden(false)
--- 		-- show swap button
--- 		BMU.closeBtnSwitchTexture(true)
+	
+		-- show anchor button
+		teleporterWin.anchorTexture:SetHidden(false)
+		-- show swap button
+		BMU.closeBtnSwitchTexture(true)
 		
 		if BMU.savedVarsAcc.anchorOnMap then
 			-- anchor to map
@@ -2204,7 +2646,11 @@ end
 function BMU.TeleporterSetupUI(addOnName)
 	if appName ~= addOnName then return end
 		addOnName = appName .. " - Teleporter"
-		SetupOptionsMenu(addOnName)
+		if BMU.IsNotKeyboard() then
+      CS.SetupOptionsMenu(addOnName)
+		else
+		  SetupOptionsMenu(addOnName)
+		end
 		SetupUI()
 end
 
@@ -2421,3 +2867,271 @@ function BMU.requestGuildDataRecursive(guildIds)
 		BMU.isCurrentlyRequestingGuildData = false
 	end
 end
+
+
+--------------------------------------------------
+-- GUILD ADMINISTRATION TOOL
+--------------------------------------------------
+
+function BMU.AdminAddContextMenuToGuildRoster()
+	-- add context menu to guild roster
+	local GuildRosterRow_OnMouseUp = GUILD_ROSTER_KEYBOARD.GuildRosterRow_OnMouseUp --ZO_GuildRecruitment_ApplicationsList_Keyboard.Row_OnMouseUp
+	GUILD_ROSTER_KEYBOARD.GuildRosterRow_OnMouseUp = function(self, control, button, upInside)
+
+		local data = ZO_ScrollList_GetData(control)
+		GuildRosterRow_OnMouseUp(self, control, button, upInside)
+		
+		local currentGuildId = GUILD_ROSTER_MANAGER:GetGuildId()
+		if (button ~= MOUSE_BUTTON_INDEX_RIGHT --[[and not upInside]]) or data == nil or not BMU.AdminIsBMUGuild(currentGuildId) then
+			return
+		end
+		
+		local isAlreadyMember, memberStatusText = BMU.AdminIsAlreadyInGuild(data.displayName)
+		
+		local entries = {}
+		
+		-- welcome message
+		table.insert(entries, {label = "Willkommensnachricht",
+								callback = function(state)
+									local guildId = currentGuildId
+									local guildIndex = BMU.AdminGetGuildIndexFromGuildId(guildId)
+									StartChatInput("Welcome on the bridge " .. data.displayName, _G["CHAT_CHANNEL_GUILD_" .. guildIndex])
+								end,
+								})
+								
+		-- new message
+		table.insert(entries, {label = "Neue Nachricht",
+								callback = function(state) BMU.createMail(data.displayName, "", "") BMU.printToChat("Nachricht erstellt an: " .. data.displayName) end,
+								})
+								
+		-- copy account name
+		table.insert(entries, {label = "Account-ID kopieren",
+								callback = function(state) BMU.AdminCopyTextToChat(data.displayName) end,
+								})
+		
+		-- invite to BMU guilds
+		if BMU.var.BMUGuilds[GetWorldName()] ~= nil then
+			for _, guildId in pairs(BMU.var.BMUGuilds[GetWorldName()]) do
+				if IsPlayerInGuild(guildId) and not GetGuildMemberIndexFromDisplayName(guildId, data.displayName) then
+					table.insert(entries, {label = "Einladen in: " .. GetGuildName(guildId),
+											callback = function(state) BMU.AdminInviteToGuilds(guildId, data.displayName) end,
+											})
+				end
+			end
+		end
+		
+		-- invite to partner guilds
+		if BMU.var.partnerGuilds[GetWorldName()] ~= nil then
+			for _, guildId in pairs(BMU.var.partnerGuilds[GetWorldName()]) do
+				if IsPlayerInGuild(guildId) and not GetGuildMemberIndexFromDisplayName(guildId, data.displayName) then
+					table.insert(entries, {label = "Einladen in: " .. GetGuildName(guildId),
+											callback = function(state) BMU.AdminInviteToGuilds(guildId, data.displayName) end,
+											})
+				end
+			end
+		end
+		
+		-- check if the player is also in other BMU guilds and add info
+		table.insert(entries, {label = memberStatusText,
+								callback = function(state) end,
+								})
+		
+		AddCustomSubMenuItem("BMU Admin", entries)
+		self:ShowMenu(control)
+	end
+end
+
+
+function BMU.AdminAddContextMenuToGuildApplicationRoster()
+	-- add context menu to guild recruitment application roster (if player is already in a one of the BMU guilds + redirection to the other guilds)
+	local Row_OnMouseUp = ZO_GuildRecruitment_ApplicationsList_Keyboard.Row_OnMouseUp
+	ZO_GuildRecruitment_ApplicationsList_Keyboard.Row_OnMouseUp = function(self, control, button, upInside)
+
+		local data = ZO_ScrollList_GetData(control)
+		Row_OnMouseUp(self, control, button, upInside)
+	
+		local currentGuildId = GUILD_ROSTER_MANAGER:GetGuildId()
+		if (button ~= MOUSE_BUTTON_INDEX_RIGHT --[[and not upInside]]) or data == nil or not BMU.AdminIsBMUGuild(currentGuildId) then
+			return
+		end
+		
+		local isAlreadyMember, memberStatusText = BMU.AdminIsAlreadyInGuild(data.name)
+
+		local entries = {}
+		
+		-- new message
+		table.insert(entries, {label = "Neue Nachricht",
+								callback = function(state) BMU.createMail(data.name, "", "") BMU.printToChat("Nachricht erstellt an: " .. data.name) end,
+								})
+								
+		-- copy account name
+		table.insert(entries, {label = "Account-ID kopieren",
+								callback = function(state) BMU.AdminCopyTextToChat(data.name) end,
+								})
+		
+		-- invite to BMU guilds
+		if BMU.var.BMUGuilds[GetWorldName()] ~= nil then
+			for _, guildId in pairs(BMU.var.BMUGuilds[GetWorldName()]) do
+				if IsPlayerInGuild(guildId) and not GetGuildMemberIndexFromDisplayName(guildId, data.name) then
+					table.insert(entries, {label = "Einladen in: " .. GetGuildName(guildId),
+											callback = function(state) BMU.AdminInviteToGuilds(guildId, data.name) end,
+											})
+				end
+			end
+		end
+		
+		-- invite to partner guilds
+		if BMU.var.partnerGuilds[GetWorldName()] ~= nil then
+			for _, guildId in pairs(BMU.var.partnerGuilds[GetWorldName()]) do
+				if IsPlayerInGuild(guildId) and not GetGuildMemberIndexFromDisplayName(guildId, data.name) then
+					table.insert(entries, {label = "Einladen in: " .. GetGuildName(guildId),
+											callback = function(state) BMU.AdminInviteToGuilds(guildId, data.name) end,
+											})
+				end
+			end
+		end
+		
+		-- check if the player is also in other BMU guilds and add info
+		table.insert(entries, {label = memberStatusText,
+								callback = function(state) end,
+								})
+		
+		AddCustomSubMenuItem("BMU Admin", entries)
+		self:ShowMenu(control)
+	end
+end
+
+function BMU.AdminAddTooltipInfoToGuildApplicationRoster()
+	-- add info to the tooltip in guild recruitment application roster
+	local Row_OnMouseEnter = ZO_GuildRecruitment_ApplicationsList_Keyboard.Row_OnMouseEnter
+	ZO_GuildRecruitment_ApplicationsList_Keyboard.Row_OnMouseEnter = function(self, control)
+		
+		local data = ZO_ScrollList_GetData(control)
+		local currentGuildId = GUILD_ROSTER_MANAGER:GetGuildId()
+		
+		if data ~= nil and not data.BMUInfo and BMU.AdminIsBMUGuild(currentGuildId) then
+			local isAlreadyMember, memberStatusText = BMU.AdminIsAlreadyInGuild(data.name)
+			data.message = data.message .. "\n\n" .. memberStatusText
+			data.BMUInfo = true
+		end
+	
+		Row_OnMouseEnter(self, control)		
+	end
+end
+
+function BMU.AdminGetGuildIndexFromGuildId(guildId)
+	for i = 1, GetNumGuilds() do
+		if GetGuildId(i) == guildId then
+			return i
+		end
+	end
+	return 0
+end
+
+function BMU.AdminCopyTextToChat(message)
+	-- Max of input box is 351 chars
+	if string.len(message) < 351 then
+		if CHAT_SYSTEM.textEntry:GetText() == "" then
+			CHAT_SYSTEM.textEntry:Open(message)
+			ZO_ChatWindowTextEntryEditBox:SelectAll()
+		end
+	end
+end
+
+function BMU.AdminAutoWelcome(eventCode, guildId, displayName, result)
+	-- only for BMU guilds
+	if not BMU.AdminIsBMUGuild(guildId) then
+		return
+	end
+	
+	zo_callLater(function()
+		if result == 0 then
+			local guildIndex = BMU.AdminGetGuildIndexFromGuildId(guildId)
+			local totalGuildMembers = GetNumGuildMembers(guildId)
+			
+			-- find new guild member
+			for j = 0, totalGuildMembers do
+				local displayName_info, note, guildMemberRankIndex, status, secsSinceLogoff = GetGuildMemberInfo(guildId, j)
+				if displayName_info == displayName and status ~= PLAYER_STATUS_OFFLINE then
+					-- new guild member is online -> write welcome message to chat
+					StartChatInput("Welcome on the bridge " .. displayName, _G["CHAT_CHANNEL_GUILD_" .. guildIndex])
+				end
+			end
+		end
+	end, 1300)
+end
+
+function BMU.AdminIsAlreadyInGuild(displayName)
+	local text = ""
+	
+	if GetGuildMemberIndexFromDisplayName(BMU.var.BMUGuilds[GetWorldName()][1], displayName) then
+		text = text .. " 1 "
+	end
+	if GetGuildMemberIndexFromDisplayName(BMU.var.BMUGuilds[GetWorldName()][2], displayName) then
+		text = text .. " 2 "
+	end
+	if GetGuildMemberIndexFromDisplayName(BMU.var.BMUGuilds[GetWorldName()][3], displayName) then
+		text = text .. " 3 "
+	end
+	if GetGuildMemberIndexFromDisplayName(BMU.var.BMUGuilds[GetWorldName()][4], displayName) then
+		text = text .. " 4 "
+	end
+	
+	if text ~= "" then
+		-- already member
+		return true, BMU.colorizeText("Bereits Mitglied in " .. text, "red")
+	else
+		-- not a member or admin is not member of the BMU guilds
+		return false, BMU.colorizeText("Neues Mitglied", "green")
+	end
+end
+
+function BMU.AdminIsBMUGuild(guildId)
+	if BMU.has_value(BMU.var.BMUGuilds[GetWorldName()], guildId) then
+		return true
+	else
+		return false
+	end
+end
+
+function BMU.AdminInviteToGuilds(guildId, displayName)
+	-- add tuple to queue
+	table.insert(inviteQueue, {guildId, displayName})
+	if #inviteQueue == 1 then
+		BMU.AdminInviteToGuildsQueue()
+	end
+end
+
+function BMU.AdminInviteToGuildsQueue()
+	if #inviteQueue > 0 then
+		-- get first element and send invite
+		local first = inviteQueue[1]
+		GuildInvite(first[1], first[2])
+		PlaySound(SOUNDS.BOOK_OPEN)
+		-- restart to check for other elements
+		zo_callLater(function() table.remove(inviteQueue, 1) BMU.AdminInviteToGuildsQueue() end, 16000)
+	end		
+end
+
+function BMU.AdminAddAutoFillToDeclineApplicationDialog()
+	local font = string.format("%s|$(KB_%s)|%s", ZoFontGame:GetFontInfo(), 21, "soft-shadow-thin")
+	-- default message
+	local autoFill_1 = WINDOW_MANAGER:CreateControl(nil, ZO_ConfirmDeclineApplicationDialog_Keyboard, CT_LABEL)
+	autoFill_1:SetAnchor(TOPRIGHT, ZO_ConfirmDeclineApplicationDialog_Keyboard, TOPRIGHT, -5, 10)
+	autoFill_1:SetFont(font)
+	autoFill_1:SetText(BMU.colorizeText("BMU_AM", "gold"))
+	autoFill_1:SetMouseEnabled(true)
+	autoFill_1:SetHandler("OnMouseUp", function(self)
+		ZO_ConfirmDeclineApplicationDialog_KeyboardDeclineMessageEdit:SetText("You are already a member of one of our other BMU guilds. Sorry, but we only allow joining one guild. You are welcome to join and support our partner guilds (flag button in the upper left corner).")
+	end)
+	-- message when player is already in 5 guilds
+	local autoFill_2 = WINDOW_MANAGER:CreateControl(nil, ZO_ConfirmDeclineApplicationDialog_Keyboard, CT_LABEL)
+	autoFill_2:SetAnchor(TOPRIGHT, ZO_ConfirmDeclineApplicationDialog_Keyboard, TOPRIGHT, -5, 40)
+	autoFill_2:SetFont(font)
+	autoFill_2:SetText(BMU.colorizeText("BMU_5G", "gold"))
+	autoFill_2:SetMouseEnabled(true)
+	autoFill_2:SetHandler("OnMouseUp", function(self)
+		ZO_ConfirmDeclineApplicationDialog_KeyboardDeclineMessageEdit:SetText("We cannot accpect your application because you have already joined 5 other guilds (which is the maximum). If you want to join us, please submit a new application with free guild slot.")
+	end)
+end
+

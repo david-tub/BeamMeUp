@@ -8,16 +8,13 @@
 ## IsLibrary: false
 ## DependsOn: LibZone>=0895
 ## PCDependsOn: LibAddonMenu-2.0>=41 LibCustomMenu>=730
-## ConsoleDependsOn: LibHarvensAddonSettings>=2.0.7 LibGPS LibDebugLogger LibChatMessage LibMapPing
+## ConsoleDependsOn: LibHarvensAddonSettings>=207 LibGPS LibDebugLogger LibChatMessage LibMapPing
 ## OptionalDependsOn: LibSlashCommander LibSets LibMapPing LibChatMenuButton PortToFriendsHouse BanditsUserInterface MorrowindStyleUI
 
-
 ## Globals / data sets
-PC/GuildData.lua
-Console/GuildData.lua
+GuildData.lua
 TeleporterGlobals.lua
-PC/BaseGlobals.lua
-Console/BaseGlobals.lua
+
 
 ## Core
 core/SI.lua
@@ -38,15 +35,15 @@ Console/core/entryData.lua
 Console/core/categoryList.lua
 Console/core/telportList.lua
 Console/core/autoUnlock.lua
-
-## Bindings
-PC/bindings/bindings.lua
-PC/bindings/bindings.xml
+Console/Settings.lua
 
 core/List.lua
-PC/TeleAppUI.lua
-Console/TeleAppUI.lua
+core/TeleAppUI.lua
 core/TeleSlashCommands.lua
 core/TeleporterChecker.lua
+
+## Bindings
+bindings/bindings.lua
+bindings/bindings.xml
 
 BeamMeUp.lua

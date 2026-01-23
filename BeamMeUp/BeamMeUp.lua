@@ -1,5 +1,4 @@
 local SI = BMU.SI
-local BG = BMU.BG
 local teleporterVars = BMU.var
 local appName = teleporterVars.appName
 
@@ -232,33 +231,12 @@ function BMU.onWorldMapChanged(wasNavigateIn)
 	BMU.refreshListAuto(true)
 end
 
-function BMU.useBackToClose(show)
-  if show then
-    if BMU.var.closeConsoleBtn == nil then
-      BMU.var.closeConsoleBtn = {
-        alignment = KEYBIND_STRIP_ALIGN_LEFT,
-        {
-            name = SI.get(SI.TELE_KEYBINDING_CLOSE_MAIN),
-            keybind = "UI_SHORTCUT_SECONDARY",
-            callback = BMU.HideTeleporter,
-            visible = function()
-              return true
-            end
-          }
-        }
-    end
-    KEYBIND_STRIP:AddKeybindButtonGroup(BMU.var.closeConsoleBtn)
-  elseif BMU.var.closeConsoleBtn ~= nil then
-    KEYBIND_STRIP:RemoveKeybindButtonGroup(BMU.var.closeConsoleBtn)
-  end
-end
-
 
 function BMU.OpenTeleporter(refresh)
 	-- show notification (in case)
 	BMU.showNotification()
 	
-	if not BG.ZO_WorldMapZoneStoryTopLevel:IsHidden() then
+	if not ZO_WorldMapZoneStoryTopLevel_Keyboard:IsHidden() then
 		--hide ZoneGuide
 		BMU.toggleZoneGuide(false)
 		-- show swap button
@@ -316,9 +294,6 @@ function BMU.HideTeleporter()
 		-- show ZoneGuide
 		BMU.toggleZoneGuide(true)
 	end
-	if IsInGamepadPreferredMode() or IsConsoleUI() then
-	  BMU.useBackToClose(false)
-	end
 end
 
 
@@ -350,12 +325,12 @@ function BMU.toggleZoneGuide(show)
 		-- show ZoneGuide
 		--ZO_WorldMapZoneStoryTopLevel_Keyboard:SetHidden(false)
 		--ZO_SharedMediumLeftPanelBackground:SetHidden(false)
-		WORLD_MAP_SCENE:AddFragment(BG.ZoneStoryFragment)
+		WORLD_MAP_SCENE:AddFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
 	else
 		-- hide ZoneGuide
 		--ZO_WorldMapZoneStoryTopLevel_Keyboard:SetHidden(true)
 		--ZO_SharedMediumLeftPanelBackground:SetHidden(true)
-		WORLD_MAP_SCENE:RemoveFragment(BG.ZoneStoryFragment)
+		WORLD_MAP_SCENE:RemoveFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
 	end
 end
 
@@ -666,7 +641,6 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["chatOutputFastTravel"] = true,
 		["chatOutputAdditional"] = true,
 		["chatOutputUnlock"] = true,
-		["IJAVars"] = {},
     }
     
 	BMU.DefaultsServer = {
@@ -745,11 +719,8 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	BMU.savedVarsAcc = ZO_SavedVars:NewAccountWide("BeamMeUp_SV", 2, nil, BMU.DefaultsAccount, nil)
 	BMU.savedVarsServ = ZO_SavedVars:NewAccountWide("BeamMeUp_SV", 3, nil, BMU.DefaultsServer, GetWorldName())
 	BMU.savedVarsChar = ZO_SavedVars:NewCharacterIdSettings("BeamMeUp_SV", 3, nil, BMU.DefaultsCharacter, nil)
-
-	if BMU.IJA then
-      BMU.IJA.savedVars = BMU.savedVarsAcc.IJAVars
-	end
-
+	
+	
 	BMU.TeleporterSetupUI(addOnName)
 	
     EVENT_MANAGER:RegisterForEvent(appName, EVENT_PLAYER_ACTIVATED, PlayerInitAndReady)
@@ -759,7 +730,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 
 	CALLBACK_MANAGER:RegisterCallback("OnWorldMapChanged", BMU.onWorldMapChanged)
 
-	ZO_PreHookHandler(BG.ZO_WorldMapZoneStoryTopLevel, "OnShow", BMU.onZoneGuideShow)
+	ZO_PreHookHandler(ZO_WorldMapZoneStoryTopLevel_Keyboard, "OnShow", BMU.onZoneGuideShow)
 		
 	EVENT_MANAGER:RegisterForEvent(appName, EVENT_GAME_CAMERA_UI_MODE_CHANGED, BMU.cameraModeChanged)
 	
@@ -800,25 +771,23 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	
 	-- activate Link Handler for handling clicks on chat links
 	LINK_HANDLER:RegisterCallback(LINK_HANDLER.LINK_MOUSE_UP_EVENT, BMU.handleChatLinkClick)
-
+	
 	--Request BMU guilds and partner guilds information
 	--zo_callLater(function() BMU.requestGuildData() end, 5000)
 
-  if not IsConsoleUI() then
-    -- activate guild admin tools
-    local displayName = GetDisplayName()
-    if displayName == "@DeadSoon" or displayName == "@Gamer1986PAN" or displayName == "@Pandora959" or displayName == "@Sokarx" or displayName == "@Knifekill1984" or displayName == "@BeamMeUp-Addon" then
-      -- add context menu in guild roster and application roster
-      zo_callLater(function()
-        BMU.AdminAddContextMenuToGuildRoster()
-        BMU.AdminAddContextMenuToGuildApplicationRoster()
-        BMU.AdminAddTooltipInfoToGuildApplicationRoster()
-        BMU.AdminAddAutoFillToDeclineApplicationDialog()
-      end, 5000)
-      -- write welcome message to chat when you accept application (automatically welcome)
-      EVENT_MANAGER:RegisterForEvent(appName, EVENT_GUILD_FINDER_PROCESS_APPLICATION_RESPONSE, BMU.AdminAutoWelcome)
-    end
-  end
+	-- activate guild admin tools
+	local displayName = GetDisplayName()
+	if displayName == "@DeadSoon" or displayName == "@Gamer1986PAN" or displayName == "@Pandora959" or displayName == "@Sokarx" or displayName == "@Knifekill1984" or displayName == "@BeamMeUp-Addon" then
+		-- add context menu in guild roster and application roster
+		zo_callLater(function()
+			BMU.AdminAddContextMenuToGuildRoster()
+			BMU.AdminAddContextMenuToGuildApplicationRoster()
+			BMU.AdminAddTooltipInfoToGuildApplicationRoster()
+			BMU.AdminAddAutoFillToDeclineApplicationDialog()
+		end, 5000)
+		-- write welcome message to chat when you accept application (automatically welcome)
+		EVENT_MANAGER:RegisterForEvent(appName, EVENT_GUILD_FINDER_PROCESS_APPLICATION_RESPONSE, BMU.AdminAutoWelcome)
+	end
 end
 
 

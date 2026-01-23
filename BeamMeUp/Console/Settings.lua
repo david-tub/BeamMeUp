@@ -3,12 +3,7 @@ local BMU = BMU
 local LHAS = LibHarvensAddonSettings
 local SI = BMU.SI ---- used for localization
 local BMU_SI_get = SI.get
-local BMU_savedVarsChar = BMU.savedVarsChar
-local BMU_savedVarsAcc = BMU.savedVarsAcc
-local BMU_savedVarsServ = BMU.savedVarsServ
 local BMU_colorizeText = BMU.colorizeText
-local BMU_DefaultsAccount = BMU.DefaultsAccount
-local BMU_getIndexFromValue = BMU.getIndexFromValue
 
 local teleporterVars    = BMU.var
 local appName           = teleporterVars.appName
@@ -41,57 +36,18 @@ local dropdownSecLangItems = zipDropdownSortedKeys(BMU.dropdownSecLangChoices)
 
 function CS.SetupOptionsMenu(index) --index == Addon name
     local teleporterWin     = BMU.win
-
-    local panelData = {
-            type 				= 'panel',
-            name 				= index,
-            displayName 		= BMU_colorizeText(index, "gold"),
-            author 				= BMU_colorizeText(teleporterVars.author, "teal"),
-            version 			= BMU_colorizeText(teleporterVars.version, "teal"),
-            website             = teleporterVars.website,
-            feedback            = teleporterVars.feedback,
-            registerForRefresh  = true,
-            registerForDefaults = true,
-        }
+    local BMU_savedVarsChar = BMU.savedVarsChar
+    local BMU_savedVarsAcc = BMU.savedVarsAcc
+    local BMU_savedVarsServ = BMU.savedVarsServ
+    local BMU_DefaultsAccount = BMU.DefaultsAccount
+    local BMU_getIndexFromValue = BMU.getIndexFromValue
 
     local panel = LHAS:AddAddon(appName .. "Options", {
       allowDefaults = false,  -- Show "Reset to Defaults" button
       allowRefresh = false    -- Enable automatic control updates
     })
 
-	-- retreive most ported zones for statistic
-	local portCounterPerZoneSorted = {}
-	for index, value in pairs(BMU_savedVarsAcc.portCounterPerZone) do
-		table.insert(portCounterPerZoneSorted, {["zoneId"]=index, ["count"]=value})
-	end
-	-- sort by counts
-	table.sort(portCounterPerZoneSorted, function(a, b) return a["count"] > b["count"] end)
-	-- build text block
-	local mostPortedZonesText = ""
-	for i=1, 10 do
-		if portCounterPerZoneSorted[i] == nil then
-			mostPortedZonesText = mostPortedZonesText .. "\n"
-		else
-			mostPortedZonesText = mostPortedZonesText .. BMU.formatName(GetZoneNameById(portCounterPerZoneSorted[i]["zoneId"])) .. " (" .. portCounterPerZoneSorted[i]["count"] .. ")\n"
-		end
-	end
-
     local optionsData = {
-		 {
-              type = LHAS.ST_SLIDER,
-              label = BMU_SI_get(SI.TELE_SETTINGS_NUMBER_LINES),
-              tooltip = BMU_SI_get(SI.TELE_SETTINGS_NUMBER_LINES_TOOLTIP) .. " [DEFAULT: " .. BMU_DefaultsAccount["numberLines"] .. "]",
-              min = 6,
-              max = 16,
-              step = 1,
-              getFunction = function() return BMU_savedVarsAcc.numberLines end,
-              setFunction = function(value) BMU_savedVarsAcc.numberLines = value
-							teleporterWin.Main_Control:SetHeight(BMU.calculateListHeight())
-							-- add also current height of the counter panel
-							teleporterWin.Main_Control.bd:SetHeight(BMU.calculateListHeight() + 280*BMU_savedVarsAcc.Scale + select(2, BMU.counterPanel:GetTextDimensions()))
-				end,
-			  default = BMU_DefaultsAccount["numberLines"]
-         },
          {
               type = LHAS.ST_CHECKBOX,
               label = BMU_SI_get(SI.TELE_SETTINGS_SHOW_ON_MAP_OPEN),
@@ -158,17 +114,6 @@ function CS.SetupOptionsMenu(index) --index == Addon name
 			  default = BMU_DefaultsAccount["showOpenButtonOnMap"],
          },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = BMU_SI_get(SI.TELE_SETTINGS_SHOW_CHAT_BUTTON),
-              tooltip = BMU_SI_get(SI.TELE_SETTINGS_SHOW_CHAT_BUTTON_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU_DefaultsAccount["chatButton"]) .. "]",
-			        getFunction = function() return BMU_savedVarsAcc.chatButton end,
-              setFunction = function(value)
-                BMU_savedVarsAcc.chatButton = value
-                ReloadUI("ingame")
-              end,
-			  default = BMU_DefaultsAccount["chatButton"],
-         },
-		 {
               type = LHAS.ST_SLIDER,
               label = BMU_SI_get(SI.TELE_SETTINGS_SCALE),
 			  tooltip = BMU_SI_get(SI.TELE_SETTINGS_SCALE_TOOLTIP) .. " [DEFAULT: " .. BMU_DefaultsAccount["Scale"] .. "]",
@@ -215,22 +160,6 @@ function CS.SetupOptionsMenu(index) --index == Addon name
               getFunction = function() return BMU_savedVarsAcc.anchorMapOffset_y end,
               setFunction = function(value) BMU_savedVarsAcc.anchorMapOffset_y = value end,
 			  default = BMU_DefaultsAccount["anchorMapOffset_y"],
-         },
-		 {
-              type = LHAS.ST_BUTTON,
-              label = BMU_SI_get(SI.TELE_SETTINGS_RESET_UI),
-			  tooltip = BMU_SI_get(SI.TELE_SETTINGS_RESET_UI_TOOLTIP),
-			  clickHandler = function() BMU_savedVarsAcc.Scale = BMU_DefaultsAccount["Scale"]
-								BMU_savedVarsAcc.chatButtonHorizontalOffset = BMU_DefaultsAccount["chatButtonHorizontalOffset"]
-								BMU_savedVarsAcc.anchorMapOffset_x = BMU_DefaultsAccount["anchorMapOffset_x"]
-								BMU_savedVarsAcc.anchorMapOffset_y = BMU_DefaultsAccount["anchorMapOffset_y"]
-								BMU_savedVarsAcc.pos_MapScene_x = BMU_DefaultsAccount["pos_MapScene_x"]
-								BMU_savedVarsAcc.pos_MapScene_y = BMU_DefaultsAccount["pos_MapScene_y"]
-								BMU_savedVarsAcc.pos_x = BMU_DefaultsAccount["pos_x"]
-								BMU_savedVarsAcc.pos_y = BMU_DefaultsAccount["pos_y"]
-								BMU_savedVarsAcc.anchorOnMap = BMU_DefaultsAccount["anchorOnMap"]
-								ReloadUI()
-						end,
          },
 		 {
               type = LHAS.ST_CHECKBOX,
@@ -678,5 +607,41 @@ function CS.SetupOptionsMenu(index) --index == Addon name
     }
     BMU.SettingsPanel = panel:AddSettings(optionsData)
 end
+
+-- function CS.SetupUI()
+--   -- dummy controls
+--   local win = BMU.win
+--
+--   win.Main_Control = wm:CreateTopLevelWindow("Teleporter_Location_MainController")
+--   BMU.control_global = win.Main_Control
+--   BMU.control_global.bd = wm:CreateControl(nil, win.Main_Control, CT_TEXTURE)
+--   BMU.counterPanel = wm:CreateControl(nil, win.Main_Control, CT_LABEL)
+--   win.anchorTexture = wm:CreateControl(nil, win.Main_Control, CT_TEXTURE)
+--   win.closeTexture = wm:CreateControl(nil, win.Main_Control, CT_TEXTURE)
+--   win.fixWindowTexture = wm:CreateControl(nil, win.Main_Control, CT_TEXTURE)
+--   win.Main_Control.ItemTexture = wm:CreateControl(nil, win.Main_Control, CT_TEXTURE)
+-- 	win.Main_Control.OnlyYourzoneTexture = wm:CreateControl(nil, win.Main_Control, CT_TEXTURE)
+-- 	win.Main_Control.DelvesTexture = wm:CreateControl(nil, win.Main_Control, CT_TEXTURE)
+-- 	win.SearchTexture = wm:CreateControl(nil, win.Main_Control, CT_TEXTURE)
+-- 	win.Main_Control.QuestTexture = wm:CreateControl(nil, win.Main_Control, CT_TEXTURE)
+-- 	win.Main_Control.OwnHouseTexture = wm:CreateControl(nil, win.Main_Control, CT_TEXTURE)
+-- 	win.Main_Control.PTFTexture = wm:CreateControl(nil, win.Main_Control, CT_TEXTURE)
+-- 	win.Main_Control.DungeonTexture = wm:CreateControl(nil, win.Main_Control, CT_TEXTURE)
+-- 	win.Searcher_Player = wm:CreateControl(nil, win.Main_Control, CT_TEXTURE)
+--   win.Main_Control:SetHidden(true)
+--   BMU.counterPanel:SetHidden(true)
+--   win.anchorTexture:SetHidden(true)
+--   win.closeTexture:SetHidden(true)
+--   win.fixWindowTexture:SetHidden(true)
+--   win.Main_Control.ItemTexture:SetHidden(true)
+--   win.Main_Control.OnlyYourzoneTexture:SetHidden(true)
+--   win.Main_Control.DelvesTexture:SetHidden(true)
+--   win.SearchTexture:SetHidden(true)
+--   win.Main_Control.QuestTexture:SetHidden(true)
+--   win.Main_Control.OwnHouseTexture:SetHidden(true)
+--   win.Main_Control.PTFTexture:SetHidden(true)
+--   win.Searcher_Player:SetHidden(true)
+--   win.Main_Control.DungeonTexture:SetHidden(true)
+-- end
 
 BMU.CS = CS

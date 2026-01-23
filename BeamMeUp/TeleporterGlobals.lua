@@ -1855,5 +1855,5 @@ function BMU.GetCurrentMapDisplayFilter()
 end
 
 function BMU.IsNotKeyboard()
-  return not (IsInGamepadPreferredMode() or IsConsoleUI())
+  return IsInGamepadPreferredMode() or IsConsoleUI()
 end

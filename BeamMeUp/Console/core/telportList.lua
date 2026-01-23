@@ -60,6 +60,7 @@ function teleportList:Initialize(owner, control)
 	self.categoryList = owner.categoryList
 	self.container = control
 	self.owner = owner
+	self.owner.savedVars = self.owner.savedVars or {}
 
 	self.noItemsLabel:SetText(GetString(SI_TELE_UI_NO_MATCHES))
 
@@ -627,7 +628,7 @@ function teleportList:SetMapToTarget(selectedData)
 	
 	if self.currentaMapId == selectedData.mapId then
 		-- We don't need to wait for the map to change, so just do it now.
-		if self.owner.savedVars.panAndZoom then
+		if self.owner.savedVars and self.owner.savedVars.panAndZoom then
 			self:PanAndZoomToPin()
 		end
 		g_onWorldMapChanged_SetMapToTarget = false

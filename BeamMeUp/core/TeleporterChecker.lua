@@ -1,5 +1,4 @@
 local SI = BMU.SI
-local BG = BMU.BG
 local portalPlayers = {}
 local TeleportAllPlayersTable = {}
 local allZoneIds = {} -- stores the number of hits of a zoneId at index (allzoneIds[zoneId] = 1) | to know which zoneId is already added | to count the number of port options/alternatives
@@ -249,7 +248,12 @@ function BMU.createTable(args)
 	if not BMU.savedVarsAcc.hideOwnHouses and not noOwnHouses then
 		-- 4. go over own houses
 		-- player can port outside own houses -> check own houses and add parent zone entries if not already in list
-		local ownedHouses = ZO_COLLECTIBLE_DATA_MANAGER:GetAllCollectibleDataObjects({ ZO_CollectibleCategoryData.IsHousingCategory }, { ZO_CollectibleData.IsUnlocked })
+		local ownedHouses = {}
+		if BMU.IsNotKeyboard() then
+		  ownedHouses = ZO_COLLECTIBLE_DATA_MANAGER:GetAllCollectibleDataObjects({ ZO_CollectibleCategoryData.IsHousingCategory }, { ZO_CollectibleData.IsUnlocked })
+		else
+		  ownedHouses = COLLECTIONS_BOOK_SINGLETON:GetOwnedHouses()
+    end
 		for _, house in pairs(ownedHouses) do
 			local houseZoneId = GetHouseZoneId(house.houseId)
 			local mapIndex = BMU.getMapIndex(houseZoneId)
@@ -1884,8 +1888,12 @@ function BMU.createTableHouses()
 	-- change global state, to have the correct tab active
 	BMU.changeState(BMU.indexListOwnHouses)
 	local resultList = {}
-
-	local ownedHouses = ZO_COLLECTIBLE_DATA_MANAGER:GetAllCollectibleDataObjects({ ZO_CollectibleCategoryData.IsHousingCategory }, { ZO_CollectibleData.IsUnlocked })
+	local ownedHouses = {}
+	if BMU.IsNotKeyboard() then
+    ownedHouses = ZO_COLLECTIBLE_DATA_MANAGER:GetAllCollectibleDataObjects({ ZO_CollectibleCategoryData.IsHousingCategory }, { ZO_CollectibleData.IsUnlocked })
+  else
+    ownedHouses = COLLECTIONS_BOOK_SINGLETON:GetOwnedHouses()
+  end
 	for _, house in pairs(ownedHouses) do
 		local entry = BMU.createBlankRecord()
 		entry.houseId = house.houseId

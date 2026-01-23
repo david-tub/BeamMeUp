@@ -1,13 +1,16 @@
 local LAM2 = BMU.LAM
 local SI = BMU.SI ---- used for localization
-
-if BMU.IsNotKeyboard() then
-  local CS = BMU.CS
-end
+local CS = BMU.CS
 
 local teleporterVars    = BMU.var
 local appName           = teleporterVars.appName
 local wm                = WINDOW_MANAGER
+
+local WorldMapZoneStoryTopLevel = ZO_WorldMapZoneStoryTopLevel_Keyboard
+
+if BMU.IsNotKeyboard() then
+  WorldMapZoneStoryTopLevel = ZO_WorldMapZoneStoryTopLevel_Gamepad
+end
 
 -- list of tuples (guildId & displayname) for invite queue (only for admin)
 local inviteQueue = {}
@@ -1226,16 +1229,22 @@ end
 local function SetupUI()
 	-----------------------------------------------
 	-- Fonts
+	local FontGame = ZoFontGame
+	local FontBookTablet = ZoFontBookTablet
+	if BMU.IsNotKeyboard() then
+	  FontGame = ZoFontGamepad36
+	  FontBookTablet = ZoFontGamepadBookTablet
+	end
 	
 	-- default font
 	local fontSize = BMU.round(17*BMU.savedVarsAcc.Scale, 0)
-	local fontStyle = ZoFontGame:GetFontInfo()
+	local fontStyle = FontGame:GetFontInfo()
 	local fontWeight = "soft-shadow-thin"
 	BMU.font1 = string.format("%s|$(KB_%s)|%s", fontStyle, fontSize, fontWeight)
 	
 	-- font of statistics
 	fontSize = BMU.round(13*BMU.savedVarsAcc.Scale, 0)
-	fontStyle = ZoFontBookTablet:GetFontInfo()
+	fontStyle = FontBookTablet:GetFontInfo()
 	--fontStyle = "EsoUI/Common/Fonts/consola.ttf"
 	fontWeight = "soft-shadow-thin"
 	BMU.font2 = string.format("%s|$(KB_%s)|%s", fontStyle, fontSize, fontWeight)
@@ -1328,9 +1337,9 @@ local function SetupUI()
     -------------------------------------------------------------------
   -- Switch BUTTON ON ZoneGuide window
 
-  teleporterWin.zoneGuideSwapTexture = wm:CreateControl(nil, ZO_WorldMapZoneStoryTopLevel_Keyboard, CT_TEXTURE)
+  teleporterWin.zoneGuideSwapTexture = wm:CreateControl(nil, WorldMapZoneStoryTopLevel, CT_TEXTURE)
   teleporterWin.zoneGuideSwapTexture:SetDimensions(50*BMU.savedVarsAcc.Scale, 50*BMU.savedVarsAcc.Scale)
-  teleporterWin.zoneGuideSwapTexture:SetAnchor(TOPRIGHT, ZO_WorldMapZoneStoryTopLevel_Keyboard, TOPRIGHT, TOPRIGHT -10*BMU.savedVarsAcc.Scale, -35*BMU.savedVarsAcc.Scale)
+  teleporterWin.zoneGuideSwapTexture:SetAnchor(TOPRIGHT, WorldMapZoneStoryTopLevel, TOPRIGHT, TOPRIGHT -10*BMU.savedVarsAcc.Scale, -35*BMU.savedVarsAcc.Scale)
   teleporterWin.zoneGuideSwapTexture:SetTexture(BMU.textures.swapBtn)
   teleporterWin.zoneGuideSwapTexture:SetMouseEnabled(true)
   
@@ -2432,7 +2441,7 @@ end
 
 function BMU.updatePosition()
     local teleporterWin     = BMU.win
-	if SCENE_MANAGER:IsShowing(BG.worldMap) then
+	if SCENE_MANAGER:IsShowing("worldMap") then
 	
 		-- show anchor button
 		teleporterWin.anchorTexture:SetHidden(false)
@@ -2741,7 +2750,7 @@ function BMU.handleChatLinkClick(rawLink, mouseButton, linkText, linkStyle, link
 			WORLD_MAP_MANAGER:SetMapByIndex(1)
 			WORLD_MAP_MANAGER:SetMapByIndex(mapIndex)
 			-- start ping
-			if not SCENE_MANAGER:IsShowing(BG.worldMap) then SCENE_MANAGER:Show(BG.worldMap) end
+			if not SCENE_MANAGER:IsShowing("worldMap") then SCENE_MANAGER:Show("worldMap") end
 			PingMap(MAP_PIN_TYPE_RALLY_POINT, MAP_TYPE_LOCATION_CENTERED, coorX, coorY)
 		end
 		

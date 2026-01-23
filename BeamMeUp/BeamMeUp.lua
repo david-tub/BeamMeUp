@@ -1,6 +1,17 @@
 local SI = BMU.SI
 local teleporterVars = BMU.var
 local appName = teleporterVars.appName
+local worldMap = "worldMap"
+
+if BMU.IsNotKeyboard() then
+  worldMap = "gamepad_worldMap"
+end
+
+local WorldMapZoneStoryTopLevel = ZO_WorldMapZoneStoryTopLevel_Keyboard
+
+if BMU.IsNotKeyboard() then
+  WorldMapZoneStoryTopLevel = ZO_WorldMapZoneStoryTopLevel_Gamepad
+end
 
 --Old code from TeleUnicorn -> Moved directly to Teleporter to strip the library
 BMU.throttled = {}
@@ -233,10 +244,11 @@ end
 
 
 function BMU.OpenTeleporter(refresh)
+  if BMU.IsNotKeyboard() then return end
 	-- show notification (in case)
 	BMU.showNotification()
 	
-	if not ZO_WorldMapZoneStoryTopLevel_Keyboard:IsHidden() then
+	if not WorldMapZoneStoryTopLevel:IsHidden() then
 		--hide ZoneGuide
 		BMU.toggleZoneGuide(false)
 		-- show swap button
@@ -281,11 +293,12 @@ end
 
 
 function BMU.HideTeleporter()
+  if BMU.IsNotKeyboard() then return end
     BMU.win.Main_Control:SetHidden(true) -- hide main window
 	ClearMenu() -- close all submenus
 	ZO_Tooltips_HideTextTooltip() -- close all tooltips
 	
-	if SCENE_MANAGER:IsShowing("worldMap") then
+	if SCENE_MANAGER:IsShowing(worldMap) then
 		-- show button only when main window is hidden and world map is open
 		if BMU.win.MapOpen then
 			BMU.win.MapOpen:SetHidden(false)
@@ -323,12 +336,12 @@ end
 function BMU.toggleZoneGuide(show)
 	if show then
 		-- show ZoneGuide
-		--ZO_WorldMapZoneStoryTopLevel_Keyboard:SetHidden(false)
+		--WorldMapZoneStoryTopLevel:SetHidden(false)
 		--ZO_SharedMediumLeftPanelBackground:SetHidden(false)
 		WORLD_MAP_SCENE:AddFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
 	else
 		-- hide ZoneGuide
-		--ZO_WorldMapZoneStoryTopLevel_Keyboard:SetHidden(true)
+		--WorldMapZoneStoryTopLevel:SetHidden(true)
 		--ZO_SharedMediumLeftPanelBackground:SetHidden(true)
 		WORLD_MAP_SCENE:RemoveFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
 	end
@@ -582,6 +595,8 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	teleporterVars.version = tostring(GetAddonVersionFromManifest())
 
     teleporterVars.isAddonLoaded = true
+    local anchorOnMap = not BMU.IsNotKeyboard()
+    local chatButton = not BMU.IsNotKeyboard()
 
     BMU.DefaultsAccount = {
 		["pos_MapScene_x"] = -15,
@@ -590,7 +605,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["pos_y"] = 63,
 		["anchorMapOffset_x"] = 0,
 		["anchorMapOffset_y"] = 0,
-		["anchorOnMap"] = true,
+		["anchorOnMap"] = anchorOnMap,
         ["ShowOnMapOpen"] = true,
 		["HideOnMapClose"] = true,
         ["AutoPortFreq"]  = 300,
@@ -614,7 +629,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["closeOnPorting"] = true,
 		["showNumberPlayers"] = true,
 		["totalPortCounter"] = 0,
-		["chatButton"] = true,
+		["chatButton"] = chatButton,
 		["chatButtonHorizontalOffset"] = 0,
 		["portCounterPerZone"] = {},
 		["searchCharacterNames"] = false,
@@ -730,7 +745,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 
 	CALLBACK_MANAGER:RegisterCallback("OnWorldMapChanged", BMU.onWorldMapChanged)
 
-	ZO_PreHookHandler(ZO_WorldMapZoneStoryTopLevel_Keyboard, "OnShow", BMU.onZoneGuideShow)
+	ZO_PreHookHandler(WorldMapZoneStoryTopLevel, "OnShow", BMU.onZoneGuideShow)
 		
 	EVENT_MANAGER:RegisterForEvent(appName, EVENT_GAME_CAMERA_UI_MODE_CHANGED, BMU.cameraModeChanged)
 	

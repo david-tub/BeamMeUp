@@ -192,6 +192,7 @@ mkstr(SI.TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP, "Technical messages for troubleshoo
 -- KEY BINDING
 -----------------------------------------------------------------------------
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN, "Open BeamMeUp")
+mkstr(SI.TELE_KEYBINDING_CLOSE_MAIN, "Close BeamMeUp")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_RELATED_ITEMS, "Treasure & survey maps & leads")
 mkstr(SI.TELE_KEYBINDING_REFRESH, "Refresh result list")
 mkstr(SI.TELE_KEYBINDING_WAYSHRINE_UNLOCK, "Unlock current zone wayshrines")

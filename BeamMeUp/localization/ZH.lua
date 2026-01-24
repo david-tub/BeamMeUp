@@ -192,6 +192,7 @@ mkstr(SI.TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP, "Technical messages for troubleshoo
 -- KEY BINDING
 -----------------------------------------------------------------------------
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN, "打开BeamMeUp")
+mkstr(SI.TELE_KEYBINDING_CLOSE_MAIN, "倒闭BeamMeUp")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_RELATED_ITEMS, "藏宝图&调查报告&线索")
 mkstr(SI.TELE_KEYBINDING_REFRESH, "刷新结果列表")
 mkstr(SI.TELE_KEYBINDING_WAYSHRINE_UNLOCK, "解锁当前区域的指路祭坛")

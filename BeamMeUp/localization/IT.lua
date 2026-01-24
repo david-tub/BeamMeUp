@@ -192,6 +192,7 @@ mkstr(SI.TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP, "Technical messages for troubleshoo
 -- KEY BINDING
 -----------------------------------------------------------------------------
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN, "Apri BeamMeUp")
+mkstr(SI.TELE_KEYBINDING_CLOSE_MAIN, "Chiudere BeamMeUp")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_RELATED_ITEMS, "Mappe del Tesoro & Mappe di Ricerca & Indizi")
 mkstr(SI.TELE_KEYBINDING_REFRESH, "Aggiorna Lista Risultati")
 mkstr(SI.TELE_KEYBINDING_WAYSHRINE_UNLOCK, "Sblocca i santuari nella zona attuale")

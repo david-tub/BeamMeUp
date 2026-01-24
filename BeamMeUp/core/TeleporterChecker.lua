@@ -248,7 +248,13 @@ function BMU.createTable(args)
 	if not BMU.savedVarsAcc.hideOwnHouses and not noOwnHouses then
 		-- 4. go over own houses
 		-- player can port outside own houses -> check own houses and add parent zone entries if not already in list
-		for _, house in pairs(COLLECTIONS_BOOK_SINGLETON:GetOwnedHouses()) do
+		local ownedHouses = {}
+		if BMU.IsNotKeyboard() then
+		  ownedHouses = ZO_COLLECTIBLE_DATA_MANAGER:GetAllCollectibleDataObjects({ ZO_CollectibleCategoryData.IsHousingCategory }, { ZO_CollectibleData.IsUnlocked })
+		else
+		  ownedHouses = COLLECTIONS_BOOK_SINGLETON:GetOwnedHouses()
+    end
+		for _, house in pairs(ownedHouses) do
 			local houseZoneId = GetHouseZoneId(house.houseId)
 			local mapIndex = BMU.getMapIndex(houseZoneId)
 			local parentZoneId = BMU.getParentZoneId(houseZoneId)
@@ -1882,11 +1888,22 @@ function BMU.createTableHouses()
 	-- change global state, to have the correct tab active
 	BMU.changeState(BMU.indexListOwnHouses)
 	local resultList = {}
-	
-	for _, house in pairs(COLLECTIONS_BOOK_SINGLETON:GetOwnedHouses()) do
+	local ownedHouses = {}
+	local houseId = nil
+	if BMU.IsNotKeyboard() then
+    ownedHouses = ZO_COLLECTIBLE_DATA_MANAGER:GetAllCollectibleDataObjects({ ZO_CollectibleCategoryData.IsHousingCategory }, { ZO_CollectibleData.IsUnlocked })
+  else
+    ownedHouses = COLLECTIONS_BOOK_SINGLETON:GetOwnedHouses()
+  end
+	for _, house in pairs(ownedHouses) do
 		local entry = BMU.createBlankRecord()
-		entry.houseId = house.houseId
-		if IsPrimaryHouse(house.houseId) then
+		if BMU.IsNotKeyboard() then
+		  houseId = house:GetReferenceId()
+    else
+      houseId = house.houseId
+		end
+		entry.houseId = houseId
+		if IsPrimaryHouse(houseId) then
 			entry.prio = 1
 			entry.textColorZoneName = "gold"
 		else
@@ -1894,7 +1911,7 @@ function BMU.createTableHouses()
 			entry.textColorZoneName = "white"
 		end
 		entry.isOwnHouse = true
-		entry.zoneId = GetHouseZoneId(house.houseId)
+		entry.zoneId = GetHouseZoneId(houseId)
 		entry.zoneNameUnformatted = GetZoneNameById(entry.zoneId)
 		entry.textColorDisplayName = "gray"
 		entry.zoneNameClickable = true

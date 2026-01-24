@@ -1853,3 +1853,7 @@ function BMU.GetCurrentMapDisplayFilter()
 		BMU.savedVarsChar.displayMaps.clothier, BMU.savedVarsChar.displayMaps.jewelry,
 		BMU.savedVarsChar.displayMaps.treasure
 end
+
+function BMU.IsNotKeyboard()
+  return IsInGamepadPreferredMode() or IsConsoleUI()
+end

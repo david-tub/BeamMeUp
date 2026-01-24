@@ -192,6 +192,7 @@ mkstr(SI.TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP, "Technical messages for troubleshoo
 -- KEY BINDING
 -----------------------------------------------------------------------------
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN, "Abrir BeamMeUp")
+mkstr(SI.TELE_KEYBINDING_CLOSE_MAIN, "Cerrar BeamMeUp")
 mkstr(SI.TELE_KEYBINDING_TOGGLE_MAIN_RELATED_ITEMS, "Mapas de Tesoros & Prospecciones & Pistas")
 mkstr(SI.TELE_KEYBINDING_REFRESH, "Actualizar resultado de lista")
 mkstr(SI.TELE_KEYBINDING_WAYSHRINE_UNLOCK, "Desbloquear ermitas de la zona actual")

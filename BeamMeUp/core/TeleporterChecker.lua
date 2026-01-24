@@ -1889,6 +1889,7 @@ function BMU.createTableHouses()
 	BMU.changeState(BMU.indexListOwnHouses)
 	local resultList = {}
 	local ownedHouses = {}
+	local houseId = nil
 	if BMU.IsNotKeyboard() then
     ownedHouses = ZO_COLLECTIBLE_DATA_MANAGER:GetAllCollectibleDataObjects({ ZO_CollectibleCategoryData.IsHousingCategory }, { ZO_CollectibleData.IsUnlocked })
   else
@@ -1896,8 +1897,13 @@ function BMU.createTableHouses()
   end
 	for _, house in pairs(ownedHouses) do
 		local entry = BMU.createBlankRecord()
-		entry.houseId = house.houseId
-		if IsPrimaryHouse(house.houseId) then
+		if BMU.IsNotKeyboard() then
+		  houseId = house:GetReferenceId()
+    else
+      houseId = house.houseId
+		end
+		entry.houseId = houseId
+		if IsPrimaryHouse(houseId) then
 			entry.prio = 1
 			entry.textColorZoneName = "gold"
 		else
@@ -1905,7 +1911,7 @@ function BMU.createTableHouses()
 			entry.textColorZoneName = "white"
 		end
 		entry.isOwnHouse = true
-		entry.zoneId = GetHouseZoneId(house.houseId)
+		entry.zoneId = GetHouseZoneId(houseId)
 		entry.zoneNameUnformatted = GetZoneNameById(entry.zoneId)
 		entry.textColorDisplayName = "gray"
 		entry.zoneNameClickable = true

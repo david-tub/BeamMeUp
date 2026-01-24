@@ -103,17 +103,6 @@ function CS.SetupOptionsMenu(index) --index == Addon name
               label = ""
          },
 		 {
-              type = LHAS.ST_CHECKBOX,
-              label = BMU_SI_get(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP),
-              tooltip = BMU_SI_get(SI.TELE_SETTINGS_SHOW_BUTTON_ON_MAP_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU_DefaultsAccount["showOpenButtonOnMap"]) .. "]",
-			        getFunction = function() return BMU_savedVarsAcc.showOpenButtonOnMap end,
-              setFunction = function(value)
-                BMU_savedVarsAcc.showOpenButtonOnMap = value
-                ReloadUI("ingame")
-              end,
-			  default = BMU_DefaultsAccount["showOpenButtonOnMap"],
-         },
-		 {
               type = LHAS.ST_SLIDER,
               label = BMU_SI_get(SI.TELE_SETTINGS_SCALE),
 			  tooltip = BMU_SI_get(SI.TELE_SETTINGS_SCALE_TOOLTIP) .. " [DEFAULT: " .. BMU_DefaultsAccount["Scale"] .. "]",

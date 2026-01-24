@@ -1342,11 +1342,11 @@ local function SetupUI()
   teleporterWin.zoneGuideSwapTexture:SetAnchor(TOPRIGHT, WorldMapZoneStoryTopLevel, TOPRIGHT, TOPRIGHT -10*BMU.savedVarsAcc.Scale, -35*BMU.savedVarsAcc.Scale)
   teleporterWin.zoneGuideSwapTexture:SetTexture(BMU.textures.swapBtn)
   teleporterWin.zoneGuideSwapTexture:SetMouseEnabled(true)
-  
+
   teleporterWin.zoneGuideSwapTexture:SetHandler("OnMouseUp", function()
 	  BMU.OpenTeleporter(true)
 	end)
-	  
+
   teleporterWin.zoneGuideSwapTexture:SetHandler("OnMouseEnter", function(self)
       teleporterWin.zoneGuideSwapTexture:SetTexture(BMU.textures.swapBtnOver)
       BMU:tooltipTextEnter(teleporterWin.zoneGuideSwapTexture,
@@ -1357,6 +1357,10 @@ local function SetupUI()
       teleporterWin.zoneGuideSwapTexture:SetTexture(BMU.textures.swapBtn)
       BMU:tooltipTextEnter(teleporterWin.zoneGuideSwapTexture)
   end)
+
+  if BMU.IsNotKeyboard() then
+    teleporterWin.zoneGuideSwapTexture:SetHidden(true)
+  end
 
   ---------------------------------------------------------------------------------------------------------------
     -------------------------------------------------------------------
@@ -2441,13 +2445,17 @@ end
 
 function BMU.updatePosition()
     local teleporterWin     = BMU.win
-	if SCENE_MANAGER:IsShowing("worldMap") then
-	
-		-- show anchor button
-		teleporterWin.anchorTexture:SetHidden(false)
+  local worldMap = "worldMap"
+  if BMU.IsNotKeyboard() then
+    worldMap = "gamepad_worldMap"
+  end
+	if SCENE_MANAGER:IsShowing(worldMap) then
+
+    -- show anchor button
+    teleporterWin.anchorTexture:SetHidden(false)
 		-- show swap button
-		BMU.closeBtnSwitchTexture(true)
-		
+    BMU.closeBtnSwitchTexture(true)
+
 		if BMU.savedVarsAcc.anchorOnMap then
 			-- anchor to map
 			BMU.control_global.bd:ClearAnchors()

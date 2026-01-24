@@ -188,7 +188,7 @@ end
 
 function BMU.onMapShow()
 	-- no support for gamepad mode + stay hidden when using the "HarvestFarmTour Editor"
-	if BMU.win.Main_Control:IsHidden() and not IsInGamepadPreferredMode() and not SCENE_MANAGER:IsShowing("HarvestFarmScene") then
+	if BMU.win.Main_Control:IsHidden() and not BMU.IsNotKeyboard() and not SCENE_MANAGER:IsShowing("HarvestFarmScene") then
 		if BMU.savedVarsAcc.ShowOnMapOpen then
 			-- just open Teleporter
 			BMU.OpenTeleporter(true)
@@ -593,6 +593,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
     teleporterVars.isAddonLoaded = true
     local anchorOnMap = not BMU.IsNotKeyboard()
     local chatButton = not BMU.IsNotKeyboard()
+    local showOpenButtonOnMap = not BMU.IsNotKeyboard()
 
     BMU.DefaultsAccount = {
 		["pos_MapScene_x"] = -15,
@@ -636,7 +637,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["surveyMapsNotification"] = false,
 		["infoFavoritePlayerStatusNotification"] = false, -- false = not yet read
 		["infoSurveyMapsNotification"] = false, -- false = not yet read
-		["showOpenButtonOnMap"] = true,
+		["showOpenButtonOnMap"] = showOpenButtonOnMap,
 		["surveyMapsNotificationSound"] = true,
 		["wayshrineTravelAutoConfirm"] = false,
 		["currentZoneAlwaysTop"] = false,

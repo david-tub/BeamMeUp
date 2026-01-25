@@ -16,7 +16,7 @@ local SharedInv = SHARED_INVENTORY
 local worldMapScene_Keyboard				= WORLD_MAP_SCENE
 local worldMapScene_Gamepad					= GAMEPAD_WORLD_MAP_SCENE
 local worldMapZoneStoryTLC_Keyboard			= ZO_WorldMapZoneStoryTopLevel_Keyboard
-local ClearMenu 							= ClearMenu
+local ClearCustomScrollableMenu 							= ClearCustomScrollableMenu
 --Other addon variables
 local BMU_LibZone = BMU.LibZone
 --BMU variables
@@ -387,7 +387,7 @@ function BMU.HideTeleporter()
 	BMU_win_Main_Control = BMU_win_Main_Control or BMU_win.Main_Control
 
     BMU_win_Main_Control:SetHidden(true) -- hide main window
-	ClearMenu() -- close all submenus
+	ClearCustomScrollableMenu() -- close all submenus
 	ZO_Tooltips_HideTextTooltip() -- close all tooltips
 	
 	if SCENE_MANAGER:IsShowing("worldMap") then

@@ -44,6 +44,8 @@ local string_lower = string.lower
 local string_upper = string.upper
 local string_gsub = string.gsub
 local string_find = string.find
+--local string_format = string.format --For future feature INS BAERTRAM20260124
+--local houseWithNicknameStrPattern = "%q (%s)" --For future feature INS BAERTRAM20260124
 local zo_strformat = zo_strformat
 local zo_plainstrfind = zo_plainstrfind
 local table = table
@@ -2129,6 +2131,8 @@ function BMU.createTableHouses()
 		if BMU.savedVarsChar.houseNickNames then
 			-- show nick name instead of real house name
 			houseEntry.zoneName = houseEntry.nickName
+			--Future feature? Show nickname (houseName)
+			--houseEntry.zoneName = string_format(houseWithNicknameStrPattern, houseEntry.nickName, houseEntry.zoneName)  --For future feature INS BAERTRAM20260124
 		end
 
 		table_insert(resultList, houseEntry)

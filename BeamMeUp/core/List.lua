@@ -55,8 +55,8 @@ local select = select
 local RequestJumpToHouse = RequestJumpToHouse
 local CancelCast = CancelCast
 local FastTravelToNode = FastTravelToNode
-local ShowMenu = ShowMenu
-local ClearMenu = ClearMenu
+local ShowCustomScrollableMenu = ShowCustomScrollableMenu
+local ClearCustomScrollableMenu = ClearCustomScrollableMenu
 local IsPlayerInGroup = IsPlayerInGroup
 local GetGroupSize = GetGroupSize
 local GetGroupUnitTagByIndex = GetGroupUnitTagByIndex
@@ -1833,10 +1833,10 @@ function BMU.clickOnTeleportToOwnHouseButton(textureControl, button, message)
 		BMU_clickOnTeleportToOwnHouseButton_2(button, message, true)
 	else
 		-- show submenu
-		ClearMenu()
-		AddCustomMenuItem(GetString(SI_HOUSING_BOOK_ACTION_TRAVEL_TO_HOUSE_INSIDE), function() BMU_clickOnTeleportToOwnHouseButton_2(button, message, false) end)
-		AddCustomMenuItem(GetString(SI_HOUSING_BOOK_ACTION_TRAVEL_TO_HOUSE_OUTSIDE), function() BMU_clickOnTeleportToOwnHouseButton_2(button, message, true) end)
-		ShowMenu()
+		ClearCustomScrollableMenu()
+		AddCustomScrollableMenuEntry(GetString(SI_HOUSING_BOOK_ACTION_TRAVEL_TO_HOUSE_INSIDE), function() BMU_clickOnTeleportToOwnHouseButton_2(button, message, false) end)
+		AddCustomScrollableMenuEntry(GetString(SI_HOUSING_BOOK_ACTION_TRAVEL_TO_HOUSE_OUTSIDE), function() BMU_clickOnTeleportToOwnHouseButton_2(button, message, true) end)
+		ShowCustomScrollableMenu()
 	end
 end
 BMU_clickOnTeleportToOwnHouseButton = BMU.clickOnTeleportToOwnHouseButton
@@ -1917,10 +1917,10 @@ function BMU.clickOnTeleportToDungeonButton(textureControl, button, message)
 	
 	if button == MOUSE_BUTTON_INDEX_RIGHT and CanPlayerChangeGroupDifficulty() then
 		-- show context menu
-		ClearMenu()
-		AddCustomMenuItem(BMU_textures.dungeonDifficultyNormal .. GetString(SI_DUNGEONDIFFICULTY1), function() BMU.setDungeonDifficulty(false) zo_callLater(function() BMU.clickOnTeleportToDungeonButton_2(message) end, 200) end)
-		AddCustomMenuItem(BMU_textures.dungeonDifficultyVeteran .. GetString(SI_DUNGEONDIFFICULTY2), function() BMU.setDungeonDifficulty(true) zo_callLater(function() BMU.clickOnTeleportToDungeonButton_2(message) end, 200) end)
-		ShowMenu()
+		ClearCustomScrollableMenu()
+		AddCustomScrollableMenuEntry(BMU_textures.dungeonDifficultyNormal .. GetString(SI_DUNGEONDIFFICULTY1), function() BMU.setDungeonDifficulty(false) zo_callLater(function() BMU.clickOnTeleportToDungeonButton_2(message) end, 200) end)
+		AddCustomScrollableMenuEntry(BMU_textures.dungeonDifficultyVeteran .. GetString(SI_DUNGEONDIFFICULTY2), function() BMU.setDungeonDifficulty(true) zo_callLater(function() BMU.clickOnTeleportToDungeonButton_2(message) end, 200) end)
+		ShowCustomScrollableMenu()
 	else
 		-- just start teleport
 		BMU.clickOnTeleportToDungeonButton_2(message)
@@ -2142,17 +2142,17 @@ function BMU.clickOnZoneName(button, record)
 		end
 		
 		-- start generating context menus
-		ClearMenu()
+		ClearCustomScrollableMenu()
 		
 		if inOwnHouseTab then
 
 			-- 1. custom sorting (not for primary residence which is always on top)
 			if record.prio ~= 1 then
 				-- divider
-				AddCustomMenuItem("-", function() end)
+				AddCustomScrollableMenuDivider()
 				
 				-- button to increase sorting ("move up")
-				AddCustomMenuItem(BMU_textures.arrowUp, function()
+				AddCustomScrollableMenuEntry(BMU_textures.arrowUp, function()
 					
 					if not BMU_savedVarsServ.houseCustomSorting[record.houseId] then
 						if next(BMU_savedVarsServ.houseCustomSorting) == nil then
@@ -2178,7 +2178,7 @@ function BMU.clickOnZoneName(button, record)
 				-- button to decrease sorting ("move down")
 				-- show only if the entry is already in order
 				if BMU_savedVarsServ.houseCustomSorting[record.houseId] then
-					AddCustomMenuItem(BMU_textures.arrowDown, function()
+					AddCustomScrollableMenuEntry(BMU_textures.arrowDown, function()
 
 						local currentValue = BMU_savedVarsServ.houseCustomSorting[record.houseId]
 						local houseIdOfSuc = BMU_has_value(BMU_savedVarsServ.houseCustomSorting, currentValue - 1)
@@ -2191,7 +2191,7 @@ function BMU.clickOnZoneName(button, record)
 
 					end)
 				end
-				AddCustomMenuItem("-", function() end)
+				AddCustomScrollableMenuDivider()
 			end
 			
 			-- 2. manage preferred houses
@@ -2199,18 +2199,18 @@ function BMU.clickOnZoneName(button, record)
 			if preferredHouseId and preferredHouseId == record.houseId then
 				-- current house is set as preferred
 				-- clear zone to unset the house
-				AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_UNSET_PREFERRED_HOUSE), function() BMU_clearZoneSpecificHouse(record.parentZoneId) end)
+				AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_UNSET_PREFERRED_HOUSE), function() BMU_clearZoneSpecificHouse(record.parentZoneId) end)
 			else
 				-- current house is not preferred
 				-- set house as preferred
-				AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_SET_PREFERRED_HOUSE), function() BMU_setZoneSpecificHouse(record.parentZoneId, record.houseId) end)
+				AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_SET_PREFERRED_HOUSE), function() BMU_setZoneSpecificHouse(record.parentZoneId, record.houseId) end)
 			end
 			
 			-- 3. make primary residence
 			if record.prio ~= 1 then
 				-- prio = 1 -> is primary house
 				-- make primary and refresh with delay
-				AddCustomMenuItem(GetString(SI_HOUSING_FURNITURE_SETTINGS_GENERAL_PRIMARY_RESIDENCE_BUTTON_TEXT), function()
+				AddCustomScrollableMenuEntry(GetString(SI_HOUSING_FURNITURE_SETTINGS_GENERAL_PRIMARY_RESIDENCE_BUTTON_TEXT), function()
 					SetHousingPrimaryHouse(record.houseId)
 					zo_callLater(function()
 						BMU_createTableHouses()
@@ -2219,17 +2219,17 @@ function BMU.clickOnZoneName(button, record)
 			end
 
 			-- 4. rename own houses
-			AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_RENAME_HOUSE_NICKNAME), function() ZO_CollectionsBook.ShowRenameDialog(record.collectibleId) end)
+			AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_RENAME_HOUSE_NICKNAME), function() ZO_CollectionsBook.ShowRenameDialog(record.collectibleId) end)
 
 			-- 5. paste link to chat
-			AddCustomMenuItem(GetString(SI_HOUSING_LINK_IN_CHAT), function() ZO_HousingBook_LinkHouseInChat(record.houseId, GetDisplayName()) end)
+			AddCustomScrollableMenuEntry(GetString(SI_HOUSING_LINK_IN_CHAT), function() ZO_HousingBook_LinkHouseInChat(record.houseId, GetDisplayName()) end)
 		end
 		
 		-- show quest marker
 		if inQuestTab then
 			for k, v in pairs(record.relatedQuests) do
 				-- Show quest marker on map if record contains quest
-				AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_SHOW_QUEST_MARKER_ON_MAP) .. ": \"" .. record.relatedQuests[k] .. "\"", function() ZO_WorldMap_ShowQuestOnMap(record.relatedQuestsSlotIndex[k]) end)
+				AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_SHOW_QUEST_MARKER_ON_MAP) .. ": \"" .. record.relatedQuests[k] .. "\"", function() ZO_WorldMap_ShowQuestOnMap(record.relatedQuestsSlotIndex[k]) end)
 			end
 		end
 		
@@ -2239,7 +2239,7 @@ function BMU.clickOnZoneName(button, record)
 			for index, item in pairs(record.relatedItems) do
 				if item.bagId == BAG_BACKPACK and IsProtectedFunction("UseItem") then -- item is in inventory and can be used
 					-- use item
-					AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_VIEW_MAP_ITEM) .. ": '" .. item.itemName .. "'", function()
+					AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_VIEW_MAP_ITEM) .. ": '" .. item.itemName .. "'", function()
 						-- hide world map if open
 						SM:Hide("worldMap")
 						-- hide UI if open
@@ -2250,7 +2250,7 @@ function BMU.clickOnZoneName(button, record)
 						end, 250)
 					end)
 				elseif item.antiquityId then -- lead -> show lead in codex
-					AddCustomMenuItem(GetString(SI_ANTIQUITY_VIEW_IN_CODEX) .. ": \"" .. item.itemName .. "\"", function()
+					AddCustomScrollableMenuEntry(GetString(SI_ANTIQUITY_VIEW_IN_CODEX) .. ": \"" .. item.itemName .. "\"", function()
 						ANTIQUITY_LORE_KEYBOARD:ShowAntiquity(item.antiquityId)
 					end)
 				end
@@ -2263,7 +2263,7 @@ function BMU.clickOnZoneName(button, record)
 
 			if BMU_isFavoriteZone(record.zoneId) then
 				-- remove zone favorite
-				AddCustomMenuItem(GetString(SI_COLLECTIBLE_ACTION_REMOVE_FAVORITE), function() BMU_removeFavoriteZone(record.zoneId) end)
+				AddCustomScrollableMenuEntry(GetString(SI_COLLECTIBLE_ACTION_REMOVE_FAVORITE), function() BMU_removeFavoriteZone(record.zoneId) end)
 			end
 			-- favorite list
 			local entries_favorites = {}
@@ -2280,14 +2280,14 @@ function BMU.clickOnZoneName(button, record)
 				table_insert(entries_favorites, entry)
 			end
 
-			AddCustomSubMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
+			AddCustomScrollableSubMenuEntry(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
 
 		end
 		
 		-- unlocking wayshrines menu (showing in all lists except dungeon and own house tab)
 		if not inDungeonTab and not inOwnHouseTab then
 			if BMU.isZoneOverlandZone(record.zoneId) then
-				AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_UNLOCK_WAYSHRINES), function() BMU_showDialogAutoUnlock(record.zoneId) end)
+				AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_UNLOCK_WAYSHRINES), function() BMU_showDialogAutoUnlock(record.zoneId) end)
 			end
 		end
 		
@@ -2295,28 +2295,28 @@ function BMU.clickOnZoneName(button, record)
 		if not inOwnHouseTab then
 			local numUnlocked, numTotal, workingZoneId = BMU_getNumSetCollectionProgressPieces(record.zoneId, record.category, record.parentZoneId)
 			if workingZoneId then
-				AddCustomMenuItem(GetString(SI_ITEM_SETS_BOOK_TITLE), function() BMU_LibSets.OpenItemSetCollectionBookOfZone(workingZoneId) end)
+				AddCustomScrollableMenuEntry(GetString(SI_ITEM_SETS_BOOK_TITLE), function() BMU_LibSets.OpenItemSetCollectionBookOfZone(workingZoneId) end)
 			end
 		end
 		
 		-- reset port counter (due to force refresh only available in general list)
 		if not inDungeonTab and not inOwnHouseTab and not inQuestTab and not inItemsTab then
 			if BMU.savedVarsChar.sorting == 3 or BMU.savedVarsChar.sorting == 4 then
-				AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_RESET_COUNTER_ZONE), function() BMU_savedVarsAcc.portCounterPerZone[record.zoneId] = nil BMU_refreshListAuto() end)
+				AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_RESET_COUNTER_ZONE), function() BMU_savedVarsAcc.portCounterPerZone[record.zoneId] = nil BMU_refreshListAuto() end)
 			end
 		end
 
 		-- favorite a dungeon
 		if inDungeonTab then
 			if BMU_savedVarsServ.favoriteDungeon == record.zoneId then
-				AddCustomMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), function() BMU_savedVarsServ.favoriteDungeon = 0 BMU_createTableDungeons() end)
+				AddCustomScrollableMenuEntry(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), function() BMU_savedVarsServ.favoriteDungeon = 0 BMU_createTableDungeons() end)
 			else
-				AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_FAVORITE_ZONE), function() BMU_savedVarsServ.favoriteDungeon = record.zoneId BMU_createTableDungeons() end)
+				AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_FAVORITE_ZONE), function() BMU_savedVarsServ.favoriteDungeon = record.zoneId BMU_createTableDungeons() end)
 			end
 		end
 
 		-- travel to parent zone
-		AddCustomMenuItem(BMU_SI_get(SI.TELE_UI_TRAVEL_PARENT_ZONE), function()
+		AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_TRAVEL_PARENT_ZONE), function()
 			BMU_portToParentZone(record.zoneId)
 			-- close UI if enabled
 			if BMU_savedVarsAcc.closeOnPorting then
@@ -2327,7 +2327,7 @@ function BMU.clickOnZoneName(button, record)
 			end
 		end)
 		
-		ShowMenu()
+		ShowCustomScrollableMenu()
 	end
 end
 
@@ -2352,7 +2352,7 @@ function BMU.clickOnPlayerName(button, record)
 		-- GuildInvite(number guildId, string displayName)
 	
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
-		ClearMenu()
+		ClearCustomScrollableMenu()
 
 		local isPlayerInGroup = IsPlayerInGroup(GetDisplayName())
 		
@@ -2516,7 +2516,7 @@ function BMU.clickOnPlayerName(button, record)
 		-- player favorite options
 		if BMU_isFavoritePlayer(record.displayName) then
 			-- remove player favorite
-			AddCustomMenuItem(GetString(SI_COLLECTIBLE_ACTION_REMOVE_FAVORITE), function() BMU_removeFavoritePlayer(record.displayName) end)
+			AddCustomScrollableMenuEntry(GetString(SI_COLLECTIBLE_ACTION_REMOVE_FAVORITE), function() BMU_removeFavoritePlayer(record.displayName) end)
 		end
 		-- favorite list
 		local entries_favorites = {}
@@ -2533,16 +2533,16 @@ function BMU.clickOnPlayerName(button, record)
 			table_insert(entries_favorites, entry)
 		end
 
-		AddCustomSubMenuItem(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
+		AddCustomScrollableSubMenuEntry(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
 		
 		
 		-- add submenu group
 		if #entries_group > 0 then
-			AddCustomSubMenuItem(GetString(SI_PLAYER_MENU_GROUP), entries_group)
+			AddCustomScrollableSubMenuEntry(GetString(SI_PLAYER_MENU_GROUP), entries_group)
 		end
 		
 		-- add submenu misc
-	    AddCustomSubMenuItem(GetString(SI_PLAYER_MENU_MISC), entries_misc)
+	    AddCustomScrollableSubMenuEntry(GetString(SI_PLAYER_MENU_MISC), entries_misc)
 		
 		-- add submenu filter
 		local entries_filter = {
@@ -2566,9 +2566,9 @@ function BMU.clickOnPlayerName(button, record)
 				table_insert(entries_filter, entry)
 		end		
 		
-		AddCustomSubMenuItem(GetString(SI_GAMEPAD_BANK_FILTER_HEADER), entries_filter)
+		AddCustomScrollableSubMenuEntry(GetString(SI_GAMEPAD_BANK_FILTER_HEADER), entries_filter)
 		
-		ShowMenu()
+		ShowCustomScrollableMenu()
 		
 	else -- left mouse click
 		if record.groupUnitTag then		
@@ -2751,6 +2751,12 @@ function BMU.setDungeonDifficulty(vet)
 		control.normalModeButton:SetState(vet and BSTATE_NORMAL or BSTATE_PRESSED)
 	end
 end
+
+local function getCurrentDungeonDifficulty()  --INS BAERTRAM 20260125
+	return ZO_ConvertToIsVeteranDifficulty(ZO_GetEffectiveDungeonDifficulty())
+end
+BMU.getCurrentDungeonDifficulty = getCurrentDungeonDifficulty
+
 
 
 -- port to group leader OR to the other group member when group contains only 2 player

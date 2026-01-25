@@ -1249,10 +1249,10 @@ local function SetupUI()
 		  AddCustomScrollableMenuDivider()
 
 		  -- include bank items
-		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_CRAFTING_INCLUDE_BANKED), BMU.savedVarsChar, "scanBankForMaps", nil, nil, nil)
+		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_CRAFTING_INCLUDE_BANKED), BMU.savedVarsChar, "scanBankForMaps", function() BMU_CreateTable_IndexListItems() end, nil, nil)
 
 		  -- enable/disable counter panel
-		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_ENDLESS_DUNGEON_BUFF_TRACKER_SWITCH_TO_SUMMARY_KEYBIND), BMU.savedVarsChar, "displayCounterPanel", nil, nil, nil)
+		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_ENDLESS_DUNGEON_BUFF_TRACKER_SWITCH_TO_SUMMARY_KEYBIND), BMU.savedVarsChar, "displayCounterPanel", function() BMU_CreateTable_IndexListItems() end, nil, nil)
 
 		  -- divider
 		  AddCustomScrollableMenuDivider()
@@ -1375,7 +1375,7 @@ local function SetupUI()
 		-- show context menu
 		local BMU_savedVarsChar = BMU.savedVarsChar  --INS251229 Baertram
 		-- show all or only in current zone
-	  	addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_GAMEPAD_GUILD_HISTORY_SUBCATEGORY_ALL), BMU.savedVarsChar, "showAllDelves", nil, nil)
+	  	addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_GAMEPAD_GUILD_HISTORY_SUBCATEGORY_ALL), BMU.savedVarsChar, "showAllDelves", function() BMU.createTable({index=BMU.indexListDelves}) end, nil)
 
 		-- divider
 		AddCustomScrollableMenuDivider()

@@ -120,6 +120,7 @@ end
 
 ---Helper function to check if the checkbox/radio button should be checked, based on the SavedVariables table, and SV option name
 local function isCheckedHelperFunc(p_SVsettings, p_SVsettingName, p_isCheckedValueOrFunc, p_additionalData)
+	if p_SVsettings == nil or p_SVsettings[p_SVsettingName] == nil then return false end
 	--Check if we got a value or a function returning a value
 	local isCheckedValue = getValueOrCallback(p_isCheckedValueOrFunc, p_additionalData)
 	--Comapre the SavedVariables to the determined value
@@ -1541,7 +1542,7 @@ local function SetupUI()
 		)
 
 		-- add dungeon difficulty toggle
-		addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_textures.dungeonDifficultyVeteran .. GetString(SI_DUNGEONDIFFICULTY2), nil, nil, nil,
+		addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_textures.dungeonDifficultyVeteran .. GetString(SI_DUNGEONDIFFICULTY2), nil, nil,
 				function(comboBox, itemName, item, checked, data)
 					BMU_setDungeonDifficulty(not BMU_getCurrentDungeonDifficulty())
 					zo_callLater(function() BMU.createTableDungeons() end, 300)

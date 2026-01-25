@@ -22,7 +22,7 @@ local string 								= string
 local string_lower 							= string.lower
 local string_len							= string.len
 local string_format							= string.format
-local string_sub							= string.sub
+--local string_sub							= string.sub
 local table 								= table
 local table_insert 							= table.insert
 local table_remove 							= table.remove
@@ -46,6 +46,32 @@ local AddCustomScrollableMenuCheckbox 	= AddCustomScrollableMenuCheckbox
 local RefreshCustomScrollableMenu 		= RefreshCustomScrollableMenu
 local AddCustomScrollableSubMenuEntry 	= AddCustomScrollableSubMenuEntry
 local ShowCustomScrollableMenu 			= ShowCustomScrollableMenu
+
+--The default options for a LSM contextMenu
+---Item filters
+local LSM_itemFilterContextMenuOptions = {
+	visibleRowsDropdown = 15, visibleRowsSubmenu = 15,
+	sortEntries = false,
+	enableFilter        = true,
+	headerCollapsible = true,
+    --[[ Search filter header
+    headerCollapsed = true, --show search editbox at header, but automatically collapse the header by default
+    headerCollapsedIcon = function() return {
+		   iconTexture = "/esoui/art/miscellaneous/search_icon.dds",
+		   width       = 15,
+		   height      = 15,
+		   --iconTint=CUSTOM_HIGHLIGHT_TEXT_COLOR,
+		   align       = LEFT,
+		   offsetX     = 20,
+		   offSetY     = 0,
+   		}
+	end,
+	]]
+	--Automatic refresh is currently done manually via functions called from entry's callback (e.g. survey and/or leads), where needed only
+    --automaticSubmenuRefresh  = false, --Make the submenus automatically refresh if any entry was clicked
+    --automaticRefresh    = true, --Make the normal menus automatically refresh if any entry was clicked (for the e.g. "Logout icon")
+
+}
 ---^- INS BEARTRAM 20260125 LibScrollableMenu
 
 
@@ -61,22 +87,22 @@ local subType_Woodworker 					= "woodworker"
 local subType_Blacksmith 					= "blacksmith"
 local subType_Clothier 						= "clothier"
 local subType_Jewelry 						= "jewelry"
+local subType_Clue 							= "clue"
 local subType_Treasure 						= "treasure"
 local subType_Leads 						= "leads"
 local surveyTypes 							= {subType_Alchemist, subType_Enchanter, subType_Woodworker, subType_Blacksmith, subType_Clothier, subType_Jewelry}
-local surveyTypeNames						= {GetString(SI_ITEMTYPEDISPLAYCATEGORY14), GetString(SI_ITEMTYPEDISPLAYCATEGORY15), GetString(SI_ITEMTYPEDISPLAYCATEGORY12), GetString(SI_ITEMTYPEDISPLAYCATEGORY10), GetString(SI_ITEMTYPEDISPLAYCATEGORY11), GetString(SI_ITEMTYPEDISPLAYCATEGORY13)}
-local surveyAppendixStrPattern 				= " (%d/%d)"
-local maxSurveyTypes 						= #surveyTypes --Currently 6, add the new entries to table surveyTypes to increase this if new survey types get added (new crafting profession types that got surveys)
-
+local surveyTypeNames                		= {GetString(SI_ITEMTYPEDISPLAYCATEGORY14), GetString(SI_ITEMTYPEDISPLAYCATEGORY15), GetString(SI_ITEMTYPEDISPLAYCATEGORY12), GetString(SI_ITEMTYPEDISPLAYCATEGORY10), GetString(SI_ITEMTYPEDISPLAYCATEGORY11), GetString(SI_ITEMTYPEDISPLAYCATEGORY13)}
+local appendixCurrentOfMaxStrPattern 		= " (%d/%d)"
+local maxSurveyTypes                 		= #surveyTypes --Currently 6: Alchemist, Enchanter, Woodworker, Blacksmith, Clothier, Jewelry. Add the new entries to table surveyTypes to increase this if new survey types get added (new crafting profession types that got surveys)
+local leadType_scryable 					= "srcyable"
+local leadType_scried 						= "scried"
+local leadType_completed 					= "completed"
+local leadTypes 							= { leadType_scryable , leadType_scried,  leadType_completed }
+local leadTypeNames							= {GetString(SI_ANTIQUITY_SCRYABLE), GetString(SI_ANTIQUITY_SUBHEADING_IN_PROGRESS), GetString(SI_SCREEN_NARRATION_ACHIEVEMENT_EARNED_ICON_NARRATION) .. " (" .. GetString(SI_ANTIQUITY_LOG_BOOK) .. ")"}
+local maxAntiquityTypes						= #leadTypes --Currently 3: Scryable, In progress, Completed (Codex)
 
 ----functions
 --ZOs functions
-local zoPlainStrFind 						= zo_plainstrfind
-local zo_IsTableEmpty 						= ZO_IsTableEmpty
-local zo_CheckButton_IsChecked 				= ZO_CheckButton_IsChecked
-local zo_CheckButton_SetCheckState 			= ZO_CheckButton_SetCheckState
-local zo_CheckButton_IsEnabled 				= ZO_CheckButton_IsEnabled
-local zo_CheckButton_SetChecked 			= ZO_CheckButton_SetChecked
 local unpack 								= unpack
 --BMU functions
 local BMU_SI_get                            = SI.get
@@ -96,10 +122,10 @@ local BMU_chatButtonTex, teleporterWin_appTitle, teleporterWin_Main_Control, tel
 	teleporterWin_Main_Control_OnlyYourzoneTexture, teleporterWin_Main_Control_DelvesTexture, teleporterWin_Main_Control_DungeonTexture
 
 -------functions (defined inline in code below, upon first usage, as they are still nil at this line)
-local BMU_getItemTypeIcon, BMU_getDataMapInfo, BMU_OpenTeleporter, BMU_updateContextMenuEntrySurveyAll,
-      BMU_getContextMenuEntrySurveyAllAppendix, BMU_clearInputFields, BMU_createTable,
-      BMU_createTableDungeons, BMU_createTableGuilds, BMU_numOfSurveyTypesChecked, 	BMU_updateCheckboxSurveyMap,
- 	  BMU_createTableHouses, BMU_getCurrentDungeonDifficulty, BMU_setDungeonDifficulty, BMU_PortalToPlayer, BMU_printToChat,
+local BMU_getItemTypeIcon, BMU_getDataMapInfo, BMU_OpenTeleporter, BMU_updateContextMenuEntrySurveyAll, BMU_updateContextMenuEntryAntiquityAll,
+      BMU_getContextMenuEntrySurveyAllAppendix, BMU_getContextMenuEntryAntiquityAllAppendix, BMU_clearInputFields, BMU_createTable,
+      BMU_createTableDungeons, BMU_createTableGuilds, BMU_numOfSurveyTypesChecked, BMU_updateCheckboxSurveyMap, BMU_numOfAntiquityTypesChecked,
+      BMU_updateCheckboxLeadsMap, BMU_createTableHouses, BMU_getCurrentDungeonDifficulty, BMU_setDungeonDifficulty, BMU_PortalToPlayer, BMU_printToChat,
 	  BMU_has_value, BMU_showNotification
 -- -^- INS251229 Baertram END 0
 
@@ -1123,29 +1149,66 @@ local function SetupUI()
   local function BMU_CreateTable_IndexListItems() --local function which is not redefined each contextMenu open again and again and again -> memory and performance drain!
     BMU_createTable({index=BMU.indexListItems})
   end
+  local function refreshLSMMainMenuOfMOC(comboBox)
+	  RefreshCustomScrollableMenu(moc(), LSM_UPDATE_MODE_MAINMENU, comboBox) --Update the opening mainmenu's entry to refresh the shown survey/lead/... filter numbers
+  end
   local function refreshSurveyMapMainMenu(comboBox)
-	  RefreshCustomScrollableMenu(moc(), LSM_UPDATE_MODE_MAINMENU, comboBox) --Update the opening mainmenu's entry to refresh the shown survey filter numbers
+	  refreshLSMMainMenuOfMOC(comboBox)
 	  BMU_CreateTable_IndexListItems()
   end
+  local function refreshLeadsMainMenu(comboBox)
+	  --Currently the same as surveyMaps so use that func too!
+	  refreshSurveyMapMainMenu(comboBox)
+  end
 
-  local allSurveyFiltersEnabled = false --Variable to toggle the survey filters submenu checkboses all on/off if the submenu openingCOntrol is clicked
+  local allSurveyFiltersEnabled = false --Variable to toggle the survey filters submenu checkboxes all on/off if the submenu openingControl is clicked
+  local allLeadFiltersEnabled = false	--Variable to toggle the leads filters submenu checkboxes all on/off if the submenu openingControl is clicked
   --Default value is false so next click will change all survey checkboxes to ON
   -- -^- INS251229 Baertram END 1
   teleporterWin_Main_Control_ItemTexture:SetHandler("OnMouseUp", function(ctrl, button)
       BMU_updateCheckboxSurveyMap = BMU_updateCheckboxSurveyMap or BMU.updateCheckboxSurveyMap  --INS251229 Baertram
+	  BMU_updateCheckboxLeadsMap = BMU_updateCheckboxLeadsMap or BMU.updateCheckboxLeadsMap  --INS251229 Baertram
 	  BMU_getContextMenuEntrySurveyAllAppendix = BMU_getContextMenuEntrySurveyAllAppendix or BMU.getContextMenuEntrySurveyAllAppendix --INS251229 Baertram
+	  BMU_getContextMenuEntryAntiquityAllAppendix = BMU_getContextMenuEntryAntiquityAllAppendix or BMU.getContextMenuEntryAntiquityAllAppendix --INS251229 Baertram
 	  BMU_numOfSurveyTypesChecked = BMU_numOfSurveyTypesChecked or BMU.numOfSurveyTypesChecked 										  --INS251229 Baertram
+	  BMU_numOfAntiquityTypesChecked = BMU_numOfAntiquityTypesChecked or BMU.numOfAntiquityTypesChecked								  --INS251229 Baertram
 	  BMU_updateContextMenuEntrySurveyAll = BMU_updateContextMenuEntrySurveyAll or BMU.updateContextMenuEntrySurveyAll				  --INS251229 Baertram
+	  BMU_updateContextMenuEntryAntiquityAll = BMU_updateContextMenuEntryAntiquityAll or BMU.updateContextMenuEntryAntiquityAll		  --INS251229 Baertram
 	  BMU_showNotification = BMU_showNotification or BMU.showNotification															  --INS251229 Baertram
-
-	  local BMU_savedVarsChar = BMU.savedVarsChar												--INS251229 Baertram
 
 	  ClearCustomScrollableMenu()
 	  if button == MOUSE_BUTTON_INDEX_RIGHT then
-		  ClearCustomScrollableMenu()
 		  -- show filter menu
 
 		  -- Add submenu for antiquity leads
+		  -- Add submenu dynamically for all lead types: Each lead type = 1 filter checkbox
+		  local leadTypesSubmenuEntries = {}
+		  for leadTypeIndex, leadType in ipairs(leadTypes) do
+			  local leadTypeName         = leadTypeNames[leadTypeIndex] or leadType
+			  local leadTypeSubmenuEntry = {
+				  label = leadTypeName,
+				  callback = function(comboBox, itemName, item, checked, data)
+					  BMU.savedVarsChar.displayAntiquityLeads[leadType] = checked
+					  refreshLeadsMainMenu(comboBox)
+				  end,
+				  entryType = LSM_ENTRY_TYPE_CHECKBOX,
+				  checked = function() return BMU.savedVarsChar.displayAntiquityLeads[leadType] end,
+			  }
+			  leadTypesSubmenuEntries[#leadTypesSubmenuEntries +1] = leadTypeSubmenuEntry
+		  end
+
+		  AddCustomScrollableSubMenuEntry(function() return BMU_updateContextMenuEntryAntiquityAll() end, --INS251229 Baertram Survey filters
+				  leadTypesSubmenuEntries,
+			    function(comboBox, itemName, item, selectionChanged, oldItem)
+				  --d("Clicked Leads submenu openingControl")
+					  allLeadFiltersEnabled = not allLeadFiltersEnabled
+					  -- check all subTypes (1) or uncheck all subtypes (2)
+					  BMU_updateCheckboxLeadsMap(allLeadFiltersEnabled and 1 or 2)
+					  refreshLeadsMainMenu(comboBox)
+			    end
+		  )
+
+			--[[
 		  AddCustomScrollableSubMenuEntry(GetString(SI_GAMEPAD_VENDOR_ANTIQUITY_LEAD_GROUP_HEADER), --INS251229 Baertram
 				  {
 					  {
@@ -1174,39 +1237,19 @@ local function SetupUI()
 					  },
 				  },
 				  function()
-					  d("Clicked Antiquity submenu openingControl")
+					  --d("Clicked Antiquity submenu openingControl")
 
-					--[[
-					local function myAddonCallbackFunc(LSM_comboBox, selectedContextMenuItem, openingMenusEntries, customParam1, customParam2)
-							--Loop at openingMenusEntries, get it's .dataSource, and if it's a checked checkbox then update SavedVariables of your addon accordingly
-							--or do oher things
-							--> Attention: Updating the entries in openingMenusEntries won't work as it's a copy of the data as the contextMenu was shown, and no reference!
-							--> Updating the data directly would make the menus break, and sometimes the data would be even gone due to your mouse moving above any other entry
-							--> wile the callbackFunc here runs
-					end
-					--Use LSM API func to get the opening control's list and m_sorted items properly so addons do not have to take care of that again and again on their own
-					RunCustomScrollableMenuItemsCallback(comboBox, item, myAddonCallbackFunc, { LSM_ENTRY_TYPE_CHECKBOX }, true, "customParam1", "customParam2")
-					]]
 				  end
-		  )
-
-		  -- Clues
-		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_SPECIALIZEDITEMTYPE113), BMU.savedVarsChar.displayMaps, "clue", 		function() BMU_CreateTable_IndexListItems() end, nil, nil)
-
-		  -- Treasure Maps
-		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_SPECIALIZEDITEMTYPE100), BMU.savedVarsChar.displayMaps, "treasure", 	function() BMU_CreateTable_IndexListItems() end, nil, nil)
-
-		  -- All Survey Maps
-		  --[[
-		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, function() return BMU_updateContextMenuEntrySurveyAll() end, nil, nil,
-				  function(comboBox, itemName, item, checked, data)
-					  -- check all subTypes (1) or uncheck all subtypes (2)
-					  BMU_updateCheckboxSurveyMap(checked and 1 or 2)
-				  end,
-				  function() return BMU_numOfSurveyTypesChecked() > 0  end, nil
 		  )
 		  ]]
 
+		  -- Clues
+		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_SPECIALIZEDITEMTYPE113), BMU.savedVarsChar.displayMaps, subType_Clue, 		function() BMU_CreateTable_IndexListItems() end, nil, nil)
+
+		  -- Treasure Maps
+		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_SPECIALIZEDITEMTYPE100), BMU.savedVarsChar.displayMaps, subType_Treasure, 	function() BMU_CreateTable_IndexListItems() end, nil, nil)
+
+		  -- All Survey Maps
 		  -- Add submenu dynamically for all survey types: Each survey type = 1 filter checkbox
 		  local surveyTypesSubmenuEntries = {}
 		  for surveyTypeIndex, surveyType in ipairs(surveyTypes) do
@@ -1249,7 +1292,7 @@ local function SetupUI()
 		  -- make default tab
 		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_SI_get(SI.TELE_SETTINGS_DEFAULT_TAB), BMU.savedVarsChar, "defaultTab", nil, BMU.indexListItems, nil)
 
-		  ShowCustomScrollableMenu()
+		  ShowCustomScrollableMenu(ctrl, LSM_itemFilterContextMenuOptions)
 	  else
 		  BMU_CreateTable_IndexListItems()
 		  BMU_showNotification(true)
@@ -1263,14 +1306,14 @@ local function SetupUI()
 	if BMU_savedVarsChar.displayAntiquityLeads.scried or BMU_savedVarsChar.displayAntiquityLeads.srcyable then
 		tooltip = GetString(SI_ANTIQUITY_LEAD_TOOLTIP_TAG)
 	end
-	if BMU_savedVarsChar.displayMaps.clue then
+	if BMU_savedVarsChar.displayMaps[subType_Clue] then
 		if tooltip ~= "" then
 			tooltip = tooltip .. " + " .. GetString(SI_SPECIALIZEDITEMTYPE113)
 		else
 			tooltip = GetString(SI_SPECIALIZEDITEMTYPE113)
 		end
 	end
-	if BMU_savedVarsChar.displayMaps.treasure then
+	if BMU_savedVarsChar.displayMaps[subType_Treasure] then
 		if tooltip ~= "" then
 			tooltip = tooltip .. " + " .. GetString(SI_SPECIALIZEDITEMTYPE100)
 		else
@@ -1597,6 +1640,7 @@ function BMU.updateCheckboxSurveyMap(action)
 	BMU_numOfSurveyTypesChecked = BMU_numOfSurveyTypesChecked or BMU.numOfSurveyTypesChecked   	    --INS251229 Baertram
 	BMU_updateContextMenuEntrySurveyAll = BMU_updateContextMenuEntrySurveyAll or BMU.updateContextMenuEntrySurveyAll --INS251229 Baertram
 	if action == 3 then
+		--[[
 		-- check if at least one of the subTypes is checked
 		if BMU_numOfSurveyTypesChecked() > 0 then
 			--Not needed anymore with LSM. Done in the entry's "checked" function itsself
@@ -1606,6 +1650,7 @@ function BMU.updateCheckboxSurveyMap(action)
 			--Not needed anymore with LSM. Done in the entry's "checked" function itsself
 			---ZO_CheckButton_SetUnchecked(zo_Menu.items[BMU.menuIndexSurveyAll].checkbox)
 		end
+		]]
 	else
 		-- if action == 1 --> all are checked
 		-- else (action == 2) --> all are unchecked
@@ -1641,11 +1686,61 @@ BMU_updateContextMenuEntrySurveyAll = BMU.updateContextMenuEntrySurveyAll
 
 function BMU.getContextMenuEntrySurveyAllAppendix()
 	BMU_numOfSurveyTypesChecked = BMU_numOfSurveyTypesChecked or BMU.numOfSurveyTypesChecked   	    --INS251229 Baertram
-	local num = BMU_numOfSurveyTypesChecked()
-	local appendix = string_format(surveyAppendixStrPattern, num, maxSurveyTypes)
-	return appendix
+	return string_format(appendixCurrentOfMaxStrPattern, BMU_numOfSurveyTypesChecked(), maxSurveyTypes)
 end
 BMU_getContextMenuEntrySurveyAllAppendix = BMU.getContextMenuEntrySurveyAllAppendix --INS251229 Baertram
+
+function BMU.numOfAntiquityTypesChecked()
+	local displayAntiquityLeads = BMU.savedVarsChar.displayAntiquityLeads
+	local num = 0
+	for _, subType in pairs(leadTypes) do
+		if displayAntiquityLeads[subType] then
+			num = num + 1
+		end
+	end
+	return num
+end
+BMU_numOfAntiquityTypesChecked = BMU.numOfAntiquityTypesChecked --INS251229 Baertram
+
+function BMU.getContextMenuEntryAntiquityAllAppendix()
+	BMU_numOfAntiquityTypesChecked = BMU_numOfAntiquityTypesChecked or BMU.numOfAntiquityTypesChecked   	    --INS251229 Baertram
+	return string_format(appendixCurrentOfMaxStrPattern, BMU_numOfAntiquityTypesChecked(), maxAntiquityTypes)
+end
+BMU_getContextMenuEntryAntiquityAllAppendix = BMU.getContextMenuEntryAntiquityAllAppendix --INS251229 Baertram
+
+
+function BMU.updateContextMenuEntryAntiquityAll()
+	return GetString(SI_GAMEPAD_VENDOR_ANTIQUITY_LEAD_GROUP_HEADER) .. BMU_getContextMenuEntryAntiquityAllAppendix()
+end
+BMU_updateContextMenuEntryAntiquityAll = BMU.updateContextMenuEntryAntiquityAll
+
+
+function BMU.updateCheckboxLeadsMap(action)
+	BMU_numOfAntiquityTypesChecked = BMU_numOfAntiquityTypesChecked or BMU.numOfAntiquityTypesChecked   	    --INS251229 Baertram
+	BMU_updateContextMenuEntryAntiquityAll = BMU_updateContextMenuEntryAntiquityAll or BMU.updateContextMenuEntryAntiquityAll --INS251229 Baertram
+	if action == 3 then
+		--[[
+		-- check if at least one of the subTypes is checked
+		if BMU_numOfAntiquityTypesChecked() > 0 then
+			--Not needed anymore with LSM. Done in the entry's "checked" function itsself
+			---zo_CheckButton_SetChecked(zo_Menu.items[BMU.menuIndexSurveyAll].checkbox)
+		else
+			-- no survey type is checked
+			--Not needed anymore with LSM. Done in the entry's "checked" function itsself
+			---ZO_CheckButton_SetUnchecked(zo_Menu.items[BMU.menuIndexSurveyAll].checkbox)
+		end
+		]]
+	else
+		-- if action == 1 --> all are checked
+		-- else (action == 2) --> all are unchecked
+		for _, subType in pairs(leadTypes) do
+			BMU.savedVarsChar.displayAntiquityLeads[subType] = (action == 1)
+		end
+	end
+    BMU_updateContextMenuEntryAntiquityAll() --CHG251229 Baertram
+end
+BMU_updateCheckboxLeadsMap = BMU.updateCheckboxLeadsMap
+
 
 
 function BMU.updatePosition()

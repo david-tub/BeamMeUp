@@ -1127,6 +1127,9 @@ local function SetupUI()
 	  RefreshCustomScrollableMenu(moc(), LSM_UPDATE_MODE_MAINMENU, comboBox) --Update the opening mainmenu's entry to refresh the shown survey filter numbers
 	  BMU_CreateTable_IndexListItems()
   end
+
+  local allSurveyFiltersEnabled = false --Variable to toggle the survey filters submenu checkboses all on/off if the submenu openingCOntrol is clicked
+  --Default value is false so next click will change all survey checkboxes to ON
   -- -^- INS251229 Baertram END 1
   teleporterWin_Main_Control_ItemTexture:SetHandler("OnMouseUp", function(ctrl, button)
       BMU_updateCheckboxSurveyMap = BMU_updateCheckboxSurveyMap or BMU.updateCheckboxSurveyMap  --INS251229 Baertram
@@ -1194,6 +1197,7 @@ local function SetupUI()
 		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_SPECIALIZEDITEMTYPE100), BMU.savedVarsChar.displayMaps, "treasure", 	function() BMU_CreateTable_IndexListItems() end, nil, nil)
 
 		  -- All Survey Maps
+		  --[[
 		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, function() return BMU_updateContextMenuEntrySurveyAll() end, nil, nil,
 				  function(comboBox, itemName, item, checked, data)
 					  -- check all subTypes (1) or uncheck all subtypes (2)
@@ -1201,9 +1205,9 @@ local function SetupUI()
 				  end,
 				  function() return BMU_numOfSurveyTypesChecked() > 0  end, nil
 		  )
+		  ]]
 
-		  -- Add submenu for survey types filter
-		  --todo: make this dynamic here based on surveyTypes table
+		  -- Add submenu dynamically for all survey types: Each survey type = 1 filter checkbox
 		  local surveyTypesSubmenuEntries = {}
 		  for surveyTypeIndex, surveyType in ipairs(surveyTypes) do
 			  local surveyTypeName = surveyTypeNames[surveyTypeIndex] or surveyType
@@ -1219,69 +1223,15 @@ local function SetupUI()
 			  surveyTypesSubmenuEntries[#surveyTypesSubmenuEntries+1] = surveyTypeSubmenuEntry
 		  end
 
-		  AddCustomScrollableSubMenuEntry(GetString(SI_GAMEPAD_BANK_FILTER_HEADER), --INS251229 Baertram Survey filters
+		  AddCustomScrollableSubMenuEntry(function() return BMU_updateContextMenuEntrySurveyAll() end, --INS251229 Baertram Survey filters
 				surveyTypesSubmenuEntries,
-		  			--[[
-				  {
-					  {
-						  label = GetString(SI_ITEMTYPEDISPLAYCATEGORY14),
-						  callback = function(comboBox, itemName, item, checked, data)
-							  BMU.savedVarsChar.displayMaps.alchemist = checked
-							  refreshSurveyMapMainMenu(comboBox)
-						  end,
-						  entryType = LSM_ENTRY_TYPE_CHECKBOX,
-						  checked = function() return BMU.savedVarsChar.displayMaps.alchemist end,
-					  },
-					  {
-						  label = GetString(SI_ITEMTYPEDISPLAYCATEGORY15),
-						  callback = function(comboBox, itemName, item, checked, data)
-							  BMU.savedVarsChar.displayMaps.enchanter = checked
-							  refreshSurveyMapMainMenu(comboBox)
-						  end,
-						  entryType = LSM_ENTRY_TYPE_CHECKBOX,
-						  checked = function() return BMU.savedVarsChar.displayMaps.enchanter end,
-					  },
-					  {
-						  label = GetString(SI_ITEMTYPEDISPLAYCATEGORY12),
-						  callback = function(comboBox, itemName, item, checked, data)
-							  BMU.savedVarsChar.displayMaps.woodworker = checked
-							  refreshSurveyMapMainMenu(comboBox)
-						  end,
-						  entryType = LSM_ENTRY_TYPE_CHECKBOX,
-						  checked = function() return BMU.savedVarsChar.displayMaps.woodworker end,
-					  },
-					  {
-						  label = GetString(SI_ITEMTYPEDISPLAYCATEGORY10),
-						  callback = function(comboBox, itemName, item, checked, data)
-							  BMU.savedVarsChar.displayMaps.blacksmith = checked
-							  refreshSurveyMapMainMenu(comboBox)
-						  end,
-						  entryType = LSM_ENTRY_TYPE_CHECKBOX,
-						  checked = function() return BMU.savedVarsChar.displayMaps.blacksmith end,
-					  },
-					  {
-						  label = GetString(SI_ITEMTYPEDISPLAYCATEGORY11),
-						  callback = function(comboBox, itemName, item, checked, data)
-							  BMU.savedVarsChar.displayMaps.clothier = checked
-							  refreshSurveyMapMainMenu(comboBox)
-						  end,
-						  entryType = LSM_ENTRY_TYPE_CHECKBOX,
-						  checked = function() return BMU.savedVarsChar.displayMaps.clothier end,
-					  },
-					  {
-						  label = GetString(SI_ITEMTYPEDISPLAYCATEGORY13),
-						  callback = function(comboBox, itemName, item, checked, data)
-							  BMU.savedVarsChar.displayMaps.jewelry = checked
-							  refreshSurveyMapMainMenu(comboBox)
-						  end,
-						  entryType = LSM_ENTRY_TYPE_CHECKBOX,
-						  checked = function() return BMU.savedVarsChar.displayMaps.jewelry end,
-					  },
-				  },
-				  ]]
-				  function()
-					  d("Clicked Survey submenu openingControl")
-				  end
+			    function(comboBox, itemName, item, selectionChanged, oldItem)
+				  --d("Clicked Survey submenu openingControl")
+					  allSurveyFiltersEnabled = not allSurveyFiltersEnabled
+					  -- check all subTypes (1) or uncheck all subtypes (2)
+					  BMU_updateCheckboxSurveyMap(allSurveyFiltersEnabled and 1 or 2)
+					  refreshSurveyMapMainMenu(comboBox)
+			    end
 		  )
 
 		  -- divider

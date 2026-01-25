@@ -2275,7 +2275,7 @@ function BMU.clickOnZoneName(button, record)
 				end
 				local entry = {
 					label = tos(i) .. ": " .. favName,
-					callback = function(state) BMU_addFavoriteZone(i, record.zoneId, record.zoneName) end,
+					callback = function() BMU_addFavoriteZone(i, record.zoneId, record.zoneName) end,
 				}			
 				table_insert(entries_favorites, entry)
 			end
@@ -2354,7 +2354,7 @@ function BMU.clickOnPlayerName(button, record)
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		ClearCustomScrollableMenu()
 
-		local isPlayerInGroup = IsPlayerInGroup(GetDisplayName())
+		local isAccountInGroup = IsPlayerInGroup(GetDisplayName())
 		
 		local unitTag = nil
 		local entries_group = {}
@@ -2362,7 +2362,7 @@ function BMU.clickOnPlayerName(button, record)
 		local pos = 1
 		
 		-- get unitTag
-		if isPlayerInGroup then
+		if isAccountInGroup then
 			local groupUnitTag = ""
 			for j = 1, GetGroupSize() do
 				groupUnitTag = GetGroupUnitTagByIndex(j)
@@ -2380,7 +2380,7 @@ function BMU.clickOnPlayerName(button, record)
 		if not isGroupPlayerInGroup and IsUnitSoloOrGroupLeader(playerTag) then
 			entries_group[pos] = {
 				label = GetString(SI_CHAT_PLAYER_CONTEXT_ADD_GROUP),
-				callback = function(state) GroupInviteByName(record.characterName) end,
+				callback = function() GroupInviteByName(record.characterName) end,
 			}
 			pos = pos + 1
 		end
@@ -2388,13 +2388,13 @@ function BMU.clickOnPlayerName(button, record)
 		if isGroupPlayerInGroup and isPlayerGroupLeader then
 			entries_group[pos] = {
 				label = GetString(SI_GROUP_LIST_MENU_PROMOTE_TO_LEADER),
-				callback = function(state) GroupPromote(unitTag) end,
+				callback = function() GroupPromote(unitTag) end,
 			}
 			pos = pos + 1
 			
 			entries_group[pos] = {
 				label = GetString(SI_GROUP_LIST_MENU_KICK_FROM_GROUP),
-				callback = function(state) GroupKick(unitTag) end,
+				callback = function() GroupKick(unitTag) end,
 			}
 			pos = pos + 1
 		end
@@ -2402,7 +2402,7 @@ function BMU.clickOnPlayerName(button, record)
 		if isPlayerInGroup and not isPlayerGroupLeader and isGroupPlayerInGroup and not IsUnitGroupLeader(unitTag) then
 			entries_group[pos] = {
 				label = BMU_SI_get(SI.TELE_UI_VOTE_TO_LEADER),
-				callback = function(state) BeginGroupElection(GROUP_ELECTION_TYPE_NEW_LEADER, ZO_GROUP_ELECTION_DESCRIPTORS.NONE, unitTag) end,
+				callback = function() BeginGroupElection(GROUP_ELECTION_TYPE_NEW_LEADER, ZO_GROUP_ELECTION_DESCRIPTORS.NONE, unitTag) end,
 			}
 			pos = pos + 1
 		end
@@ -2410,14 +2410,14 @@ function BMU.clickOnPlayerName(button, record)
 		if isPlayerInGroup then
 			entries_group[pos] = {
 				label = GetString(SI_GROUP_LIST_MENU_LEAVE_GROUP),
-				callback = function(state) GroupLeave() end,
+				callback = function() GroupLeave() end,
 			}
 			pos = pos + 1
 			
 			if DoesGroupModificationRequireVote() then
 				entries_group[pos] = {
 					label = GetString(SI_GROUP_LIST_MENU_VOTE_KICK_FROM_GROUP),
-					callback = function(state) BeginGroupElection(GROUP_ELECTION_TYPE_KICK_MEMBER, ZO_GROUP_ELECTION_DESCRIPTORS.NONE, unitTag) end,
+					callback = function() BeginGroupElection(GROUP_ELECTION_TYPE_KICK_MEMBER, ZO_GROUP_ELECTION_DESCRIPTORS.NONE, unitTag) end,
 				}
 				pos = pos + 1
 			end
@@ -2430,7 +2430,7 @@ function BMU.clickOnPlayerName(button, record)
 		-- whisper
 		entries_misc[pos] = {
 			label = GetString(SI_SOCIAL_LIST_PANEL_WHISPER),
-			callback = function(state) StartChatInput("", CHAT_CHANNEL_WHISPER, record.displayName) end,
+			callback = function() StartChatInput("", CHAT_CHANNEL_WHISPER, record.displayName) end,
 --			tooltip = "Tooltip Test: Whisper",
 		}
 		pos = pos + 1
@@ -2438,14 +2438,14 @@ function BMU.clickOnPlayerName(button, record)
 		-- Jump to House
 		entries_misc[pos] = {
 			label = GetString(SI_SOCIAL_MENU_VISIT_HOUSE),
-			callback = function(state) JumpToHouse(record.displayName) end,
+			callback = function() JumpToHouse(record.displayName) end,
 		}
 		pos = pos + 1
 		
 		-- Send Mail
 		entries_misc[pos] = {
 			label = GetString(SI_SOCIAL_MENU_SEND_MAIL),
-			callback = function(state) BMU_createMail(record.displayName, "", "") end,
+			callback = function() BMU_createMail(record.displayName, "", "") end,
 		}
 		pos = pos + 1	
 
@@ -2453,13 +2453,13 @@ function BMU.clickOnPlayerName(button, record)
 		if IsFriend(record.displayName) then
 			entries_misc[pos] = {
 				label = GetString(SI_FRIEND_MENU_REMOVE_FRIEND),
-				callback = function(state) RemoveFriend(record.displayName) end,
+				callback = function() RemoveFriend(record.displayName) end,
 			}
 			pos = pos + 1
 		else
 			entries_misc[pos] = {
 				label = GetString(SI_SOCIAL_MENU_ADD_FRIEND),
-				callback = function(state) RequestFriend(record.displayName, "") end,
+				callback = function() RequestFriend(record.displayName, "") end,
 			}
 			pos = pos + 1
 		end
@@ -2467,7 +2467,7 @@ function BMU.clickOnPlayerName(button, record)
 		-- Invite to Tribute Card Game
 		entries_misc[pos] = {
 			label = GetString(SI_NOTIFICATIONTYPE30),
-			callback = function(state) InviteToTributeByDisplayName(record.displayName) end,
+			callback = function() InviteToTributeByDisplayName(record.displayName) end,
 		}
 		pos = pos + 1
 		
@@ -2477,7 +2477,7 @@ function BMU.clickOnPlayerName(button, record)
 			if IsPlayerInGuild(primaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(primaryBMUGuild, record.displayName) then
 				entries_misc[pos] = {
 					label = BMU_SI_get(SI.TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp",
-					callback = function(state) GuildInvite(primaryBMUGuild, record.displayName) end,
+					callback = function() GuildInvite(primaryBMUGuild, record.displayName) end,
 				}
 				pos = pos + 1
 			end
@@ -2487,7 +2487,7 @@ function BMU.clickOnPlayerName(button, record)
 			if IsPlayerInGuild(secondaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(secondaryBMUGuild, record.displayName) then
 				entries_misc[pos] = {
 					label = BMU_SI_get(SI.TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp-Two",
-					callback = function(state) GuildInvite(secondaryBMUGuild, record.displayName) end,
+					callback = function() GuildInvite(secondaryBMUGuild, record.displayName) end,
 				}
 				pos = pos + 1
 			end
@@ -2497,7 +2497,7 @@ function BMU.clickOnPlayerName(button, record)
 			if IsPlayerInGuild(tertiaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(tertiaryBMUGuild, record.displayName) then
 				entries_misc[pos] = {
 					label = BMU_SI_get(SI.TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp-Three",
-					callback = function(state) GuildInvite(tertiaryBMUGuild, record.displayName) end,
+					callback = function() GuildInvite(tertiaryBMUGuild, record.displayName) end,
 				}
 				pos = pos + 1
 			end
@@ -2507,7 +2507,7 @@ function BMU.clickOnPlayerName(button, record)
 			if IsPlayerInGuild(quaternaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(quaternaryBMUGuild, record.displayName) then
 				entries_misc[pos] = {
 					label = BMU_SI_get(SI.TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp-Four",
-					callback = function(state) GuildInvite(quaternaryBMUGuild, record.displayName) end,
+					callback = function() GuildInvite(quaternaryBMUGuild, record.displayName) end,
 				}
 				pos = pos + 1
 			end
@@ -2528,7 +2528,7 @@ function BMU.clickOnPlayerName(button, record)
 			end
 			local entry = {
 				label = tos(i) .. ": " .. favName,
-				callback = function(state) BMU_addFavoritePlayer(i, record.displayName) end,
+				callback = function() BMU_addFavoritePlayer(i, record.displayName) end,
 			}			
 			table_insert(entries_favorites, entry)
 		end
@@ -2548,11 +2548,11 @@ function BMU.clickOnPlayerName(button, record)
 		local entries_filter = {
 				{
 					label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_GROUP_MEMBERS), "orange"),
-					callback = function(state) BMU_createTable({index=BMU.indexListSource, filterSourceIndex=BMU.SOURCE_INDEX_GROUP}) end,
+					callback = function() BMU_createTable({index=BMU.indexListSource, filterSourceIndex=BMU.SOURCE_INDEX_GROUP}) end,
 				},
 				{
 					label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_FRIENDS), "green"),
-					callback = function(state) BMU_createTable({index=BMU.indexListSource, filterSourceIndex=BMU.SOURCE_INDEX_FRIEND}) end,
+					callback = function() BMU_createTable({index=BMU.indexListSource, filterSourceIndex=BMU.SOURCE_INDEX_FRIEND}) end,
 				},
 			}
 			

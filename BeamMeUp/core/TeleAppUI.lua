@@ -1513,14 +1513,22 @@ local function SetupUI()
 			{
 				{
 					label = BMU_SI_get(SI.TELE_UI_TOGGLE_UPDATE_NAME),
-					callback = function(comboBox, itemName, item, checked, data) BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName = checked BMU_clearInputFields() BMU_createTableDungeons() end,
-					entryType = LSM_ENTRY_TYPE_CHECKBOX,
+					callback = function(comboBox, itemName, item, checked, data)
+						BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName = true
+						BMU_clearInputFields() BMU_createTableDungeons()
+					end,
+					entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
+					buttonGroup = 2,
 					checked = function() return not BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName end,
 				},
 				{
 					label = BMU_SI_get(SI.TELE_UI_TOGGLE_ACRONYM),
-					callback = function(comboBox, itemName, item, checked, data) BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName = checked BMU_clearInputFields() BMU_createTableDungeons() end,
-					entryType = LSM_ENTRY_TYPE_CHECKBOX,
+					callback = function(comboBox, itemName, item, checked, data)
+						BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName = false
+						BMU_clearInputFields() BMU_createTableDungeons()
+					end,
+					entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
+					buttonGroup = 2,
 					checked = function() return BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName end,
 				},
 				{
@@ -1528,14 +1536,22 @@ local function SetupUI()
 				},
 				{
 					label = BMU_SI_get(SI.TELE_UI_TOOGLE_DUNGEON_NAME),
-					callback = function(comboBox, itemName, item, checked, data) BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName = checked BMU_clearInputFields() BMU_createTableDungeons() end,
-					entryType = LSM_ENTRY_TYPE_CHECKBOX,
+					callback = function(comboBox, itemName, item, checked, data)
+						BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName = true
+						BMU_clearInputFields() BMU_createTableDungeons()
+					end,
+					entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
+					buttonGroup = 3,
 					checked = function() return not BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName end,
 				},
 				{
 					label = BMU_SI_get(SI.TELE_UI_TOOGLE_ZONE_NAME),
-					callback = function(comboBox, itemName, item, checked, data) BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName = checked BMU_clearInputFields() BMU_createTableDungeons() end,
-					entryType = LSM_ENTRY_TYPE_CHECKBOX,
+					callback = function(comboBox, itemName, item, checked, data)
+						BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName = false
+						BMU_clearInputFields() BMU_createTableDungeons()
+					end,
+					entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
+					buttonGroup = 3,
 					checked = function() return BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName end,
 				},
 			}, nil, nil, nil, 5

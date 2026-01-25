@@ -94,7 +94,7 @@ local BMU_getItemTypeIcon, BMU_getDataMapInfo, BMU_OpenTeleporter, BMU_updateCon
       BMU_getContextMenuEntrySurveyAllAppendix, BMU_clearInputFields, BMU_createTable,
       BMU_createTableDungeons, BMU_createTableGuilds, BMU_numOfSurveyTypesChecked, 	BMU_updateCheckboxSurveyMap,
  	  BMU_createTableHouses, BMU_getCurrentDungeonDifficulty, BMU_setDungeonDifficulty, BMU_PortalToPlayer, BMU_printToChat,
-	  BMU_has_value
+	  BMU_has_value, BMU_showNotification
 -- -^- INS251229 Baertram END 0
 
 -- list of tuples (guildId & displayname) for invite queue (only for admin)
@@ -133,10 +133,10 @@ local function updateSVFromLSMEntryNow(p_SVsettings, p_SVsettingName, p_value)
 end
 
 --OnClick helper function, updating the SavedVariables table and SV option name based on the checked state of the checkbox or radioButton
-local function LSMEntryTypeCheckboxOrRadioButtonClickedHelperFunc(p_SVsettings, p_SVsettingName, p_isCheckedValueOrFunc, p_additionalData, comboBox, itemName, item, checked, data)
+local function LSMEntryTypeCheckboxOrRadioButtonClickedHelperFunc(p_SVsettings, p_SVsettingName, p_isCheckedValueOrFunc, p_additionalData, onClickedFuncWasProvided, comboBox, itemName, item, checked, data)
 	--DefaultTab change is prepared? Check if the checkbox was checked, and if not pass in the default tab BMU.indexListMain (not the checkbox's checked state)
 	local newChecked = checked
-	if p_SVsettingName == "defaultTab" then
+	if not onClickedFuncWasProvided and p_SVsettingName == "defaultTab" then
 		newChecked = BMU.indexListMain
 		if p_isCheckedValueOrFunc ~= nil then
 			newChecked = getValueOrCallback(p_isCheckedValueOrFunc, p_additionalData)
@@ -158,7 +158,7 @@ local function addDynamicLSMContextMenuEntry(entryType, entryText, SVsettings, S
 	entryType = entryType or LSM_ENTRY_TYPE_NORMAL
 	--Create references which do not get changed later
 	local p_entryText = entryText
-	local settingsProvided = (SVsettings ~= nil and SVsettingName ~= nil and true) or false
+	local p_settingsProvided = (SVsettings ~= nil and SVsettingName ~= nil and true) or false
 	local p_onClickFunc = (type(onClickFunc) == typeFunc and onClickFunc) or nil
 	local p_isCheckedValueOrFunc = isCheckedValueOrFunc
 	local p_additionalData = additionalData
@@ -170,7 +170,7 @@ local function addDynamicLSMContextMenuEntry(entryType, entryText, SVsettings, S
 	--If no explicit "checked" function or value was passed in and we are creating a checkBox or radioButton:
 	--Just create an anonymous function returning the passed in SV table and it's "current value" (as the function get's
 	--called from the open contextMenu as the entry get's created)
-	if p_isCheckedValueOrFunc == nil and (isCheckBox or isRadioButton) and settingsProvided then
+	if p_isCheckedValueOrFunc == nil and (isCheckBox or isRadioButton) and p_settingsProvided then
 		p_isCheckedValueOrFunc = function()
 			return SVsettings[SVsettingName]
 		end
@@ -180,10 +180,13 @@ local function addDynamicLSMContextMenuEntry(entryType, entryText, SVsettings, S
 	if isCheckBox then
 		AddCustomScrollableMenuCheckbox(p_entryText,
 				function(...)					--toggle function of checkbox, params ... = comboBox, itemName, item, checked, data
-					if p_onClickFunc ~= nil then
+					local onClickedFuncProvided = p_onClickFunc ~= nil
+					if p_settingsProvided then
+						LSMEntryTypeCheckboxOrRadioButtonClickedHelperFunc(SVsettings, SVsettingName, p_isCheckedValueOrFunc, p_additionalData, onClickedFuncProvided, ...)
+					end
+					if onClickedFuncProvided then
 						return p_onClickFunc(...)
 					end
-					LSMEntryTypeCheckboxOrRadioButtonClickedHelperFunc(SVsettings, SVsettingName, p_isCheckedValueOrFunc, p_additionalData, ...)
 				end,
 				function()
 					return isCheckedHelperFunc(SVsettings, SVsettingName, p_isCheckedValueOrFunc, p_additionalData)
@@ -197,13 +200,16 @@ local function addDynamicLSMContextMenuEntry(entryType, entryText, SVsettings, S
 		local buttonGroup = (p_additionalData ~= nil and p_additionalData.buttonGroup) or 1
 		AddCustomScrollableMenuRadioButton(p_entryText,
 				function(...)					--toggle function of checkbox, params ... = comboBox, itemName, item, checked, data
-					if p_onClickFunc ~= nil then
+					local onClickedFuncProvided = p_onClickFunc ~= nil
+					if p_settingsProvided then
+						--The OnClick function can be used to update the SavedVariables for the clicked radioButton control of a radioButton group
+						--But you could also pass in the additionalData.buttonGroupOnSelectionChangedCallback(control, previousControl) which fires as any radioButton in the same group was really changed
+						--(and not only clicked), and update the SVs based on control.data or any other information then.
+						LSMEntryTypeCheckboxOrRadioButtonClickedHelperFunc(SVsettings, SVsettingName, p_isCheckedValueOrFunc, p_additionalData, onClickedFuncProvided, ...)
+					end
+					if onClickedFuncProvided then
 						return p_onClickFunc(...)
 					end
-					--The OnClick function can be used to update the SavedVariables for the clicked radioButton control of a radioButton group
-					--But you could also pass in the additionalData.buttonGroupOnSelectionChangedCallback(control, previousControl) which fires as any radioButton in the same group was really changed
-					--(and not only clicked), and update the SVs based on control.data or any other information then.
-					LSMEntryTypeCheckboxOrRadioButtonClickedHelperFunc(SVsettings, SVsettingName, p_isCheckedValueOrFunc, p_additionalData, ...)
 				end,
 				function()
 					return isCheckedHelperFunc(SVsettings, SVsettingName, p_isCheckedValueOrFunc, p_additionalData)
@@ -981,7 +987,7 @@ local function SetupUI()
 			ClearCustomScrollableMenu()
 			if upInside and button == MOUSE_BUTTON_INDEX_RIGHT then --CHG251229 Baertram Usage of upInside to properly check the user releaased the mouse on the control!!!
 				-- toggle between zone names and house names
-				addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_SI_get(SI.TELE_UI_TOOGLE_ZONE_NAME), BMU.savedVarsChar, "ptfHouseZoneNames", nil, nil, nil)
+				addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_SI_get(SI.TELE_UI_TOOGLE_ZONE_NAME), BMU.savedVarsChar, "ptfHouseZoneNames", function() BMU.clearInputFields() BMU.createTablePTF() end, nil, nil)
 
 				ShowCustomScrollableMenu()
 			else
@@ -1035,7 +1041,7 @@ local function SetupUI()
 	ClearCustomScrollableMenu()
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		-- toggle between nicknames and standard names
-		addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_SI_get(SI.TELE_UI_TOGGLE_HOUSE_NICKNAME), BMU.savedVarsChar , "houseNickNames", nil, nil, nil)
+		addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_SI_get(SI.TELE_UI_TOGGLE_HOUSE_NICKNAME), BMU.savedVarsChar , "houseNickNames", function() BMU.clearInputFields() BMU.createTableHouses() end, nil, nil)
 
 		-- divider
 		AddCustomScrollableMenuDivider()
@@ -1115,7 +1121,6 @@ local function SetupUI()
   teleporterWin_Main_Control_ItemTexture:SetDrawLayer(2)
 
   -- -v- INS251229 Baertram BEGIN 1 Variables for the relevant submenu opening controls
-  local submenuIndicesToAddCallbackTo = {}
   --reference variables for performance etc.
   local function BMU_CreateTable_IndexListItems() --local function which is not redefined each contextMenu open again and again and again -> memory and performance drain!
     BMU_createTable({index=BMU.indexListItems})
@@ -1123,7 +1128,11 @@ local function SetupUI()
   -- -^- INS251229 Baertram END 1
   teleporterWin_Main_Control_ItemTexture:SetHandler("OnMouseUp", function(ctrl, button)
       BMU_updateCheckboxSurveyMap = BMU_updateCheckboxSurveyMap or BMU.updateCheckboxSurveyMap  --INS251229 Baertram
-	  submenuIndicesToAddCallbackTo = {}                                                        --INS251229 Baertram
+	  BMU_getContextMenuEntrySurveyAllAppendix = BMU_getContextMenuEntrySurveyAllAppendix or BMU.getContextMenuEntrySurveyAllAppendix --INS251229 Baertram
+	  BMU_numOfSurveyTypesChecked = BMU_numOfSurveyTypesChecked or BMU.numOfSurveyTypesChecked 										  --INS251229 Baertram
+	  BMU_updateContextMenuEntrySurveyAll = BMU_updateContextMenuEntrySurveyAll or BMU.updateContextMenuEntrySurveyAll				  --INS251229 Baertram
+	  BMU_showNotification = BMU_showNotification or BMU.showNotification															  --INS251229 Baertram
+
 	  local BMU_savedVarsChar = BMU.savedVarsChar												--INS251229 Baertram
 
 	  ClearCustomScrollableMenu()
@@ -1132,7 +1141,7 @@ local function SetupUI()
 		  -- show filter menu
 
 		  -- Add submenu for antiquity leads
-		  submenuIndicesToAddCallbackTo[#submenuIndicesToAddCallbackTo+1] = AddCustomScrollableSubMenuEntry(GetString(SI_GAMEPAD_VENDOR_ANTIQUITY_LEAD_GROUP_HEADER), --INS251229 Baertram
+		  AddCustomScrollableSubMenuEntry(GetString(SI_GAMEPAD_VENDOR_ANTIQUITY_LEAD_GROUP_HEADER), --INS251229 Baertram
 				  {
 					  {
 						  label = GetString(SI_ANTIQUITY_SCRYABLE),
@@ -1162,16 +1171,12 @@ local function SetupUI()
 		  )
 
 		  -- Clues
-		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_SPECIALIZEDITEMTYPE113), BMU.savedVarsChar.displayMaps, "clue", nil, nil, nil)
+		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_SPECIALIZEDITEMTYPE113), BMU.savedVarsChar.displayMaps, "clue", 		function() BMU_CreateTable_IndexListItems() end, nil, nil)
 
 		  -- Treasure Maps
-		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_SPECIALIZEDITEMTYPE100), BMU.savedVarsChar.displayMaps, "treasure", nil, nil, nil)
+		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_SPECIALIZEDITEMTYPE100), BMU.savedVarsChar.displayMaps, "treasure", 	function() BMU_CreateTable_IndexListItems() end, nil, nil)
 
 		  -- All Survey Maps
-		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_SPECIALIZEDITEMTYPE100), BMU.savedVarsChar.displayMaps, "treasure", nil, nil, nil)
-
-		  BMU_getContextMenuEntrySurveyAllAppendix = BMU_getContextMenuEntrySurveyAllAppendix or BMU.getContextMenuEntrySurveyAllAppendix --INS251229 Baertram
-		  BMU_numOfSurveyTypesChecked = BMU_numOfSurveyTypesChecked or BMU.numOfSurveyTypesChecked 										  --INS251229 Baertram
 		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, function() return BMU_updateContextMenuEntrySurveyAll() end, nil, nil,
 				  function(comboBox, itemName, item, checked, data)
 					  -- check all subTypes (1) or uncheck all subtypes (2)
@@ -1258,81 +1263,9 @@ local function SetupUI()
 		  ShowCustomScrollableMenu()
 	  else
 		  BMU_CreateTable_IndexListItems()
-		  BMU.showNotification(true)
+		  BMU_showNotification(true)
 	  end
   end)
-  -- -v- INS251229 Baertram BEGIN 2 - Variables for the submenu OnMouseUp click handler -> Clicking the submenu opening controls toggles all checkboxes in the submenu to checked/unchecked
-  --[[
-  --Called from ZO_Menu_OnHide callback
-  local function cleanUpzo_MenuItemsSubmenuSpecialCallbacks()
---d("[BMU]cleanUpzo_MenuItemsSubmenuSpecialCallbacks")
-      if zo_IsTableEmpty(submenuIndicesToAddCallbackTo) or zo_IsTableEmpty(zo_MenuSubmenuItemsHooked) then return end
-      submenuIndicesToAddCallbackTo = {}
-      zo_MenuSubmenuItemsHooked = {}
-  end
-
-  --Check if LibCustomMenuSubmenu is shown and if any enabled and shown checkboxes are in the submenu, then change the clicked state of them
-  --> Called from clicking the ZO_Menu entry which opens the submenu
-  local function checkIfLibCustomMenuSubmenuShownAndToggleCheckboxes(itemCtrl, mouseButton, upInside)
---d("[BMU]checkIfLibCustomMenuSubmenuShownAndToggleCheckboxes-mouseButton: " .. tostring(mouseButton) .. ", upInside: " ..tostring(upInside))
-      --LibCustomMenuSubmenu got entries?
-      if not upInside or mouseButton ~= MOUSE_BUTTON_INDEX_LEFT or not libCustomMenuSubmenu or zo_MenuSubmenuItemsHooked[itemCtrl] == nil then return end
-      --Get the current state of the submenu (if not set yet it is assumed to be "all unchecked")
-      local checkboxesAtSubmenuNewState = checkboxesAtSubmenuCurrentState[itemCtrl] or false
-      --and invert it (on -> off / off -> on)
-      checkboxesAtSubmenuNewState = not checkboxesAtSubmenuNewState
-
-      --Check all child controls of the submenu for any checkbox entry and set the new state and calling the toggle function of the checkbox
-      for childIndex=1, libCustomMenuSubmenu:GetNumChildren(), 1 do
-        local childCtrl = libCustomMenuSubmenu:GetChild(childIndex)
---d(">found childCtrl: " ..tostring(childCtrl:GetName()))
-          --Child is a subMenuItem?
-          if childCtrl ~= nil then
-            local checkBox = childCtrl.checkbox
-            if childCtrl.IsHidden and childCtrl.IsMouseEnabled and not childCtrl:IsHidden() and childCtrl:IsMouseEnabled()
-                  and checkBox and checkBox.toggleFunction and zo_CheckButton_IsEnabled(checkBox)
-                  and childCtrl.GetName and zoPlainStrFind(childCtrl:GetName(), LCM_SubmenuEntryNamePrefix) ~= nil then
---d(">>set new state to: " ..tostring(checkboxesAtSubmenuNewState))
-              zo_CheckButton_SetCheckState(checkBox, (checkboxesAtSubmenuNewState == false and BSTATE_NORMAL) or BSTATE_PRESSED)
-              checkBox:toggleFunction(checkboxesAtSubmenuNewState)
-            end
-          end
-      end
-  end
-
-  --Add the PreHook for handler OnMouseUp, on the submenu opening ZO_Menu item control row
-  local function AddToggleAllSubmenuCheckboxEntriesCallback(submenuIndex)
-      --d("[BMU]AddToggleAllSubmenuCheckboxEntriesCallback-index: " .. tostring(submenuIndex))
-      if not submenuIndex then return end
-      local submenuItem = zo_Menu.items[submenuIndex]
-      local itemCtrl = submenuItem and submenuItem.item or nil
-      --d(">found the itemCtrl: " .. tostring(itemCtrl))
-      --Found the zo_Menu submenu opening control?
-      if not itemCtrl then return end
-      --Add the OnEffectivelyShown handler to the submenu opening control of zo_Menu (if not already in it)
-      if zo_MenuSubmenuItemsHooked[itemCtrl] ~= nil then return end
-      zo_MenuSubmenuItemsHooked[itemCtrl] = true
-      ZO_PreHookHandler(itemCtrl, "OnMouseUp", checkIfLibCustomMenuSubmenuShownAndToggleCheckboxes)
-  end
-
-  --Add a prehook to the OnMouseUp handler of the relevant submenu opening ZO_Menu controls (saved into table submenuIndicesToAddCallbackTo)
-   ZO_PostHook("ShowMenu", function(owner, initialRefCount, menuType)
-      owner = owner or moc()
-      menuType = menuType or MENU_TYPE_DEFAULT
---d("[BMU]ShowMenu-owner: " .. tostring(owner) .. "/" .. tostring(BMU_ItemTexture) .. "; menuType: " ..tostring(menuType))
-      --Check if the menu is our at the BMU panel's itemTexture, if it got entries, if special submenu items have been defined -> Else abort
-      if menuType ~= MENU_TYPE_DEFAULT or (owner == nil or owner ~= teleporterWin_Main_Control_ItemTexture) or zo_IsTableEmpty(submenuIndicesToAddCallbackTo)
-              or next(zo_Menu.items) == nil then return end
-      zo_MenuSubmenuItemsHooked = {}
-      --Add the OnMouseUp handler to the submenu's "opening control" so clicking them will enable/disable (toggle) all the checkboxes inside the submenu
-      for _, indexToAddTo in ipairs(submenuIndicesToAddCallbackTo) do
-          AddToggleAllSubmenuCheckboxEntriesCallback(indexToAddTo)
-      end
-      --Called at zo_Menu_OnHide, and cleaned automatically at ClearMenu()
-      SetMenuHiddenCallback(cleanUpzo_MenuItemsSubmenuSpecialCallbacks)
-  end)
-  ]]
-  -- -^- INS251229 Baertram - END 2
 
   teleporterWin_Main_Control_ItemTexture:SetHandler("OnMouseEnter", function(teleporterWin_Main_Control_ItemTextureCtrl)
 	-- set tooltip accordingly to the selected filter
@@ -1675,9 +1608,10 @@ BMU_updateCheckboxSurveyMap = BMU.updateCheckboxSurveyMap
 
 
 function BMU.numOfSurveyTypesChecked()
+	local displayMaps = BMU.savedVarsChar.displayMaps
 	local num = 0
 	for _, subType in pairs(surveyTypes) do
-		if BMU.savedVarsChar.displayMaps[subType] then
+		if displayMaps[subType] then
 			num = num + 1
 		end
 	end

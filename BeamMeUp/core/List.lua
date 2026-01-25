@@ -30,6 +30,15 @@ local table_remove = table.remove
 local BMU_LibZone = BMU.LibZone
 local BMU_LibSets = BMU.LibSets
 
+--Other addon variables
+---v- INS BEARTRAM 20260125 LibScrollableMenu
+local AddCustomScrollableMenuEntry 		= AddCustomScrollableMenuEntry
+local ClearCustomScrollableMenu 		= ClearCustomScrollableMenu
+local AddCustomScrollableMenuDivider    = AddCustomScrollableMenuDivider
+local AddCustomScrollableSubMenuEntry 	= AddCustomScrollableSubMenuEntry
+local ShowCustomScrollableMenu 			= ShowCustomScrollableMenu
+---^- INS BEARTRAM 20260125 LibScrollableMenu
+
 --BMU variables
 local BMU_textures = BMU.textures
 local BMU_ZONE_CATEGORY_DELVE = BMU.ZONE_CATEGORY_DELVE
@@ -1339,7 +1348,7 @@ function ListView:update()
 				
 				----
 				-- add source text
-				table_insert(tooltipTextPlayer, BMU_textures.tooltipSeperator)
+				table_insert(tooltipTextPlayer, BMU_textures.tooltipSeperatorStr)
 				for _, sourceText in pairs(message.sourcesText) do
 					table_insert(tooltipTextPlayer, sourceText)
 				end
@@ -1348,7 +1357,7 @@ function ListView:update()
 				-- add favorite player text
 				local favSlot = BMU.isFavoritePlayer(message.displayName)
 				if favSlot then
-					table_insert(tooltipTextPlayer, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextPlayer, BMU_textures.tooltipSeperatorStr)
 					table_insert(tooltipTextPlayer, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. tos(favSlot), "gold"))
 				end
 
@@ -1389,7 +1398,7 @@ function ListView:update()
 			if cachedSavedVarsAccountSecondLanguage ~= 1 and message.zoneNameClickable == true and message.zoneNameSecondLanguage ~= nil then --CHG251229 Baertram
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperatorStr)
 				end
 				-- add zone name
 				table_insert(tooltipTextZone, message.zoneNameSecondLanguage)
@@ -1401,7 +1410,7 @@ function ListView:update()
 			if message.category ~= BMU.ZONE_CATEGORY_OVERLAND and message.parentZoneName and not message.houseTooltip then
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperatorStr)
 				end
 				-- add zone name
 				table_insert(tooltipTextZone, message.parentZoneName)
@@ -1412,7 +1421,7 @@ function ListView:update()
 			if message.houseTooltip then
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperatorStr)
 				end
 				-- add house infos
 				for _, v in pairs(message.houseTooltip) do
@@ -1425,7 +1434,7 @@ function ListView:update()
 			if message.zoneNameClickable == true and (message.zoneWayhsrineDiscoveryInfo ~= nil or message.zoneSkyshardDiscoveryInfo ~= nil) then
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperatorStr)
 				end
 				if message.zoneSkyshardDiscoveryInfo ~= nil then
 					table_insert(tooltipTextZone, message.zoneSkyshardDiscoveryInfo)
@@ -1440,7 +1449,7 @@ function ListView:update()
 			if message.zoneNameClickable == true and message.publicDungeonAchiementInfo then
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperatorStr)
 				end
 				table_insert(tooltipTextZone, message.publicDungeonAchiementInfo)
 			end
@@ -1450,7 +1459,7 @@ function ListView:update()
 			if message.setCollectionProgress then
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperatorStr)
 				end
 				-- add set collection info
 				table_insert(tooltipTextZone, message.setCollectionProgress)
@@ -1493,7 +1502,7 @@ function ListView:update()
 				-- copy item names to tooltipTextZone
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperatorStr)
 				end
 				for _, item in ipairs(message.relatedItems) do
 					table_insert(tooltipTextZone, item.itemTooltip)
@@ -1511,7 +1520,7 @@ function ListView:update()
 				-- copy quest names to tooltipTextZone
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperatorStr)
 				end
 				for _, questName in ipairs(message.relatedQuests) do
 					table_insert(tooltipTextZone, questName)
@@ -1523,7 +1532,7 @@ function ListView:update()
 			if message.groupMemberSameInstance ~= nil then
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperatorStr)
 				end
 				-- add instance info
 				if message.groupMemberSameInstance == true then
@@ -1537,7 +1546,7 @@ function ListView:update()
 			-- Info if zone is favorite
 			local favSlot = BMU.isFavoriteZone(message.zoneId)
 			if favSlot then
-				table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+				table_insert(tooltipTextZone, BMU_textures.tooltipSeperatorStr)
 				table_insert(tooltipTextZone, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. tos(favSlot), "gold"))
 			end
 			------------------
@@ -1570,7 +1579,7 @@ function ListView:update()
 			if message.isDungeon then
 				if #tooltipTextZone > 0 then
 					-- add separator
-					table_insert(tooltipTextZone, BMU_textures.tooltipSeperator)
+					table_insert(tooltipTextZone, BMU_textures.tooltipSeperatorStr)
 				end
 				-- add dungeon infos
 				for _, v in pairs(message.dungeonTooltip) do
@@ -1918,8 +1927,8 @@ function BMU.clickOnTeleportToDungeonButton(textureControl, button, message)
 	if button == MOUSE_BUTTON_INDEX_RIGHT and CanPlayerChangeGroupDifficulty() then
 		-- show context menu
 		ClearCustomScrollableMenu()
-		AddCustomScrollableMenuEntry(BMU_textures.dungeonDifficultyNormal .. GetString(SI_DUNGEONDIFFICULTY1), function() BMU.setDungeonDifficulty(false) zo_callLater(function() BMU.clickOnTeleportToDungeonButton_2(message) end, 200) end)
-		AddCustomScrollableMenuEntry(BMU_textures.dungeonDifficultyVeteran .. GetString(SI_DUNGEONDIFFICULTY2), function() BMU.setDungeonDifficulty(true) zo_callLater(function() BMU.clickOnTeleportToDungeonButton_2(message) end, 200) end)
+		AddCustomScrollableMenuEntry(BMU_textures.dungeonDifficultyNormalStr .. GetString(SI_DUNGEONDIFFICULTY1), function() BMU.setDungeonDifficulty(false) zo_callLater(function() BMU.clickOnTeleportToDungeonButton_2(message) end, 200) end)
+		AddCustomScrollableMenuEntry(BMU_textures.dungeonDifficultyVeteranStr .. GetString(SI_DUNGEONDIFFICULTY2), function() BMU.setDungeonDifficulty(true) zo_callLater(function() BMU.clickOnTeleportToDungeonButton_2(message) end, 200) end)
 		ShowCustomScrollableMenu()
 	else
 		-- just start teleport
@@ -2152,7 +2161,7 @@ function BMU.clickOnZoneName(button, record)
 				AddCustomScrollableMenuDivider()
 				
 				-- button to increase sorting ("move up")
-				AddCustomScrollableMenuEntry(BMU_textures.arrowUp, function()
+				AddCustomScrollableMenuEntry(BMU_textures.arrowUpStr, function()
 					
 					if not BMU_savedVarsServ.houseCustomSorting[record.houseId] then
 						if next(BMU_savedVarsServ.houseCustomSorting) == nil then
@@ -2178,7 +2187,7 @@ function BMU.clickOnZoneName(button, record)
 				-- button to decrease sorting ("move down")
 				-- show only if the entry is already in order
 				if BMU_savedVarsServ.houseCustomSorting[record.houseId] then
-					AddCustomScrollableMenuEntry(BMU_textures.arrowDown, function()
+					AddCustomScrollableMenuEntry(BMU_textures.arrowDownStr, function()
 
 						local currentValue = BMU_savedVarsServ.houseCustomSorting[record.houseId]
 						local houseIdOfSuc = BMU_has_value(BMU_savedVarsServ.houseCustomSorting, currentValue - 1)

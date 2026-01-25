@@ -31,19 +31,24 @@ local worldName 							= GetWorldName()
 local typeFunc = "function"
 
 
-local zo_Menu                               = ZO_Menu     --ZO_Menu speed-up variable (so _G is not searched each time context menus are used)
 local zo_WorldMapZoneStoryTopLevel_Keyboard = ZO_WorldMapZoneStoryTopLevel_Keyboard
 local zo_ChatWindow                         = ZO_ChatWindow
-local ClearCustomScrollableMenu 							= ClearCustomScrollableMenu
-local ShowCustomScrollableMenu 								= ShowCustomScrollableMenu
 --Other addon variables
----LibCustomMenu
---[[
-local libCustomMenuSubmenu = LibCustomMenuSubmenu --The control holding the currently shown submenu control entries (as a submenu is opened)
-local LCM_SubmenuEntryNamePrefix = "ZO_SubMenuItem" --row name of a ZO_Menu's submenu entrxy added by LibCustomMenu to the parent control LibCustomMenuSubmenu
-local zo_MenuSubmenuItemsHooked = {} --Items hooked by this code, to add a special OnMouseUp handler.
-local checkboxesAtSubmenuCurrentState = {} --Save the current checkboxes state (on/off) for a submenu opening control, so we can toggle all checkboxes in the submenu properly
-]]
+---v- INS BEARTRAM 20260125 LibScrollableMenu
+local LSM_ENTRY_TYPE_NORMAL 		= LSM_ENTRY_TYPE_NORMAL
+local LSM_ENTRY_TYPE_CHECKBOX 		= LSM_ENTRY_TYPE_CHECKBOX
+local LSM_ENTRY_TYPE_RADIOBUTTON	= LSM_ENTRY_TYPE_RADIOBUTTON
+local LSM_UPDATE_MODE_MAINMENU 		= LSM_UPDATE_MODE_MAINMENU
+
+local ClearCustomScrollableMenu 		= ClearCustomScrollableMenu
+local AddCustomScrollableMenuDivider    = AddCustomScrollableMenuDivider
+local AddCustomScrollableMenuCheckbox 	= AddCustomScrollableMenuCheckbox
+local RefreshCustomScrollableMenu 		= RefreshCustomScrollableMenu
+local AddCustomScrollableSubMenuEntry 	= AddCustomScrollableSubMenuEntry
+local ShowCustomScrollableMenu 			= ShowCustomScrollableMenu
+---^- INS BEARTRAM 20260125 LibScrollableMenu
+
+
 --BMU variables
 local BMU_textures                          = BMU.textures
 local colorGreen 							= "green"
@@ -59,6 +64,7 @@ local subType_Jewelry 						= "jewelry"
 local subType_Treasure 						= "treasure"
 local subType_Leads 						= "leads"
 local surveyTypes 							= {subType_Alchemist, subType_Enchanter, subType_Woodworker, subType_Blacksmith, subType_Clothier, subType_Jewelry}
+local surveyTypeNames						= {GetString(SI_ITEMTYPEDISPLAYCATEGORY14), GetString(SI_ITEMTYPEDISPLAYCATEGORY15), GetString(SI_ITEMTYPEDISPLAYCATEGORY12), GetString(SI_ITEMTYPEDISPLAYCATEGORY10), GetString(SI_ITEMTYPEDISPLAYCATEGORY11), GetString(SI_ITEMTYPEDISPLAYCATEGORY13)}
 local surveyAppendixStrPattern 				= " (%d/%d)"
 local maxSurveyTypes 						= #surveyTypes --Currently 6, add the new entries to table surveyTypes to increase this if new survey types get added (new crafting profession types that got surveys)
 
@@ -102,17 +108,6 @@ local inviteQueue = {}
 
 
 ---v- INS BEARTRAM 20260125 LibScrollableMenu helpers
-local LSM_ENTRY_TYPE_NORMAL 		= LSM_ENTRY_TYPE_NORMAL
---local LSM_ENTRY_TYPE_DIVIDER 		= LSM_ENTRY_TYPE_DIVIDER
---local LSM_ENTRY_TYPE_HEADER 		= LSM_ENTRY_TYPE_HEADER
-local LSM_ENTRY_TYPE_SUBMENU 		= LSM_ENTRY_TYPE_SUBMENU
-local LSM_ENTRY_TYPE_CHECKBOX 		= LSM_ENTRY_TYPE_CHECKBOX
---local LSM_ENTRY_TYPE_BUTTON 		= LSM_ENTRY_TYPE_BUTTON
-local LSM_ENTRY_TYPE_RADIOBUTTON	= LSM_ENTRY_TYPE_RADIOBUTTON
---local LSM_ENTRY_TYPE_EDITBOX 		= LSM_ENTRY_TYPE_EDITBOX
---local LSM_ENTRY_TYPE_SLIDER 		= LSM_ENTRY_TYPE_SLIDER
-
-
 --Context menu dynamic helpers for LibScrollableMenu entries
 local function getValueOrCallback(variableOrFunc, ...)
 	return (type(variableOrFunc) == typeFunc and variableOrFunc(...)) or variableOrFunc
@@ -138,8 +133,10 @@ local function LSMEntryTypeCheckboxOrRadioButtonClickedHelperFunc(p_SVsettings, 
 	--DefaultTab change is prepared? Check if the checkbox was checked, and if not pass in the default tab BMU.indexListMain (not the checkbox's checked state)
 	local newChecked = checked
 	if not onClickedFuncWasProvided and p_SVsettingName == "defaultTab" then
+		--Reset the defaultTab to the base list first
 		newChecked = BMU.indexListMain
-		if p_isCheckedValueOrFunc ~= nil then
+		--If any checkbox for the defaultTab was checked, get that list's value from p_isCheckedValueOrFunc variable/function now
+		if checked and p_isCheckedValueOrFunc ~= nil then
 			newChecked = getValueOrCallback(p_isCheckedValueOrFunc, p_additionalData)
 		end
 	end
@@ -418,7 +415,7 @@ local function SetupUI()
 			BMU_chatButtonTex:SetMouseEnabled(true) --CHG251229 Baertram
 			BMU_chatButtonTex:SetDrawLayer(2) --CHG251229 Baertram
 			--Handlers
-			BMU_chatButtonTex:SetHandler("OnMouseUp", function() --CHG251229 Baertram
+			BMU_chatButtonTex:SetHandler("OnMouseUp", function(self, button) --CHG251229 Baertram
 				if button ~= MOUSE_BUTTON_INDEX_LEFT then return end  --INS BAERTRAM20260124
 				BMU_OpenTeleporter(true)
 			end)
@@ -494,7 +491,7 @@ local function SetupUI()
   teleporterWin_zoneGuideSwapTexture:SetTexture(BMU_textures.swapBtn) --CHG251229 Baertram Performance improvement
   teleporterWin_zoneGuideSwapTexture:SetMouseEnabled(true) --CHG251229 Baertram Performance improvement
 
-  teleporterWin_zoneGuideSwapTexture:SetHandler("OnMouseUp", function()
+  teleporterWin_zoneGuideSwapTexture:SetHandler("OnMouseUp", function(self, button)
 	  if button ~= MOUSE_BUTTON_INDEX_LEFT then return end  --INS BAERTRAM20260124
       BMU_OpenTeleporter = BMU_OpenTeleporter or BMU.OpenTeleporter --INS251229 Baertram performance improvement for multiple used variable reference
 	  BMU_OpenTeleporter(true) ----CHG251229 Baertram Performance improvement by using local
@@ -521,7 +518,7 @@ local function SetupUI()
   teleporterWin_feedbackTexture:SetTexture(BMU_textures.feedbackBtn) --CHG251229 Baertram
   teleporterWin_feedbackTexture:SetMouseEnabled(true) --CHG251229 Baertram
 
-  teleporterWin_feedbackTexture:SetHandler("OnMouseUp", function() --CHG251229 Baertram
+  teleporterWin_feedbackTexture:SetHandler("OnMouseUp", function(self, button) --CHG251229 Baertram
       if button ~= MOUSE_BUTTON_INDEX_LEFT then return end  --INS BAERTRAM20260124
       BMU.createMail(teleporterVars.feedbackContact, "Feedback - BeamMeUp", "") --CHG251229 Baertram
 	end)
@@ -1126,6 +1123,10 @@ local function SetupUI()
   local function BMU_CreateTable_IndexListItems() --local function which is not redefined each contextMenu open again and again and again -> memory and performance drain!
     BMU_createTable({index=BMU.indexListItems})
   end
+  local function refreshSurveyMapMainMenu(comboBox)
+	  RefreshCustomScrollableMenu(moc(), LSM_UPDATE_MODE_MAINMENU, comboBox) --Update the opening mainmenu's entry to refresh the shown survey filter numbers
+	  BMU_CreateTable_IndexListItems()
+  end
   -- -^- INS251229 Baertram END 1
   teleporterWin_Main_Control_ItemTexture:SetHandler("OnMouseUp", function(ctrl, button)
       BMU_updateCheckboxSurveyMap = BMU_updateCheckboxSurveyMap or BMU.updateCheckboxSurveyMap  --INS251229 Baertram
@@ -1169,11 +1170,21 @@ local function SetupUI()
 						  checked = function() return BMU_savedVarsChar.displayAntiquityLeads.completed end,
 					  },
 				  },
-				  {
-					  callback = function()
-						  d("Clicked Antiquity submenu openingControl")
-					  end
-				  } --additionalData.callback is the function which is called as you click the submenu's openingControl
+				  function()
+					  d("Clicked Antiquity submenu openingControl")
+
+					--[[
+					local function myAddonCallbackFunc(LSM_comboBox, selectedContextMenuItem, openingMenusEntries, customParam1, customParam2)
+							--Loop at openingMenusEntries, get it's .dataSource, and if it's a checked checkbox then update SavedVariables of your addon accordingly
+							--or do oher things
+							--> Attention: Updating the entries in openingMenusEntries won't work as it's a copy of the data as the contextMenu was shown, and no reference!
+							--> Updating the data directly would make the menus break, and sometimes the data would be even gone due to your mouse moving above any other entry
+							--> wile the callbackFunc here runs
+					end
+					--Use LSM API func to get the opening control's list and m_sorted items properly so addons do not have to take care of that again and again on their own
+					RunCustomScrollableMenuItemsCallback(comboBox, item, myAddonCallbackFunc, { LSM_ENTRY_TYPE_CHECKBOX }, true, "customParam1", "customParam2")
+					]]
+				  end
 		  )
 
 		  -- Clues
@@ -1192,14 +1203,32 @@ local function SetupUI()
 		  )
 
 		  -- Add submenu for survey types filter
+		  --todo: make this dynamic here based on surveyTypes table
+		  local surveyTypesSubmenuEntries = {}
+		  for surveyTypeIndex, surveyType in ipairs(surveyTypes) do
+			  local surveyTypeName = surveyTypeNames[surveyTypeIndex] or surveyType
+			  local surveyTypeSubmenuEntry = {
+				  label = surveyTypeName,
+				  callback = function(comboBox, itemName, item, checked, data)
+					  BMU.savedVarsChar.displayMaps[surveyType] = checked
+					  refreshSurveyMapMainMenu(comboBox)
+				  end,
+				  entryType = LSM_ENTRY_TYPE_CHECKBOX,
+				  checked = function() return BMU.savedVarsChar.displayMaps[surveyType] end,
+			  }
+			  surveyTypesSubmenuEntries[#surveyTypesSubmenuEntries+1] = surveyTypeSubmenuEntry
+		  end
+
 		  AddCustomScrollableSubMenuEntry(GetString(SI_GAMEPAD_BANK_FILTER_HEADER), --INS251229 Baertram Survey filters
+				surveyTypesSubmenuEntries,
+		  			--[[
 				  {
 					  {
 						  label = GetString(SI_ITEMTYPEDISPLAYCATEGORY14),
 						  callback = function(comboBox, itemName, item, checked, data)
 							  BMU.savedVarsChar.displayMaps.alchemist = checked
-							  --BMU_updateCheckboxSurveyMap(3)
-							  BMU_CreateTable_IndexListItems() end,
+							  refreshSurveyMapMainMenu(comboBox)
+						  end,
 						  entryType = LSM_ENTRY_TYPE_CHECKBOX,
 						  checked = function() return BMU.savedVarsChar.displayMaps.alchemist end,
 					  },
@@ -1207,8 +1236,8 @@ local function SetupUI()
 						  label = GetString(SI_ITEMTYPEDISPLAYCATEGORY15),
 						  callback = function(comboBox, itemName, item, checked, data)
 							  BMU.savedVarsChar.displayMaps.enchanter = checked
-							  --BMU_updateCheckboxSurveyMap(3)
-							  BMU_CreateTable_IndexListItems() end,
+							  refreshSurveyMapMainMenu(comboBox)
+						  end,
 						  entryType = LSM_ENTRY_TYPE_CHECKBOX,
 						  checked = function() return BMU.savedVarsChar.displayMaps.enchanter end,
 					  },
@@ -1216,8 +1245,8 @@ local function SetupUI()
 						  label = GetString(SI_ITEMTYPEDISPLAYCATEGORY12),
 						  callback = function(comboBox, itemName, item, checked, data)
 							  BMU.savedVarsChar.displayMaps.woodworker = checked
-							  --BMU_updateCheckboxSurveyMap(3)
-							  BMU_CreateTable_IndexListItems() end,
+							  refreshSurveyMapMainMenu(comboBox)
+						  end,
 						  entryType = LSM_ENTRY_TYPE_CHECKBOX,
 						  checked = function() return BMU.savedVarsChar.displayMaps.woodworker end,
 					  },
@@ -1225,8 +1254,8 @@ local function SetupUI()
 						  label = GetString(SI_ITEMTYPEDISPLAYCATEGORY10),
 						  callback = function(comboBox, itemName, item, checked, data)
 							  BMU.savedVarsChar.displayMaps.blacksmith = checked
-							  --BMU_updateCheckboxSurveyMap(3)
-							  BMU_CreateTable_IndexListItems() end,
+							  refreshSurveyMapMainMenu(comboBox)
+						  end,
 						  entryType = LSM_ENTRY_TYPE_CHECKBOX,
 						  checked = function() return BMU.savedVarsChar.displayMaps.blacksmith end,
 					  },
@@ -1234,8 +1263,8 @@ local function SetupUI()
 						  label = GetString(SI_ITEMTYPEDISPLAYCATEGORY11),
 						  callback = function(comboBox, itemName, item, checked, data)
 							  BMU.savedVarsChar.displayMaps.clothier = checked
-							  --BMU_updateCheckboxSurveyMap(3)
-							  BMU_CreateTable_IndexListItems() end,
+							  refreshSurveyMapMainMenu(comboBox)
+						  end,
 						  entryType = LSM_ENTRY_TYPE_CHECKBOX,
 						  checked = function() return BMU.savedVarsChar.displayMaps.clothier end,
 					  },
@@ -1243,17 +1272,16 @@ local function SetupUI()
 						  label = GetString(SI_ITEMTYPEDISPLAYCATEGORY13),
 						  callback = function(comboBox, itemName, item, checked, data)
 							  BMU.savedVarsChar.displayMaps.jewelry = checked
-							  --BMU_updateCheckboxSurveyMap(3)
-							  BMU_CreateTable_IndexListItems() end,
+							  refreshSurveyMapMainMenu(comboBox)
+						  end,
 						  entryType = LSM_ENTRY_TYPE_CHECKBOX,
 						  checked = function() return BMU.savedVarsChar.displayMaps.jewelry end,
 					  },
 				  },
-				  {
-					  callback = function()
-						  d("Clicked Survey submenu openingControl")
-					  end
-				  } --additionalData.callback is the function which is called as you click the submenu's openingControl
+				  ]]
+				  function()
+					  d("Clicked Survey submenu openingControl")
+				  end
 		  )
 
 		  -- divider
@@ -1467,11 +1495,9 @@ local function SetupUI()
 					checked = function() return BMU.savedVarsChar.dungeonFinder.showDungeons end,
 				},
 			},
-		  {
-			  callback = function()
-				  d("Clicked filters submenu openingControl")
-			  end
-		  } --additionalData.callback is the function which is called as you click the submenu's openingControl
+		  	function()
+				d("Clicked filters submenu openingControl")
+		  	end
 
 		)
 
@@ -1481,7 +1507,8 @@ local function SetupUI()
 			{
 				-- sort by release: from old (top of list) to new
 				{
-					label = BMU_SI_get(SI.TELE_UI_TOGGLE_SORT_RELEASE) .. BMU_textures.arrowUp,
+					label = BMU_SI_get(SI.TELE_UI_TOGGLE_SORT_RELEASE),
+					icon = BMU_textures.arrowUp,
 					callback = function(comboBox, itemName, item, checked, data)
 						local dungeonFinderCharSV = BMU.savedVarsChar.dungeonFinder
 						dungeonFinderCharSV.sortByReleaseASC = true
@@ -1495,7 +1522,8 @@ local function SetupUI()
 				},
 				-- sort by release: from new (top of list) to old
 				{
-					label = BMU_SI_get(SI.TELE_UI_TOGGLE_SORT_RELEASE) .. BMU_textures.arrowDown,
+					label = BMU_SI_get(SI.TELE_UI_TOGGLE_SORT_RELEASE),
+					icon = BMU_textures.arrowDown,
 					callback = function(comboBox, itemName, item, checked, data)
 						local dungeonFinderCharSV = BMU.savedVarsChar.dungeonFinder
 						dungeonFinderCharSV.sortByReleaseASC = false
@@ -1521,7 +1549,7 @@ local function SetupUI()
 					buttonGroup = 1,
 					checked = function() return BMU.savedVarsChar.dungeonFinder.sortByAcronym end,
 				},
-			}, nil, nil, nil, 5
+			}
 		)
 
 		-- display options (update name or acronym) (dungeon name or zone name)
@@ -1570,11 +1598,11 @@ local function SetupUI()
 					buttonGroup = 3,
 					checked = function() return BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName == true end,
 				},
-			}, nil, nil, nil, 5
+			}
 		)
 
 		-- add dungeon difficulty toggle
-		addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_textures.dungeonDifficultyVeteran .. GetString(SI_DUNGEONDIFFICULTY2), nil, nil,
+		addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_textures.dungeonDifficultyVeteranStr .. GetString(SI_DUNGEONDIFFICULTY2), nil, nil,
 				function(comboBox, itemName, item, checked, data)
 					BMU_setDungeonDifficulty(not BMU_getCurrentDungeonDifficulty())
 					zo_callLater(function() BMU.createTableDungeons() end, 300)

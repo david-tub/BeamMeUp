@@ -284,6 +284,12 @@ SI.CONSTANT_SURVEY_MAP = "SI_CONSTANT_SURVEY_MAP"
 
 
 
+-----------------------------------------------------------------------------
+-- LibScrollableMenu - Context menu strings --INS260127 Baertram
+-----------------------------------------------------------------------------
+SI.CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL = "SI_CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL"
+
+
 -- utility functions
 function SI.get(key, n)
     assert(key ~= nil)

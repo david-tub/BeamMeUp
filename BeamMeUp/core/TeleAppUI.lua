@@ -49,28 +49,9 @@ local ShowCustomScrollableMenu 			= ShowCustomScrollableMenu
 
 --The default options for a LSM contextMenu
 ---Item filters
-local LSM_itemFilterContextMenuOptions = {
-	visibleRowsDropdown = 15, visibleRowsSubmenu = 15,
-	sortEntries = false,
-	enableFilter        = true,
-	headerCollapsible = true,
-    headerCollapsed = true, --show search editbox at header, but automatically collapse the header by default
-	headerToggleTooltip = GetString(SI_SCREEN_NARRATION_EDIT_BOX_SEARCH_NAME), --Search
-    headerCollapsedIcon = function() return {
-		   iconTexture = "/esoui/art/miscellaneous/search_icon.dds",
-		   width       = 20,
-		   height      = 16,
-		   --iconTint=CUSTOM_HIGHLIGHT_TEXT_COLOR,
-		   align       = LEFT,
-		   offsetX     = 20,
-		   offSetY     = 0,
-   		}
-	end,
-	--Automatic refresh is currently done manually via functions called from entry's callback (e.g. survey and/or leads), where needed only
-    --automaticSubmenuRefresh  = false, --Make the submenus automatically refresh if any entry was clicked
-    --automaticRefresh    = true, --Make the normal menus automatically refresh if any entry was clicked (for the e.g. "Logout icon")
-
-}
+local LSMVars = teleporterVars.LSMVars
+local LSM_itemFilterContextMenuOptions = LSMVars.itemFilterContextMenuOptions
+local LSM_dungeonFilterContextMenuOptions = LSMVars.dungeonFilterContextMenuOptions
 ---^- INS BEARTRAM 20260125 LibScrollableMenu
 
 
@@ -1006,13 +987,13 @@ local function SetupUI()
     local PortToFriend = PortToFriend --INS251229 Baertram performance improvement for 2 same used global variables
 	if PortToFriend and PortToFriend.GetFavorites then
 		-- enable tab
-		teleporterWin_Main_Control_PTFTexture:SetHandler("OnMouseUp", function(self, button, upInside) --CHG251229 Baertram Usage of upInside to properly check the user releaased the mouse on the control!!!
+		teleporterWin_Main_Control_PTFTexture:SetHandler("OnMouseUp", function(ctrl, button, upInside) --CHG251229 Baertram Usage of upInside to properly check the user releaased the mouse on the control!!!
 			ClearCustomScrollableMenu()
 			if upInside and button == MOUSE_BUTTON_INDEX_RIGHT then --CHG251229 Baertram Usage of upInside to properly check the user releaased the mouse on the control!!!
 				-- toggle between zone names and house names
 				addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_SI_get(SI.TELE_UI_TOOGLE_ZONE_NAME), BMU.savedVarsChar, "ptfHouseZoneNames", function() BMU.clearInputFields() BMU.createTablePTF() end, nil, nil)
 
-				ShowCustomScrollableMenu()
+				ShowCustomScrollableMenu(ctrl, nil)
 			else
                 BMU_clearInputFields()
 				BMU.createTablePTF()
@@ -1060,7 +1041,7 @@ local function SetupUI()
   teleporterWin_Main_Control_OwnHouseTexture:SetMouseEnabled(true)
   teleporterWin_Main_Control_OwnHouseTexture:SetDrawLayer(2)
 
-  teleporterWin_Main_Control_OwnHouseTexture:SetHandler("OnMouseUp", function(self, button)
+  teleporterWin_Main_Control_OwnHouseTexture:SetHandler("OnMouseUp", function(ctrl, button)
 	ClearCustomScrollableMenu()
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		-- toggle between nicknames and standard names
@@ -1072,7 +1053,7 @@ local function SetupUI()
 		-- make default tab
 		addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_SI_get(SI.TELE_SETTINGS_DEFAULT_TAB), BMU.savedVarsChar, "defaultTab", nil, BMU.indexListOwnHouses, nil)
 
-		ShowCustomScrollableMenu()
+		ShowCustomScrollableMenu(ctrl, nil)
 	else
         BMU_clearInputFields( )
 		BMU_createTableHouses()
@@ -1104,7 +1085,7 @@ local function SetupUI()
   teleporterWin_Main_Control_QuestTexture:SetMouseEnabled(true)
   teleporterWin_Main_Control_QuestTexture:SetDrawLayer(2)
 
-  teleporterWin_Main_Control_QuestTexture:SetHandler("OnMouseUp", function(self, button)
+  teleporterWin_Main_Control_QuestTexture:SetHandler("OnMouseUp", function(ctrl, button)
 	ClearCustomScrollableMenu()
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		-- show context menu
@@ -1112,7 +1093,7 @@ local function SetupUI()
 		-- make default tab
 		addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_SI_get(SI.TELE_SETTINGS_DEFAULT_TAB), BMU_savedVarsChar, "defaultTab", nil, BMU.indexListQuests, nil)
 
-		ShowCustomScrollableMenu()
+		ShowCustomScrollableMenu(ctrl, nil)
 	else
 		BMU_createTable({index=BMU.indexListQuests})
 	end
@@ -1204,7 +1185,10 @@ local function SetupUI()
 					  -- check all subTypes (1) or uncheck all subtypes (2)
 					  BMU_updateCheckboxLeadsMap(allLeadFiltersEnabled and 1 or 2)
 					  refreshLeadsMainMenu(comboBox)
-			    end
+			    end,
+				{ --additionalData
+					tooltip = BMU_SI_get(SI.CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL),
+				}
 		  )
 
 			--[[
@@ -1273,7 +1257,10 @@ local function SetupUI()
 					  -- check all subTypes (1) or uncheck all subtypes (2)
 					  BMU_updateCheckboxSurveyMap(allSurveyFiltersEnabled and 1 or 2)
 					  refreshSurveyMapMainMenu(comboBox)
-			    end
+			    end,
+				{ --additionalData
+					tooltip = BMU_SI_get(SI.CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL),
+				}
 		  )
 
 		  -- divider
@@ -1361,7 +1348,7 @@ local function SetupUI()
   teleporterWin_Main_Control_OnlyYourzoneTexture:SetMouseEnabled(true)
   teleporterWin_Main_Control_OnlyYourzoneTexture:SetDrawLayer(2)
 
-	teleporterWin_Main_Control_OnlyYourzoneTexture:SetHandler("OnMouseUp", function(self, button)
+	teleporterWin_Main_Control_OnlyYourzoneTexture:SetHandler("OnMouseUp", function(ctrl, button)
 		ClearCustomScrollableMenu()
 		if button == MOUSE_BUTTON_INDEX_RIGHT then
 			-- show context menu
@@ -1369,7 +1356,7 @@ local function SetupUI()
 			-- make default tab
 			addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_SI_get(SI.TELE_SETTINGS_DEFAULT_TAB), BMU_savedVarsChar, "defaultTab", nil, BMU.indexListCurrentZone, nil)
 
-			ShowCustomScrollableMenu()
+			ShowCustomScrollableMenu(ctrl, nil)
 		else
 			BMU_createTable({index=BMU.indexListCurrentZone})
 		end
@@ -1400,7 +1387,7 @@ local function SetupUI()
   teleporterWin_Main_Control_DelvesTexture:SetMouseEnabled(true)
   teleporterWin_Main_Control_DelvesTexture:SetDrawLayer(2)
 
-  teleporterWin_Main_Control_DelvesTexture:SetHandler("OnMouseUp", function(self, button)
+  teleporterWin_Main_Control_DelvesTexture:SetHandler("OnMouseUp", function(ctrl, button)
 	ClearCustomScrollableMenu()
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		-- show context menu
@@ -1414,7 +1401,7 @@ local function SetupUI()
 		-- make default tab
 		addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_SI_get(SI.TELE_SETTINGS_DEFAULT_TAB), BMU.savedVarsChar, "defaultTab", nil, BMU.indexListDelves, nil)
 
-		ShowCustomScrollableMenu()
+		ShowCustomScrollableMenu(ctrl, nil)
 	else
 		BMU_createTable({index=BMU.indexListDelves})
 	end
@@ -1489,9 +1476,12 @@ local function SetupUI()
 				},
 			},
 		  	function()
-				d("Clicked filters submenu openingControl")
-		  	end
-
+				--d("Clicked filters submenu openingControl")
+				--todo enable/disable all checkboxes in submenu
+		  	end,
+			{ --additionalData
+				tooltip = BMU_SI_get(SI.CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL),
+			}
 		)
 
 		-- sorting (release or acronym)
@@ -1610,7 +1600,7 @@ local function SetupUI()
 		-- make default tab
 		addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_SI_get(SI.TELE_SETTINGS_DEFAULT_TAB), BMU.savedVarsChar, "defaultTab", nil, BMU.indexListDungeons, nil)
 
-		ShowCustomScrollableMenu(ctrl, LSM_itemFilterContextMenuOptions)
+		ShowCustomScrollableMenu(ctrl, LSM_dungeonFilterContextMenuOptions)
 	else
 		BMU_clearInputFields()
 		BMU_createTableDungeons()

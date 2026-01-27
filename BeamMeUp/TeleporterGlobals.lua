@@ -106,6 +106,46 @@ BMU.LibMapPing = LibMapPing2
 BMU.LCMB = LibChatMenuButton
 
 
+--v- INS260127 Baertram
+--LibScrollableMenu options for contextMenus
+teleporterVars.LSMVars = {
+	--The options for any LSM contextMenu at the item filter button (surveys, leads)
+	itemFilterContextMenuOptions = {
+		visibleRowsDropdown = 15,	--Rows visible max in the normal main menus (more rows -> scrollbar is shown)
+		visibleRowsSubmenu 	= 15,	--Rows visible max in any (nested) submenu (more rows -> scrollbar is shown)
+		sortEntries         = false,
+		--[[
+			enableFilter        = true, --Show header filter search box
+			headerCollapsible = true,	--Header can be collapsed/expanded
+			headerCollapsed = true, --automatically always collapse the header by default (if this is left false the last state will be saved in LSM SavedVariables, per dropdown)
+			headerToggleTooltip = GetString(SI_SCREEN_NARRATION_EDIT_BOX_SEARCH_NAME), --Tootlip at the header, here: "Search"
+			headerCollapsedIcon = function() return { --Show an icon at the header, here a search "magnifying glass" texture
+				   iconTexture = "/esoui/art/miscellaneous/search_icon.dds",
+				   width       = 20,
+				   height      = 16,
+				   --iconTint=CUSTOM_HIGHLIGHT_TEXT_COLOR,
+				   align       = LEFT,
+				   offsetX     = 20,
+				   offSetY     = 0,
+				}
+			end,
+			--Automatic refresh means if any entry is clicked, automatically refresh all other entries in the same submenu or parent menu(s).
+			-->This is currently done manually via functions called from entry's callback (e.g. survey and/or leads), where needed only! So not enabled here in general, to save performance!
+			--automaticSubmenuRefresh  = false, --Make the submenus automatically refresh if any entry was clicked
+			--automaticRefresh    = true, --Make the normal menus automatically refresh if any entry was clicked (for the e.g. "Logout icon")
+		]]
+	},
+	--The options for any LSM contextMenu at the dungeon filter button (trial, dungeon, ...)
+	dungeonFilterContextMenuOptions = {
+		visibleRowsDropdown = 15,
+		visibleRowsSubmenu 	= 15,
+		sortEntries        	= false,
+	},
+}
+
+--^- INS260127 Baertram
+
+
 -------------VERY FIRST FUNCTIONS---------
 function BMU.mergeTables(t, ...)
 	local new = {unpack(t)}

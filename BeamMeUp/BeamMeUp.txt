@@ -6,7 +6,7 @@
 ## Version: 3.7.5
 ## AddOnVersion: 375
 ## IsLibrary: false
-## DependsOn: LibAddonMenu-2.0>=41 LibScrollableMenu>=020400 LibZone>=0895
+## DependsOn: LibAddonMenu-2.0>=41 LibScrollableMenu>=020401 LibZone>=0895
 ## OptionalDependsOn: LibCustomMenu LibSlashCommander LibSets LibMapPing LibChatMenuButton PortToFriendsHouse BanditsUserInterface MorrowindStyleUI
 
 ## Globals / data sets

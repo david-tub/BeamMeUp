@@ -54,19 +54,18 @@ local LSM_itemFilterContextMenuOptions = {
 	sortEntries = false,
 	enableFilter        = true,
 	headerCollapsible = true,
-    --[[ Search filter header
     headerCollapsed = true, --show search editbox at header, but automatically collapse the header by default
+	headerToggleTooltip = GetString(SI_SCREEN_NARRATION_EDIT_BOX_SEARCH_NAME), --Search
     headerCollapsedIcon = function() return {
 		   iconTexture = "/esoui/art/miscellaneous/search_icon.dds",
-		   width       = 15,
-		   height      = 15,
+		   width       = 20,
+		   height      = 16,
 		   --iconTint=CUSTOM_HIGHLIGHT_TEXT_COLOR,
 		   align       = LEFT,
 		   offsetX     = 20,
 		   offSetY     = 0,
    		}
 	end,
-	]]
 	--Automatic refresh is currently done manually via functions called from entry's callback (e.g. survey and/or leads), where needed only
     --automaticSubmenuRefresh  = false, --Make the submenus automatically refresh if any entry was clicked
     --automaticRefresh    = true, --Make the normal menus automatically refresh if any entry was clicked (for the e.g. "Logout icon")
@@ -1197,7 +1196,7 @@ local function SetupUI()
 			  leadTypesSubmenuEntries[#leadTypesSubmenuEntries +1] = leadTypeSubmenuEntry
 		  end
 
-		  AddCustomScrollableSubMenuEntry(function() return BMU_updateContextMenuEntryAntiquityAll() end, --INS251229 Baertram Survey filters
+		  AddCustomScrollableSubMenuEntry(function() return BMU_updateContextMenuEntryAntiquityAll() end, --INS251229 Baertram Antiquity/Lead filters
 				  leadTypesSubmenuEntries,
 			    function(comboBox, itemName, item, selectionChanged, oldItem)
 				  --d("Clicked Leads submenu openingControl")
@@ -1450,8 +1449,9 @@ local function SetupUI()
   teleporterWin_Main_Control_DungeonTexture:SetMouseEnabled(true)
   teleporterWin_Main_Control_DungeonTexture:SetDrawLayer(2)
 
-  teleporterWin_Main_Control_DungeonTexture:SetHandler("OnMouseUp", function(self, button)
-	ClearCustomScrollableMenu()
+  teleporterWin_Main_Control_DungeonTexture:SetHandler("OnMouseUp", function(ctrl, button)
+	BMU_createTableDungeons = BMU_createTableDungeons or BMU.createTableDungeons					--INS251229 Baertram
+    ClearCustomScrollableMenu()
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		-- show filter menu
 		-- add filters
@@ -1598,7 +1598,7 @@ local function SetupUI()
 		addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_textures.dungeonDifficultyVeteranStr .. GetString(SI_DUNGEONDIFFICULTY2), nil, nil,
 				function(comboBox, itemName, item, checked, data)
 					BMU_setDungeonDifficulty(not BMU_getCurrentDungeonDifficulty())
-					zo_callLater(function() BMU.createTableDungeons() end, 300)
+					zo_callLater(function() BMU_createTableDungeons() end, 300)
 				end,
 				function() return BMU_getCurrentDungeonDifficulty() end,
 				{ enabled = function() return CanPlayerChangeGroupDifficulty() end } --additionalData.enabled
@@ -1610,7 +1610,7 @@ local function SetupUI()
 		-- make default tab
 		addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_SI_get(SI.TELE_SETTINGS_DEFAULT_TAB), BMU.savedVarsChar, "defaultTab", nil, BMU.indexListDungeons, nil)
 
-		ShowCustomScrollableMenu()
+		ShowCustomScrollableMenu(ctrl, LSM_itemFilterContextMenuOptions)
 	else
 		BMU_clearInputFields()
 		BMU_createTableDungeons()

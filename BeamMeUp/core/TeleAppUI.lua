@@ -1480,7 +1480,7 @@ local function SetupUI()
 				--todo enable/disable all checkboxes in submenu
 		  	end,
 			{ --additionalData
-				tooltip = BMU_SI_get(SI.CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL),
+				--tooltip = BMU_SI_get(SI.CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL),
 			}
 		)
 

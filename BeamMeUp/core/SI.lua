@@ -1,3 +1,5 @@
+local BMU = BMU --INS251229 Baertram Performancee gain, not searching _G for BMU each time again!
+
 local SI = {}
 
 -- Switch language ingame (chat command)
@@ -280,6 +282,12 @@ SI.TELE_CENTERSCREEN_FAVORITE_PLAYER_ONLINE = "SI_TELE_CENTERSCREEN_FAVORITE_PLA
 SI.CONSTANT_TREASURE_MAP = "SI_CONSTANT_TREASURE_MAP"
 SI.CONSTANT_SURVEY_MAP = "SI_CONSTANT_SURVEY_MAP"
 
+
+
+-----------------------------------------------------------------------------
+-- LibScrollableMenu - Context menu strings --INS260127 Baertram
+-----------------------------------------------------------------------------
+SI.CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL = "SI_CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL"
 
 
 -- utility functions

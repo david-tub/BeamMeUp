@@ -2247,7 +2247,7 @@ function BMU.AdminAddContextMenuToGuildRoster()
 								})
 		
 		AddCustomScrollableSubMenuEntry("BMU Admin", entries)
-		self:ShowCustomScrollableMenu(control)
+		self:ShowMenu(control)
 	end
 end
 
@@ -2309,7 +2309,7 @@ function BMU.AdminAddContextMenuToGuildApplicationRoster()
 								})
 		
 		AddCustomScrollableSubMenuEntry("BMU Admin", entries)
-		self:ShowCustomScrollableMenu(control)
+		self:ShowMenu(control)
 	end
 end
 

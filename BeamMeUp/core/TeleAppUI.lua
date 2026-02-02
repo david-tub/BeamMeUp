@@ -39,6 +39,7 @@ local LSM_ENTRY_TYPE_NORMAL 		= LSM_ENTRY_TYPE_NORMAL
 local LSM_ENTRY_TYPE_CHECKBOX 		= LSM_ENTRY_TYPE_CHECKBOX
 local LSM_ENTRY_TYPE_RADIOBUTTON	= LSM_ENTRY_TYPE_RADIOBUTTON
 local LSM_UPDATE_MODE_MAINMENU 		= LSM_UPDATE_MODE_MAINMENU
+local LSM_UPDATE_MODE_BOTH 			= LSM_UPDATE_MODE_BOTH
 
 local ClearCustomScrollableMenu 		= ClearCustomScrollableMenu
 local AddCustomScrollableMenuDivider    = AddCustomScrollableMenuDivider
@@ -47,6 +48,7 @@ local RefreshCustomScrollableMenu 		= RefreshCustomScrollableMenu
 local AddCustomScrollableSubMenuEntry 	= AddCustomScrollableSubMenuEntry
 local ShowCustomScrollableMenu 			= ShowCustomScrollableMenu
 
+local LSM								= BMU.LSM
 local LCM								= BMU.LCM
 local ClearMenu 						= ClearMenu
 
@@ -1143,16 +1145,16 @@ local function SetupUI()
   local function BMU_CreateTable_IndexListItems() --local function which is not redefined each contextMenu open again and again and again -> memory and performance drain!
     BMU_createTable({index=BMU.indexListItems})
   end
-  local function refreshLSMMainMenuOfMOC(comboBox)
-	  RefreshCustomScrollableMenu(moc(), LSM_UPDATE_MODE_MAINMENU, comboBox) --Update the opening mainmenu's entry to refresh the shown survey/lead/... filter numbers
+  local function refreshLSMMainAndSubMenuOfMOC(comboBox)
+	  RefreshCustomScrollableMenu(moc(), LSM_UPDATE_MODE_BOTH, comboBox) --Update the opening mainmenu's entry to refresh the shown survey/lead/... filter numbers
   end
-  local function refreshSurveyMapMainMenu(comboBox)
-	  refreshLSMMainMenuOfMOC(comboBox)
+  local function refreshSurveyMapMainAndSubMenu(comboBox)
+	  refreshLSMMainAndSubMenuOfMOC(comboBox)
 	  BMU_CreateTable_IndexListItems()
   end
   local function refreshLeadsMainMenu(comboBox)
 	  --Currently the same as surveyMaps so use that func too!
-	  refreshSurveyMapMainMenu(comboBox)
+	  refreshSurveyMapMainAndSubMenu(comboBox)
   end
 
   local allSurveyFiltersEnabled = true --Variable to toggle the survey filters submenu checkboxes all on/off if the submenu openingControl is clicked
@@ -1190,6 +1192,11 @@ local function SetupUI()
 				  end,
 				  entryType = LSM_ENTRY_TYPE_CHECKBOX,
 				  checked = function() return BMU.savedVarsChar[leadsSVTab][leadType] end,
+				  buttonGroup = 4,
+				  contextMenuCallback = function(comboBox, control, data)
+					LSM.ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
+				  end,
+
 			  }
 			  leadTypesSubmenuEntries[#leadTypesSubmenuEntries +1] = leadTypeSubmenuEntry
 		  end
@@ -1207,6 +1214,7 @@ local function SetupUI()
 			    end,
 				{ --additionalData
 					tooltip = BMU_SI_get(SI.CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL),
+					closeOnSelect = false, --Keep the dropdown opened even if entry get's clicked
 				}
 		  )
 
@@ -1226,10 +1234,14 @@ local function SetupUI()
 				  label = surveyTypeName,
 				  callback = function(comboBox, itemName, item, checked, data)
 					  BMU.savedVarsChar[surveySVTab][surveyType] = checked
-					  refreshSurveyMapMainMenu(comboBox)
+					  refreshSurveyMapMainAndSubMenu(comboBox)
 				  end,
 				  entryType = LSM_ENTRY_TYPE_CHECKBOX,
 				  checked = function() return BMU.savedVarsChar[surveySVTab][surveyType] end,
+				  buttonGroup = 5,
+				  contextMenuCallback = function(comboBox, control, data)
+					LSM.ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
+				  end,
 			  }
 			  surveyTypesSubmenuEntries[#surveyTypesSubmenuEntries+1] = surveyTypeSubmenuEntry
 		  end
@@ -1243,10 +1255,11 @@ local function SetupUI()
 					  allSurveyFiltersEnabled = BMU_checkCheckboxesCurrentStatus(subType_Surveys, allSurveyFiltersEnabled)
 					  -- check all subTypes (1) or uncheck all subtypes (2)
 					  BMU_updateCheckboxSurveyMap(allSurveyFiltersEnabled and 1 or 2)
-					  refreshSurveyMapMainMenu(comboBox)
+					  refreshSurveyMapMainAndSubMenu(comboBox)
 			    end,
 				{ --additionalData
 					tooltip = BMU_SI_get(SI.CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL),
+					closeOnSelect = false, --Keep the dropdown opened even if entry get's clicked
 				}
 		  )
 
@@ -1441,30 +1454,50 @@ local function SetupUI()
 					callback = function(comboBox, itemName, item, checked, data) BMU.savedVarsChar.dungeonFinder.showEndlessDungeons = checked BMU_createTableDungeons() end,
 					entryType = LSM_ENTRY_TYPE_CHECKBOX,
 					checked = function() return BMU.savedVarsChar.dungeonFinder.showEndlessDungeons end,
+					buttonGroup = 6,
+				    contextMenuCallback = function(comboBox, control, data)
+					  LSM.ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
+				    end,
 				},
 				{
 					label = BMU_SI_get(SI.TELE_UI_TOGGLE_ARENAS),
 					callback = function(comboBox, itemName, item, checked, data) BMU.savedVarsChar.dungeonFinder.showArenas = checked BMU_createTableDungeons() end,
 					entryType = LSM_ENTRY_TYPE_CHECKBOX,
 					checked = function() return BMU.savedVarsChar.dungeonFinder.showArenas end,
+					buttonGroup = 6,
+				    contextMenuCallback = function(comboBox, control, data)
+					  LSM.ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
+				    end,
 				},
 				{
 					label = BMU_SI_get(SI.TELE_UI_TOGGLE_GROUP_ARENAS),
 					callback = function(comboBox, itemName, item, checked, data) BMU.savedVarsChar.dungeonFinder.showGroupArenas = checked BMU_createTableDungeons() end,
 					entryType = LSM_ENTRY_TYPE_CHECKBOX,
 					checked = function() return BMU.savedVarsChar.dungeonFinder.showGroupArenas end,
+					buttonGroup = 6,
+				    contextMenuCallback = function(comboBox, control, data)
+					  LSM.ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
+				    end,
 				},
 				{
 					label = BMU_SI_get(SI.TELE_UI_TOGGLE_TRIALS),
 					callback = function(comboBox, itemName, item, checked, data) BMU.savedVarsChar.dungeonFinder.showTrials = checked BMU_createTableDungeons() end,
 					entryType = LSM_ENTRY_TYPE_CHECKBOX,
 					checked = function() return BMU.savedVarsChar.dungeonFinder.showTrials end,
+					buttonGroup = 6,
+				    contextMenuCallback = function(comboBox, control, data)
+					  LSM.ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
+				    end,
 				},
 				{
 					label = BMU_SI_get(SI.TELE_UI_TOGGLE_GROUP_DUNGEONS),
 					callback = function(comboBox, itemName, item, checked, data) BMU.savedVarsChar.dungeonFinder.showDungeons = checked BMU_createTableDungeons() end,
 					entryType = LSM_ENTRY_TYPE_CHECKBOX,
 					checked = function() return BMU.savedVarsChar.dungeonFinder.showDungeons end,
+					buttonGroup = 6,
+				    contextMenuCallback = function(comboBox, control, data, useLibCustomMenu)
+					  LSM.ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
+				    end,
 				},
 			},
 		  	function()

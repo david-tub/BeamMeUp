@@ -727,6 +727,10 @@ local function OnAddOnLoaded(eventCode, addOnName)
 
     teleporterVars.isAddonLoaded = true
 
+	--Libraries
+	BMU.GetLibraries() --Check if any BMU.* library variable needs an update
+
+
     BMU.DefaultsAccount = {
 		["pos_MapScene_x"] = -15,
 		["pos_MapScene_y"] = 63,
@@ -916,9 +920,6 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	--zo_callLater(function() BMU.requestGuildData() end, 5000)
 
 	-- activate guild admin tools -- Needs LibCustomMenu
-	local LCM = LibCustomMenu
-	BMU.LCM = LCM
-
 	local displayName = GetDisplayName()
 	local adminAccountsAllowed = {
 		["@DeadSoon"] = true,

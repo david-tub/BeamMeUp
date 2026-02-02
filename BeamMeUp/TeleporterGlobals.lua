@@ -94,20 +94,23 @@ local colorStrToColorCodes = {
 }
 -- -^- INS251229 Baertram BEGIN 1
 
-
--- necessary libraries
-BMU.LibZone = LibZone
-BMU.LAM = LibAddonMenu2
-
--- optional libraries
-BMU.LSC = LibSlashCommander
-BMU.LibSets = LibSets
-BMU.LibMapPing = LibMapPing2
-BMU.LCMB = LibChatMenuButton
-BMU.LCM = LibCustomMenu --Filled at EVENT_ADD_ON_LOADED
-
-
 --v- INS260127 Baertram
+local function getLibraries()
+	-- necessary libraries - Will be updated at EVENT_ADD_ON_LOADED again
+	BMU.LibZone = LibZone
+	BMU.LAM = LibAddonMenu2
+	BMU.LSM = LibScrollableMenu
+
+	-- optional libraries
+	BMU.LSC = LibSlashCommander
+	BMU.LibSets = LibSets
+	BMU.LibMapPing = LibMapPing2
+	BMU.LCMB = LibChatMenuButton
+	BMU.LCM = LibCustomMenu
+end
+BMU.GetLibraries = getLibraries
+getLibraries()
+
 --LibScrollableMenu options for contextMenus
 teleporterVars.LSMVars = {
 	--The options for any LSM contextMenu at the item filter button (surveys, leads)

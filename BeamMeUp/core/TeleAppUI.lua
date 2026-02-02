@@ -1700,24 +1700,43 @@ end
 BMU_updateContextMenuEntryAntiquityAll = BMU.updateContextMenuEntryAntiquityAll
 
 --Check if all checkboxes got the desiredCheckedState already, and if so toggle the variable so the click on an openingControl
---of the submenu does not try to toggle all checkboxes to the already curerntly given state
+--of the submenu does not try to toggle all checkboxes to the already curerntly given state.
+-->If any checkbox got the current state already then return the new state as "false" -> All off
 function BMU.checkCheckboxesCurrentStatus(typeOfCheck, desiredCheckedState)
 	local checkTypeTable = typeToCheckboxTable[typeOfCheck]
-	if ZO_IsTableEmpty(checkTypeTable) then return desiredCheckedState end
+	if ZO_IsTableEmpty(checkTypeTable) then return false end
 	local svTableName = typeToSVTableName[typeOfCheck]
-	if svTableName == nil or svTableName == "" then return desiredCheckedState end
+	if svTableName == nil or svTableName == "" then return false end
 	local BMU_svChar = BMU.savedVarsChar
 	local BMU_svCharTypeTab = BMU_svChar[svTableName]
-	if ZO_IsTableEmpty(BMU_svCharTypeTab) then return desiredCheckedState end
+	if ZO_IsTableEmpty(BMU_svCharTypeTab) then return false end
 
+	--Check all checkboxes in the submenu of the type (e.g. surveys)
+	local numEntries = NonContiguousCount(checkTypeTable)
+	local numCheckedAlready = 0
+	local numUncheckedAlready = 0
 	for _, subType in pairs(checkTypeTable) do
-		--Any entry must be toggled?
 		local svCharTypeSubTypeTab = BMU_svCharTypeTab[subType]
-		if svCharTypeSubTypeTab ~= nil and svCharTypeSubTypeTab ~= typeOfCheck then return desiredCheckedState end
+		if svCharTypeSubTypeTab ~= nil then
+			--Any entry is marked already, then disable all first
+			if svCharTypeSubTypeTab == true then return false end
+
+			--Count currently checked/unchecked
+			if svCharTypeSubTypeTab == true then
+				numCheckedAlready = numCheckedAlready + 1
+			else
+				numUncheckedAlready = numUncheckedAlready + 1
+			end
+
+			--All entries are unchecked already? Then check them all instead
+			if numUncheckedAlready == numEntries then return true
+			--All entries are checked already? Then uncheck them all instead
+			elseif numCheckedAlready == numEntries then return false end
+		end
 	end
 
-	--Nothing to toggle: Change the value so anything get's toggled with next function call to BMU.updateCheckbox*Map(action)
-	return not desiredCheckedState
+	--For all other checked states: Toggle all as usual
+	return desiredCheckedState
 end
 BMU_checkCheckboxesCurrentStatus = BMU.checkCheckboxesCurrentStatus
 

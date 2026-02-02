@@ -1676,7 +1676,7 @@ BMU_getContextMenuEntrySurveyAllAppendix = BMU.getContextMenuEntrySurveyAllAppen
 
 function BMU.numOfAntiquityTypesChecked()
     local leadsSVTab = typeToSVTableName[subType_Leads] --displayAntiquityLeads
-	local displayAntiquityLeads = BMU.savedVarsCha[leadsSVTab]
+	local displayAntiquityLeads = BMU.savedVarsChar[leadsSVTab]
 	local num = 0
 	for _, subType in pairs(leadTypes) do
 		if displayAntiquityLeads[subType] then

@@ -104,6 +104,7 @@ BMU.LSC = LibSlashCommander
 BMU.LibSets = LibSets
 BMU.LibMapPing = LibMapPing2
 BMU.LCMB = LibChatMenuButton
+BMU.LCM = LibCustomMenu --Filled at EVENT_ADD_ON_LOADED
 
 
 --v- INS260127 Baertram

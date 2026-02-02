@@ -47,6 +47,9 @@ local RefreshCustomScrollableMenu 		= RefreshCustomScrollableMenu
 local AddCustomScrollableSubMenuEntry 	= AddCustomScrollableSubMenuEntry
 local ShowCustomScrollableMenu 			= ShowCustomScrollableMenu
 
+local LCM								= BMU.LCM
+local ClearMenu 						= ClearMenu
+
 --The default options for a LSM contextMenu
 ---Item filters
 local LSMVars = teleporterVars.LSMVars
@@ -2180,23 +2183,86 @@ end
 --------------------------------------------------
 -- GUILD ADMINISTRATION TOOL
 --------------------------------------------------
+local BMU_AdminContextMenuStr = "BMU Admin"
+
+local BMU_AdminInviteToGuildsQueue
+function BMU.AdminInviteToGuildsQueue()
+	BMU_AdminInviteToGuildsQueue = BMU_AdminInviteToGuildsQueue or BMU.AdminInviteToGuildsQueue
+	if #inviteQueue > 0 then
+		-- get first element and send invite
+		local first = inviteQueue[1]
+		GuildInvite(first[1], first[2])
+		PlaySound(SOUNDS.BOOK_OPEN)
+		-- restart to check for other elements
+		zo_callLater(function() table_remove(inviteQueue, 1) BMU_AdminInviteToGuildsQueue() end, 16000)
+	end
+end
+BMU_AdminInviteToGuildsQueue = BMU.AdminInviteToGuildsQueue
+
+function BMU.AdminInviteToGuilds(guildId, displayName)
+	-- add tuple to queue
+	table_insert(inviteQueue, {guildId, displayName})
+	if #inviteQueue == 1 then
+		BMU_AdminInviteToGuildsQueue()
+	end
+end
+local BMU_AdminInviteToGuilds = BMU.AdminInviteToGuilds
+
+function BMU.AdminIsAlreadyInGuild(displayName)
+	local text = ""
+	local BMU_guildsOfServer = teleporterVars.BMUGuilds[worldName]  								--INS251229 Baertram
+	if GetGuildMemberIndexFromDisplayName(BMU_guildsOfServer[1], displayName) then
+		text = text .. " 1 "
+	end
+	if GetGuildMemberIndexFromDisplayName(BMU_guildsOfServer[2], displayName) then
+		text = text .. " 2 "
+	end
+	if GetGuildMemberIndexFromDisplayName(BMU_guildsOfServer[3], displayName) then
+		text = text .. " 3 "
+	end
+	if GetGuildMemberIndexFromDisplayName(BMU_guildsOfServer[4], displayName) then
+		text = text .. " 4 "
+	end
+
+	if text ~= "" then
+		-- already member
+		return true, BMU_colorizeText("Bereits Mitglied in " .. text, colorRed)
+	else
+		-- not a member or admin is not member of the BMU guilds
+		return false, BMU_colorizeText("Neues Mitglied", colorGreen)
+	end
+end
+local BMU_AdminIsAlreadyInGuild = BMU.AdminIsAlreadyInGuild
+
+function BMU.AdminIsBMUGuild(guildId)
+	BMU_has_value = BMU.has_value or BMU.has_value
+	if BMU_has_value(teleporterVars.BMUGuilds[worldName], guildId) then
+		return true
+	else
+		return false
+	end
+end
+local BMU_AdminIsBMUGuild = BMU.AdminIsBMUGuild
 
 function BMU.AdminAddContextMenuToGuildRoster()
 	-- add context menu to guild roster
+	LCM = LCM or BMU.LCM
+	if not LCM then return end --Only with LibCustomMenu enabled!
+
 	local GUILD_ROSTER_KEYBOARD = GUILD_ROSTER_KEYBOARD
 	local GUILD_ROSTER_MANAGER = GUILD_ROSTER_MANAGER
 	local GuildRosterRow_OnMouseUp = GUILD_ROSTER_KEYBOARD.GuildRosterRow_OnMouseUp --ZO_GuildRecruitment_ApplicationsList_Keyboard.Row_OnMouseUp
 	GUILD_ROSTER_KEYBOARD.GuildRosterRow_OnMouseUp = function(self, control, button, upInside)
-		ClearCustomScrollableMenu()
+		ClearMenu()
 		local data = ZO_ScrollList_GetData(control)
 		GuildRosterRow_OnMouseUp(self, control, button, upInside)
 		
 		local currentGuildId = GUILD_ROSTER_MANAGER:GetGuildId()
-		if (button ~= MOUSE_BUTTON_INDEX_RIGHT --[[and not upInside]]) or data == nil or not BMU.AdminIsBMUGuild(currentGuildId) then
+		if (button ~= MOUSE_BUTTON_INDEX_RIGHT --[[and not upInside]]) or data == nil or not BMU_AdminIsBMUGuild(currentGuildId) then
 			return
 		end
 		
-		local isAlreadyMember, memberStatusText = BMU.AdminIsAlreadyInGuild(data.displayName)
+		local isAlreadyMember, memberStatusText = BMU_AdminIsAlreadyInGuild(data.displayName)
 		
 		local entries = {}
 		
@@ -2224,7 +2290,7 @@ function BMU.AdminAddContextMenuToGuildRoster()
 			for _, guildId in pairs(teleporterVars.BMUGuilds[worldName]) do
 				if IsPlayerInGuild(guildId) and not GetGuildMemberIndexFromDisplayName(guildId, data.displayName) then
 					table_insert(entries, {label = "Einladen in: " .. GetGuildName(guildId),
-											callback = function() BMU.AdminInviteToGuilds(guildId, data.displayName) end,
+											callback = function() BMU_AdminInviteToGuilds(guildId, data.displayName) end,
 											})
 				end
 			end
@@ -2235,7 +2301,7 @@ function BMU.AdminAddContextMenuToGuildRoster()
 			for _, guildId in pairs(teleporterVars.partnerGuilds[worldName]) do
 				if IsPlayerInGuild(guildId) and not GetGuildMemberIndexFromDisplayName(guildId, data.displayName) then
 					table_insert(entries, {label = "Einladen in: " .. GetGuildName(guildId),
-											callback = function() BMU.AdminInviteToGuilds(guildId, data.displayName) end,
+											callback = function() BMU_AdminInviteToGuilds(guildId, data.displayName) end,
 											})
 				end
 			end
@@ -2246,7 +2312,7 @@ function BMU.AdminAddContextMenuToGuildRoster()
 								callback = function() end,
 								})
 		
-		AddCustomScrollableSubMenuEntry("BMU Admin", entries)
+		AddCustomSubMenuItem(BMU_AdminContextMenuStr, entries)
 		self:ShowMenu(control)
 	end
 end
@@ -2254,61 +2320,64 @@ end
 
 function BMU.AdminAddContextMenuToGuildApplicationRoster()
 	-- add context menu to guild recruitment application roster (if player is already in a one of the BMU guilds + redirection to the other guilds)
+	LCM = LCM or BMU.LCM
+	if not LCM then return end --Only with LibCustomMenu enabled!
+
 	local GUILD_ROSTER_MANAGER = GUILD_ROSTER_MANAGER
 	local ZO_GuildRecruitment_ApplicationsList_Keyboard = ZO_GuildRecruitment_ApplicationsList_Keyboard
 	local Row_OnMouseUp = ZO_GuildRecruitment_ApplicationsList_Keyboard.Row_OnMouseUp
 	ZO_GuildRecruitment_ApplicationsList_Keyboard.Row_OnMouseUp = function(self, control, button, upInside)
-		ClearCustomScrollableMenu()
+		ClearMenu()
 		local data = ZO_ScrollList_GetData(control)
 		Row_OnMouseUp(self, control, button, upInside)
-	
+
 		local currentGuildId = GUILD_ROSTER_MANAGER:GetGuildId()
-		if (button ~= MOUSE_BUTTON_INDEX_RIGHT --[[and not upInside]]) or data == nil or not BMU.AdminIsBMUGuild(currentGuildId) then
+		if (button ~= MOUSE_BUTTON_INDEX_RIGHT --[[and not upInside]]) or data == nil or not BMU_AdminIsBMUGuild(currentGuildId) then
 			return
 		end
-		
-		local isAlreadyMember, memberStatusText = BMU.AdminIsAlreadyInGuild(data.name)
+
+		local isAlreadyMember, memberStatusText = BMU_AdminIsAlreadyInGuild(data.name)
 
 		local entries = {}
-		
+
 		-- new message
 		table_insert(entries, {label = "Neue Nachricht",
-								callback = function() BMU.createMail(data.name, "", "") BMU.printToChat("Nachricht erstellt an: " .. data.name) end,
-								})
-								
+							   callback = function() BMU.createMail(data.name, "", "") BMU.printToChat("Nachricht erstellt an: " .. data.name) end,
+		})
+
 		-- copy account name
 		table_insert(entries, {label = "Account-ID kopieren",
-								callback = function() BMU.AdminCopyTextToChat(data.name) end,
-								})
-		
+							   callback = function() BMU.AdminCopyTextToChat(data.name) end,
+		})
+
 		-- invite to BMU guilds
 		if teleporterVars.BMUGuilds[worldName] ~= nil then
 			for _, guildId in pairs(teleporterVars.BMUGuilds[worldName]) do
 				if IsPlayerInGuild(guildId) and not GetGuildMemberIndexFromDisplayName(guildId, data.name) then
 					table_insert(entries, {label = "Einladen in: " .. GetGuildName(guildId),
-											callback = function() BMU.AdminInviteToGuilds(guildId, data.name) end,
-											})
+										   callback = function() BMU_AdminInviteToGuilds(guildId, data.name) end,
+					})
 				end
 			end
 		end
-		
+
 		-- invite to partner guilds
 		if teleporterVars.partnerGuilds[worldName] ~= nil then
 			for _, guildId in pairs(teleporterVars.partnerGuilds[worldName]) do
 				if IsPlayerInGuild(guildId) and not GetGuildMemberIndexFromDisplayName(guildId, data.name) then
 					table_insert(entries, {label = "Einladen in: " .. GetGuildName(guildId),
-											callback = function() BMU.AdminInviteToGuilds(guildId, data.name) end,
-											})
+										   callback = function() BMU_AdminInviteToGuilds(guildId, data.name) end,
+					})
 				end
 			end
 		end
-		
+
 		-- check if the player is also in other BMU guilds and add info
 		table_insert(entries, {label = memberStatusText,
-								callback = function() end,
-								})
-		
-		AddCustomScrollableSubMenuEntry("BMU Admin", entries)
+							   callback = function() end,
+		})
+
+		AddCustomSubMenuItem(BMU_AdminContextMenuStr, entries)
 		self:ShowMenu(control)
 	end
 end
@@ -2323,8 +2392,8 @@ function BMU.AdminAddTooltipInfoToGuildApplicationRoster()
 		local data = ZO_ScrollList_GetData(control)
 		local currentGuildId = GUILD_ROSTER_MANAGER:GetGuildId()
 		
-		if data ~= nil and not data.BMUInfo and BMU.AdminIsBMUGuild(currentGuildId) then
-			local isAlreadyMember, memberStatusText = BMU.AdminIsAlreadyInGuild(data.name)
+		if data ~= nil and not data.BMUInfo and BMU_AdminIsBMUGuild(currentGuildId) then
+			local isAlreadyMember, memberStatusText = BMU_AdminIsAlreadyInGuild(data.name)
 			data.message = data.message .. "\n\n" .. memberStatusText
 			data.BMUInfo = true
 		end
@@ -2356,7 +2425,7 @@ end
 
 function BMU.AdminAutoWelcome(eventCode, guildId, displayName, result)
 	-- only for BMU guilds
-	if not BMU.AdminIsBMUGuild(guildId) then
+	if not BMU_AdminIsBMUGuild(guildId) then
 		return
 	end
 	
@@ -2375,62 +2444,6 @@ function BMU.AdminAutoWelcome(eventCode, guildId, displayName, result)
 			end
 		end
 	end, 1300)
-end
-
-function BMU.AdminIsAlreadyInGuild(displayName)
-	local text = ""
-	local BMU_guildsOfServer = teleporterVars.BMUGuilds[worldName]  								--INS251229 Baertram
-	if GetGuildMemberIndexFromDisplayName(BMU_guildsOfServer[1], displayName) then
-		text = text .. " 1 "
-	end
-	if GetGuildMemberIndexFromDisplayName(BMU_guildsOfServer[2], displayName) then
-		text = text .. " 2 "
-	end
-	if GetGuildMemberIndexFromDisplayName(BMU_guildsOfServer[3], displayName) then
-		text = text .. " 3 "
-	end
-	if GetGuildMemberIndexFromDisplayName(BMU_guildsOfServer[4], displayName) then
-		text = text .. " 4 "
-	end
-	
-	if text ~= "" then
-		-- already member
-		return true, BMU_colorizeText("Bereits Mitglied in " .. text, colorRed)
-	else
-		-- not a member or admin is not member of the BMU guilds
-		return false, BMU_colorizeText("Neues Mitglied", colorGreen)
-	end
-end
-
-function BMU.AdminIsBMUGuild(guildId)
-	BMU_has_value = BMU.has_value or BMU.has_value
-	if BMU_has_value(teleporterVars.BMUGuilds[worldName], guildId) then
-		return true
-	else
-		return false
-	end
-end
-
-local BMU_AdminInviteToGuildsQueue
-function BMU.AdminInviteToGuildsQueue()
-	BMU_AdminInviteToGuildsQueue = BMU_AdminInviteToGuildsQueue or BMU.AdminInviteToGuildsQueue
-	if #inviteQueue > 0 then
-		-- get first element and send invite
-		local first = inviteQueue[1]
-		GuildInvite(first[1], first[2])
-		PlaySound(SOUNDS.BOOK_OPEN)
-		-- restart to check for other elements
-		zo_callLater(function() table_remove(inviteQueue, 1) BMU_AdminInviteToGuildsQueue() end, 16000)
-	end
-end
-BMU_AdminInviteToGuildsQueue = BMU.AdminInviteToGuildsQueue
-
-function BMU.AdminInviteToGuilds(guildId, displayName)
-	-- add tuple to queue
-	table_insert(inviteQueue, {guildId, displayName})
-	if #inviteQueue == 1 then
-		BMU_AdminInviteToGuildsQueue()
-	end
 end
 
 function BMU.AdminAddAutoFillToDeclineApplicationDialog()

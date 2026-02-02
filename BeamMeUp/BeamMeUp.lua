@@ -915,7 +915,10 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	--Request BMU guilds and partner guilds information
 	--zo_callLater(function() BMU.requestGuildData() end, 5000)
 
-	-- activate guild admin tools
+	-- activate guild admin tools -- Needs LibCustomMenu
+	local LCM = LibCustomMenu
+	BMU.LCM = LCM
+
 	local displayName = GetDisplayName()
 	local adminAccountsAllowed = {
 		["@DeadSoon"] = true,

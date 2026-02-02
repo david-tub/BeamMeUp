@@ -38,7 +38,7 @@ local zo_ChatWindow                         = ZO_ChatWindow
 local LSM_ENTRY_TYPE_NORMAL 		= LSM_ENTRY_TYPE_NORMAL
 local LSM_ENTRY_TYPE_CHECKBOX 		= LSM_ENTRY_TYPE_CHECKBOX
 local LSM_ENTRY_TYPE_RADIOBUTTON	= LSM_ENTRY_TYPE_RADIOBUTTON
-local LSM_UPDATE_MODE_MAINMENU 		= LSM_UPDATE_MODE_MAINMENU
+--local LSM_UPDATE_MODE_MAINMENU 		= LSM_UPDATE_MODE_MAINMENU
 local LSM_UPDATE_MODE_BOTH 			= LSM_UPDATE_MODE_BOTH
 
 local ClearCustomScrollableMenu 		= ClearCustomScrollableMenu
@@ -154,6 +154,7 @@ end
 local function LSMEntryTypeCheckboxOrRadioButtonClickedHelperFunc(p_SVsettings, p_SVsettingName, p_isCheckedValueOrFunc, p_additionalData, onClickedFuncWasProvided, comboBox, itemName, item, checked, data)
 	--DefaultTab change is prepared? Check if the checkbox was checked, and if not pass in the default tab BMU.indexListMain (not the checkbox's checked state)
 	local newChecked = checked
+	--Special case: Default tab selection for the lists:
 	if not onClickedFuncWasProvided and p_SVsettingName == "defaultTab" then
 		--Reset the defaultTab to the base list first
 		newChecked = BMU.indexListMain
@@ -173,7 +174,9 @@ end
 ]]
 
 
---Dynamically add LSM entries to a LSM contextMenu
+--Dynamically add LSM entries to a LSM contextMenu.
+--Currently only for checkboxes and radiobuttons
+--Special cases: Happens inside function "LSMEntryTypeCheckboxOrRadioButtonClickedHelperFunc"
 local function addDynamicLSMContextMenuEntry(entryType, entryText, SVsettings, SVsettingName, onClickFunc, isCheckedValueOrFunc, additionalData)
 	entryType = entryType or LSM_ENTRY_TYPE_NORMAL
 	--Create references which do not get changed later
@@ -189,7 +192,7 @@ local function addDynamicLSMContextMenuEntry(entryType, entryText, SVsettings, S
 
 	--If no explicit "checked" function or value was passed in and we are creating a checkBox or radioButton:
 	--Just create an anonymous function returning the passed in SV table and it's "current value" (as the function get's
-	--called from the open contextMenu as the entry get's created)
+	--called from the open contextMenu, when the entry get's created)
 	if p_isCheckedValueOrFunc == nil and (isCheckBox or isRadioButton) and p_settingsProvided then
 		p_isCheckedValueOrFunc = function()
 			return SVsettings[SVsettingName]
@@ -1495,7 +1498,7 @@ local function SetupUI()
 					entryType = LSM_ENTRY_TYPE_CHECKBOX,
 					checked = function() return BMU.savedVarsChar.dungeonFinder.showDungeons end,
 					buttonGroup = 6,
-				    contextMenuCallback = function(comboBox, control, data, useLibCustomMenu)
+				    contextMenuCallback = function(comboBox, control, data)
 					  LSM.ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
 				    end,
 				},

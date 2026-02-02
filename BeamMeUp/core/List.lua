@@ -1378,7 +1378,7 @@ function ListView:update()
 				end
 				
 				-- set handler for making favorite
-				list.ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU.clickOnPlayerName(button, message) end)
+				list.ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) if button ~= MOUSE_BUTTON_INDEX_LEFT then return end BMU.clickOnPlayerName(button, message) end)
 			else
 				-- make tooltip invisible (no DisplayName of Player -> no Tooltip)
 				list.ColumnPlayerNameTex:SetHidden(true)
@@ -1565,7 +1565,7 @@ function ListView:update()
 				-- set handler for map opening
 				list.ColumnZoneNameTex:SetHidden(false)
 				list.ColumnZoneNameTex:SetHandler("OnMouseEnter", function(self) list.ColumnZoneNameTex:SetAlpha(0.3) BMU_tooltipTextEnter(BMU, list.ColumnZoneNameTex, tooltipTextZone) BMU.pauseAutoRefresh = true end)
-				list.ColumnZoneNameTex:SetHandler("OnMouseUp", function(self, button) BMU.clickOnZoneName(button, message) end)
+				list.ColumnZoneNameTex:SetHandler("OnMouseUp", function(self, button) if button ~= MOUSE_BUTTON_INDEX_LEFT then return end BMU.clickOnZoneName(button, message) end)
 				list.ColumnZoneNameTex:SetHandler("OnMouseExit", function(self) list.ColumnZoneNameTex:SetAlpha(0) BMU_tooltipTextEnter(BMU, list.ColumnZoneNameTex) BMU.pauseAutoRefresh = false end)
 				-- link tooltip text to control (for update on scroll / mouse wheel)
 				list.ColumnZoneNameTex.tooltipText = tooltipTextZone
@@ -1603,7 +1603,7 @@ function ListView:update()
 				-- hide MouseOver handler
 				list.ColumnNumberPlayersTex:SetHandler("OnMouseExit", function(self) list.ColumnNumberPlayersTex:SetAlpha(0) end)
 				-- set handler for opening
-				list.ColumnNumberPlayersTex:SetHandler("OnMouseUp", function(self, button) BMU_createTable({index=BMU.indexListZone, fZoneId=message.zoneId}) end)
+				list.ColumnNumberPlayersTex:SetHandler("OnMouseUp", function(self, button) if button ~= MOUSE_BUTTON_INDEX_LEFT then return end BMU_createTable({index=BMU.indexListZone, fZoneId=message.zoneId}) end)
 			else
 				list.ColumnNumberPlayers:SetText("")
 				-- hide
@@ -1674,7 +1674,7 @@ function ListView:update()
 				list.portalToPlayerTex:SetTexture(BMU_textures.houseBtn)
 				list.portalToPlayerTex:SetHandler("OnMouseEnter", function(self) list.portalToPlayerTex:SetTexture(BMU_textures.houseBtnOver) BMU.pauseAutoRefresh = true end)
 				list.portalToPlayerTex:SetHandler("OnMouseExit", function(self) list.portalToPlayerTex:SetTexture(BMU_textures.houseBtn) BMU.pauseAutoRefresh = false end)
-				list.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnTeleportToOwnHouseButton(list.portalToPlayerTex, button, message) end)
+				list.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) if button ~= MOUSE_BUTTON_INDEX_LEFT then return end BMU_clickOnTeleportToOwnHouseButton(list.portalToPlayerTex, button, message) end)
 				
 			elseif message.isPTFHouse and CanJumpToHouseFromCurrentLocation() and CanLeaveCurrentLocationViaTeleport() then
 				-- "Port to Freind's House" integration
@@ -1682,7 +1682,7 @@ function ListView:update()
 				list.portalToPlayerTex:SetTexture(BMU_textures.ptfHouseBtn)
 				list.portalToPlayerTex:SetHandler("OnMouseEnter", function(self) list.portalToPlayerTex:SetTexture(BMU_textures.ptfHouseBtnOver) BMU.pauseAutoRefresh = true end)
 				list.portalToPlayerTex:SetHandler("OnMouseExit", function(self) list.portalToPlayerTex:SetTexture(BMU_textures.ptfHouseBtn) BMU.pauseAutoRefresh = false end)
-				list.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) BMU.clickOnTeleportToPTFHouseButton(list.portalToPlayerTex, button, message) end)
+				list.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) if button ~= MOUSE_BUTTON_INDEX_LEFT then return end BMU.clickOnTeleportToPTFHouseButton(list.portalToPlayerTex, button, message) end)
 
 			elseif message.isGuild then
 				-- Own and partner guilds
@@ -1691,7 +1691,7 @@ function ListView:update()
 					list.portalToPlayerTex:SetTexture(BMU_textures.guildBtn)
 					list.portalToPlayerTex:SetHandler("OnMouseEnter", function(self) list.portalToPlayerTex:SetTexture(BMU_textures.guildBtnOver) BMU.pauseAutoRefresh = true end)
 					list.portalToPlayerTex:SetHandler("OnMouseExit", function(self) list.portalToPlayerTex:SetTexture(BMU_textures.guildBtn) BMU.pauseAutoRefresh = false end)
-					list.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) BMU.clickOnOpenGuild(list.portalToPlayerTex, button, message) end)
+					list.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) if button ~= MOUSE_BUTTON_INDEX_LEFT then return end BMU.clickOnOpenGuild(list.portalToPlayerTex, button, message) end)
 				else
 					list.portalToPlayerTex:SetHidden(true)
 				end
@@ -1710,7 +1710,7 @@ function ListView:update()
 					end
 					BMU.pauseAutoRefresh = true end)
 				list.portalToPlayerTex:SetHandler("OnMouseExit", function(self) list.portalToPlayerTex:SetTexture(texture_normal) BMU_tooltipTextEnter(BMU, list.portalToPlayerTex) BMU.pauseAutoRefresh = false end)
-				list.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) BMU.clickOnTeleportToDungeonButton(list.portalToPlayerTex, button, message) end)
+				list.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) if button ~= MOUSE_BUTTON_INDEX_LEFT then return end BMU.clickOnTeleportToDungeonButton(list.portalToPlayerTex, button, message) end)
 				
 			elseif message.displayName ~= "" and CanJumpToPlayerInZone(message.zoneId) and CanLeaveCurrentLocationViaTeleport() then
 				-- player
@@ -1718,7 +1718,7 @@ function ListView:update()
 				list.portalToPlayerTex:SetTexture(texture_normal)
 				list.portalToPlayerTex:SetHandler("OnMouseEnter", function(self) list.portalToPlayerTex:SetTexture(texture_over) BMU.pauseAutoRefresh = true end)
 				list.portalToPlayerTex:SetHandler("OnMouseExit", function(self) list.portalToPlayerTex:SetTexture(texture_normal) BMU.pauseAutoRefresh = false end)
-				list.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) BMU.clickOnTeleportToPlayerButton(list.portalToPlayerTex, button, message) end)
+				list.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) if button ~= MOUSE_BUTTON_INDEX_LEFT then return end BMU.clickOnTeleportToPlayerButton(list.portalToPlayerTex, button, message) end)
 
 			elseif BMU.savedVarsAcc.showZonesWithoutPlayers2 and message.displayName == "" and message.zoneWithoutPlayer and CanLeaveCurrentLocationViaTeleport() and message.zoneWayshrineDiscovered and message.zoneWayshrineDiscovered > 0 then
 				-- zones without players (fast travel for gold)
@@ -1732,7 +1732,7 @@ function ListView:update()
 					end
 					BMU.pauseAutoRefresh = true end)
 				list.portalToPlayerTex:SetHandler("OnMouseExit", function(self) list.portalToPlayerTex:SetTexture(texture_normal) BMU_tooltipTextEnter(BMU, list.portalToPlayerTex) BMU.pauseAutoRefresh = false end)
-				list.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) BMU.clickOnTeleportToPlayerButton(list.portalToPlayerTex, button, message) end)
+				list.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) if button ~= MOUSE_BUTTON_INDEX_LEFT then return end BMU.clickOnTeleportToPlayerButton(list.portalToPlayerTex, button, message) end)
 			else
 				-- no DisplayName -> no teleport possibility
 				list.portalToPlayerTex:SetHidden(true)

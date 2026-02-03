@@ -31,7 +31,7 @@ BMU.var = {
   appName               = "BeamMeUp",
   appNameAbbr			= "BMU",
   version				= "", -- Will be set by help of function GetAddonVersionFromManifest(), see file BeamMeUp.lua event_add_on_loaded
-  author				= "DeadSoon, Gamer1986PAN",
+  author				= "DeadSoon, Gamer1986PAN, Baertram",
   feedbackContact		= "@Deadsoon", --INS251229 Baertram Used account for email feedback
   website				= "https://www.esoui.com/downloads/info2143-BeamMeUp-TeleporterFastTravel.html",
   feedback				= "https://www.esoui.com/portal.php?id=283&a=faq", -- FAQ link

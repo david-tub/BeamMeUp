@@ -350,7 +350,7 @@ local BMU_dropdownSecLangChoices = {}
 local BMU_dropdownSecLangValues = {}
 local secLangDropdownEntryPrefix = numVars.secLangDropdownEntryPrefix
 for i=1, numVars.numSecLangDropdownEntries, 1 do
-	BMU_dropdownSecLangChoices[i] = BMU_SI_Get(SI[secLangDropdownEntryPrefix], i)
+	BMU_dropdownSecLangChoices[i] = BMU_SI_Get(secLangDropdownEntryPrefix, i)
 	BMU_dropdownSecLangValues[i] = i
 end
 BMU.dropdownSecLangValues = BMU_dropdownSecLangValues
@@ -361,7 +361,7 @@ local BMU_dropdownSortChoices = {}
 local BMU_dropdownSortValues = {}
 local sortDropdownEntryPrefix = BMU.numVars.sortDropdownEntryPrefix
 for i=1, numVars.numSortDropdownEntries, 1 do
-	BMU_dropdownSortChoices[i] = BMU_SI_Get(SI[sortDropdownEntryPrefix], i)
+	BMU_dropdownSortChoices[i] = BMU_SI_Get(sortDropdownEntryPrefix, i)
 	BMU_dropdownSortValues[i] = i
 end
 BMU.dropdownSortChoices = BMU_dropdownSortChoices

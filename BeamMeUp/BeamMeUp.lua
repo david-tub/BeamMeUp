@@ -708,6 +708,10 @@ end
 
 local function OnAddOnLoaded(eventCode, addOnName)
     if (appName ~= addOnName) then return end
+	EM:UnregisterForEvent(appName, EVENT_ADD_ON_LOADED)
+
+	--Libraries
+	BMU.GetLibraries() --Check if any BMU.* library variable needs an update
 
 	--Read the addon version from the addon's txt manifest file tag ##AddOnVersion
 	local function GetAddonVersionFromManifest()
@@ -726,9 +730,6 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	teleporterVars.version = tostring(GetAddonVersionFromManifest())
 
     teleporterVars.isAddonLoaded = true
-
-	--Libraries
-	BMU.GetLibraries() --Check if any BMU.* library variable needs an update
 
 
     BMU.DefaultsAccount = {
@@ -789,6 +790,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["chatOutputFastTravel"] = true,
 		["chatOutputAdditional"] = true,
 		["chatOutputUnlock"] = true,
+		["showContextMenuIcons"] = true, --INS 260203 Baertram
     }
     
 	BMU.DefaultsServer = {

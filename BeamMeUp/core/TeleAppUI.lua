@@ -78,6 +78,7 @@ local subType_Treasure 						= "treasure"
 local subType_Leads 						= "leads"
 local surveyTypes 							= {subType_Alchemist, subType_Enchanter, subType_Woodworker, subType_Blacksmith, subType_Clothier, subType_Jewelry}
 local surveyTypeNames                		= {GetString(SI_ITEMTYPEDISPLAYCATEGORY14), GetString(SI_ITEMTYPEDISPLAYCATEGORY15), GetString(SI_ITEMTYPEDISPLAYCATEGORY12), GetString(SI_ITEMTYPEDISPLAYCATEGORY10), GetString(SI_ITEMTYPEDISPLAYCATEGORY11), GetString(SI_ITEMTYPEDISPLAYCATEGORY13)}
+local surveyTypeTextures					= { "surveyTypeAlchemy", "surveyTypeEnchanting", "surveyTypeWoodworker", "surveyTypeBlacksmith", "surveyTypeClothier", "surveyTypeJewelry" }
 local appendixCurrentOfMaxStrPattern 		= " (%d/%d)"
 local maxSurveyTypes                 		= #surveyTypes --Currently 6: Alchemist, Enchanter, Woodworker, Blacksmith, Clothier, Jewelry. Add the new entries to table surveyTypes to increase this if new survey types get added (new crafting profession types that got surveys)
 local leadType_scryable 					= "srcyable"
@@ -85,6 +86,7 @@ local leadType_scried 						= "scried"
 local leadType_completed 					= "completed"
 local leadTypes 							= { leadType_scryable , leadType_scried,  leadType_completed }
 local leadTypeNames							= {GetString(SI_ANTIQUITY_SCRYABLE), GetString(SI_ANTIQUITY_SUBHEADING_IN_PROGRESS), GetString(SI_SCREEN_NARRATION_ACHIEVEMENT_EARNED_ICON_NARRATION) .. " (" .. GetString(SI_ANTIQUITY_LOG_BOOK) .. ")"}
+local leadTypeTextures						= { "leadTypeScryable", "leadTypeScried", "leadTypeCompleted" }
 local maxAntiquityTypes						= #leadTypes --Currently 3: Scryable, In progress, Completed (Codex)
 --Lookup for the table to loop for checkboxes of the type
 local typeToCheckboxTable = {
@@ -122,7 +124,7 @@ local BMU_getItemTypeIcon, BMU_getDataMapInfo, BMU_OpenTeleporter, BMU_updateCon
       BMU_getContextMenuEntrySurveyAllAppendix, BMU_getContextMenuEntryAntiquityAllAppendix, BMU_clearInputFields, BMU_createTable,
       BMU_createTableDungeons, BMU_createTableGuilds, BMU_numOfSurveyTypesChecked, BMU_updateCheckboxSurveyMap, BMU_numOfAntiquityTypesChecked,
       BMU_updateCheckboxLeadsMap, BMU_checkCheckboxesCurrentStatus, BMU_createTableHouses, BMU_getCurrentDungeonDifficulty, BMU_setDungeonDifficulty, BMU_PortalToPlayer, BMU_printToChat,
-	  BMU_has_value, BMU_showNotification, LSM_ButtonGroupDefaultContextMenu
+	  BMU_has_value, BMU_showNotification, LSM_ButtonGroupDefaultContextMenu, BMU_checkIfContextMenuIconShouldShow
 -- -^- INS251229 Baertram END 0
 
 -- list of tuples (guildId & displayname) for invite queue (only for admin)
@@ -1174,7 +1176,8 @@ local function SetupUI()
 	  BMU_updateContextMenuEntrySurveyAll = BMU_updateContextMenuEntrySurveyAll or BMU.updateContextMenuEntrySurveyAll				  --INS251229 Baertram
 	  BMU_updateContextMenuEntryAntiquityAll = BMU_updateContextMenuEntryAntiquityAll or BMU.updateContextMenuEntryAntiquityAll		  --INS251229 Baertram
 	  BMU_showNotification = BMU_showNotification or BMU.showNotification															  --INS251229 Baertram
-      LSM_ButtonGroupDefaultContextMenu = LSM_ButtonGroupDefaultContextMenu or LSM.ButtonGroupDefaultContextMenu
+      LSM_ButtonGroupDefaultContextMenu = LSM_ButtonGroupDefaultContextMenu or LSM.ButtonGroupDefaultContextMenu					  --INS260203 Baertram
+	  BMU_checkIfContextMenuIconShouldShow = BMU_checkIfContextMenuIconShouldShow or BMU.checkIfContextMenuIconShouldShow			  --INS260203 Baertram
 
 	  ClearCustomScrollableMenu()
 	  if button == MOUSE_BUTTON_INDEX_RIGHT then
@@ -1197,9 +1200,9 @@ local function SetupUI()
 				  checked = function() return BMU.savedVarsChar[leadsSVTab][leadType] end,
 				  buttonGroup = 4,
 				  contextMenuCallback = function(comboBox, control, data)
-					LSM_ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
+					  LSM_ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
 				  end,
-
+				  icon = function() return BMU_checkIfContextMenuIconShouldShow(leadTypeTextures[leadTypeIndex]) end,
 			  }
 			  leadTypesSubmenuEntries[#leadTypesSubmenuEntries +1] = leadTypeSubmenuEntry
 		  end
@@ -1218,14 +1221,19 @@ local function SetupUI()
 				{ --additionalData
 					tooltip = BMU_SI_Get(SI_CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL),
 					closeOnSelect = false, --Keep the dropdown opened even if entry get's clicked
+					icon = function() return BMU_checkIfContextMenuIconShouldShow("antiquity") end,
 				}
 		  )
 
 		  -- Clues
-		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_SPECIALIZEDITEMTYPE113), BMU.savedVarsChar[surveySVTab], subType_Clue, 		function() BMU_CreateTable_IndexListItems() end, nil, nil)
+		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_SPECIALIZEDITEMTYPE113), BMU.savedVarsChar[surveySVTab], subType_Clue, 		function() BMU_CreateTable_IndexListItems() end, nil, {
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("tribute") end,
+		  })
 
 		  -- Treasure Maps
-		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_SPECIALIZEDITEMTYPE100), BMU.savedVarsChar[surveySVTab], subType_Treasure, 	function() BMU_CreateTable_IndexListItems() end, nil, nil)
+		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_SPECIALIZEDITEMTYPE100), BMU.savedVarsChar[surveySVTab], subType_Treasure, 	function() BMU_CreateTable_IndexListItems() end, nil, {
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("treasureMap") end,
+		  })
 
 		  -- All Survey Maps
 		  -- Add submenu dynamically for all survey types: Each survey type = 1 filter checkbox
@@ -1245,6 +1253,7 @@ local function SetupUI()
 				  contextMenuCallback = function(comboBox, control, data)
 					LSM_ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
 				  end,
+				  icon = function() return BMU_checkIfContextMenuIconShouldShow(surveyTypeTextures[surveyTypeIndex]) end,
 			  }
 			  surveyTypesSubmenuEntries[#surveyTypesSubmenuEntries+1] = surveyTypeSubmenuEntry
 		  end
@@ -1263,6 +1272,7 @@ local function SetupUI()
 				{ --additionalData
 					tooltip = BMU_SI_Get(SI_CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL),
 					closeOnSelect = false, --Keep the dropdown opened even if entry get's clicked
+					icon = function() return BMU_checkIfContextMenuIconShouldShow("survey") end,
 				}
 		  )
 
@@ -1270,7 +1280,9 @@ local function SetupUI()
 		  AddCustomScrollableMenuDivider()
 
 		  -- include bank items
-		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_CRAFTING_INCLUDE_BANKED), BMU.savedVarsChar, "scanBankForMaps", function() BMU_CreateTable_IndexListItems() end, nil, nil)
+		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_CRAFTING_INCLUDE_BANKED), BMU.savedVarsChar, "scanBankForMaps", function() BMU_CreateTable_IndexListItems() end, nil, {
+			  icon = function() return BMU_checkIfContextMenuIconShouldShow("bank") end,
+		  })
 
 		  -- enable/disable counter panel
 		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_ENDLESS_DUNGEON_BUFF_TRACKER_SWITCH_TO_SUMMARY_KEYBIND), BMU.savedVarsChar, "displayCounterPanel", function() BMU_CreateTable_IndexListItems() end, nil, nil)
@@ -1446,7 +1458,9 @@ local function SetupUI()
 
   teleporterWin_Main_Control_DungeonTexture:SetHandler("OnMouseUp", function(ctrl, button)
 	BMU_createTableDungeons = BMU_createTableDungeons or BMU.createTableDungeons					--INS251229 Baertram
-	LSM_ButtonGroupDefaultContextMenu = LSM_ButtonGroupDefaultContextMenu or LSM.ButtonGroupDefaultContextMenu
+	LSM_ButtonGroupDefaultContextMenu = LSM_ButtonGroupDefaultContextMenu or LSM.ButtonGroupDefaultContextMenu --INS260203 Baertram
+	BMU_checkIfContextMenuIconShouldShow = BMU_checkIfContextMenuIconShouldShow or BMU.checkIfContextMenuIconShouldShow --INS260203 Baertram
+
     ClearCustomScrollableMenu()
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 
@@ -1463,6 +1477,7 @@ local function SetupUI()
 				    contextMenuCallback = function(comboBox, control, data)
 					  LSM_ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
 				    end,
+				  	icon = function() return BMU_checkIfContextMenuIconShouldShow("endlessDungeon") end,
 				},
 				{
 					label = BMU_SI_Get(SI_TELE_UI_TOGGLE_ARENAS),
@@ -1473,6 +1488,7 @@ local function SetupUI()
 				    contextMenuCallback = function(comboBox, control, data)
 					  LSM_ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
 				    end,
+				  	icon = function() return BMU_checkIfContextMenuIconShouldShow("arena") end,
 				},
 				{
 					label = BMU_SI_Get(SI_TELE_UI_TOGGLE_GROUP_ARENAS),
@@ -1483,6 +1499,7 @@ local function SetupUI()
 				    contextMenuCallback = function(comboBox, control, data)
 					  LSM_ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
 				    end,
+				  	icon = function() return BMU_checkIfContextMenuIconShouldShow("groupArena") end,
 				},
 				{
 					label = BMU_SI_Get(SI_TELE_UI_TOGGLE_TRIALS),
@@ -1493,6 +1510,7 @@ local function SetupUI()
 				    contextMenuCallback = function(comboBox, control, data)
 					  LSM_ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
 				    end,
+				  	icon = function() return BMU_checkIfContextMenuIconShouldShow("trial") end,
 				},
 				{
 					label = BMU_SI_Get(SI_TELE_UI_TOGGLE_GROUP_DUNGEONS),
@@ -1503,6 +1521,7 @@ local function SetupUI()
 				    contextMenuCallback = function(comboBox, control, data)
 					  LSM_ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
 				    end,
+				  	icon = function() return BMU_checkIfContextMenuIconShouldShow("groupDungeon") end,
 				},
 			},
 			function()
@@ -1510,9 +1529,7 @@ local function SetupUI()
 				--todo enable/disable all checkboxes in submenu
 
 			end,
-			{ --additionalData
-				--tooltip = BMU_SI_Get(SI_CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL),
-			}
+			{ icon = function() return BMU_checkIfContextMenuIconShouldShow("filter") end }
 		)
 
 		-- sorting (release or acronym)
@@ -1522,7 +1539,6 @@ local function SetupUI()
 				-- sort by release: from old (top of list) to new
 				{
 					label = BMU_SI_Get(SI_TELE_UI_TOGGLE_SORT_RELEASE),
-					icon = BMU_textures.arrowUp,
 					callback = function(comboBox, itemName, item, checked, data)
 						local dungeonFinderCharSV = BMU.savedVarsChar.dungeonFinder
 						dungeonFinderCharSV.sortByReleaseASC = true
@@ -1533,11 +1549,11 @@ local function SetupUI()
 					entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
 					buttonGroup = 1,
 					checked = function() return BMU.savedVarsChar.dungeonFinder.sortByReleaseASC end,
+				  	icon = function() return BMU_checkIfContextMenuIconShouldShow("arrowUp") end,
 				},
 				-- sort by release: from new (top of list) to old
 				{
 					label = BMU_SI_Get(SI_TELE_UI_TOGGLE_SORT_RELEASE),
-					icon = BMU_textures.arrowDown,
 					callback = function(comboBox, itemName, item, checked, data)
 						local dungeonFinderCharSV = BMU.savedVarsChar.dungeonFinder
 						dungeonFinderCharSV.sortByReleaseASC = false
@@ -1548,6 +1564,7 @@ local function SetupUI()
 					entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
 					buttonGroup = 1,
 					checked = function() return BMU.savedVarsChar.dungeonFinder.sortByReleaseDESC end,
+				  	icon = function() return BMU_checkIfContextMenuIconShouldShow("arrowDown") end,
 				},
 				-- sort by acronym
 				{
@@ -1562,8 +1579,11 @@ local function SetupUI()
 					entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
 					buttonGroup = 1,
 					checked = function() return BMU.savedVarsChar.dungeonFinder.sortByAcronym end,
+					icon = function() return BMU_checkIfContextMenuIconShouldShow("abbreviate") end
 				},
-			}
+			},
+			nil,
+			{ icon = function() return BMU_checkIfContextMenuIconShouldShow("sortHeader") end }
 		)
 
 		-- display options (update name or acronym) (dungeon name or zone name)
@@ -1616,13 +1636,15 @@ local function SetupUI()
 		)
 
 		-- add dungeon difficulty toggle
-		addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_textures.dungeonDifficultyVeteranStr .. GetString(SI_DUNGEONDIFFICULTY2), nil, nil,
+		addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_DUNGEONDIFFICULTY2), nil, nil,
 				function(comboBox, itemName, item, checked, data)
 					BMU_setDungeonDifficulty(not BMU_getCurrentDungeonDifficulty())
 					zo_callLater(function() BMU_createTableDungeons() end, 300)
 				end,
 				function() return BMU_getCurrentDungeonDifficulty() end,
-				{ enabled = function() return CanPlayerChangeGroupDifficulty() end } --additionalData.enabled
+				{ enabled = function() return CanPlayerChangeGroupDifficulty() end,
+				  icon = function() return BMU_checkIfContextMenuIconShouldShow("dungeonDifficultyVeteran") end,
+				} --additionalData.enabled
 		)
 
 		-- divider

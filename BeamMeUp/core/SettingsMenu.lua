@@ -366,6 +366,15 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
 			  submenu = "ui",
          },
 		 {
+              type = "checkbox",
+              name = BMU_SI_Get(SI_TELE_SETTINGS_SHOW_CNTXTMENU_ICONS),
+              tooltip = BMU_SI_Get(SI_TELE_SETTINGS_SHOW_CNTXTMENU_ICONS_TOOLTIP) .. " [DEFAULT: " .. tos(BMU_DefaultsPerAccount["showContextMenuIcons"]) .. "]",
+			  getFunc = function() return BMU_SVAcc.showContextMenuIcons end,
+              setFunc = function(value) BMU_SVAcc.showContextMenuIcons = value end,
+			  default = BMU_DefaultsPerAccount["showContextMenuIcons"],
+			  submenu = "ui",
+         },
+		 {
               type = "button",
               name = BMU_SI_Get(SI_TELE_SETTINGS_RESET_UI),
 			  tooltip = BMU_SI_Get(SI_TELE_SETTINGS_RESET_UI_TOOLTIP),
@@ -385,6 +394,7 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
 			  warning = "This will automatically reload your UI!",
 			  submenu = "ui",
          },
+
 		 {
               type = "checkbox",
               name = BMU_SI_Get(SI_TELE_SETTINGS_AUTO_REFRESH),

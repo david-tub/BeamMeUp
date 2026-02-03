@@ -201,6 +201,9 @@ local stringsEN = {
     ["SI_TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP"] = "Technical messages for troubleshooting. It will spam your chat. Please use only on request for short time!",
     ["SI_TELE_SETTINGS_OUTPUT_DEBUG_WARN"] = "This option can not be set permanently.",
 
+    ["SI_TELE_SETTINGS_SHOW_CNTXTMENU_ICONS"] = "Show contextmenu icons",
+    ["SI_TELE_SETTINGS_SHOW_CNTXTMENU_ICONS_TOOLTIP"] = "Show icons at the contextmenu entries to help you find the relevant entry",
+
     -----------------------------------------------------------------------------
     -- KEY BINDING
     -----------------------------------------------------------------------------

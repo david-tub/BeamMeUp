@@ -201,6 +201,9 @@ local strings = {
     ["SI_TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP"] = "Technische Chat-Meldungen zur Fehlerbehebung. Dadurch wird der Chat zugespammt. Bitte nur auf Anfrage und nur für kurze Zeit verwenden!",
     ["SI_TELE_SETTINGS_OUTPUT_DEBUG_WARN"] = "Diese Option kann nicht permanent aktiviert bleiben.",
 
+    ["SI_TELE_SETTINGS_SHOW_CNTXTMENU_ICONS"] = "Zeige Symbole in Kontextmenüs",
+    ["SI_TELE_SETTINGS_SHOW_CNTXTMENU_ICONS_TOOLTIP"] = "Zeige Symbole in Kontextmenüs, um die relevanten Einträge einfacher zu finden",
+
     -----------------------------------------------------------------------------
     -- KEY BINDING
     -----------------------------------------------------------------------------

@@ -201,7 +201,7 @@ BMU.MSG_UL = 3
 BMU.MSG_DB = 4
 
 -- Textures
-BMU.textures = {
+local BMU_textures = {
 	tooltipSeperatorStr = "|t120:5:esoui/art/guild/sectiondivider_left.dds|t",
 	anchorMapBtn = BMU_MediaPath .. "dock.dds",
 	anchorMapBtnOver = BMU_MediaPath .. "dock_over.dds",
@@ -256,8 +256,8 @@ BMU.textures = {
 	ptfHouseBtnOver             = BMU_MediaPath .. "ptf_house_mouseover.dds",
 	soloArenaBtn                = BMU_MediaPath .. "poi_solotrial.dds",
 	soloArenaBtnOver            = BMU_MediaPath .. "poi_solotrial_over.dds",
-	dungeonDifficultyNormalStr  = "|t32:32:esoui/art/lfg/lfg_normaldungeon_up.dds|t",
-	dungeonDifficultyVeteranStr = "|t32:32:esoui/art/lfg/lfg_veterandungeon_up.dds|t",
+	dungeonDifficultyNormal  	= "esoui/art/lfg/lfg_normaldungeon_up.dds",
+	dungeonDifficultyVeteran    = "esoui/art/lfg/lfg_veterandungeon_up.dds",
 	noPlayerBtn                 = BMU_MediaPath .. "guildstore_sell_tabicon.dds",
 	noPlayerBtnOver             = BMU_MediaPath .. "guildstore_sell_tabicon_over.dds",
 	arrowDown                   = "esoui/art/worldmap/mapnav_downarrow_up.dds",
@@ -266,8 +266,44 @@ BMU.textures = {
 	arrowUpStr                  = "|t32:32:esoui/art/worldmap/mapnav_uparrow_up.dds|t",
 	acceptGreenStr              = "|t16:16:esoui/art/interaction/accept.dds|t",
 	declineRedStr               = "|t16:16:esoui/art/interaction/goodbye.dds|t",
+
+	--Context menu icons
+	---Antiquity leads
+	antiquity					= "/esoui/art/mappins/antiquity_digsite.dds",
+	leadTypeScryable			= "/esoui/art/treeicons/antiquities_indexicon_scryable_up.dds",
+	leadTypeScried				= "/esoui/art/journal/journal_quest_scrying_selected.dds",
+	leadTypeCompleted			= "/esoui/art/icons/skilllinexp_scrying.dds",
+	---Surveys
+	survey						= "/esoui/art/icons/treasuremap_witchesfestival.dds",
+	surveyTypeAlchemy			= "/esoui/art/inventory/inventory_tabicon_craftbag_alchemy_up.dds",
+	surveyTypeEnchanting		= "/esoui/art/inventory/inventory_tabicon_craftbag_enchanting_up.dds",
+	surveyTypeWoodworker		= "/esoui/art/inventory/inventory_tabicon_craftbag_woodworking_up.dds",
+	surveyTypeBlacksmith		= "/esoui/art/inventory/inventory_tabicon_craftbag_blacksmithing_up.dds",
+	surveyTypeClothier			= "/esoui/art/inventory/inventory_tabicon_craftbag_clothing_up.dds",
+	surveyTypeJewelry			= "/esoui/art/inventory/inventory_tabicon_craftbag_jewelrycrafting_up.dds",
+	---Tales Of Tribute
+	tribute						= "/esoui/art/tribute/tribute_tabicon_tribute_up.dds",
+	---Dungeons
+	endlessDungeon 				= "/esoui/art/treeicons/tutorial_endlessdungeon_up.dds",
+	arena 						= "/esoui/art/treeicons/reconstruction_tabicon_arenasolo_up.dds",
+	groupArena 					= "/esoui/art/treeicons/reconstruction_tabicon_arenagroup_up.dds",
+	trial 						= BMU_MediaPath .. "poi_raiddungeon_complete.dds",
+	groupDungeon 				= BMU_MediaPath .. "poi_groupinstance_complete.dds",
+	---Social
+	friends						= "/esoui/art/campaign/campaignbrowser_friends.dds",
+	group						= "/esoui/art/lfg/lfg_indexicon_group_up.dds",
+	otherHouses					= "/esoui/art/journal/journal_quest_group_housing.dds",
+	abbreviate					= "/esoui/art/buttons/gamepad/heron/nav_heron_view.dds",
+	---Other
+	filter						= "/esoui/art/worldmap/map_indexicon_filters_up.dds",
+	bank						= "/esoui/art/tooltips/icon_bank.dds",
+	treasureMap					= "/esoui/art/tradinghouse/tradinghouse_trophy_treasure_map_up.dds",
+	sortHeader					= "/esoui/art/miscellaneous/list_sortheader_icon_neutral.dds",
 }
-local BMU_textures = BMU.textures  																	--INS251229 Baertram
+BMU_textures.dungeonDifficultyNormalStr  = "|t32:32:" .. BMU_textures.dungeonDifficultyNormal .. "|t"
+BMU_textures.dungeonDifficultyVeteranStr = "|t32:32:" .. BMU_textures.dungeonDifficultyVeteran .. "|t"
+
+BMU.textures = BMU_textures																			--INS251229 Baertram
 
 local serviceMapPinsDDSPath = "esoui/art/icons/servicemappins/servicepin_"
 local itemTypeIcons = {
@@ -289,6 +325,10 @@ function BMU.getItemTypeIcon(itemType, dimension)
 	end
 end
 
+function BMU.checkIfContextMenuIconShouldShow(iconPath)
+	if iconPath == nil or iconPath == "" or BMU.savedVarsAcc.showContextMenuIcons == false then return nil end
+	return BMU_textures[iconPath]
+end
 
 -- Special textures for event days
 local ld = os.date("*t")

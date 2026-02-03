@@ -245,10 +245,9 @@ end
 ---^- INS BEARTRAM 20260125 LibScrollableMenu helpers
 
 
-
+local stringInstalled = BMU_colorizeText( BMU_SI_Get(SI_TELE_LIB_INSTALLED), colorGreen)
+local stringNotInstalled = BMU_colorizeText(BMU_SI_Get(SI_TELE_LIB_NOT_INSTALLED), colorRed)
 function BMU.getStringIsInstalledLibrary(addonName)
-	local stringInstalled = BMU_colorizeText("installed and enabled", colorGreen)
-	local stringNotInstalled = BMU_colorizeText("not installed or disabled", colorRed)
 	local lowerAddonName = string_lower(addonName)
 
 	-- PortToFriendsHouse

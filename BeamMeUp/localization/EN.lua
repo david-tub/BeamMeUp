@@ -79,7 +79,9 @@ local stringsEN = {
     -- SETTINGS
     -----------------------------------------------------------------------------
     --Addon Extensions
-    ["SI_TELE_SETTINGS_ADDON_EXTENSIONS"] = "AddOn Extensions",
+    ["SI_TELE_LIB_INSTALLED"] = "installed and enabled",
+    ["SI_TELE_LIB_NOT_INSTALLED"] = "not installed or disabled",
+    ["SI_TELE_SETTINGS_ADDON_EXTENSIONS"] = "AddOn Erweiterungen",
     ["SI_TELE_ADDON_EXT_DESC"] = "Get the most out of BeamMeUp by using it together with the following addons.",
     ["SI_TELE_ADDON_EXT_OPEN_URL"] = "Open addon website",
     ["SI_TELE_ADDON_EXT_PTF_DESC"] = "Access your houses and guild halls directly through BeamMeUp. Your houses that are set in PTF will be displayed in a separate list.",
@@ -87,7 +89,7 @@ local stringsEN = {
     ["SI_TELE_ADDON_EXT_LIBMAPPING_DESC"] = "Use pings on the map (rally points) instead of zooming when you click on specific zone names or group members. An option in the 'Extra Features' allows you to toggle between the map ping and the zoom & pan feature.",
     ["SI_TELE_ADDON_EXT_LIBSLASHCOMMANDER_DESC"] = "Get comprehensive auto-completion, color coding and short description for chat commands.",
     ["SI_TELE_ADDON_EXT_LIBCHATMENUBTN_DESC"] = "Leave the positioning of the BMU chat button to an external library. Support the concept of libraries. But you will lose the option to set an individual offset.",
-    ["SI_TELE_ADDON_EXT_IJAGBMUGP_DESC"] = "Use BeamMeUp in the gamepad mode. Finally, BeamMeUp gets a dedicated gamepad support. |cFF00FFIsJusta|r Beam Me Up Gamepad Plugin integrates the features of BeamMeUp in the gamepad interface and allows you to travel more comfortable than ever before.",
+    ["SI_TELE_ADDON_EXT_IJAGBMUGP_DESC"] = "Use BeamMeUp in the gamepad mode. With this addon, BeamMeUp gets a dedicated gamepad support. |cFF00FFIsJusta|r Beam Me Up Gamepad Plugin integrates the features of BeamMeUp in the gamepad interface and allows you to travel more comfortable than ever before.",
 
     --Other settings
     ["SI_TELE_SETTINGS_SHOW_ON_MAP_OPEN"] = "Open BeamMeUp when the map is opened",

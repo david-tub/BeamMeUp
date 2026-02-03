@@ -9,15 +9,15 @@
 ## DependsOn: LibAddonMenu-2.0>=41 LibScrollableMenu>=020401 LibZone>=0895
 ## OptionalDependsOn: LibCustomMenu LibSlashCommander LibSets LibMapPing LibChatMenuButton PortToFriendsHouse BanditsUserInterface MorrowindStyleUI
 
-## Globals / data sets
+## Core translation files
 core/SI.lua
+localization/EN.lua
+localization/$(language).lua
+
+## Globals / data sets
 GuildData.lua
 TeleporterGlobals.lua
 
-
-## Core
-localization/EN.lua
-localization/$(language).lua
 
 core/List.lua
 core/SettingsMenu.lua

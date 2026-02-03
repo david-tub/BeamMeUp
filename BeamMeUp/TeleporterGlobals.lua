@@ -1,4 +1,3 @@
-BMU = {}
 local BMU = BMU --INS251229 Baertram Performancee gain, not searching _G for BMU each time again!
 
 -- -v- INS251229 Baertram BEGIN 0
@@ -18,6 +17,9 @@ local BMU_MediaPath = "/BeamMeUp/media/"
 
 --BMU reference variables
 local BMU_GUILD_DATA = BMU_GUILD_DATA
+local numVars = BMU.numVars
+local SI = BMU.SI
+local BMU_SI_Get = SI.get
 -- -^- INS251229 Baertram BEGIN 0
 
 
@@ -339,14 +341,33 @@ BMU.ZONE_CATEGORY_OVERLAND = 100
 -- flag and cache to check if quest data in journal changed
 BMU.questDataCache = {}
 BMU.questDataChanged = true
-		
--- second language dropdown choices/values
-BMU.dropdownSecLangChoices = {"DISABLED", "en", "de", "fr", "ru", "jp", "pl"}
-BMU.dropdownSecLangValues = {1, 2, 3, 4, 5, 6, 7}
 
--- sortings dropdown choices/values
-BMU.dropdownSortChoices = {"zone name", "zone category > zone name", "most used zone > zone name", "most used zone > zone category > zone name", "number of players > zone name", "undiscovered wayshrines > zone category > zone name", "undiscovered skyshards > zone category > zone name", "last used zone > zone name", "last used zone > zone category > zone name", "missing set items > zone category > zone name (LibSets must be installed)", "zone category (zones without free options at the end) > zone name"}
-BMU.dropdownSortValues = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+--------------------------------------------------
+--For LAM settings menu - Dropdowns
+--------------------------------------------------
+-- second language dropdown choices/values
+local BMU_dropdownSecLangChoices = {}
+local BMU_dropdownSecLangValues = {}
+local secLangDropdownEntryPrefix = numVars.secLangDropdownEntryPrefix
+for i=1, numVars.numSecLangDropdownEntries, 1 do
+	BMU_dropdownSecLangChoices[i] = BMU_SI_Get(SI[secLangDropdownEntryPrefix], i)
+	BMU_dropdownSecLangValues[i] = i
+end
+BMU.dropdownSecLangValues = BMU_dropdownSecLangValues
+BMU.dropdownSecLangChoices = BMU_dropdownSecLangChoices
+
+-- sorting dropdown choices/values
+local BMU_dropdownSortChoices = {}
+local BMU_dropdownSortValues = {}
+local sortDropdownEntryPrefix = BMU.numVars.sortDropdownEntryPrefix
+for i=1, numVars.numSortDropdownEntries, 1 do
+	BMU_dropdownSortChoices[i] = BMU_SI_Get(SI[sortDropdownEntryPrefix], i)
+	BMU_dropdownSortValues[i] = i
+end
+BMU.dropdownSortChoices = BMU_dropdownSortChoices
+BMU.dropdownSortValues = BMU_dropdownSortValues
+--------------------------------------------------
+
 
 -- scenario indicies
 -- list/tab or action id

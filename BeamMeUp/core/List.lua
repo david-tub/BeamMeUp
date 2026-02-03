@@ -106,7 +106,7 @@ local zo_callLater = zo_callLater
 local CanJumpToPlayerInZone = CanJumpToPlayerInZone
 
 --BMU functions
-local BMU_SI_get 							= SI.get
+local BMU_SI_Get 							= SI.get
 local BMU_colorizeText 						= BMU.colorizeText
 local BMU_printToChat 						= BMU.printToChat
 local BMU_getItemTypeIcon 					= BMU.getItemTypeIcon
@@ -188,7 +188,7 @@ function BMU.checkAndStartAutoUnlockOfZone(zoneId)
 
 	if not BMU_isZoneOverlandZone(zoneId) or not CanJumpToPlayerInZone(zoneId) then
 		-- zone is no OverlandZone OR user has no access to zone (DLC) -> show dialog, that unlocking is not possible
-		BMU_showDialogSimple("RefuseAutoUnlock2", BMU_SI_get(SI.TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE), BMU_formatName(GetZoneNameById(zoneId), false) .. ": " .. BMU_SI_get(SI.TELE_DIALOG_REFUSE_AUTO_UNLOCK_BODY2), nil, nil)
+		BMU_showDialogSimple("RefuseAutoUnlock2", BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE), BMU_formatName(GetZoneNameById(zoneId), false) .. ": " .. BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_BODY2), nil, nil)
 		return
 	end
 	
@@ -196,7 +196,7 @@ function BMU.checkAndStartAutoUnlockOfZone(zoneId)
 	local numWayshrines, numWayshrinesDiscovered = BMU_getZoneWayshrineCompletion(zoneId)
 	if numWayshrinesDiscovered >= numWayshrines then
 		-- show dialog, that unlocking is not longer possible
-		BMU_showDialogSimple("RefuseAutoUnlock", BMU_SI_get(SI.TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE), BMU_formatName(GetZoneNameById(zoneId), false) .. ": " .. BMU_SI_get(SI.TELE_DIALOG_REFUSE_AUTO_UNLOCK_BODY) .. BMU_colorizeText(" (" .. numWayshrinesDiscovered .. "/" .. numWayshrines .. ")", "green"), nil, nil)
+		BMU_showDialogSimple("RefuseAutoUnlock", BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE), BMU_formatName(GetZoneNameById(zoneId), false) .. ": " .. BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_BODY) .. BMU_colorizeText(" (" .. numWayshrinesDiscovered .. "/" .. numWayshrines .. ")", "green"), nil, nil)
 		return
 	end
 	BMU_prepareAutoUnlock(zoneId, nil, nil)
@@ -218,7 +218,7 @@ function BMU.startAutoUnlock(zoneId, loopType, loopZoneList)
 		-- check if list is empty
 		local firstRecord = list[1]
 		if #list == 0 or not firstRecord or firstRecord.displayName == "" then
-			BMU_showDialogSimple("AutoUnlockNoPlayer", BMU_SI_get(SI.TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE), formattedZoneName .. ": " .. BMU_SI_get(SI.TELE_DIALOG_REFUSE_AUTO_UNLOCK_BODY3), nil, nil)
+			BMU_showDialogSimple("AutoUnlockNoPlayer", BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE), formattedZoneName .. ": " .. BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_BODY3), nil, nil)
 			return
 		end
 		
@@ -355,10 +355,10 @@ function BMU.showAutoUnlockProceedDialog(record)
 	end
 	
 	local body =
-		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART) .. "\n\n" ..
-		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_DISCOVERY) .. " " .. tos(unlockedWayshrinesString) .. " (" .. tos(allUnlockedWayshrines) .. "/" .. tos(totalWayhsrines) .. ")" .. "\n" ..
-		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_XP) .. " " .. tos(gainedXPString) .. "\n\n" ..
-		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_PROGRESS) .. " " .. tos(currentStep) .."/" .. tos(totalSteps) .. "\n" ..
+		BMU_SI_Get(SI_TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART) .. "\n\n" ..
+		BMU_SI_Get(SI_TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_DISCOVERY) .. " " .. tos(unlockedWayshrinesString) .. " (" .. tos(allUnlockedWayshrines) .. "/" .. tos(totalWayhsrines) .. ")" .. "\n" ..
+		BMU_SI_Get(SI_TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_XP) .. " " .. tos(gainedXPString) .. "\n\n" ..
+		BMU_SI_Get(SI_TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_PROGRESS) .. " " .. tos(currentStep) .."/" .. tos(totalSteps) .. "\n" ..
 		GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. tos(record.displayName)
 	
 	local countdown = GetTimeStamp() + 8
@@ -368,7 +368,7 @@ function BMU.showAutoUnlockProceedDialog(record)
 	
 	-- local function to update the dialog body (to append the countdown)
 	local function setTextParameter(parameter)
-		ZO_Dialogs_UpdateDialogMainText(dialogReference, {text=body .. "\n\n" .. BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_TIMER) .. " <<1>>\n"}, {parameter})
+		ZO_Dialogs_UpdateDialogMainText(dialogReference, {text=body .. "\n\n" .. BMU_SI_Get(SI_TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_TIMER) .. " <<1>>\n"}, {parameter})
 	end
 
 	-- local function that is called continously
@@ -391,7 +391,7 @@ function BMU.showAutoUnlockProceedDialog(record)
 			-- finishedCallback is also triggered when entering the loading screen
 			-- -> consider only during countdown
 			-- timeout is handled via update function
-			BMU_printToChat(BMU_SI_get(SI.TELE_CHAT_AUTO_UNLOCK_CANCELED), BMU.MSG_UL)
+			BMU_printToChat(BMU_SI_Get(SI_TELE_CHAT_AUTO_UNLOCK_CANCELED), BMU.MSG_UL)
 			BMU_finishedAutoUnlock("canceled")
 		end
 	end
@@ -428,7 +428,7 @@ function BMU.finishedAutoUnlock(reason)
 	if BMU.flagSocialErrorWhilePorting ~= 0  and reason == "timeout" then
 		BMU.flagSocialErrorWhilePorting = 0
 		-- just proceed with next player
-		BMU_printToChat(BMU_SI_get(SI.TELE_CHAT_AUTO_UNLOCK_SKIP), BMU.MSG_UL)
+		BMU_printToChat(BMU_SI_Get(SI_TELE_CHAT_AUTO_UNLOCK_SKIP), BMU.MSG_UL)
 		BMU_proceedAutoUnlock()
 		return
 	end
@@ -464,22 +464,22 @@ function BMU.finishedAutoUnlock(reason)
 	end
 		
 	if reason == "timeout" then
-		BMU_showDialogSimple("AutoUnlockTimeout", BMU_SI_get(SI.TELE_DIALOG_TIMEOUT_AUTO_UNLOCK_TITLE), BMU_SI_get(SI.TELE_DIALOG_TIMEOUT_AUTO_UNLOCK_BODY), nil, nil)
+		BMU_showDialogSimple("AutoUnlockTimeout", BMU_SI_Get(SI_TELE_DIALOG_TIMEOUT_AUTO_UNLOCK_TITLE), BMU_SI_Get(SI_TELE_DIALOG_TIMEOUT_AUTO_UNLOCK_BODY), nil, nil)
 	end
 	
 	local finishDialogTitle = BMU.uwData.fZoneName
 	local finishDialogBody =
-		BMU_SI_get(SI.TELE_DIALOG_FINISH_AUTO_UNLOCK_BODY_PART) .. "\n\n" ..
-		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_DISCOVERY) .. " " .. tos(unlockedWayshrinesString) .. " (" .. tos(totalWayshrinesString) .. ")" .. "\n" ..
-		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_XP) .. " " .. tos(gainedXPString)
+		BMU_SI_Get(SI_TELE_DIALOG_FINISH_AUTO_UNLOCK_BODY_PART) .. "\n\n" ..
+		BMU_SI_Get(SI_TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_DISCOVERY) .. " " .. tos(unlockedWayshrinesString) .. " (" .. tos(totalWayshrinesString) .. ")" .. "\n" ..
+		BMU_SI_Get(SI_TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_XP) .. " " .. tos(gainedXPString)
 	
 	local globalDialogName, dialogReference = BMU_showDialogSimple("AutoUnlockFinished", finishDialogTitle, finishDialogBody, nil, nil)
 
 	-- print summary into chat
 	BMU_printToChat(
 		BMU.uwData.fZoneName .. ": " ..
-		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_DISCOVERY) .. " " .. tos(unlockedWayshrinesString) .. " (" .. tos(totalWayshrinesString) .. ")  " ..
-		BMU_SI_get(SI.TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_XP) .. " " .. tos(gainedXPString), BMU.MSG_UL)
+		BMU_SI_Get(SI_TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_DISCOVERY) .. " " .. tos(unlockedWayshrinesString) .. " (" .. tos(totalWayshrinesString) .. ")  " ..
+		BMU_SI_Get(SI_TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_XP) .. " " .. tos(gainedXPString), BMU.MSG_UL)
 
 	-- if continuing with next zones and process finished successfully
 	local loopType = BMU.uwData.loopType
@@ -532,7 +532,7 @@ function BMU.startAutoUnlockLoopRandom(prevZoneId, loopType)
 		end
 	end
 	-- finished here: found no zone to unlock
-	BMU.showDialogSimple("AutoUnlockLoopFinish", BMU_SI_get(SI.TELE_DIALOG_LOOP_FINISH_AUTO_UNLOCK_TITLE), BMU_SI_get(SI.TELE_DIALOG_LOOP_FINISH_AUTO_UNLOCK_BODY), nil, nil)
+	BMU.showDialogSimple("AutoUnlockLoopFinish", BMU_SI_Get(SI_TELE_DIALOG_LOOP_FINISH_AUTO_UNLOCK_TITLE), BMU_SI_Get(SI_TELE_DIALOG_LOOP_FINISH_AUTO_UNLOCK_BODY), nil, nil)
 end
 
 
@@ -612,7 +612,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType)
 	end
 	
 	-- finished here: found no zone to unlock
-	BMU_showDialogSimple("AutoUnlockLoopFinish", BMU_SI_get(SI.TELE_DIALOG_LOOP_FINISH_AUTO_UNLOCK_TITLE), BMU_SI_get(SI.TELE_DIALOG_LOOP_FINISH_AUTO_UNLOCK_BODY), nil, nil)
+	BMU_showDialogSimple("AutoUnlockLoopFinish", BMU_SI_Get(SI_TELE_DIALOG_LOOP_FINISH_AUTO_UNLOCK_TITLE), BMU_SI_Get(SI_TELE_DIALOG_LOOP_FINISH_AUTO_UNLOCK_BODY), nil, nil)
 end
 
 
@@ -642,19 +642,19 @@ function BMU.showDialogAutoUnlock(zoneId)
 		BMU.customDialog_dropdownControl = ZO_ComboBox_ObjectFromContainer(BMU.customDialog_comboBox)
 		BMU.customDialog_dropdownControl:SetSortsItems(false)
 		-- add items
-		local entry1 = BMU.customDialog_dropdownControl:CreateItemEntry(BMU_SI_get(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION1), function() end)
+		local entry1 = BMU.customDialog_dropdownControl:CreateItemEntry(BMU_SI_Get(SI_TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION1), function() end)
 		entry1.key = "suffle"
 		BMU.customDialog_dropdownControl:AddItem(entry1)
 		
-		local entry2 = BMU.customDialog_dropdownControl:CreateItemEntry(BMU_SI_get(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION2), function() end)
+		local entry2 = BMU.customDialog_dropdownControl:CreateItemEntry(BMU_SI_Get(SI_TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION2), function() end)
 		entry2.key = "wayshrines"
 		BMU.customDialog_dropdownControl:AddItem(entry2)
 		
-		local entry3 = BMU.customDialog_dropdownControl:CreateItemEntry(BMU_SI_get(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION3), function() end)
+		local entry3 = BMU.customDialog_dropdownControl:CreateItemEntry(BMU_SI_Get(SI_TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION3), function() end)
 		entry3.key = "players"
 		BMU.customDialog_dropdownControl:AddItem(entry3)
 
-		local entry4 = BMU.customDialog_dropdownControl:CreateItemEntry(BMU_SI_get(SI.TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION4), function() end)
+		local entry4 = BMU.customDialog_dropdownControl:CreateItemEntry(BMU_SI_Get(SI_TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION4), function() end)
 		entry4.key = "zonenames"
 		BMU.customDialog_dropdownControl:AddItem(entry4)
 		--
@@ -663,7 +663,7 @@ function BMU.showDialogAutoUnlock(zoneId)
 		BMU.customDialog_checkboxControl = CreateControlFromVirtual("BMU_CustomCheckboxControl", BMU_customDialogSection, "ZO_CheckButton")
 		BMU.customDialog_checkboxControl:SetAnchor(BOTTOMLEFT, BMU_customDialogSection, BOTTOMLEFT, 0, 0)
 
-		ZO_CheckButton_SetLabelText(BMU.customDialog_checkboxControl, BMU_SI_get(SI.TELE_DIALOG_AUTO_UNLOCK_CHAT_LOG_OPTION))
+		ZO_CheckButton_SetLabelText(BMU.customDialog_checkboxControl, BMU_SI_Get(SI_TELE_DIALOG_AUTO_UNLOCK_CHAT_LOG_OPTION))
 		--ZO_CheckButton_SetTooltipText(BMU.customDialog_checkboxControl, "check to enable the log")
 		
 		BMU.customDialog_dropdownControl:SelectItem(entry1, true)
@@ -702,8 +702,8 @@ function BMU.showDialogAutoUnlock(zoneId)
 	
 	local dialogInfo = {
 		canQueue = true,
-		title = {text = BMU_SI_get(SI.TELE_DIALOG_AUTO_UNLOCK_TITLE)},
-		mainText = {align = TEXT_ALIGN_LEFT, text = BMU_SI_get(SI.TELE_DIALOG_AUTO_UNLOCK_BODY)},
+		title = {text = BMU_SI_Get(SI_TELE_DIALOG_AUTO_UNLOCK_TITLE)},
+		mainText = {align = TEXT_ALIGN_LEFT, text = BMU_SI_Get(SI_TELE_DIALOG_AUTO_UNLOCK_BODY)},
 		buttons = {
 			{
 				text = SI_DIALOG_CONFIRM,
@@ -738,7 +738,7 @@ function BMU.showDialogAutoUnlock(zoneId)
 				data = {loop=false},
 			},
 			{
-				text = BMU_SI_get(SI.TELE_DIALOG_AUTO_UNLOCK_LOOP_OPTION),
+				text = BMU_SI_Get(SI_TELE_DIALOG_AUTO_UNLOCK_LOOP_OPTION),
 				data = {loop=true},
 			},
 		},
@@ -939,7 +939,7 @@ function BMU.PortalToZone(zoneId)
 		end
 	end
 	-- found no wayshrine
-	BMU_printToChat(BMU_SI_get(SI.TELE_CHAT_NO_FAST_TRAVEL))
+	BMU_printToChat(BMU_SI_Get(SI_TELE_CHAT_NO_FAST_TRAVEL))
 end
 
 
@@ -947,7 +947,7 @@ end
 function BMU.showOfflineNote(_, messageType)
 	-- option is enabled + player does not set to offline since last reload + a blank call or it is outgoing whisper message + player is set to offline + last message was 24 hours ago
 	if BMU.savedVarsAcc.showOfflineReminder and not BMU.playerStatusChangedToOffline and (not messageType or messageType == CHAT_CHANNEL_WHISPER_SENT) and GetPlayerStatus() == PLAYER_STATUS_OFFLINE and (GetTimeStamp() - BMU.savedVarsServ.lastofflineReminder > 86400) then
-		CENTER_SCREEN_ANNOUNCE:AddMessage(0, CSA_CATEGORY_LARGE_TEXT, "Justice_NowKOS", BMU_SI_get(SI.TELE_CENTERSCREEN_OFFLINE_NOTE_HEAD), BMU_SI_get(SI.TELE_CENTERSCREEN_OFFLINE_NOTE_BODY), nil, nil, nil, nil, 10000, nil)
+		CENTER_SCREEN_ANNOUNCE:AddMessage(0, CSA_CATEGORY_LARGE_TEXT, "Justice_NowKOS", BMU_SI_Get(SI_TELE_CENTERSCREEN_OFFLINE_NOTE_HEAD), BMU_SI_Get(SI_TELE_CENTERSCREEN_OFFLINE_NOTE_BODY), nil, nil, nil, nil, 10000, nil)
 		BMU.savedVarsServ.lastofflineReminder = GetTimeStamp()
 	end
 end
@@ -1167,12 +1167,12 @@ local function _initialize_listview(self_listview, width, height, left, top)
 	BMU.control_global.statisticGold = wm:CreateControl(name .. "_StatisticGold", BMU.control_global, CT_LABEL)
 	BMU.control_global.statisticGold:SetFont(BMU.font2)
     BMU.control_global.statisticGold:SetAnchor(TOPLEFT, BMU.control_global, TOPLEFT, TOPLEFT-35*scale, 25*scale)
-	BMU.control_global.statisticGold:SetText(BMU_SI_get(SI.TELE_UI_GOLD) .. " " .. BMU.formatGold(BMU.savedVarsAcc.savedGold))
+	BMU.control_global.statisticGold:SetText(BMU_SI_Get(SI_TELE_UI_GOLD) .. " " .. BMU.formatGold(BMU.savedVarsAcc.savedGold))
 	
 	BMU.control_global.statisticTotal = wm:CreateControl(name .. "_StatisticTotal", BMU.control_global, CT_LABEL)
 	BMU.control_global.statisticTotal:SetFont(BMU.font2)
     BMU.control_global.statisticTotal:SetAnchor(TOPLEFT, BMU.control_global, TOPLEFT, TOPLEFT-35*scale, 45*scale)
-	BMU.control_global.statisticTotal:SetText(BMU_SI_get(SI.TELE_UI_TOTAL_PORTS) .. " " .. BMU.formatGold(BMU.savedVarsAcc.totalPortCounter))
+	BMU.control_global.statisticTotal:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL_PORTS) .. " " .. BMU.formatGold(BMU.savedVarsAcc.totalPortCounter))
 		
 	BMU.control_global.total = wm:CreateControl(name .. "_Total", BMU.control_global, CT_LABEL)
     BMU.control_global.total:SetFont(BMU.font2)
@@ -1315,13 +1315,13 @@ function ListView:update()
 	local firstRecord = self.lines[1]
 	if firstRecord.displayName == "" and firstRecord.zoneNameClickable ~= true then
 		-- no entries, only no matches info
-		self.control.total:SetText(BMU_SI_get(SI.TELE_UI_TOTAL) .. " " .. "0")
+		self.control.total:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL) .. " " .. "0")
 	elseif #self.lines > 1 and self.lines[totalPortals-1].displayName == "" and self.lines[totalPortals-1].zoneNameClickable ~= true then
 		-- last entry is "maps in other zones"
-		self.control.total:SetText(BMU_SI_get(SI.TELE_UI_TOTAL) .. " " .. totalPortals - 1)
+		self.control.total:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL) .. " " .. totalPortals - 1)
 	else
 		-- normal
-		self.control.total:SetText(BMU_SI_get(SI.TELE_UI_TOTAL) .. " " .. totalPortals)
+		self.control.total:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL) .. " " .. totalPortals)
 	end
 	
 	
@@ -1362,7 +1362,7 @@ function ListView:update()
 				local favSlot = BMU.isFavoritePlayer(message.displayName)
 				if favSlot then
 					table_insert(tooltipTextPlayer, BMU_textures.tooltipSeperatorStr)
-					table_insert(tooltipTextPlayer, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. tos(favSlot), "gold"))
+					table_insert(tooltipTextPlayer, BMU_colorizeText(BMU_SI_Get(SI_TELE_UI_FAVORITE_PLAYER) .. " " .. tos(favSlot), "gold"))
 				end
 
 
@@ -1540,9 +1540,9 @@ function ListView:update()
 				end
 				-- add instance info
 				if message.groupMemberSameInstance == true then
-					table_insert(tooltipTextZone, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_SAME_INSTANCE), "green"))
+					table_insert(tooltipTextZone, BMU_colorizeText(BMU_SI_Get(SI_TELE_UI_SAME_INSTANCE), "green"))
 				else
-					table_insert(tooltipTextZone, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_DIFFERENT_INSTANCE), "red"))
+					table_insert(tooltipTextZone, BMU_colorizeText(BMU_SI_Get(SI_TELE_UI_DIFFERENT_INSTANCE), "red"))
 				end
 			end
 			------------------
@@ -1551,7 +1551,7 @@ function ListView:update()
 			local favSlot = BMU.isFavoriteZone(message.zoneId)
 			if favSlot then
 				table_insert(tooltipTextZone, BMU_textures.tooltipSeperatorStr)
-				table_insert(tooltipTextZone, BMU_colorizeText(BMU_SI_get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. tos(favSlot), "gold"))
+				table_insert(tooltipTextZone, BMU_colorizeText(BMU_SI_Get(SI_TELE_UI_FAVORITE_ZONE) .. " " .. tos(favSlot), "gold"))
 			end
 			------------------
 			
@@ -2212,11 +2212,11 @@ function BMU.clickOnZoneName(button, record)
 			if preferredHouseId and preferredHouseId == record.houseId then
 				-- current house is set as preferred
 				-- clear zone to unset the house
-				AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_UNSET_PREFERRED_HOUSE), function() BMU_clearZoneSpecificHouse(record.parentZoneId) end)
+				AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_UNSET_PREFERRED_HOUSE), function() BMU_clearZoneSpecificHouse(record.parentZoneId) end)
 			else
 				-- current house is not preferred
 				-- set house as preferred
-				AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_SET_PREFERRED_HOUSE), function() BMU_setZoneSpecificHouse(record.parentZoneId, record.houseId) end)
+				AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_SET_PREFERRED_HOUSE), function() BMU_setZoneSpecificHouse(record.parentZoneId, record.houseId) end)
 			end
 			
 			-- 3. make primary residence
@@ -2232,7 +2232,7 @@ function BMU.clickOnZoneName(button, record)
 			end
 
 			-- 4. rename own houses
-			AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_RENAME_HOUSE_NICKNAME), function() ZO_CollectionsBook.ShowRenameDialog(record.collectibleId) end)
+			AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_RENAME_HOUSE_NICKNAME), function() ZO_CollectionsBook.ShowRenameDialog(record.collectibleId) end)
 
 			-- 5. paste link to chat
 			AddCustomScrollableMenuEntry(GetString(SI_HOUSING_LINK_IN_CHAT), function() ZO_HousingBook_LinkHouseInChat(record.houseId, GetDisplayName()) end)
@@ -2242,7 +2242,7 @@ function BMU.clickOnZoneName(button, record)
 		if inQuestTab then
 			for k, v in pairs(record.relatedQuests) do
 				-- Show quest marker on map if record contains quest
-				AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_SHOW_QUEST_MARKER_ON_MAP) .. ": \"" .. record.relatedQuests[k] .. "\"", function() ZO_WorldMap_ShowQuestOnMap(record.relatedQuestsSlotIndex[k]) end)
+				AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_SHOW_QUEST_MARKER_ON_MAP) .. ": \"" .. record.relatedQuests[k] .. "\"", function() ZO_WorldMap_ShowQuestOnMap(record.relatedQuestsSlotIndex[k]) end)
 			end
 		end
 		
@@ -2252,7 +2252,7 @@ function BMU.clickOnZoneName(button, record)
 			for index, item in pairs(record.relatedItems) do
 				if item.bagId == BAG_BACKPACK and IsProtectedFunction("UseItem") then -- item is in inventory and can be used
 					-- use item
-					AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_VIEW_MAP_ITEM) .. ": '" .. item.itemName .. "'", function()
+					AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_VIEW_MAP_ITEM) .. ": '" .. item.itemName .. "'", function()
 						-- hide world map if open
 						SM:Hide("worldMap")
 						-- hide UI if open
@@ -2300,7 +2300,7 @@ function BMU.clickOnZoneName(button, record)
 		-- unlocking wayshrines menu (showing in all lists except dungeon and own house tab)
 		if not inDungeonTab and not inOwnHouseTab then
 			if BMU.isZoneOverlandZone(record.zoneId) then
-				AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_UNLOCK_WAYSHRINES), function() BMU_showDialogAutoUnlock(record.zoneId) end)
+				AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_UNLOCK_WAYSHRINES), function() BMU_showDialogAutoUnlock(record.zoneId) end)
 			end
 		end
 		
@@ -2315,7 +2315,7 @@ function BMU.clickOnZoneName(button, record)
 		-- reset port counter (due to force refresh only available in general list)
 		if not inDungeonTab and not inOwnHouseTab and not inQuestTab and not inItemsTab then
 			if BMU.savedVarsChar.sorting == 3 or BMU.savedVarsChar.sorting == 4 then
-				AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_RESET_COUNTER_ZONE), function() BMU_savedVarsAcc.portCounterPerZone[record.zoneId] = nil BMU_refreshListAuto() end)
+				AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_RESET_COUNTER_ZONE), function() BMU_savedVarsAcc.portCounterPerZone[record.zoneId] = nil BMU_refreshListAuto() end)
 			end
 		end
 
@@ -2324,12 +2324,12 @@ function BMU.clickOnZoneName(button, record)
 			if BMU_savedVarsServ.favoriteDungeon == record.zoneId then
 				AddCustomScrollableMenuEntry(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), function() BMU_savedVarsServ.favoriteDungeon = 0 BMU_createTableDungeons() end)
 			else
-				AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_FAVORITE_ZONE), function() BMU_savedVarsServ.favoriteDungeon = record.zoneId BMU_createTableDungeons() end)
+				AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_FAVORITE_ZONE), function() BMU_savedVarsServ.favoriteDungeon = record.zoneId BMU_createTableDungeons() end)
 			end
 		end
 
 		-- travel to parent zone
-		AddCustomScrollableMenuEntry(BMU_SI_get(SI.TELE_UI_TRAVEL_PARENT_ZONE), function()
+		AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_TRAVEL_PARENT_ZONE), function()
 			BMU_portToParentZone(record.zoneId)
 			-- close UI if enabled
 			if BMU_savedVarsAcc.closeOnPorting then
@@ -2414,7 +2414,7 @@ function BMU.clickOnPlayerName(button, record)
 		
 		if isPlayerInGroup and not isPlayerGroupLeader and isGroupPlayerInGroup and not IsUnitGroupLeader(unitTag) then
 			entries_group[pos] = {
-				label = BMU_SI_get(SI.TELE_UI_VOTE_TO_LEADER),
+				label = BMU_SI_Get(SI_TELE_UI_VOTE_TO_LEADER),
 				callback = function() BeginGroupElection(GROUP_ELECTION_TYPE_NEW_LEADER, ZO_GROUP_ELECTION_DESCRIPTORS.NONE, unitTag) end,
 			}
 			pos = pos + 1
@@ -2489,7 +2489,7 @@ function BMU.clickOnPlayerName(button, record)
 			local primaryBMUGuild = BMUGuildsAtServer[1]
 			if IsPlayerInGuild(primaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(primaryBMUGuild, record.displayName) then
 				entries_misc[pos] = {
-					label = BMU_SI_get(SI.TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp",
+					label = BMU_SI_Get(SI_TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp",
 					callback = function() GuildInvite(primaryBMUGuild, record.displayName) end,
 				}
 				pos = pos + 1
@@ -2499,7 +2499,7 @@ function BMU.clickOnPlayerName(button, record)
 			local secondaryBMUGuild = BMUGuildsAtServer[2]
 			if IsPlayerInGuild(secondaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(secondaryBMUGuild, record.displayName) then
 				entries_misc[pos] = {
-					label = BMU_SI_get(SI.TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp-Two",
+					label = BMU_SI_Get(SI_TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp-Two",
 					callback = function() GuildInvite(secondaryBMUGuild, record.displayName) end,
 				}
 				pos = pos + 1
@@ -2509,7 +2509,7 @@ function BMU.clickOnPlayerName(button, record)
 			local tertiaryBMUGuild = BMUGuildsAtServer[3]
 			if IsPlayerInGuild(tertiaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(tertiaryBMUGuild, record.displayName) then
 				entries_misc[pos] = {
-					label = BMU_SI_get(SI.TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp-Three",
+					label = BMU_SI_Get(SI_TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp-Three",
 					callback = function() GuildInvite(tertiaryBMUGuild, record.displayName) end,
 				}
 				pos = pos + 1
@@ -2519,7 +2519,7 @@ function BMU.clickOnPlayerName(button, record)
 			local quaternaryBMUGuild = BMUGuildsAtServer[4]
 			if IsPlayerInGuild(quaternaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(quaternaryBMUGuild, record.displayName) then
 				entries_misc[pos] = {
-					label = BMU_SI_get(SI.TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp-Four",
+					label = BMU_SI_Get(SI_TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp-Four",
 					callback = function() GuildInvite(quaternaryBMUGuild, record.displayName) end,
 				}
 				pos = pos + 1
@@ -2628,7 +2628,7 @@ function BMU.addFavoriteZone(position, zoneId, zoneName)
 		BMU.savedVarsServ.favoriteListZones[oldPos] = BMU.savedVarsServ.favoriteListZones[position]
 	end
 	BMU.savedVarsServ.favoriteListZones[position] = zoneId
-	BMU_printToChat(BMU_SI_get(SI.TELE_UI_FAVORITE_ZONE) .. " " .. position .. ": " .. zoneName, BMU.MSG_AD)
+	BMU_printToChat(BMU_SI_Get(SI_TELE_UI_FAVORITE_ZONE) .. " " .. position .. ": " .. zoneName, BMU.MSG_AD)
 	BMU_refreshListAuto()
 end
 
@@ -2643,7 +2643,7 @@ function BMU.addFavoritePlayer(position, displayName)
 		BMU.savedVarsServ.favoriteListPlayers[oldPos] = BMU.savedVarsServ.favoriteListPlayers[position]
 	end
 	BMU.savedVarsServ.favoriteListPlayers[position] = displayName
-	BMU_printToChat(BMU_SI_get(SI.TELE_UI_FAVORITE_PLAYER) .. " " .. position .. ": " .. displayName, BMU.MSG_AD)
+	BMU_printToChat(BMU_SI_Get(SI_TELE_UI_FAVORITE_PLAYER) .. " " .. position .. ": " .. displayName, BMU.MSG_AD)
 	BMU_refreshListAuto()
 end
 
@@ -2680,9 +2680,9 @@ BMU_round = BMU.round
 function BMU.formatGold(number)
 	BMU_round = BMU_round or BMU.round
 	if number >= 1000000 then
-		return BMU_round((number/1000000), 3) .. " " .. BMU_SI_get(SI.TELE_UI_GOLD_ABBR2)
+		return BMU_round((number/1000000), 3) .. " " .. BMU_SI_Get(SI_TELE_UI_GOLD_ABBR2)
 	elseif number >= 1000 then
-		return BMU_round((number/1000), 1) .. " " .. BMU_SI_get(SI.TELE_UI_GOLD_ABBR)
+		return BMU_round((number/1000), 1) .. " " .. BMU_SI_Get(SI_TELE_UI_GOLD_ABBR)
 	else
 		return tos(number)
 	end
@@ -2712,11 +2712,11 @@ function BMU.updateStatistic(category, zoneId)
 		-- regard only Overland zones for gold statistics
 		if category == BMU.ZONE_CATEGORY_OVERLAND then
 			BMU.savedVarsAcc.savedGold = BMU.savedVarsAcc.savedGold + GetRecallCost()
-			self.control.statisticGold:SetText(BMU_SI_get(SI.TELE_UI_GOLD) .. " " .. BMU_formatGold(BMU.savedVarsAcc.savedGold))
+			self.control.statisticGold:SetText(BMU_SI_Get(SI_TELE_UI_GOLD) .. " " .. BMU_formatGold(BMU.savedVarsAcc.savedGold))
 		end
 		-- increase total port counter
 		BMU.savedVarsAcc.totalPortCounter = BMU.savedVarsAcc.totalPortCounter + 1
-		self.control.statisticTotal:SetText(BMU_SI_get(SI.TELE_UI_TOTAL_PORTS) .. " " .. BMU_formatGold(BMU.savedVarsAcc.totalPortCounter))
+		self.control.statisticTotal:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL_PORTS) .. " " .. BMU_formatGold(BMU.savedVarsAcc.totalPortCounter))
 		-- update port counter per zone statistic
 		if BMU.savedVarsAcc.portCounterPerZone[zoneId] == nil then
 			BMU.savedVarsAcc.portCounterPerZone[zoneId] = 1
@@ -2782,7 +2782,7 @@ function BMU.portToGroupLeader()
 	
 	if leaderUnitTag == nil or leaderUnitTag == "" then
 		-- no group
-		BMU_printToChat(BMU_SI_get(SI.TELE_CHAT_NOT_IN_GROUP))
+		BMU_printToChat(BMU_SI_Get(SI_TELE_CHAT_NOT_IN_GROUP))
 		return
 	elseif GetGroupSize() == 2 then
 		-- group of two -> port to the other player
@@ -2793,7 +2793,7 @@ function BMU.portToGroupLeader()
 		end
 	elseif IsUnitGroupLeader(playerTag) then
 		-- group of more than 2 and the current player is the leader himself
-		BMU_printToChat(BMU_SI_get(SI.TELE_CHAT_GROUP_LEADER_YOURSELF))
+		BMU_printToChat(BMU_SI_Get(SI_TELE_CHAT_GROUP_LEADER_YOURSELF))
 		return
 	else
 		-- group of more than 2 -> port to group leader
@@ -2820,7 +2820,7 @@ function BMU.portToOwnHouse(primary, houseId, jumpOutside, parentZoneName)
 		houseId = GetHousingPrimaryHouse()
 		zoneId = GetHouseZoneId(houseId)
 		if zoneId == nil or zoneId == 0 then
-			BMU_printToChat(BMU_SI_get(SI.TELE_CHAT_PORT_TO_OWN_PRIMARY_HOUSE_FAILED))
+			BMU_printToChat(BMU_SI_Get(SI_TELE_CHAT_PORT_TO_OWN_PRIMARY_HOUSE_FAILED))
 			return
 		end
 		-- get parentZoneName
@@ -2938,7 +2938,7 @@ function BMU.portToAnyZone()
 		end
 	end
 	-- no travel option found
-	BMU_printToChat(BMU_SI_get(SI.TELE_CHAT_NO_FAST_TRAVEL))
+	BMU_printToChat(BMU_SI_Get(SI_TELE_CHAT_NO_FAST_TRAVEL))
 end
 
 

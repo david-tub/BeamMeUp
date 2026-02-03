@@ -37,7 +37,7 @@ local GetZoneNameById = GetZoneNameById
 local GetCurrentMapZoneIndex = GetCurrentMapZoneIndex
 local GetZoneId = GetZoneId
 --BMU functions
-local BMU_SI_get 							= SI.get
+local BMU_SI_Get 							= SI.get
 local BMU_updatePosition					= BMU.updatePosition
 local BMU_activateWayshrineTravelAutoConfirm= BMU.activateWayshrineTravelAutoConfirm
 local BMU_printToChat 						= BMU.printToChat
@@ -157,7 +157,7 @@ function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 	if keyPressIndex == 15 then
 		local fZoneId = BMU.savedVarsServ.favoriteListZones[favorite]
 			if fZoneId == nil then
-				BMU_printToChat(BMU_SI_get(SI.TELE_CHAT_FAVORITE_UNSET))
+				BMU_printToChat(BMU_SI_Get(SI_TELE_CHAT_FAVORITE_UNSET))
 				return
 			end
 		local result = BMU_createTable({index=BMU.indexListZoneHidden, fZoneId=fZoneId, dontDisplay=true})
@@ -167,7 +167,7 @@ function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 		elseif firstRecord.isOwnHouse then
 			BMU_portToOwnHouse(false, firstRecord.houseId, true, firstRecord.parentZoneName)
 		else
-			BMU_printToChat(BMU_formatName(GetZoneNameById(fZoneId), BMU.savedVarsAcc.formatZoneName) .. " - " .. BMU_SI_get(SI.TELE_CHAT_NO_FAST_TRAVEL))
+			BMU_printToChat(BMU_formatName(GetZoneNameById(fZoneId), BMU.savedVarsAcc.formatZoneName) .. " - " .. BMU_SI_Get(SI_TELE_CHAT_NO_FAST_TRAVEL))
 		end
 		return
 	end
@@ -176,13 +176,13 @@ function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 	if keyPressIndex == 16 then
 		local displayName = BMU.savedVarsServ.favoriteListPlayers[favorite]
 			if displayName == nil then
-				BMU_printToChat(BMU_SI_get(SI.TELE_CHAT_FAVORITE_UNSET))
+				BMU_printToChat(BMU_SI_Get(SI_TELE_CHAT_FAVORITE_UNSET))
 				return
 			end
 		local result = BMU_createTable({index=BMU.indexListSearchPlayer, inputString=displayName, dontDisplay=true})
 		local firstRecord = result[1]
 		if firstRecord.displayName == "" then
-			BMU_printToChat(displayName .. " - " .. BMU_SI_get(SI.TELE_CHAT_FAVORITE_PLAYER_NO_FAST_TRAVEL))
+			BMU_printToChat(displayName .. " - " .. BMU_SI_Get(SI_TELE_CHAT_FAVORITE_PLAYER_NO_FAST_TRAVEL))
 		else
 			BMU_PortalToPlayer(firstRecord.displayName, firstRecord.sourceIndexLeading, firstRecord.zoneName, firstRecord.zoneId, firstRecord.category, true, false, true)
 		end
@@ -193,7 +193,7 @@ function BMU.PortalHandlerKeyPress(keyPressIndex, favorite)
 	if keyPressIndex == 21 then
 		local nodeIndex = BMU.savedVarsServ.favoriteListWayshrines[favorite]
 		if nodeIndex == nil then
-			BMU_printToChat(BMU_SI_get(SI.TELE_CHAT_FAVORITE_UNSET))
+			BMU_printToChat(BMU_SI_Get(SI_TELE_CHAT_FAVORITE_UNSET))
 			return
 		end
 		local _, name, _, _, _, _, _, _, _ = GetFastTravelNodeInfo(nodeIndex)
@@ -614,7 +614,7 @@ function BMU.showNotification(itemTabClicked)
 		-- new feature: Survey Maps Notification
 		--[[ TEMPORARILY DEACTIVATED UNTIL FEATURE IS WORKING PROPERLY (notification comes also when moving maps to bank or chest)
 		if not BMU.savedVarsAcc.infoSurveyMapsNotification and not BMU.savedVarsAcc.surveyMapsNotification then
-			BMU_showDialogSimple("NotificationBMUNewFeatureSMN", "NEW FEATURE", BMU_SI_get(SI.TELE_DIALOG_INFO_NEW_FEATURE_SURVEY_MAP_NOTIFICATION),
+			BMU_showDialogSimple("NotificationBMUNewFeatureSMN", "NEW FEATURE", BMU_SI_Get(SI_TELE_DIALOG_INFO_NEW_FEATURE_SURVEY_MAP_NOTIFICATION),
 				function()
 					-- enable feature
 					BMU.savedVarsAcc.surveyMapsNotification = true
@@ -630,7 +630,7 @@ function BMU.showNotification(itemTabClicked)
 	else	-- normal case - when BMU window is opened		
 		-- BeamMeUp guild notification
 		if not BMU.savedVarsAcc.infoBMUGuild and not BMU_isPlayerInBMUGuild() and teleporterVars.BMUGuilds[GetWorldName()] ~= nil then
-			BMU_showDialogSimple("NotificationBMUGuild", "BeamMeUp: Guilds", BMU_SI_get(SI.TELE_DIALOG_INFO_BMU_GUILD_BODY),
+			BMU_showDialogSimple("NotificationBMUGuild", "BeamMeUp: Guilds", BMU_SI_Get(SI_TELE_DIALOG_INFO_BMU_GUILD_BODY),
 				function()
 					BMU_requestGuildData()
 					BMU_clearInputFields()

@@ -10,12 +10,12 @@
 ## OptionalDependsOn: LibCustomMenu LibSlashCommander LibSets LibMapPing LibChatMenuButton PortToFriendsHouse BanditsUserInterface MorrowindStyleUI
 
 ## Globals / data sets
+core/SI.lua
 GuildData.lua
 TeleporterGlobals.lua
 
 
 ## Core
-core/SI.lua
 localization/EN.lua
 localization/$(language).lua
 

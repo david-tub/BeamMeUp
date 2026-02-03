@@ -43,7 +43,7 @@ local BeginGroupElection = BeginGroupElection
 local GetCurrentZoneHouseId = GetCurrentZoneHouseId
 local GetHouseIdFromCollectibleId = GetHouseIdFromCollectibleId --Where does that API function come from, any customa ddon? Does not exist afaik  --INS251229 Baertram
 --BMU functions
-local BMU_SI_get = SI.get
+local BMU_SI_Get = SI.get
 local BMU_printToChat = BMU.printToChat
 local allowedLanguages = teleporterVars.allowedLanguages
 local BMU_addFavoriteZone = BMU.addFavoriteZone
@@ -205,7 +205,7 @@ local function BMU_sc_addFavoriteWayshrine(option)
 		local currentFavWayshrinePos = BMU.favWayshrineCurrentPosition
 		BMU.savedVarsServ.favoriteListWayshrines[currentFavWayshrinePos] = nodeIndex
 		local _, name, _, _, _, _, _, _, _ = GetFastTravelNodeInfo(nodeIndex)
-		BMU_printToChat(BMU_SI_get(SI.TELE_KEYBINDING_WAYSHRINE_FAVORITE) .. " " .. currentFavWayshrinePos .. ": " .. BMU_formatName(name), BMU.MSG_AD)
+		BMU_printToChat(BMU_SI_Get(SI_TELE_KEYBINDING_WAYSHRINE_FAVORITE) .. " " .. currentFavWayshrinePos .. ": " .. BMU_formatName(name), BMU.MSG_AD)
 	end
 
 	-- extract position (slot) number from input options
@@ -456,7 +456,7 @@ function BMU.sc_porting(zoneId)
 		BMU_PortalToZone(zoneId)
 	else
 		-- no travel option
-		BMU_printToChat(BMU_SI_get(SI.TELE_CHAT_NO_FAST_TRAVEL))
+		BMU_printToChat(BMU_SI_Get(SI_TELE_CHAT_NO_FAST_TRAVEL))
 	end
 end
 local BMU_sc_porting = BMU.sc_porting

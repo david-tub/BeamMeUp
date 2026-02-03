@@ -150,6 +150,7 @@ local stringsEN = {
     ["SI_TELE_SETTINGS_MAP_DOCK_OFFSET_VERTICAL_TOOLTIP"] = "Here you can customize the vertical offset of the docking on the map.",
     ["SI_TELE_SETTINGS_RESET_ALL_COUNTERS"] = "Reset all Zone Counters",
     ["SI_TELE_SETTINGS_RESET_ALL_COUNTERS_TOOLTIP"] = "All zone counters are reset. Therefore, the sorting by most used is reset.",
+    ["SI_TELE_SETTINGS_RESET_ALL_COUNTERS_WARN"] = "All zone counters are reset. Therefore, the sorting by most used and your personal statistics are reset.",
     ["SI_TELE_SETTINGS_OFFLINE_NOTE"] = "Offline Reminder",
     ["SI_TELE_SETTINGS_OFFLINE_NOTE_TOOLTIP"] = "If you are set to offline for a while and you whisper or travel to someone, you will get a short screen message as reminder. As long as you are set to offline you cannot receive any whisper messages and no one can travel to you (but sharing is caring).",
     ["SI_TELE_SETTINGS_SCALE"] = "UI Scaling",
@@ -198,7 +199,7 @@ local stringsEN = {
     ["SI_TELE_SETTINGS_OUTPUT_UNLOCK_TOOLTIP"] = "Interim results (discovered wayshrines and XP) and supporting messages of the automatic wayshrine discovery.",
     ["SI_TELE_SETTINGS_OUTPUT_DEBUG"] = "Debug messages",
     ["SI_TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP"] = "Technical messages for troubleshooting. It will spam your chat. Please use only on request for short time!",
-
+    ["SI_TELE_SETTINGS_OUTPUT_DEBUG_WARN"] = "This option can not be set permanently.",
 
     -----------------------------------------------------------------------------
     -- KEY BINDING
@@ -274,7 +275,37 @@ local stringsEN = {
     ["SI_CONSTANT_SURVEY_MAP"] = "survey:", -- need a part of the item name that is in every survey map item the same no matter which zone and kind of craft
 
 
+    -----------------------------------------------------------------------------
+    --SLASH COMMANDS
+    -----------------------------------------------------------------------------
+    ["SI_TELE_SETTINGS_SLASH_PTZONE_DESC"] = "Port to specific zone\n(Hint: when you start typing /<zone name> the auto completion will appear on top (LibSlashCommander must be active)\n",
+    ["SI_TELE_SETTINGS_SLASH_PTGROUPLEADER_DESC"] = "Port to group leader\n",
+    ["SI_TELE_SETTINGS_SLASH_PTCURFOCUSQUEST_DESC"] = "Port to currently focused quest\n",
+    ["SI_TELE_SETTINGS_SLASH_PTPRIMARYHOUSE_DESC"] = "Port into primary residence\n",
+    ["SI_TELE_SETTINGS_SLASH_PTOUTPRIMARYHOUSE_DESC"] = "Port outside primary residence\n",
+    ["SI_TELE_SETTINGS_SLASH_PTCURZONE_DESC"] = "Port to current zone\n",
+    ["SI_TELE_SETTINGS_SLASH_ADDFAVZONE_DESC"] = "Add zone favorite manually\n",
+    ["SI_TELE_SETTINGS_SLASH_ADDFAVPLAYER_DESC"] = "Add player favorite manually\n",
+    ["SI_TELE_SETTINGS_SLASH_ADDFAVWAYSHRINE_DESC"] = "Add wayshrine favorite\nOnce executed, you must interact (Default key `E`) with your favorite wayshrine within 10 seconds. You can assign hotkeys for your favorite wayshrines.\n",
+    ["SI_TELE_SETTINGS_SLASH_ADDFAVHOUSEZONE_DESC"] = "Add house favorite for zoneID\n",
+    ["SI_TELE_SETTINGS_SLASH_ADDFAVHOUSECURZONE_DESC"] = "Add house favorite for current zone\n",
+    ["SI_TELE_SETTINGS_SLASH_ADDFAVTHISHOUSECURZONE_DESC"] = "Add current house as favorite for current zone\n",
+    ["SI_TELE_SETTINGS_SLASH_REMFAVHOUSECURZONE_DESC"] = "Clear house favorite for current zone\n",
+    ["SI_TELE_SETTINGS_SLASH_REMFAVHOUSEZONE_DESC"] = "Clear house for zone\n",
+    ["SI_TELE_SETTINGS_SLASH_LISTFAVHOUSE_DESC"] = "List house favorites\n",
+    ["SI_TELE_SETTINGS_SLASH_GROUPCUSTVOTE100_DESC"] = "Start custom vote in group (100% are necessary)\n",
+    ["SI_TELE_SETTINGS_SLASH_GROUPCUSTVOTE60_DESC"] = "Start custom vote in group (>=60% are necessary)\n",
+    ["SI_TELE_SETTINGS_SLASH_GROUPCUSTVOTE50_DESC"] = "Start custom vote in group (>50% are necessary)\n",
+    ["SI_TELE_SETTINGS_SLASH_CHATPROMBMU_DESC"] = "Promote BeamMeUp by printing short advertising text in the chat\n",
+    ["SI_TELE_SETTINGS_SLASH_BMUGETZONEID_DESC"] = "Get current zone id (where the player actually is)\n",
+    ["SI_TELE_SETTINGS_SLASH_BMUCHANGELANG_DESC"] = "Switch client language (instant reload!)\n",
+    ["SI_TELE_SETTINGS_SLASH_BMUDEBUGMODE_DESC"] = "Enable debug mode\n",
+			  
+
+    
+    -----------------------------------------------------------------------------
     --Dynamic choices for LAM dropdown
+    -----------------------------------------------------------------------------
     --Second language
     ["SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_1"] = "DISABLED",
     ["SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_2"] = "English",

@@ -868,7 +868,7 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
 			  getFunc = function() return BMU.debugMode end,
 			  setFunc = function(value) BMU.debugMode = value end,
 			  default = false,
-			  warning = "This option can not be set permanently.",
+			  warning = BMU_SI_Get(SI_TELE_SETTINGS_OUTPUT_DEBUG_WARN),
 			  submenu = "co",
 	     },
 		 {
@@ -881,37 +881,37 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
 								BMU.printToChat("ALL COUNTERS RESETTET!")
 						end,
 			  width = "half",
-			  warning = "All zone counters are reset. Therefore, the sorting by most used and your personal statistics are reset.",
+			  warning =  BMU_SI_Get(SI_TELE_SETTINGS_RESET_ALL_COUNTERS_WARN),
 			  submenu = "adv",
          },
 	     {
               type = "description",
-              text = "Port to specific zone\n(Hint: when you start typing /<zone name> the auto completion will appear on top)\n" .. BMU_colorizeText("/bmutp/<zone name>\n", "gold") .. BMU_colorizeText("Example: /bmutp/deshaan", "lgray"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_PTZONE_DESC) .. BMU_colorizeText("/bmutp/<zone name>\n", "gold") .. BMU_colorizeText("Example: /bmutp/deshaan", "lgray"), --"Port to specific zone\n(Hint: when you start typing /<zone name> the auto completion will appear on top)\n"
 			  submenu = "cc",
          },
 	     {
               type = "description",
-              text = "Port to group leader\n" .. BMU_colorizeText("/bmutp/leader", "gold"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_PTGROUPLEADER_DESC) .. BMU_colorizeText("/bmutp/leader", "gold"), --"Port to group leader\n"
 			  submenu = "cc",
          },
 	     {
               type = "description",
-              text = "Port to currently focused quest\n" .. BMU_colorizeText("/bmutp/quest", "gold"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_PTCURFOCUSQUEST_DESC) .. BMU_colorizeText("/bmutp/quest", "gold"), --"Port to currently focused quest\n"
 			  submenu = "cc",
          },
 	     {
               type = "description",
-              text = "Port into primary residence\n" .. BMU_colorizeText("/bmutp/house", "gold"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_PTPRIMARYHOUSE_DESC) .. BMU_colorizeText("/bmutp/house", "gold"), --"Port into primary residence\n"
 			  submenu = "cc",
          },
 	     {
               type = "description",
-              text = "Port outside primary residence\n" .. BMU_colorizeText("/bmutp/house_out", "gold"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_PTOUTPRIMARYHOUSE_DESC) .. BMU_colorizeText("/bmutp/house_out", "gold"), --"Port outside primary residence\n"
 			  submenu = "cc",
          },
 	     {
               type = "description",
-              text = "Port to current zone\n" .. BMU_colorizeText("/bmutp/current_zone", "gold"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_PTCURZONE_DESC) .. BMU_colorizeText("/bmutp/current_zone", "gold"), --"Port to current zone\n"
 			  submenu = "cc",
          },
 		 {
@@ -920,17 +920,17 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
          },
 	     {
 			type = "description",
-			text = "Add zone favorite manually\n" .. BMU_colorizeText("/bmu/favorites/add/zone <fav slot> <zoneName or zoneId> \n", "gold") .. BMU_colorizeText("Example: /bmu/favorites/add/zone 1 Deshaan", "lgray"),
+			text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_ADDFAVZONE_DESC) .. BMU_colorizeText("/bmu/favorites/add/zone <fav slot> <zoneName or zoneId> \n", "gold") .. BMU_colorizeText("Example: /bmu/favorites/add/zone 1 Deshaan", "lgray"), --"Add zone favorite manually\n"
 			submenu = "cc",
 	   	 },
 	     {
               type = "description",
-              text = "Add player favorite manually\n" .. BMU_colorizeText("/bmu/favorites/add/player <fav slot> <player name>\n", "gold") .. BMU_colorizeText("Example: /bmu/favorites/add/player 1 @DeadSoon", "lgray"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_ADDFAVPLAYER_DESC) .. BMU_colorizeText("/bmu/favorites/add/player <fav slot> <player name>\n", "gold") .. BMU_colorizeText("Example: /bmu/favorites/add/player 1 @DeadSoon", "lgray"), --"Add player favorite manually\n"
 			  submenu = "cc",
          },
 	     {
 			  type = "description",
-			  text = "Add wayshrine favorite\nOnce executed, you must interact (`E`) with your favorite wayshrine within 10 seconds. You can assign hotkeys for your favorite wayshrines.\n" .. BMU_colorizeText("/bmu/favorites/add/wayshrine <fav slot>\n", "gold") .. BMU_colorizeText("Example: /bmu/favorites/add/wayshrine 1", "lgray"),
+			  text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_ADDFAVWAYSHRINE_DESC) .. BMU_colorizeText("/bmu/favorites/add/wayshrine <fav slot>\n", "gold") .. BMU_colorizeText("Example: /bmu/favorites/add/wayshrine 1", "lgray"), --"Add wayshrine favorite\nOnce executed, you must interact (`E`) with your favorite wayshrine within 10 seconds. You can assign hotkeys for your favorite wayshrines.\n"
 			  submenu = "cc",
 	     },
 	     {
@@ -939,32 +939,32 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
 	     },
 	     {
               type = "description",
-              text = "Add house favorite for zoneID\n" .. BMU_colorizeText("/bmu/house/set/zone <zoneID> <houseID>\n", "gold") .. BMU_colorizeText("Example: /bmu/house/set/zone 1086 68", "lgray"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_ADDFAVHOUSEZONE_DESC) .. BMU_colorizeText("/bmu/house/set/zone <zoneID> <houseID>\n", "gold") .. BMU_colorizeText("Example: /bmu/house/set/zone 1086 68", "lgray"), --"Add house favorite for zoneID\n"
 			  submenu = "cc",
          },
 	     {
               type = "description",
-              text = "Add house favorite for current zone\n" .. BMU_colorizeText("/bmu/house/set/current_zone <houseID>\n", "gold") .. BMU_colorizeText("Example: /bmu/house/set/current_zone 68", "lgray"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_ADDFAVHOUSECURZONE_DESC) .. BMU_colorizeText("/bmu/house/set/current_zone <houseID>\n", "gold") .. BMU_colorizeText("Example: /bmu/house/set/current_zone 68", "lgray"), --"Add house favorite for current zone\n"
 			  submenu = "cc",
          },
 	     {
               type = "description",
-              text = "Add current house as favorite for current zone\n" .. BMU_colorizeText("/bmu/house/set/current_house\n", "gold"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_ADDFAVTHISHOUSECURZONE_DESC) .. BMU_colorizeText("/bmu/house/set/current_house\n", "gold"), --"Add current house as favorite for current zone\n"
 			  submenu = "cc",
          },
 	     {
               type = "description",
-              text = "Clear house favorite for current zone\n" .. BMU_colorizeText("/bmu/house/clear/current_zone\n", "gold"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_REMFAVHOUSECURZONE_DESC) .. BMU_colorizeText("/bmu/house/clear/current_zone\n", "gold"), --"Clear house favorite for current zone\n"
 			  submenu = "cc",
          },
 	     {
               type = "description",
-              text = "Clear house for zone\n" .. BMU_colorizeText("/bmu/house/clear/zone <zoneID>\n", "gold") .. BMU_colorizeText("Example: /bmu/house/clear/zone 1086", "lgray"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_REMFAVHOUSEZONE_DESC) .. BMU_colorizeText("/bmu/house/clear/zone <zoneID>\n", "gold") .. BMU_colorizeText("Example: /bmu/house/clear/zone 1086", "lgray"), --"Clear house for zone\n"
 			  submenu = "cc",
          },
 	     {
               type = "description",
-              text = "List house favorites\n" .. BMU_colorizeText("/bmu/house/list\n", "gold"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_LISTFAVHOUSE_DESC) .. BMU_colorizeText("/bmu/house/list\n", "gold"), --"List house favorites\n"
 			  submenu = "cc",
          },
 	     {
@@ -973,17 +973,17 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
 	     },
 	     {
               type = "description",
-              text = "Start custom vote in group (100% are necessary)\n" .. BMU_colorizeText("/bmu/vote/custom_vote_unanimous <your text>\n", "gold") .. BMU_colorizeText("Example: /bmu/vote/custom_vote_unanimous Do you like BeamMeUp?", "lgray"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_GROUPCUSTVOTE100_DESC) .. BMU_colorizeText("/bmu/vote/custom_vote_unanimous <your text>\n", "gold") .. BMU_colorizeText("Example: /bmu/vote/custom_vote_unanimous Do you like BeamMeUp?", "lgray"), --"Start custom vote in group (100% are necessary)\n"
 			  submenu = "cc",
          },
 	     {
               type = "description",
-              text = "Start custom vote in group (>=60% are necessary)\n" .. BMU_colorizeText("/bmu/vote/custom_vote_supermajority <your text>", "gold"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_GROUPCUSTVOTE60_DESC) .. BMU_colorizeText("/bmu/vote/custom_vote_supermajority <your text>", "gold"), --"Start custom vote in group (>=60% are necessary)\n"
 			  submenu = "cc",
          },
 	     {
               type = "description",
-              text = "Start custom vote in group (>50% are necessary)\n" .. BMU_colorizeText("/bmu/vote/custom_vote_simplemajority <your text>", "gold"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_GROUPCUSTVOTE50_DESC) .. BMU_colorizeText("/bmu/vote/custom_vote_simplemajority <your text>", "gold"), --"Start custom vote in group (>50% are necessary)\n"
 			  submenu = "cc",
          },
 		 {
@@ -992,22 +992,22 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
          },
 	     {
               type = "description",
-              text = "Promote BeamMeUp by printing short advertising text in the chat\n" .. BMU_colorizeText("/bmu/misc/advertise", "gold"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_CHATPROMBMU_DESC) .. BMU_colorizeText("/bmu/misc/advertise", "gold"), --"Promote BeamMeUp by printing short advertising text in the chat\n"
 			  submenu = "cc",
          },
 	     {
 			type = "description",
-			text = "Get current zone id (where the player actually is)\n" .. BMU_colorizeText("/bmu/misc/current_zone_id", "gold"),
+			text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_BMUGETZONEID_DESC) .. BMU_colorizeText("/bmu/misc/current_zone_id", "gold"), --"Get current zone id (where the player actually is)\n"
 			submenu = "cc",
 	   	 },
 	     {
               type = "description",
-              text = "Switch client language (instant reload!)\n" .. BMU_colorizeText("/bmu/misc/lang", "gold"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_BMUCHANGELANG_DESC) .. BMU_colorizeText("/bmu/misc/lang", "gold"), --"Switch client language (instant reload!)\n"
 			  submenu = "cc",
          },
 	     {
               type = "description",
-              text = "Enable debug mode\n" .. BMU_colorizeText("/bmu/misc/debug", "gold"),
+              text = BMU_SI_Get(SI_TELE_SETTINGS_SLASH_BMUDEBUGMODE_DESC) .. BMU_colorizeText("/bmu/misc/debug", "gold"), --"Enable debug mode\n"
 			  submenu = "cc",
          },
 	     {

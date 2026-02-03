@@ -149,7 +149,8 @@ local strings = {
     ["SI_TELE_SETTINGS_MAP_DOCK_OFFSET_VERTICAL"] = "Offset der Karten Dock-Position - Vertikal",
     ["SI_TELE_SETTINGS_MAP_DOCK_OFFSET_VERTICAL_TOOLTIP"] = "Hier kannst du den vertikalen Offset des Andockens an der Karte anpassen.",
     ["SI_TELE_SETTINGS_RESET_ALL_COUNTERS"] = "Zähler zurücksetzen",
-    ["SI_TELE_SETTINGS_RESET_ALL_COUNTERS_TOOLTIP"] = "Alle Zähler werden zurückgesetzet. Dadurch wird auch die Sortierung nach 'most used' zurückgesetzt.",
+    ["SI_TELE_SETTINGS_RESET_ALL_COUNTERS_TOOLTIP"] = "Alle Zähler werden zurückgesetzet. Dadurch wird auch die Sortierung nach 'am meisten verwendet' zurückgesetzt.",
+    ["SI_TELE_SETTINGS_RESET_ALL_COUNTERS_WARN"] = "Alle Zähler werden zurückgesetzet. Dadurch wird auch die Sortierung nach 'am meisten verwendet' zurückgesetzt.",
     ["SI_TELE_SETTINGS_OFFLINE_NOTE"] = "Offline Erinnerung",
     ["SI_TELE_SETTINGS_OFFLINE_NOTE_TOOLTIP"] = "Wenn du für eine Weile offline gestellt bist und jemandem anflüsterst oder zu ihm reist, erhältst du eine kurze Bildschirmnachricht als Erinnerung. Solange du offline gestellt bist, kannst du keine Flüsternachrichten empfangen und niemand kann zu dir reisen (aber Sharing is Caring).",
     ["SI_TELE_SETTINGS_SCALE"] = "UI Skalierung",
@@ -198,7 +199,7 @@ local strings = {
     ["SI_TELE_SETTINGS_OUTPUT_UNLOCK_TOOLTIP"] = "Zwischenergebnisse (entdeckte Wegschreine und XP) und unterstützende Chat-Meldungen der automatischen Wegschrein-Freischaltung.",
     ["SI_TELE_SETTINGS_OUTPUT_DEBUG"] = "Debug Meldungen",
     ["SI_TELE_SETTINGS_OUTPUT_DEBUG_TOOLTIP"] = "Technische Chat-Meldungen zur Fehlerbehebung. Dadurch wird der Chat zugespammt. Bitte nur auf Anfrage und nur für kurze Zeit verwenden!",
-
+    ["SI_TELE_SETTINGS_OUTPUT_DEBUG_WARN"] = "Diese Option kann nicht permanent aktiviert bleiben.",
 
     -----------------------------------------------------------------------------
     -- KEY BINDING
@@ -274,7 +275,36 @@ local strings = {
     ["SI_CONSTANT_SURVEY_MAP"] = "fundbericht", -- need a part of the item name that is in every survey map item the same no matter which zone and kind of craft
 
 
+    -----------------------------------------------------------------------------
+    --SLASH COMMANDS
+    -----------------------------------------------------------------------------
+    ["SI_TELE_SETTINGS_SLASH_PTZONE_DESC"] = "Teleportiere zu einer bestimmten Zone\n(Tipp: wenn du anfängst zu tippen /<zone Name> wird die Auto-Vervollständigung dir Vorschläge anzeigen (LibSlashCommander muss aktiv sein))\n",
+    ["SI_TELE_SETTINGS_SLASH_PTGROUPLEADER_DESC"] = "Teleportiere zum Gruppenanführer\n",
+    ["SI_TELE_SETTINGS_SLASH_PTCURFOCUSQUEST_DESC"] = "Teleportiere zur aktuell verfolgten Quest\n",
+    ["SI_TELE_SETTINGS_SLASH_PTPRIMARYHOUSE_DESC"] = "Teleportiere in deine primäre Residenz\n",
+    ["SI_TELE_SETTINGS_SLASH_PTOUTPRIMARYHOUSE_DESC"] = "Teleportiere vor (ausserhalb) deine primäre Residenz\n",
+    ["SI_TELE_SETTINGS_SLASH_PTCURZONE_DESC"] = "Teleportiere zur aktuellen Zone\n",
+    ["SI_TELE_SETTINGS_SLASH_ADDFAVZONE_DESC"] = "Füge einen Zonen Favorit manuell hinzu\n",
+    ["SI_TELE_SETTINGS_SLASH_ADDFAVPLAYER_DESC"] = "Füge einen Spieler Favorit manuell hinzu\n",
+    ["SI_TELE_SETTINGS_SLASH_ADDFAVWAYSHRINE_DESC"] = "Füge einen Wegschrein Favorit hinzu\nNach dem Ausführen musst du mit dem Favoriten Wegschrein innerhalb von 10 Sekunden interagieren (Standard Taste `E`). Du kannst auch Tastenkombinationen für deine Favoriten Wegschreine definieren.\n",
+    ["SI_TELE_SETTINGS_SLASH_ADDFAVHOUSEZONE_DESC"] = "Füge Haus Favorit für eine ZonenID hinzu\n",
+    ["SI_TELE_SETTINGS_SLASH_ADDFAVHOUSECURZONE_DESC"] = "Füge Haus Favorit für die aktuelle Zone hinzu\n",
+    ["SI_TELE_SETTINGS_SLASH_ADDFAVTHISHOUSECURZONE_DESC"] = "Füge das aktuelle Haus als Favorit für die aktuelle Zone hinzu\n",
+    ["SI_TELE_SETTINGS_SLASH_REMFAVHOUSECURZONE_DESC"] = "Lösche Haus Favorit für die aktuelle Zone\n",
+    ["SI_TELE_SETTINGS_SLASH_REMFAVHOUSEZONE_DESC"] = "Lösche Haus für Zone\n",
+    ["SI_TELE_SETTINGS_SLASH_LISTFAVHOUSE_DESC"] = "Liste Haus Favoriten auf\n",
+    ["SI_TELE_SETTINGS_SLASH_GROUPCUSTVOTE100_DESC"] = "Starte Gruppenabfrage (100% Teilnahme erforderlich)\n",
+    ["SI_TELE_SETTINGS_SLASH_GROUPCUSTVOTE60_DESC"] = "Starte Gruppenabfrage (>=60% Teilnahme erforderlich)\n",
+    ["SI_TELE_SETTINGS_SLASH_GROUPCUSTVOTE50_DESC"] = "Starte Gruppenabfrage (>50% Teilnahme erforderlich)\n",
+    ["SI_TELE_SETTINGS_SLASH_CHATPROMBMU_DESC"] = "BeamMeUp im Chat promoten, mit einem Werbungstext\n",
+    ["SI_TELE_SETTINGS_SLASH_BMUGETZONEID_DESC"] = "Erhalte die aktuelle ZonenID (in welcher der Spieler sich befindet)\n",
+    ["SI_TELE_SETTINGS_SLASH_BMUCHANGELANG_DESC"] = "Wechsle die Sprache des Clients (Achtung: Sofortiger Reload der UI!)\n",
+    ["SI_TELE_SETTINGS_SLASH_BMUDEBUGMODE_DESC"] = "Aktiviere den Debug Modus\n",
+
+
+    -----------------------------------------------------------------------------
     --Dynamic choices for LAM dropdown
+    -----------------------------------------------------------------------------
     --Second language
     ["SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_1"] = "DEAKTIVIERT",
     ["SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_2"] = "Englisch",

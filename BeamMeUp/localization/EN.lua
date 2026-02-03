@@ -81,7 +81,7 @@ local stringsEN = {
     --Addon Extensions
     ["SI_TELE_LIB_INSTALLED"] = "installed and enabled",
     ["SI_TELE_LIB_NOT_INSTALLED"] = "not installed or disabled",
-    ["SI_TELE_SETTINGS_ADDON_EXTENSIONS"] = "AddOn Erweiterungen",
+    ["SI_TELE_SETTINGS_ADDON_EXTENSIONS"] = "AddOn Extensions",
     ["SI_TELE_ADDON_EXT_DESC"] = "Get the most out of BeamMeUp by using it together with the following addons.",
     ["SI_TELE_ADDON_EXT_OPEN_URL"] = "Open addon website",
     ["SI_TELE_ADDON_EXT_PTF_DESC"] = "Access your houses and guild halls directly through BeamMeUp. Your houses that are set in PTF will be displayed in a separate list.",

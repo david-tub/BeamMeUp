@@ -81,7 +81,7 @@ local strings = {
     --Addon Extensions
     ["SI_TELE_LIB_INSTALLED"] = "Installiert, und aktiv",
     ["SI_TELE_LIB_NOT_INSTALLED"] = "Nicht installiert, oder inaktiv",
-    ["SI_TELE_SETTINGS_ADDON_EXTENSIONS"] = "AddOn Extensions",
+    ["SI_TELE_SETTINGS_ADDON_EXTENSIONS"] = "AddOn Erweiterungen",
     ["SI_TELE_ADDON_EXT_DESC"] = "Holen Sie das Beste aus BeamMeUp heraus, indem Sie es zusammen mit den folgenden Add-ons verwenden.",
     ["SI_TELE_ADDON_EXT_OPEN_URL"] = "Öffne AddOn Webseite",
     ["SI_TELE_ADDON_EXT_PTF_DESC"] = "Greife direkt über BeamMeUp auf deine Häuser und Gildenhallen zu. Deine Häuser, die sich im PTF-Modus befinden, werden in einer separaten Liste angezeigt.",
@@ -89,7 +89,7 @@ local strings = {
     ["SI_TELE_ADDON_EXT_LIBMAPPING_DESC"] = "Nutzen Sie Markierungen (Treffpunkte) auf der Karte, anstatt zu zoomen, wenn Sie auf bestimmte Zonennamen oder Gruppenmitglieder klicken. Eine Option in den „Zusätzlichen Funktionen“ ermöglicht das Umschalten zwischen der Markierung auf der Karte und der Zoom- und Schwenkfunktion.",
     ["SI_TELE_ADDON_EXT_LIBSLASHCOMMANDER_DESC"] = "Erhalten Sie umfassende Autovervollständigung, Farbkennzeichnung und Kurzbeschreibung für Chat-Befehle.",
     ["SI_TELE_ADDON_EXT_LIBCHATMENUBTN_DESC"] = "Die Positionierung des BMU-Chat-Buttons sollte in einer externen Bibliothek erfolgen. Das Konzept von Bibliotheken wird unterstützt. Allerdings geht dadurch die Möglichkeit verloren, eine individuelle Offset-Position festzulegen.",
-    ["SI_TELE_ADDON_EXT_IJAGBMUGP_DESC"] = "Nutze BeamMeUp im Gamepad-Modus. Damit gibt es für BeamMeUp eine dedizierte Gamepad-Unterstützung. |cFF00FFIsJusta|r Das Beam Me Up Gamepad-Plugin integriert die Funktionen von BeamMeUp in die Gamepad-Oberfläche und ermöglicht dir komfortableres Reisen als je zuvor.",
+    ["SI_TELE_ADDON_EXT_IJAGBMUGP_DESC"] = "Nutze BeamMeUp im Gamepad-Modus. Damit gibt es für BeamMeUp eine dedizierte Gamepad-Unterstützung. Das |cFF00FFIsJusta|rBeamMeUp Gamepad-Plugin integriert die Funktionen von BeamMeUp in die Gamepad-Oberfläche und ermöglicht dir komfortableres Reisen als je zuvor.",
 
     --Andere Einstellungen
     ["SI_TELE_SETTINGS_SHOW_ON_MAP_OPEN"] = "Öffne BeamMeUp zusammen mit der Karte",

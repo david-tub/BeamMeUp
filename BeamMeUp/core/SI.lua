@@ -30,7 +30,7 @@ No need to predefine them here in another table SI and use that everywhere, it's
 -----------------------------------------------------------------------------
 BMU.numVars = {}
 local numVars = BMU.numVars
-numVars.teleDropdownPrefix = "TELE_DROPDOWN_"
+numVars.teleDropdownPrefix = "SI_TELE_DROPDOWN_"
 local teleDropdownPrefix = numVars.teleDropdownPrefix
 
 --Language selction dropdown

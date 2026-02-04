@@ -1639,7 +1639,7 @@ local function SetupUI()
 				},
 			},
 			nil,
-			icon = function() return BMU_checkIfContextMenuIconShouldShow("display") end
+			{ icon = function() return BMU_checkIfContextMenuIconShouldShow("display") end } --additionalData
 		)
 
 		-- add dungeon difficulty toggle

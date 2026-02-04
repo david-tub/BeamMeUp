@@ -38,6 +38,7 @@ local ClearCustomScrollableMenu 		= ClearCustomScrollableMenu
 local AddCustomScrollableMenuDivider    = AddCustomScrollableMenuDivider
 local AddCustomScrollableMenuHeader    = AddCustomScrollableMenuHeader
 local AddCustomScrollableSubMenuEntry 	= AddCustomScrollableSubMenuEntry
+local AddCustomScrollableSubMenuEntries = AddCustomScrollableSubMenuEntries
 local ShowCustomScrollableMenu 			= ShowCustomScrollableMenu
 local LSM_ENTRY_TYPE_HEADER			= LSM_ENTRY_TYPE_HEADER
 local LSM_ENTRY_TYPE_RADIOBUTTON    = LSM_ENTRY_TYPE_RADIOBUTTON
@@ -2253,7 +2254,6 @@ function BMU.clickOnZoneName(button, record)
 		-------Quest contextMenu-------
 		-- show quest marker
 		if inQuestTab then
-			AddCustomScrollableMenuHeader(GetString(SI_JOURNAL_MENU_QUESTS)) --Quests
 			for k, v in pairs(record.relatedQuests) do
 				-- Show quest marker on map if record contains quest
 				AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_SHOW_QUEST_MARKER_ON_MAP) .. ": \"" .. record.relatedQuests[k] .. "\"", function() ZO_WorldMap_ShowQuestOnMap(record.relatedQuestsSlotIndex[k]) end)
@@ -2268,7 +2268,7 @@ function BMU.clickOnZoneName(button, record)
 
 			-- create entry for each item in inventory: UseItem(number Bag bagId, number slotIndex)
 			--Presort to map items or codex items
-			for index, item in pairs(record.relatedItems) do
+			for _, item in pairs(record.relatedItems) do
 				if item.bagId == BAG_BACKPACK and IsProtectedFunction("UseItem") then -- item is in inventory and can be used
 					table_insert(mapItems, item)
 				elseif item.antiquityId then -- lead -> show lead in codex
@@ -2278,30 +2278,38 @@ function BMU.clickOnZoneName(button, record)
 			--Add map items headline
 			if #mapItems > 0 then
 				table_sort(mapItems, tableItemNameSortFunc)
-				AddCustomScrollableMenuHeader(BMU_SI_Get(SI_TELE_UI_VIEW_MAP_ITEM)) --View map item
+				local mapItemSubmenuEntries = {}
 				for _, mapItem in ipairs(mapItems) do
 					-- use item
-					AddCustomScrollableMenuEntry(mapItem.itemName, function()
-						-- hide world map if open
-						SM:Hide("worldMap")
-						-- hide UI if open
-						BMU_HideTeleporter()
-						-- use item delayed
-						zo_callLater(function()
-							CallSecureProtected("UseItem", BAG_BACKPACK, mapItem.slotIndex)
-						end, 250)
-					end)
+					mapItemSubmenuEntries[#mapItemSubmenuEntries +1] = {
+						label = mapItem.itemName,
+						callback = function()
+							-- hide world map if open
+							SM:Hide("worldMap")
+							-- hide UI if open
+							BMU_HideTeleporter()
+							-- use item delayed
+							zo_callLater(function()
+								CallSecureProtected("UseItem", BAG_BACKPACK, mapItem.slotIndex)
+							end, 250)
+						end
+					}
 				end
+				AddCustomScrollableSubMenuEntries(BMU_SI_Get(SI_TELE_UI_VIEW_MAP_ITEM), mapItemSubmenuEntries) --View map item
 			end
 			--Add codex items headline
 			if #codexItems > 0 then
 				table_sort(codexItems, tableItemNameSortFunc)
-				AddCustomScrollableMenuHeader(GetString(SI_ANTIQUITY_VIEW_IN_CODEX)) --View codex
+				local codexItemSubmenuEntries = {}
 				for _, codexItem in ipairs(codexItems) do
-					AddCustomScrollableMenuEntry(codexItem.itemName, function()
-						ANTIQUITY_LORE_KEYBOARD:ShowAntiquity(codexItem.antiquityId)
-					end)
+					codexItemSubmenuEntries[+codexItemSubmenuEntries +1] = {
+						label = codexItem.itemName,
+						callback = function()
+							ANTIQUITY_LORE_KEYBOARD:ShowAntiquity(codexItem.antiquityId)
+						end
+					}
 				end
+				AddCustomScrollableSubMenuEntries(GetString(SI_ANTIQUITY_VIEW_IN_CODEX), codexItemSubmenuEntries) --View
 			end
 		end
 		
@@ -2345,10 +2353,11 @@ function BMU.clickOnZoneName(button, record)
 			end
 		end
 
+		AddCustomScrollableMenuHeader(GetString(SI_ITEMTYPEDISPLAYCATEGORY7)) --Miscellaneous
+
 		-- unlocking wayshrines menu (showing in all lists except dungeon and own house tab)
 		if not inDungeonTab and not inOwnHouseTab then
 			if BMU.isZoneOverlandZone(record.zoneId) then
-				AddCustomScrollableMenuHeader(GetString(SI_ZONE_STORY_UNLOCK_ACTION)) --Unlock
 				AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_UNLOCK_WAYSHRINES), function() BMU_showDialogAutoUnlock(record.zoneId) end)
 			end
 		end
@@ -2357,7 +2366,6 @@ function BMU.clickOnZoneName(button, record)
 		if not inOwnHouseTab then
 			local numUnlocked, numTotal, workingZoneId = BMU_getNumSetCollectionProgressPieces(record.zoneId, record.category, record.parentZoneId)
 			if workingZoneId then
-				AddCustomScrollableMenuHeader(GetString(SI_ITEMTYPEDISPLAYCATEGORY7)) --Miscellaneous
 				AddCustomScrollableMenuEntry(GetString(SI_ITEM_SETS_BOOK_TITLE), function() BMU_LibSets.OpenItemSetCollectionBookOfZone(workingZoneId) end)
 			end
 		end
@@ -2365,13 +2373,13 @@ function BMU.clickOnZoneName(button, record)
 		-- reset port counter (due to force refresh only available in general list)
 		if not inDungeonTab and not inOwnHouseTab and not inQuestTab and not inItemsTab then
 			if BMU.savedVarsChar.sorting == 3 or BMU.savedVarsChar.sorting == 4 then
-				AddCustomScrollableMenuHeader(GetString(SI_GROUP_FINDER_FILTERS_RESET)) --Reset
+				AddCustomScrollableMenuDivider()
 				AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_RESET_COUNTER_ZONE), function() BMU_savedVarsAcc.portCounterPerZone[record.zoneId] = nil BMU_refreshListAuto() end)
+				AddCustomScrollableMenuDivider()
 			end
 		end
 
 		-- travel to parent zone
-		AddCustomScrollableMenuHeader(GetString(SI_GAMEPAD_HELP_UNSTUCK_TELEPORT_KEYBIND_TEXT)) --Teleport
 		AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_TRAVEL_PARENT_ZONE), function()
 			BMU_portToParentZone(record.zoneId)
 			-- close UI if enabled
@@ -2411,6 +2419,32 @@ function BMU.clickOnPlayerName(button, record)
 	
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		ClearCustomScrollableMenu()
+
+		-- player favorite options
+		local favoriteIconPath = BMU_checkIfContextMenuIconShouldShow("favorite")
+		local favoriteIconHeaderStr = favoriteIconPath ~= nil and zo_iconTextFormatNoSpace(favoriteIconPath, 24, 24, GetString(SI_COLLECTIONS_FAVORITES_CATEGORY_HEADER)) or GetString(SI_COLLECTIONS_FAVORITES_CATEGORY_HEADER)
+		AddCustomScrollableMenuHeader(GetString(SI_PLAYER_MENU_PLAYER) .. favoriteIconHeaderStr) --Player Favorites
+		local playerFavoriteIndex = BMU_isFavoritePlayer(record.displayName)
+		if playerFavoriteIndex then
+			-- remove player favorite
+			AddCustomScrollableMenuEntry(GetString(SI_COLLECTIBLE_ACTION_REMOVE_FAVORITE) .. ":  #" ..tos(playerFavoriteIndex), function() BMU_removeFavoritePlayer(record.displayName) end)
+		end
+		-- favorite list
+		local entries_favorites = {}
+
+		for i=1, teleporterVars.numFavoritePlayers, 1 do
+			local favName = ""
+			if BMU.savedVarsServ.favoriteListPlayers[i] ~= nil then
+				favName = BMU.savedVarsServ.favoriteListPlayers[i]
+			end
+			local entry = {
+				label = tos(i) .. ": " .. favName,
+				callback = function() BMU_addFavoritePlayer(i, record.displayName) end,
+			}
+			table_insert(entries_favorites, entry)
+		end
+		AddCustomScrollableSubMenuEntry(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
+
 
 		local isAccountInGroup = IsPlayerInGroup(GetDisplayName())
 		
@@ -2570,42 +2604,16 @@ function BMU.clickOnPlayerName(button, record)
 				pos = pos + 1
 			end
 		end
-		
-		-- player favorite options
-		local favoriteIconPath = BMU_checkIfContextMenuIconShouldShow("favorite")
-		local favoriteIconHeaderStr = favoriteIconPath ~= nil and zo_iconTextFormatNoSpace(favoriteIconPath, 24, 24, GetString(SI_COLLECTIONS_FAVORITES_CATEGORY_HEADER)) or GetString(SI_COLLECTIONS_FAVORITES_CATEGORY_HEADER)
-		AddCustomScrollableMenuHeader(GetString(SI_PLAYER_MENU_PLAYER) .. favoriteIconHeaderStr) --Player Favorites
-		local playerFavoriteIndex = BMU_isFavoritePlayer(record.displayName)
-		if playerFavoriteIndex then
-			-- remove player favorite
-			AddCustomScrollableMenuEntry(GetString(SI_COLLECTIBLE_ACTION_REMOVE_FAVORITE) .. ":  #" ..tos(playerFavoriteIndex), function() BMU_removeFavoritePlayer(record.displayName) end)
-		end
-		-- favorite list
-		local entries_favorites = {}
-
-		for i=1, teleporterVars.numFavoritePlayers, 1 do
-			local favName = ""
-			if BMU.savedVarsServ.favoriteListPlayers[i] ~= nil then
-				favName = BMU.savedVarsServ.favoriteListPlayers[i]
-			end
-			local entry = {
-				label = tos(i) .. ": " .. favName,
-				callback = function() BMU_addFavoritePlayer(i, record.displayName) end,
-			}			
-			table_insert(entries_favorites, entry)
-		end
-		AddCustomScrollableSubMenuEntry(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
-		
-		
-		-- add submenu group
-		if #entries_group > 0 then
-			AddCustomScrollableMenuHeader(GetString(SI_PLAYER_MENU_GROUP)) --Group
-			AddCustomScrollableSubMenuEntry(GetString(SI_GAMEPAD_GROUP_ACTIONS_MENU_HEADER), entries_group)
-		end
-		
 		-- add submenu misc
 	    AddCustomScrollableSubMenuEntry(GetString(SI_PLAYER_MENU_MISC), entries_misc)
-		
+
+
+		-- add submenu group
+		if #entries_group > 0 then
+			AddCustomScrollableMenuDivider()
+			AddCustomScrollableSubMenuEntry(GetString(SI_GAMEPAD_GROUP_ACTIONS_MENU_HEADER), entries_group, nil, { icon = function() return BMU_checkIfContextMenuIconShouldShow("group") end })
+		end
+
 		-- add submenu filter
 		local entries_filter = {
 			{
@@ -2673,9 +2681,9 @@ function BMU.clickOnPlayerName(button, record)
 				table_insert(entries_filter, entry)
 		end		
 		
-		AddCustomScrollableSubMenuEntry(GetString(SI_GAMEPAD_BANK_FILTER_HEADER), entries_filter)
+		AddCustomScrollableSubMenuEntry(GetString(SI_GAMEPAD_BANK_FILTER_HEADER), entries_filter, nil, { icon = function() return BMU_checkIfContextMenuIconShouldShow("filter") end })
 		
-		ShowCustomScrollableMenu()
+		ShowCustomScrollableMenu(nil, { visibleRows = 20 })
 		
 	else -- left mouse click
 		if record.groupUnitTag then		

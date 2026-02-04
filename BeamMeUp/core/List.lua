@@ -2614,7 +2614,7 @@ function BMU.clickOnPlayerName(button, record)
 				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
 				buttonGroup = 7,
 				checked = function() return choosenListPlayerFilter == 0 end,
-				icon = function() return BMU_checkIfContextMenuIconShouldShow("all") end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("wayshrineBtn") end,
 			},
 			{
 				label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_GROUP_MEMBERS), "orange"), -- Group
@@ -2644,6 +2644,7 @@ function BMU.clickOnPlayerName(button, record)
 				checked = function() return choosenListPlayerFilter == -1 end,
 				icon = function() return BMU_checkIfContextMenuIconShouldShow("houseBtn") end,
 			},
+			--[[ Currently not supported as there is no "all houses" list, maybe relevant for house tours in the future
 			{
 				label = BMU_colorizeText(GetString(SI_HOUSE_TOURS_FILTERS_HOUSE_DROPDOWN_NO_SELECTION_TEXT), "teal"), --All houses
 				callback = function() BMU_createTableHouses() choosenListPlayerFilter = -2 end,
@@ -2652,6 +2653,7 @@ function BMU.clickOnPlayerName(button, record)
 				checked = function() return choosenListPlayerFilter == -2 end,
 				icon = function() return BMU_checkIfContextMenuIconShouldShow("otherHouses") end,
 			},
+			]]
 		}
 			
 		-- add all guilds

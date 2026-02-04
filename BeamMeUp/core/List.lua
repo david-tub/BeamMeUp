@@ -26,6 +26,7 @@ local string_format = string.format
 local table = table
 local table_insert = table.insert
 local table_remove = table.remove
+local table_sort = table.sort
 --Other addon variables
 local BMU_LibZone = BMU.LibZone
 local BMU_LibSets = BMU.LibSets
@@ -2272,6 +2273,7 @@ function BMU.clickOnZoneName(button, record)
 			end
 			--Add map items headline
 			if #mapItems > 0 then
+				table_sort(mapItems)
 				AddCustomScrollableMenuHeader(BMU_SI_Get(SI_TELE_UI_VIEW_MAP_ITEM)) --View map item
 				for _, mapItem in ipairs(mapItems) do
 					-- use item
@@ -2289,6 +2291,7 @@ function BMU.clickOnZoneName(button, record)
 			end
 			--Add codex items headline
 			if #codexItems > 0 then
+				table_sort(codexItems)
 				AddCustomScrollableMenuHeader(GetString(SI_ANTIQUITY_VIEW_IN_CODEX)) --View codex
 				for _, codexItem in ipairs(codexItems) do
 					AddCustomScrollableMenuEntry(codexItem.itemName, function()

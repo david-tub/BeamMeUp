@@ -1184,8 +1184,8 @@ local function SetupUI()
 	  refreshSurveyMapMainAndSubMenu(comboBox)
   end
   local function refreshDungeonsMainMenu(comboBox)
-	  --Currently the same as surveyMaps so use that func too!
-	  refreshSurveyMapMainAndSubMenu(comboBox)
+	  refreshLSMMainAndSubMenuOfMOC(comboBox)
+	  BMU_createTableDungeons()
   end
 
   local allSurveyFiltersEnabled = true --Variable to toggle the survey filters submenu checkboxes all on/off if the submenu openingControl is clicked

@@ -25,8 +25,10 @@ local BMU_SourceIndex_Guild 				= BMU.SOURCE_INDEX_GUILD
 local BMU_textures                          = BMU.textures
 local textureAcceptGreen = BMU_textures.acceptGreenStr
 local textureDeclineRed = BMU_textures.declineRedStr
-local textureTooltipSeparator = BMU.textures.tooltipSeperatorStr
-local subTypeClue 							= "clue"
+local textureTooltipSeparator = BMU_textures.tooltipSeperatorStr
+local leadTypeCompletedTextureStr = BMU_textures.leadTypeCompletedStr20
+local timerTextureStr             = BMU_textures.timerStr20
+local subTypeClue                 = "clue"
 local colorOrange 							= "orange"
 local colorWhite 							= "white"
 local colorTeal 							= "teal"
@@ -35,6 +37,7 @@ local colorGreen 							= "green"
 local colorBlue 							= "blue"
 local colorRed 								= "red"
 local colorGray 							= "gray"
+local formatStringFirstUppercase 			= "<<C:1>>"
 ----functions
 --ZOs functions
 local string = string
@@ -44,7 +47,7 @@ local string_lower = string.lower
 local string_upper = string.upper
 local string_gsub = string.gsub
 local string_find = string.find
---local string_format = string.format --For future feature INS BAERTRAM20260124
+local string_format = string.format
 --local houseWithNicknameStrPattern = "%q (%s)" --For future feature INS BAERTRAM20260124
 local zo_strformat = zo_strformat
 local zo_plainstrfind = zo_plainstrfind
@@ -73,7 +76,7 @@ local BMU_getParentZoneId, BMU_getMapIndex, BMU_categorizeZone, BMU_getCurrentZo
       BMU_getDataMapInfo, BMU_itemIsRelated, BMU_createZoneLessItemsInfo, BMU_createClickableZoneRecord, BMU_addItemInformation,
    	  BMU_addLeadInformation, BMU_cleanUnrelatedRecords, BMU_cleanUnrelatedRecords2, BMU_findExactQuestLocation, BMU_createNoResultsInfo,
       BMU_decidePrioDisplay, BMU_addNumberPlayers, BMU_getZoneGuideDiscoveryInfo, BMU_createPublicDungeonAchiementInfo,
-	  BMU_createBlankRecord, BMU_createDungeonRecord, BMU_createTableGuilds, BMU_getIndexFromValue
+	  BMU_createBlankRecord, BMU_createDungeonRecord, BMU_createTableGuilds, BMU_getIndexFromValue, BMU_leadIsRelated
 ----functions (defined inline in code below, upon first usage, as they are still nil at this line)
 
 --String text variables
@@ -104,7 +107,7 @@ function BMU.formatName(unformatted, flag)
 
 	if not flag then
 		-- normal format
-		formatted = zo_strformat("<<C:1>>", unformatted)
+		formatted = zo_strformat(formatStringFirstUppercase, unformatted)
 	else
 		-- remove all articles
 		if BMU.lang == "en" then
@@ -133,12 +136,12 @@ function BMU.formatName(unformatted, flag)
 
 		else
 			-- unsupported language -> use game format
-			--formatted = zo_strformat("<<C:1>>", unformatted)
+			--formatted = zo_strformat(formatStringFirstUppercase, unformatted)
 			formatted = unformatted
 		end
 	end
 
-	return zo_strformat("<<C:1>>", formatted)
+	return zo_strformat(formatStringFirstUppercase, formatted)
 end
 local BMU_formatName = BMU.formatName                                                      --INS251229 Baertram
 
@@ -1012,7 +1015,7 @@ end
 function BMU.getSetCollectionProgressString(zoneId, category, parentZoneId)
 	local numUnlocked, numTotal, workingZoneId = BMU.getNumSetCollectionProgressPieces(zoneId, category, parentZoneId)
 	if numUnlocked and numTotal then
-		local progressString = string.format("%d/%d", numUnlocked, numTotal)
+		local progressString = string_format("%d/%d", numUnlocked, numTotal)
 		if numUnlocked == numTotal then
 			-- colorize string
 			progressString = BMU_colorizeText(progressString, colorGreen)
@@ -1343,6 +1346,17 @@ end
 local function isSubtypeEnabled(subType)
 	return BMU.savedVarsChar.displayMaps[subType] or false
 end
+
+local function leadsTableSortByNameFunc(entryA, entryB)
+	return entryA.name < entryB.name
+end
+local function tableSortRelatedItemsOrZoneName(a, b)
+	if a.countRelatedItems ~= b.countRelatedItems then
+		return a.countRelatedItems > b.countRelatedItems
+	end
+	return a.zoneName < b.zoneName
+end
+
 function BMU.syncWithItems(p_portalPlayers)															--CHG251229 Baertram Renamed param portalPlayers: Shadows the in line 6 defined table portalPlayers with same name!
 	BMU_numOfSurveyTypesChecked = BMU_numOfSurveyTypesChecked or BMU.numOfSurveyTypesChecked 		--INS251229 Baertram
 	BMU_getDataMapInfo = BMU_getDataMapInfo or BMU.getDataMapInfo 									--INS251229 Baertram
@@ -1352,6 +1366,7 @@ function BMU.syncWithItems(p_portalPlayers)															--CHG251229 Baertram R
 	BMU_addItemInformation = BMU_addItemInformation or BMU.addItemInformation						--INS251229 Baertram
 	BMU_addLeadInformation = BMU_addLeadInformation or BMU.addLeadInformation						--INS251229 Baertram
 	BMU_cleanUnrelatedRecords = BMU_cleanUnrelatedRecords or BMU.cleanUnrelatedRecords				--INS251229 Baertram
+	BMU_leadIsRelated = BMU_leadIsRelated or BMU.leadIsRelated										--INS260204 Beartram
 	local BMU_savedVarsChar = BMU.savedVarsChar 													--INS251229 Baertram
 
 	local newTable ={}
@@ -1416,6 +1431,7 @@ function BMU.syncWithItems(p_portalPlayers)															--CHG251229 Baertram R
 	end
 
 	if BMU_savedVarsChar.displayAntiquityLeads.scried or BMU_savedVarsChar.displayAntiquityLeads.srcyable then
+		local leadsFound = {} --table of leads, with each subtable per quality
 		-- seperately: go over all leads and add them to "portalPlayers" and "unrelatedItemsRecords"
 		local antiquityId = GetNextAntiquityId()
 		while antiquityId do
@@ -1431,50 +1447,63 @@ function BMU.syncWithItems(p_portalPlayers)															--CHG251229 Baertram R
 					-- include or filter completed leads (codex)
 					(BMU_savedVarsChar.displayAntiquityLeads.completed or GetNumAntiquityLoreEntries(antiquityId) ~= GetNumAntiquityLoreEntriesAcquired(antiquityId))
 				then
-					-- check if lead can be matched to an entry in portalPlayers table
-					local isRelated, updatedRecord, recordIndex = BMU.leadIsRelated(p_portalPlayers, antiquityId)
-					if isRelated then
-						-- lead is related and connected to an entry in portalPlayers table
-						-- update record in portalPlayers
-						p_portalPlayers[recordIndex] = updatedRecord
-					else
-						-- lead cannot be assigned to an entry in portalPlayers table
-						-- check if a record for the zone already exists
-						local record = unrelatedItemsRecords[zoneId]
-						if not record then
-							-- create new record
-							record = BMU_createClickableZoneRecord(zoneId)
-						end
-						-- add lead to the record
-						record = BMU_addLeadInformation(record, antiquityId)
-						-- save record
-						unrelatedItemsRecords[zoneId] = record
-					end
+					local quality = GetAntiquityQuality(antiquityId)
+					local name = GetAntiquityName(antiquityId)
+					leadsFound[quality] = leadsFound[quality] or {}
+					leadsFound[quality][#leadsFound[quality]+1] = {
+						quality = quality,
+						antiquityId = antiquityId,
+						name = name,
+						zoneId = zoneId,
+					}
 				end
 			end
 			antiquityId = GetNextAntiquityId(antiquityId)
 		end
-	end
 
+		if not ZO_IsTableEmpty(leadsFound) then
+			table_sort(leadsFound)
+			--Check found leads, in order of quality
+			for leadQuality=ANTIQUITY_QUALITY_ITERATION_BEGIN, ANTIQUITY_QUALITY_ITERATION_END, 1 do
+				local leadsPerQuality = leadsFound[leadQuality]
+				if not ZO_IsTableEmpty(leadsPerQuality) then
+					table_sort(leadsPerQuality, leadsTableSortByNameFunc)
+					for _, leadData in ipairs(leadsPerQuality) do
+						local antiquityId = leadData.antiquityId
+						local zoneId = leadData.zoneId
+						-- check if lead can be matched to an entry in portalPlayers table
+						local isRelated, updatedRecord, recordIndex = BMU_leadIsRelated(p_portalPlayers, antiquityId)
+						if isRelated then
+							-- lead is related and connected to an entry in portalPlayers table
+							-- update record in portalPlayers
+							p_portalPlayers[recordIndex] = updatedRecord
+						else
+							-- lead cannot be assigned to an entry in portalPlayers table
+							-- check if a record for the zone already exists
+							local record = unrelatedItemsRecords[zoneId]
+							if not record then
+								-- create new record
+								record = BMU_createClickableZoneRecord(zoneId)
+							end
+							-- add lead to the record
+							record = BMU_addLeadInformation(record, antiquityId)
+							-- save record
+							unrelatedItemsRecords[zoneId] = record
+						end
+					end
+				end
+			end
+		end
+	end
 
 	-- clean portalPlayers table from entries without assigned items
 	newTable = BMU_cleanUnrelatedRecords(p_portalPlayers)
 
 	-- sort table by number of items and by name
-	table_sort(newTable, function(a, b)
-			if a.countRelatedItems ~= b.countRelatedItems then
-				return a.countRelatedItems > b.countRelatedItems
-			end
-			return a.zoneName < b.zoneName
-		end)
+	table_sort(newTable, tableSortRelatedItemsOrZoneName)
 
 	-- sort records with unrelated items (maps without port possibility)
-	table_sort(unrelatedItemsRecords, function(a, b)
-			if a.countRelatedItems ~= b.countRelatedItems then
-				return a.countRelatedItems > b.countRelatedItems
-			end
-			return a.zoneName < b.zoneName
-		end)
+	table_sort(unrelatedItemsRecords, tableSortRelatedItemsOrZoneName)
 
 	-- add them to the final table
 	for zoneId, record in pairs(unrelatedItemsRecords) do
@@ -1528,6 +1557,7 @@ function BMU.leadIsRelated(p_portalPlayers, antiquityId)											--CHG251229 B
 
 	return false, nil, nil
 end
+BMU_leadIsRelated = BMU.leadIsRelated
 
 
 -- add item information to an existing record
@@ -1595,10 +1625,15 @@ function BMU.addLeadInformation(record, antiquityId)
 	local numEntries = GetNumAntiquityLoreEntries(antiquityId)
 	local numEntriesAcquired = GetNumAntiquityLoreEntriesAcquired(antiquityId)
 
-	local aName = color:Colorize(ZO_CachedStrFormat("<<C:1>>",GetAntiquityName(antiquityId)))
-	local aTooltip = color:Colorize(ZO_CachedStrFormat("<<C:1>>",GetAntiquityName(antiquityId))) .. "\n" ..
-					BMU_colorizeText(string.format(BMU_SI_Get(SI_TELE_UI_DAYS_LEFT), math.floor(leadtimeleft/86400)) .. "\n" ..
+	local aName = color:Colorize(ZO_CachedStrFormat(formatStringFirstUppercase,GetAntiquityName(antiquityId)))
+	--[[
+	local aTooltip = color:Colorize(ZO_CachedStrFormat(formatStringFirstUppercase,GetAntiquityName(antiquityId))) .. "\n" ..
+					BMU_colorizeText(string_format(BMU_SI_Get(SI_TELE_UI_DAYS_LEFT), math.floor(leadtimeleft/86400)) .. "\n" ..
 					zo_strformat(SI_ANTIQUITY_CODEX_ENTRIES_FOUND, numEntriesAcquired, numEntries), colorGray)
+					]]
+	local aTooltip = color:Colorize(ZO_CachedStrFormat(formatStringFirstUppercase,GetAntiquityName(antiquityId))) .. "\n" ..
+			timerTextureStr .. BMU_colorizeText(string_format(BMU_SI_Get(SI_TELE_UI_DAYS_LEFT), math.floor(leadtimeleft/86400)), colorGray) .. " " ..
+			leadTypeCompletedTextureStr .. numEntriesAcquired .. "/" .. numEntries --padding 25% from the left
 
 	--create and add new item to record
 	local leadData = {}
@@ -2720,7 +2755,7 @@ function BMU.createDungeonRecord(zoneId)
 	entry.releaseDate = nodeObject.releaseDate or ""
 
 	entry.dungeonTooltip = {
-		string.format(GetString(SI_CHAPTER_UPGRADE_RELEASE_HEADER) .. ": Update %s (%s)", entry.updateNum, entry.releaseDate)
+		string_format(GetString(SI_CHAPTER_UPGRADE_RELEASE_HEADER) .. ": Update %s (%s)", entry.updateNum, entry.releaseDate)
 	}
 
 	if BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName then

@@ -203,6 +203,9 @@ BMU.MSG_UL = 3
 BMU.MSG_DB = 4
 
 -- Textures
+local textureStrPattern32 = "|t32:32:%s|t"
+local textureStrPattern24 = "|t24:24:%s|t"
+local textureStrPattern20 = "|t20:20:%s|t"
 local BMU_textures = {
 	tooltipSeperatorStr = "|t120:5:esoui/art/guild/sectiondivider_left.dds|t",
 	anchorMapBtn = BMU_MediaPath .. "dock.dds",
@@ -305,8 +308,9 @@ local BMU_textures = {
 	favorite					= "/esoui/art/Collections/Favorite_StarOnly.dds",
 	all							= "",
 }
-BMU_textures.dungeonDifficultyNormalStr  = "|t32:32:" .. BMU_textures.dungeonDifficultyNormal .. "|t"
-BMU_textures.dungeonDifficultyVeteranStr = "|t32:32:" .. BMU_textures.dungeonDifficultyVeteran .. "|t"
+BMU_textures.dungeonDifficultyNormalStr  	= string_format(textureStrPattern32, BMU_textures.dungeonDifficultyNormal)
+BMU_textures.dungeonDifficultyVeteranStr 	= string_format(textureStrPattern32, BMU_textures.dungeonDifficultyVeteran)
+BMU_textures.bankStr20 						= string_format(textureStrPattern20, BMU_textures.bank)
 
 BMU.textures = BMU_textures																			--INS251229 Baertram
 

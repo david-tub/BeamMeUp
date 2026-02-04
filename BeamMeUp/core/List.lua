@@ -38,10 +38,10 @@ local ClearCustomScrollableMenu 		= ClearCustomScrollableMenu
 local AddCustomScrollableMenuDivider    = AddCustomScrollableMenuDivider
 local AddCustomScrollableMenuHeader    = AddCustomScrollableMenuHeader
 local AddCustomScrollableSubMenuEntry 	= AddCustomScrollableSubMenuEntry
-local AddCustomScrollableSubMenuEntries = AddCustomScrollableSubMenuEntries
 local ShowCustomScrollableMenu 			= ShowCustomScrollableMenu
 local LSM_ENTRY_TYPE_HEADER			= LSM_ENTRY_TYPE_HEADER
 local LSM_ENTRY_TYPE_RADIOBUTTON    = LSM_ENTRY_TYPE_RADIOBUTTON
+local teleportStr = GetString(SI_GAMEPAD_HELP_UNSTUCK_TELEPORT_KEYBIND_TEXT)
 ---^- INS BEARTRAM 20260125 LibScrollableMenu
 
 --BMU variables
@@ -2061,6 +2061,8 @@ function BMU.clickOnZoneName(button, record)
 	BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter
 	BMU_portToParentZone = BMU_portToParentZone or BMU.portToParentZone
 	BMU_checkIfContextMenuIconShouldShow = BMU_checkIfContextMenuIconShouldShow or BMU.checkIfContextMenuIconShouldShow
+	BMU_sc_porting = BMU_sc_porting or BMU.sc_porting
+	BMU_getParentZoneId = BMU_getParentZoneId or BMU.getParentZoneId
 
 	local BMU_savedVarsAcc = BMU.savedVarsAcc
 	local BMU_savedVarsServ = BMU.savedVarsServ
@@ -2281,7 +2283,7 @@ function BMU.clickOnZoneName(button, record)
 				local mapItemSubmenuEntries = {}
 				for _, mapItem in ipairs(mapItems) do
 					-- use item
-					mapItemSubmenuEntries[#mapItemSubmenuEntries +1] = {
+					mapItemSubmenuEntries[#mapItemSubmenuEntries+1] = {
 						label = mapItem.itemName,
 						callback = function()
 							-- hide world map if open
@@ -2295,21 +2297,21 @@ function BMU.clickOnZoneName(button, record)
 						end
 					}
 				end
-				AddCustomScrollableSubMenuEntries(BMU_SI_Get(SI_TELE_UI_VIEW_MAP_ITEM), mapItemSubmenuEntries) --View map item
+				AddCustomScrollableSubMenuEntry(BMU_SI_Get(SI_TELE_UI_VIEW_MAP_ITEM), mapItemSubmenuEntries) --View map item
 			end
 			--Add codex items headline
 			if #codexItems > 0 then
 				table_sort(codexItems, tableItemNameSortFunc)
 				local codexItemSubmenuEntries = {}
 				for _, codexItem in ipairs(codexItems) do
-					codexItemSubmenuEntries[+codexItemSubmenuEntries +1] = {
+					codexItemSubmenuEntries[#codexItemSubmenuEntries+1] = {
 						label = codexItem.itemName,
 						callback = function()
 							ANTIQUITY_LORE_KEYBOARD:ShowAntiquity(codexItem.antiquityId)
 						end
 					}
 				end
-				AddCustomScrollableSubMenuEntries(GetString(SI_ANTIQUITY_VIEW_IN_CODEX), codexItemSubmenuEntries) --View
+				AddCustomScrollableSubMenuEntry(GetString(SI_ANTIQUITY_VIEW_IN_CODEX), codexItemSubmenuEntries) --View
 			end
 		end
 		
@@ -2380,8 +2382,16 @@ function BMU.clickOnZoneName(button, record)
 		end
 
 		-- travel to parent zone
-		AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_TRAVEL_PARENT_ZONE), function()
-			BMU_portToParentZone(record.zoneId)
+		local zoneId = record.zoneId
+		local parentZoneId = BMU_getParentZoneId(zoneId)
+		local parentZoneExists = (parentZoneId ~= zoneId and true) or false
+		local parentZoneName = (parentZoneExists == true and BMU_formatName(GetZoneNameById(parentZoneId), false)) or ""
+		AddCustomScrollableMenuEntry((parentZoneExists == true and (BMU_SI_Get(SI_TELE_UI_TRAVEL_PARENT_ZONE) .. ": \'" .. parentZoneName .. "\'")) or teleportStr, function()
+			if parentZoneExists then
+				BMU_portToParentZone(zoneId)
+			else
+				BMU_sc_porting(zoneId)
+			end
 			-- close UI if enabled
 			if BMU_savedVarsAcc.closeOnPorting then
 				-- hide world map if open

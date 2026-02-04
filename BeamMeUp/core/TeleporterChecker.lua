@@ -84,10 +84,11 @@ local levelUpRewardSkillPointHeaderStr = GetString(SI_LEVEL_UP_REWARDS_SKILL_POI
 local groupStr = GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_GROUP_MEMBERS)
 local friendsStr = GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_FRIENDS)
 local itemCountSummaryStr = GetString(SI_ITEM_SET_SUMMARY_ITEM_COUNT_LABEL)
-local currencyLocation1Str = GetString(SI_CURRENCYLOCATION1)
+local currencyLocation1Str = GetString(SI_CURRENCYLOCATION1) --Bank
 local noItemSetMatchesStr = GetString(SI_ITEM_SETS_BOOK_SEARCH_NO_MATCHES)
 local housingFurnishingLimit0Str = GetString(SI_HOUSINGFURNISHINGLIMITTYPE0)
 local guildTraderOnwershipHeaderStr = GetString(SI_GUILD_TRADER_OWNERSHIP_HEADER)
+local bankIconStr20                 = BMU_textures["bankStr20"]
 -- -^- INS251229 Baertram END 0
 
 
@@ -1545,9 +1546,11 @@ function BMU.addItemInformation(record, bagId, slotIndex)
 		itemTooltip = itemTooltip .. BMU_colorizeText(" (" .. itemCount .. ")", colorWhite)
 	end
 
+	--Bank and subsriber bank
 	if bagId ~= BAG_BACKPACK then
-		-- coloring if item is not in inventory
-		itemTooltip = BMU_colorizeText(currencyLocation1Str .. ": ", colorGray) .. itemTooltip
+		-- coloring if item is not in inventory, but in the bank
+		--itemTooltip = BMU_colorizeText(currencyLocation1Str .. ": ", colorGray) .. itemTooltip
+		itemTooltip = bankIconStr20 .. itemTooltip
 		isInInventory = false
 		if #record.relatedItems == 0 then
 			record.textColorZoneName = colorGray

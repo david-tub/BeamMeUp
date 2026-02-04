@@ -1310,7 +1310,17 @@ local function SetupUI()
 
 		  -- include bank items
 		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_CRAFTING_INCLUDE_BANKED), BMU.savedVarsChar, "scanBankForMaps", function() BMU_CreateTable_IndexListItems() end, nil, {
-			  icon = function() return BMU_checkIfContextMenuIconShouldShow("bank") end,
+			  icon = function()
+				  local bankIconPath = BMU_checkIfContextMenuIconShouldShow("bank")
+				  if bankIconPath == nil then return end
+				  local bankIconTextureData = {
+					iconTexture = bankIconPath,
+					height = 18,
+					width = 24,
+					--iconTint = ZO_ColorDef:New(FFFFFF)...
+				  }
+				  return bankIconTextureData
+			  end,
 		  })
 
 		  -- enable/disable counter panel

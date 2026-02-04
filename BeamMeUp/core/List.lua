@@ -166,6 +166,10 @@ local function activeTextureForAuto()
 	BMU_win_Main_Control.portalToAllTexture:SetTexture(BMU_textures.wayshrineBtnOver2)
 end
 
+local function tableItemNameSortFunc(entry1, entry2)
+	return entry1.itemName < entry2.itemName
+end
+
 ------------------------------------------------------------
 
 -- closing interface and starting auto unlock core process
@@ -2255,7 +2259,7 @@ function BMU.clickOnZoneName(button, record)
 				AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_SHOW_QUEST_MARKER_ON_MAP) .. ": \"" .. record.relatedQuests[k] .. "\"", function() ZO_WorldMap_ShowQuestOnMap(record.relatedQuestsSlotIndex[k]) end)
 			end
 		end
-		
+
 		-------Use items contextMenu-------
 		-- use item
 		if inItemsTab then
@@ -2273,7 +2277,7 @@ function BMU.clickOnZoneName(button, record)
 			end
 			--Add map items headline
 			if #mapItems > 0 then
-				table_sort(mapItems)
+				table_sort(mapItems, tableItemNameSortFunc)
 				AddCustomScrollableMenuHeader(BMU_SI_Get(SI_TELE_UI_VIEW_MAP_ITEM)) --View map item
 				for _, mapItem in ipairs(mapItems) do
 					-- use item
@@ -2291,7 +2295,7 @@ function BMU.clickOnZoneName(button, record)
 			end
 			--Add codex items headline
 			if #codexItems > 0 then
-				table_sort(codexItems)
+				table_sort(codexItems, tableItemNameSortFunc)
 				AddCustomScrollableMenuHeader(GetString(SI_ANTIQUITY_VIEW_IN_CODEX)) --View codex
 				for _, codexItem in ipairs(codexItems) do
 					AddCustomScrollableMenuEntry(codexItem.itemName, function()

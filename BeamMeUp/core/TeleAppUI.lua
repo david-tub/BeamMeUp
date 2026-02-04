@@ -1537,75 +1537,6 @@ local function SetupUI()
 				}
 		  )
 
-
-		--[[
-		AddCustomScrollableSubMenuEntry(GetString(SI_GAMEPAD_BANK_FILTER_HEADER),
-			{
-				{
-					label = BMU_SI_Get(SI_TELE_UI_TOGGLE_ENDLESS_DUNGEONS),
-					callback = function(comboBox, itemName, item, checked, data) BMU.savedVarsChar.dungeonFinder.showEndlessDungeons = checked BMU_createTableDungeons() end,
-					entryType = LSM_ENTRY_TYPE_CHECKBOX,
-					checked = function() return BMU.savedVarsChar.dungeonFinder.showEndlessDungeons end,
-					buttonGroup = 6,
-				    contextMenuCallback = function(comboBox, control, data)
-					  LSM_ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
-				    end,
-				  	icon = function() return BMU_checkIfContextMenuIconShouldShow("endlessDungeon") end,
-				},
-				{
-					label = BMU_SI_Get(SI_TELE_UI_TOGGLE_ARENAS),
-					callback = function(comboBox, itemName, item, checked, data) BMU.savedVarsChar.dungeonFinder.showArenas = checked BMU_createTableDungeons() end,
-					entryType = LSM_ENTRY_TYPE_CHECKBOX,
-					checked = function() return BMU.savedVarsChar.dungeonFinder.showArenas end,
-					buttonGroup = 6,
-				    contextMenuCallback = function(comboBox, control, data)
-					  LSM_ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
-				    end,
-				  	icon = function() return BMU_checkIfContextMenuIconShouldShow("arena") end,
-				},
-				{
-					label = BMU_SI_Get(SI_TELE_UI_TOGGLE_GROUP_ARENAS),
-					callback = function(comboBox, itemName, item, checked, data) BMU.savedVarsChar.dungeonFinder.showGroupArenas = checked BMU_createTableDungeons() end,
-					entryType = LSM_ENTRY_TYPE_CHECKBOX,
-					checked = function() return BMU.savedVarsChar.dungeonFinder.showGroupArenas end,
-					buttonGroup = 6,
-				    contextMenuCallback = function(comboBox, control, data)
-					  LSM_ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
-				    end,
-				  	icon = function() return BMU_checkIfContextMenuIconShouldShow("groupArena") end,
-				},
-				{
-					label = BMU_SI_Get(SI_TELE_UI_TOGGLE_TRIALS),
-					callback = function(comboBox, itemName, item, checked, data) BMU.savedVarsChar.dungeonFinder.showTrials = checked BMU_createTableDungeons() end,
-					entryType = LSM_ENTRY_TYPE_CHECKBOX,
-					checked = function() return BMU.savedVarsChar.dungeonFinder.showTrials end,
-					buttonGroup = 6,
-				    contextMenuCallback = function(comboBox, control, data)
-					  LSM_ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
-				    end,
-				  	icon = function() return BMU_checkIfContextMenuIconShouldShow("trial") end,
-				},
-				{
-					label = BMU_SI_Get(SI_TELE_UI_TOGGLE_GROUP_DUNGEONS),
-					callback = function(comboBox, itemName, item, checked, data) BMU.savedVarsChar.dungeonFinder.showDungeons = checked BMU_createTableDungeons() end,
-					entryType = LSM_ENTRY_TYPE_CHECKBOX,
-					checked = function() return BMU.savedVarsChar.dungeonFinder.showDungeons end,
-					buttonGroup = 6,
-				    contextMenuCallback = function(comboBox, control, data)
-					  LSM_ButtonGroupDefaultContextMenu(comboBox, control, data, true) --Show contextMenu at the checkbox, to check all/uncheck all/invert checked state
-				    end,
-				  	icon = function() return BMU_checkIfContextMenuIconShouldShow("groupDungeon") end,
-				},
-			},
-			function()
-				--d("Clicked filters submenu openingControl")
-				--todo enable/disable all checkboxes in submenu
-
-			end,
-			{ icon = function() return BMU_checkIfContextMenuIconShouldShow("filter") end }
-		)
-		]]
-
 		-- sorting (release or acronym)
 		-- checkbox does not rely behave like a toogle in this case, enforce 3 possible statuses
 		AddCustomScrollableSubMenuEntry(GetString(SI_GAMEPAD_SORT_OPTION),
@@ -1706,7 +1637,9 @@ local function SetupUI()
 					buttonGroup = 3,
 					checked = function() return BMU.savedVarsChar.dungeonFinder.toggleShowZoneNameDungeonName == true end,
 				},
-			}
+			},
+			nil,
+			icon = function() return BMU_checkIfContextMenuIconShouldShow("display") end
 		)
 
 		-- add dungeon difficulty toggle

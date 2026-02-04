@@ -122,6 +122,7 @@ local maxDungeonTypes						= #dungeonTypes --Currently 5: Endless dungeon, Solo 
 local typeToCheckboxTable = {
 	[subType_Leads] = 	leadTypes,
 	[subType_Surveys] = surveyTypes,
+	[subType_Dungeons] = dungeonTypes,
 }
 --Lookup for the SavedVariables table name of the type
 local typeToSVTableName = {

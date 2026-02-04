@@ -299,6 +299,7 @@ local BMU_textures = {
 	bank						= "/esoui/art/tooltips/icon_bank.dds",
 	treasureMap					= "/esoui/art/tradinghouse/tradinghouse_trophy_treasure_map_up.dds",
 	sortHeader					= "/esoui/art/miscellaneous/list_sortheader_icon_neutral.dds",
+	display						= "/esoui/art/login/login_icon_info.dds", --Alternative: /esoui/art/icons/heraldrycrests_misc_eye_01.dds
 }
 BMU_textures.dungeonDifficultyNormalStr  = "|t32:32:" .. BMU_textures.dungeonDifficultyNormal .. "|t"
 BMU_textures.dungeonDifficultyVeteranStr = "|t32:32:" .. BMU_textures.dungeonDifficultyVeteran .. "|t"

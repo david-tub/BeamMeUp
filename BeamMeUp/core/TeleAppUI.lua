@@ -936,6 +936,7 @@ local function SetupUI()
 		else
 			BMU_createTable({index=BMU.indexListMain})
 		end
+		teleporterVars.choosenListPlayerFilter = 0
   end)
 
   teleporterWin_Main_Control_RefreshTexture:SetHandler("OnMouseEnter", function(teleporterWin_Main_Control_RefreshTextureCtrl)

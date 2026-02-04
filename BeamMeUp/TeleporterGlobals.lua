@@ -74,6 +74,8 @@ BMU.var = {
 		[string_lower("Graumoorkaverne")] = "",	--leave "" if key = value
 		[string_lower("Griselande")] = "",		--leave "" if key = value
 	},
+
+  	choosenListPlayerFilter = 0, --current list player filter, 0 = Show all
 }
 
 -- -v- INS251229 Baertram BEGIN 1
@@ -300,6 +302,7 @@ local BMU_textures = {
 	treasureMap					= "/esoui/art/tradinghouse/tradinghouse_trophy_treasure_map_up.dds",
 	sortHeader					= "/esoui/art/miscellaneous/list_sortheader_icon_neutral.dds",
 	display						= "/esoui/art/login/login_icon_info.dds", --Alternative: /esoui/art/icons/heraldrycrests_misc_eye_01.dds
+	favorite					= "/esoui/art/Collections/Favorite_StarOnly.dds",
 }
 BMU_textures.dungeonDifficultyNormalStr  = "|t32:32:" .. BMU_textures.dungeonDifficultyNormal .. "|t"
 BMU_textures.dungeonDifficultyVeteranStr = "|t32:32:" .. BMU_textures.dungeonDifficultyVeteran .. "|t"

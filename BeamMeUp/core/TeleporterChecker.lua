@@ -243,7 +243,7 @@ function BMU.createTable(args)
 	end
 
 	-- zone where the player actual is
-	local playersZoneId = BMU.getPlayersZoneId() or 0
+	local playersZoneId = BMU_getPlayersZoneId() or 0
 	-- current / displayed zone depending on map status
 	local currentZoneId = BMU_getCurrentZoneId() or 0
 

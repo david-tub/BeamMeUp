@@ -1524,7 +1524,7 @@ local function SetupUI()
 				  --d("Clicked Leads submenu openingControl")
 					  allDungeonFiltersEnabled = not allDungeonFiltersEnabled
 					  --Check if the current subfilter checkboxes are all in the state "allLeadFiltersEnabled" -> Toggle it "again" then
-					  allDungeonFiltersEnabled = BMU_checkCheckboxesCurrentStatus(subType_Leads, allDungeonFiltersEnabled)
+					  allDungeonFiltersEnabled = BMU_checkCheckboxesCurrentStatus(subType_Dungeons, allDungeonFiltersEnabled)
 					  -- check all subTypes (1) or uncheck all subtypes (2)
 					  BMU_updateCheckboxDungeonMap(allDungeonFiltersEnabled and 1 or 2)
 					  refreshDungeonsMainMenu(comboBox)

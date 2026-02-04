@@ -137,15 +137,15 @@ local LINES_OFFSET = 45
 local SLIDER_WIDTH = 25
 -- Make self available to everything in this file
 local self = {}
-local mColor = {}
+--local mColor = {}
 local controlWidth = 0
 local totalPortals = 0
 
 local mutexCounter = 0
 
-local knownWayshrinesBefore = 0
-local knownWayshrinesAfter = 0
-local totalWayshrines = 0
+--local knownWayshrinesBefore = 0
+--local knownWayshrinesAfter = 0
+--local totalWayshrines = 0
 
 -- Utility / local functions
 
@@ -2390,6 +2390,7 @@ end
 local choosenListPlayerFilter = teleporterVars.choosenListPlayerFilter
 function BMU.clickOnPlayerName(button, record)
 	BMU_createTable = BMU_createTable or BMU.createTable
+	BMU_createTableHouses = BMU_createTableHouses or BMU.createTableHouses
 	BMU_isFavoriteZone = BMU_isFavoriteZone or BMU.isFavoriteZone
 	BMU_removeFavoriteZone = BMU_removeFavoriteZone or BMU.removeFavoriteZone
 	BMU_addFavoriteZone = BMU_addFavoriteZone or BMU.addFavoriteZone
@@ -2593,7 +2594,6 @@ function BMU.clickOnPlayerName(button, record)
 			}			
 			table_insert(entries_favorites, entry)
 		end
-
 		AddCustomScrollableSubMenuEntry(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
 		
 		
@@ -2608,28 +2608,51 @@ function BMU.clickOnPlayerName(button, record)
 		
 		-- add submenu filter
 		local entries_filter = {
-				{
-					label = BMU_colorizeText(GetString(SI_TRADING_HOUSE_BROWSE_ITEM_TYPE_ALL), "white"),
-					callback = function() BMU_createTable({index=BMU.indexListMain}) choosenListPlayerFilter = 0 end,
-					entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
-					buttonGroup = 7,
-					checked = function() return choosenListPlayerFilter == 0  end
-				},
-				{
-					label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_GROUP_MEMBERS), "orange"),
-					callback = function() BMU_createTable({index=BMU.indexListSource, filterSourceIndex=BMU.SOURCE_INDEX_GROUP}) choosenListPlayerFilter = BMU.SOURCE_INDEX_GROUP end,
-					entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
-					buttonGroup = 7,
-					checked = function() return choosenListPlayerFilter == BMU.SOURCE_INDEX_GROUP  end
-				},
-				{
-					label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_FRIENDS), "green"),
-					callback = function() BMU_createTable({index=BMU.indexListSource, filterSourceIndex=BMU.SOURCE_INDEX_FRIEND}) choosenListPlayerFilter = BMU.SOURCE_INDEX_FRIEND end,
-					entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
-					buttonGroup = 7,
-					checked = function() return choosenListPlayerFilter == BMU.SOURCE_INDEX_FRIEND  end
-				},
-			}
+			{
+				label = BMU_colorizeText(GetString(SI_TRADING_HOUSE_BROWSE_ITEM_TYPE_ALL), "lgray"), --All
+				callback = function() BMU_createTable({index=BMU.indexListMain}) choosenListPlayerFilter = 0 end,
+				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
+				buttonGroup = 7,
+				checked = function() return choosenListPlayerFilter == 0 end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("all") end,
+			},
+			{
+				label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_GROUP_MEMBERS), "orange"), -- Group
+				callback = function() BMU_createTable({index=BMU.indexListSource, filterSourceIndex=BMU.SOURCE_INDEX_GROUP}) choosenListPlayerFilter = BMU.SOURCE_INDEX_GROUP end,
+				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
+				buttonGroup = 7,
+				checked = function() return choosenListPlayerFilter == BMU.SOURCE_INDEX_GROUP end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("group") end,
+			},
+			{
+				label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_FRIENDS), "green"), --Friends
+				callback = function() BMU_createTable({index=BMU.indexListSource, filterSourceIndex=BMU.SOURCE_INDEX_FRIEND}) choosenListPlayerFilter = BMU.SOURCE_INDEX_FRIEND end,
+				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
+				buttonGroup = 7,
+				checked = function() return choosenListPlayerFilter == BMU.SOURCE_INDEX_FRIEND end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("friends") end,
+			},
+			{
+				label = GetString(SI_MAPFILTER18), --"Houses",
+				entryType = LSM_ENTRY_TYPE_HEADER,
+			},
+			{
+				label = BMU_colorizeText(BMU_SI_Get(SI_TELE_UI_BTN_PORT_TO_OWN_HOUSE), "teal"), --Own houses
+				callback = function() BMU_createTableHouses() choosenListPlayerFilter = -1 end,
+				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
+				buttonGroup = 7,
+				checked = function() return choosenListPlayerFilter == -1 end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("houseBtn") end,
+			},
+			{
+				label = BMU_colorizeText(GetString(SI_HOUSE_TOURS_FILTERS_HOUSE_DROPDOWN_NO_SELECTION_TEXT), "teal"), --All houses
+				callback = function() BMU_createTableHouses() choosenListPlayerFilter = -2 end,
+				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
+				buttonGroup = 7,
+				checked = function() return choosenListPlayerFilter == -2 end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("otherHouses") end,
+			},
+		}
 			
 		-- add all guilds
 		table_insert(entries_filter, {

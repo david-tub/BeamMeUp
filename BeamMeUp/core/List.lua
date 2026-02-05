@@ -30,6 +30,7 @@ local table_sort = table.sort
 --Other addon variables
 local BMU_LibZone = BMU.LibZone
 local BMU_LibSets = BMU.LibSets
+local LSM = BMU.LSM
 
 --Other addon variables
 ---v- INS BEARTRAM 20260125 LibScrollableMenu
@@ -39,6 +40,8 @@ local AddCustomScrollableMenuDivider    = AddCustomScrollableMenuDivider
 local AddCustomScrollableMenuHeader    = AddCustomScrollableMenuHeader
 local AddCustomScrollableSubMenuEntry 	= AddCustomScrollableSubMenuEntry
 local ShowCustomScrollableMenu 			= ShowCustomScrollableMenu
+local GetCustomScrollableMenuRowData    = GetCustomScrollableMenuRowData
+local PreventCustomScrollableContextMenuHide = PreventCustomScrollableContextMenuHide
 local LSM_ENTRY_TYPE_HEADER			= LSM_ENTRY_TYPE_HEADER
 local LSM_ENTRY_TYPE_RADIOBUTTON    = LSM_ENTRY_TYPE_RADIOBUTTON
 local teleportStr = GetString(SI_GAMEPAD_HELP_UNSTUCK_TELEPORT_KEYBIND_TEXT)
@@ -2040,6 +2043,22 @@ end
 BMU_isWholeWordInString = BMU.isWholeWordInString
 
 
+local function showZoneFavoriteContextMenu(comboBox, control, data)
+	if data == nil and control ~= nil then data = GetCustomScrollableMenuRowData(control) end
+	if data.zoneId ~= nil and data.zoneId ~= 0 then
+		if LSM == nil then
+			BMU.GetLibraries()
+		end
+
+		ClearMenu()
+		AddMenuItem(GetString(SI_COLLECTIBLE_ACTION_REMOVE_FAVORITE), function()
+			BMU_removeFavoriteZone(data.zoneId)
+		end, MENU_ADD_OPTION_LABEL)
+		PreventCustomScrollableContextMenuHide() --mandatory to keep LSM open!
+		ShowMenu()
+	end
+end
+
 function BMU.clickOnZoneName(button, record)
 	BMU_createTableDungeons = BMU_createTableDungeons or BMU.createTableDungeons
 	BMU_createTablePTF = BMU_createTablePTF or BMU.createTablePTF
@@ -2337,7 +2356,11 @@ function BMU.clickOnZoneName(button, record)
 				local entry = {
 					label = tos(i) .. ": " .. favName,
 					callback = function() BMU_addFavoriteZone(i, record.zoneId, record.zoneName) end,
-				}			
+					contextMenuCallback = function(...)
+						showZoneFavoriteContextMenu(...)
+					end,
+					zoneId = record.zoneId
+				}
 				table_insert(entries_favorites, entry)
 			end
 
@@ -2406,6 +2429,22 @@ function BMU.clickOnZoneName(button, record)
 end
 
 local choosenListPlayerFilter = teleporterVars.choosenListPlayerFilter
+local function showPlayerFavoriteContextMenu(comboBox, control, data)
+	if data == nil and control ~= nil then data = GetCustomScrollableMenuRowData(control) end
+	if data.displayName ~= nil and data.displayName ~= "" then
+		if LSM == nil then
+			BMU.GetLibraries()
+		end
+
+		ClearMenu()
+		AddMenuItem(GetString(SI_COLLECTIBLE_ACTION_REMOVE_FAVORITE), function()
+			BMU_removeFavoritePlayer(data.displayName)
+		end, MENU_ADD_OPTION_LABEL)
+		PreventCustomScrollableContextMenuHide() --mandatory to keep LSM open!
+		ShowMenu()
+	end
+end
+
 function BMU.clickOnPlayerName(button, record)
 	BMU_createTable = BMU_createTable or BMU.createTable
 	BMU_createTableHouses = BMU_createTableHouses or BMU.createTableHouses
@@ -2449,7 +2488,15 @@ function BMU.clickOnPlayerName(button, record)
 			end
 			local entry = {
 				label = tos(i) .. ": " .. favName,
-				callback = function() BMU_addFavoritePlayer(i, record.displayName) end,
+				callback = function(comboBox, itemName, item, selectionChanged, oldItem)
+					if record.displayName ~= item.displayName then
+						BMU_addFavoritePlayer(i, record.displayName)
+					end
+				end,
+				contextMenuCallback = function(...)
+					showPlayerFavoriteContextMenu(...)
+				end,
+				displayName = record.displayName
 			}
 			table_insert(entries_favorites, entry)
 		end

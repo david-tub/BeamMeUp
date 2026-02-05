@@ -47,6 +47,7 @@ local RefreshCustomScrollableMenu = RefreshCustomScrollableMenu
 local LSM_UPDATE_MODE_BOTH 			= LSM_UPDATE_MODE_BOTH
 local LSM_ENTRY_TYPE_HEADER			= LSM_ENTRY_TYPE_HEADER
 local LSM_ENTRY_TYPE_RADIOBUTTON    = LSM_ENTRY_TYPE_RADIOBUTTON
+local LSM_ENTRY_TYPE_DIVIDER 		= LSM_ENTRY_TYPE_DIVIDER
 local teleportStr = GetString(SI_GAMEPAD_HELP_UNSTUCK_TELEPORT_KEYBIND_TEXT)
 
 --[[
@@ -2444,7 +2445,6 @@ function BMU.clickOnZoneName(button, record)
 	end
 end
 
-local choosenListPlayerFilter = teleporterVars.choosenListPlayerFilter
 local function showPlayerFavoriteContextMenu(comboBox, control, data)
 	if data == nil and control ~= nil then data = GetCustomScrollableMenuRowData(control) end
 	if data.displayName ~= nil and data.displayName ~= "" then
@@ -2703,26 +2703,27 @@ function BMU.clickOnPlayerName(button, record)
 		local entries_filter = {
 			{
 				label = BMU_colorizeText(GetString(SI_TRADING_HOUSE_BROWSE_ITEM_TYPE_ALL), "lgray"), --All
-				callback = function() BMU_createTable({index=BMU.indexListMain}) choosenListPlayerFilter = 0 end,
+				callback = function() BMU_createTable({index=BMU.indexListMain}) BMU.var.choosenListPlayerFilter = 0 end,
 				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
 				buttonGroup = 7,
-				checked = function() return choosenListPlayerFilter == 0 end,
+				checked = function() return BMU.var.choosenListPlayerFilter == 0 end,
 				icon = function() return BMU_checkIfContextMenuIconShouldShow("wayshrineBtn") end,
 			},
+			{ entryType = LSM_ENTRY_TYPE_DIVIDER },
 			{
 				label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_GROUP_MEMBERS), "orange"), -- Group
-				callback = function() BMU_createTable({index=BMU.indexListSource, filterSourceIndex=BMU.SOURCE_INDEX_GROUP}) choosenListPlayerFilter = BMU.SOURCE_INDEX_GROUP end,
+				callback = function() BMU_createTable({index=BMU.indexListSource, filterSourceIndex=BMU.SOURCE_INDEX_GROUP}) BMU.var.choosenListPlayerFilter = BMU.SOURCE_INDEX_GROUP end,
 				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
 				buttonGroup = 7,
-				checked = function() return choosenListPlayerFilter == BMU.SOURCE_INDEX_GROUP end,
+				checked = function() return BMU.var.choosenListPlayerFilter == BMU.SOURCE_INDEX_GROUP end,
 				icon = function() return BMU_checkIfContextMenuIconShouldShow("group") end,
 			},
 			{
 				label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_FRIENDS), "green"), --Friends
-				callback = function() BMU_createTable({index=BMU.indexListSource, filterSourceIndex=BMU.SOURCE_INDEX_FRIEND}) choosenListPlayerFilter = BMU.SOURCE_INDEX_FRIEND end,
+				callback = function() BMU_createTable({index=BMU.indexListSource, filterSourceIndex=BMU.SOURCE_INDEX_FRIEND}) BMU.var.choosenListPlayerFilter = BMU.SOURCE_INDEX_FRIEND end,
 				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
 				buttonGroup = 7,
-				checked = function() return choosenListPlayerFilter == BMU.SOURCE_INDEX_FRIEND end,
+				checked = function() return BMU.var.choosenListPlayerFilter == BMU.SOURCE_INDEX_FRIEND end,
 				icon = function() return BMU_checkIfContextMenuIconShouldShow("friends") end,
 			},
 			{
@@ -2731,10 +2732,10 @@ function BMU.clickOnPlayerName(button, record)
 			},
 			{
 				label = BMU_colorizeText(BMU_SI_Get(SI_TELE_UI_BTN_PORT_TO_OWN_HOUSE), "teal"), --Own houses
-				callback = function() BMU_createTableHouses() choosenListPlayerFilter = -1 end,
+				callback = function() BMU_createTableHouses() BMU.var.choosenListPlayerFilter = -1 end,
 				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
 				buttonGroup = 7,
-				checked = function() return choosenListPlayerFilter == -1 end,
+				checked = function() return BMU.var.choosenListPlayerFilter == -1 end,
 				icon = function() return BMU_checkIfContextMenuIconShouldShow("houseBtn") end,
 			},
 			--[[ Currently not supported as there is no "all houses" list, maybe relevant for house tours in the future
@@ -2758,17 +2759,17 @@ function BMU.clickOnPlayerName(button, record)
 			local guildId = GetGuildId(guildIndex)
 			local entry = {
 					label = BMU_colorizeText(GetGuildName(guildId), "white"),
-					callback = function() BMU_createTable({index=BMU.indexListSource, filterSourceIndex=2+guildIndex}) choosenListPlayerFilter = 2+guildIndex end,
+					callback = function() BMU_createTable({index=BMU.indexListSource, filterSourceIndex=2+guildIndex}) BMU.var.choosenListPlayerFilter = 2+guildIndex end,
 					entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
 					buttonGroup = 7,
-					checked = function() return choosenListPlayerFilter == 2+guildIndex  end
+					checked = function() return BMU.var.choosenListPlayerFilter == 2+guildIndex  end
 				}
 				table_insert(entries_filter, entry)
 		end		
 		
 		AddCustomScrollableSubMenuEntry(GetString(SI_GAMEPAD_BANK_FILTER_HEADER), entries_filter, nil, { icon = function() return BMU_checkIfContextMenuIconShouldShow("filter") end })
 		
-		ShowCustomScrollableMenu(nil, { visibleRows = 20 })
+		ShowCustomScrollableMenu(nil, { visibleRowsDropdown = 20, visibleRowsSubmenu = 20 })
 		
 	else -- left mouse click
 		if record.groupUnitTag then		

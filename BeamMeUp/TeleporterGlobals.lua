@@ -307,6 +307,16 @@ local BMU_textures = {
 	display						= "/esoui/art/login/login_icon_info.dds", --Alternative: /esoui/art/icons/heraldrycrests_misc_eye_01.dds
 	favorite					= "/esoui/art/Collections/Favorite_StarOnly.dds",
 	timer						= "/esoui/art/miscellaneous/timer_32.dds",
+	add							= "/esoui/art/progression/addpoints_up.dds",
+	remove						= "/esoui/art/progression/removepoints_up.dds",
+	cancel						= "/esoui/art/buttons/cancel_up.dds",
+	voteLeader					= "/esoui/art/champion/actionbar/champion_bar_world_selection.dds", --todo
+	voteKick					= "/esoui/art/champion/actionbar/champion_bar_conditioning_selection.dds", --todo
+	whisper						 = "/esoui/art/hud/radialicon_whisper_up.dds", --todo
+	visitPrimary				 = BMU_MediaPath .. "poi_group_house_owned.dds", --todo
+	mail						 = "/esoui/art/menubar/menubar_mail_up.dds", --todo
+	addFriend					 = "/esoui/art/hud/radialicon_addfriend_up.dds", --todo
+	removeFriend				 = "/esoui/art/hud/radialicon_removefriend_up.dds", --todo
 }
 BMU_textures.leadTypeCompletedStr20			= string_format(textureStrPattern20, BMU_textures.leadTypeCompleted)
 BMU_textures.dungeonDifficultyNormalStr  	= string_format(textureStrPattern32, BMU_textures.dungeonDifficultyNormal)

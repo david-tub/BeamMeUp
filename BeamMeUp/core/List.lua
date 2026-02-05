@@ -49,9 +49,11 @@ local LSM_ENTRY_TYPE_HEADER			= LSM_ENTRY_TYPE_HEADER
 local LSM_ENTRY_TYPE_RADIOBUTTON    = LSM_ENTRY_TYPE_RADIOBUTTON
 local teleportStr = GetString(SI_GAMEPAD_HELP_UNSTUCK_TELEPORT_KEYBIND_TEXT)
 
-local function refreshLSMMainAndSubMenuOfMOC(comboBox)
-  RefreshCustomScrollableMenu(moc(), LSM_UPDATE_MODE_BOTH, comboBox) --Update the opening mainmenu's entry to refresh the shown survey/lead/... filter numbers
+--[[
+local function refreshLSMMainAndSubMenuOfMOC(control, comboBox)
+  RefreshCustomScrollableMenu((control ~= nil and control) or moc(), LSM_UPDATE_MODE_BOTH, comboBox) --Update the opening mainmenu's entry to refresh the shown favorites
 end
+]]
 ---^- INS BEARTRAM 20260125 LibScrollableMenu
 
 --BMU variables
@@ -2530,7 +2532,7 @@ function BMU.clickOnPlayerName(button, record)
 			for j = 1, GetGroupSize() do
 				groupUnitTag = GetGroupUnitTagByIndex(j)
 				if record.displayName == GetUnitDisplayName(groupUnitTag) then
-				unitTag = groupUnitTag
+					unitTag = groupUnitTag
 				end
 			end
 		end
@@ -2544,6 +2546,7 @@ function BMU.clickOnPlayerName(button, record)
 			entries_group[pos] = {
 				label = GetString(SI_CHAT_PLAYER_CONTEXT_ADD_GROUP),
 				callback = function() GroupInviteByName(record.characterName) end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("add") end
 			}
 			pos = pos + 1
 		end
@@ -2552,12 +2555,14 @@ function BMU.clickOnPlayerName(button, record)
 			entries_group[pos] = {
 				label = GetString(SI_GROUP_LIST_MENU_PROMOTE_TO_LEADER),
 				callback = function() GroupPromote(unitTag) end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("groupLeaderBtn") end
 			}
 			pos = pos + 1
 			
 			entries_group[pos] = {
 				label = GetString(SI_GROUP_LIST_MENU_KICK_FROM_GROUP),
 				callback = function() GroupKick(unitTag) end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("remove") end
 			}
 			pos = pos + 1
 		end
@@ -2566,6 +2571,7 @@ function BMU.clickOnPlayerName(button, record)
 			entries_group[pos] = {
 				label = BMU_SI_Get(SI_TELE_UI_VOTE_TO_LEADER),
 				callback = function() BeginGroupElection(GROUP_ELECTION_TYPE_NEW_LEADER, ZO_GROUP_ELECTION_DESCRIPTORS.NONE, unitTag) end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("voteLeader") end
 			}
 			pos = pos + 1
 		end
@@ -2574,6 +2580,7 @@ function BMU.clickOnPlayerName(button, record)
 			entries_group[pos] = {
 				label = GetString(SI_GROUP_LIST_MENU_LEAVE_GROUP),
 				callback = function() GroupLeave() end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("cancel") end
 			}
 			pos = pos + 1
 			
@@ -2581,6 +2588,7 @@ function BMU.clickOnPlayerName(button, record)
 				entries_group[pos] = {
 					label = GetString(SI_GROUP_LIST_MENU_VOTE_KICK_FROM_GROUP),
 					callback = function() BeginGroupElection(GROUP_ELECTION_TYPE_KICK_MEMBER, ZO_GROUP_ELECTION_DESCRIPTORS.NONE, unitTag) end,
+					icon = function() return BMU_checkIfContextMenuIconShouldShow("voteKick") end
 				}
 				pos = pos + 1
 			end
@@ -2595,6 +2603,7 @@ function BMU.clickOnPlayerName(button, record)
 			label = GetString(SI_SOCIAL_LIST_PANEL_WHISPER),
 			callback = function() StartChatInput("", CHAT_CHANNEL_WHISPER, record.displayName) end,
 --			tooltip = "Tooltip Test: Whisper",
+			icon = function() return BMU_checkIfContextMenuIconShouldShow("whisper") end
 		}
 		pos = pos + 1
 		
@@ -2602,6 +2611,7 @@ function BMU.clickOnPlayerName(button, record)
 		entries_misc[pos] = {
 			label = GetString(SI_SOCIAL_MENU_VISIT_HOUSE),
 			callback = function() JumpToHouse(record.displayName) end,
+			icon = function() return BMU_checkIfContextMenuIconShouldShow("visitPrimary") end
 		}
 		pos = pos + 1
 		
@@ -2609,6 +2619,7 @@ function BMU.clickOnPlayerName(button, record)
 		entries_misc[pos] = {
 			label = GetString(SI_SOCIAL_MENU_SEND_MAIL),
 			callback = function() BMU_createMail(record.displayName, "", "") end,
+			icon = function() return BMU_checkIfContextMenuIconShouldShow("mail") end
 		}
 		pos = pos + 1	
 
@@ -2617,12 +2628,14 @@ function BMU.clickOnPlayerName(button, record)
 			entries_misc[pos] = {
 				label = GetString(SI_FRIEND_MENU_REMOVE_FRIEND),
 				callback = function() RemoveFriend(record.displayName) end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("removeFriend") end
 			}
 			pos = pos + 1
 		else
 			entries_misc[pos] = {
 				label = GetString(SI_SOCIAL_MENU_ADD_FRIEND),
 				callback = function() RequestFriend(record.displayName, "") end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("addFriend") end
 			}
 			pos = pos + 1
 		end
@@ -2631,6 +2644,7 @@ function BMU.clickOnPlayerName(button, record)
 		entries_misc[pos] = {
 			label = GetString(SI_NOTIFICATIONTYPE30),
 			callback = function() InviteToTributeByDisplayName(record.displayName) end,
+			icon = function() return BMU_checkIfContextMenuIconShouldShow("tribute") end
 		}
 		pos = pos + 1
 		

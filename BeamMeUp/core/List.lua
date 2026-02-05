@@ -42,9 +42,16 @@ local AddCustomScrollableSubMenuEntry 	= AddCustomScrollableSubMenuEntry
 local ShowCustomScrollableMenu 			= ShowCustomScrollableMenu
 local GetCustomScrollableMenuRowData    = GetCustomScrollableMenuRowData
 local PreventCustomScrollableContextMenuHide = PreventCustomScrollableContextMenuHide
+--local PreventCustomScrollableContextMenuEntryClickHide = PreventCustomScrollableContextMenuEntryClickHide
+local RefreshCustomScrollableMenu = RefreshCustomScrollableMenu
+local LSM_UPDATE_MODE_BOTH 			= LSM_UPDATE_MODE_BOTH
 local LSM_ENTRY_TYPE_HEADER			= LSM_ENTRY_TYPE_HEADER
 local LSM_ENTRY_TYPE_RADIOBUTTON    = LSM_ENTRY_TYPE_RADIOBUTTON
 local teleportStr = GetString(SI_GAMEPAD_HELP_UNSTUCK_TELEPORT_KEYBIND_TEXT)
+
+local function refreshLSMMainAndSubMenuOfMOC(comboBox)
+  RefreshCustomScrollableMenu(moc(), LSM_UPDATE_MODE_BOTH, comboBox) --Update the opening mainmenu's entry to refresh the shown survey/lead/... filter numbers
+end
 ---^- INS BEARTRAM 20260125 LibScrollableMenu
 
 --BMU variables
@@ -2052,6 +2059,7 @@ local function showZoneFavoriteContextMenu(comboBox, control, data)
 
 		ClearMenu()
 		AddMenuItem(GetString(SI_COLLECTIBLE_ACTION_REMOVE_FAVORITE), function()
+			BMU_removeFavoriteZone = BMU_removeFavoriteZone or BMU.removeFavoriteZone
 			BMU_removeFavoriteZone(data.zoneId)
 		end, MENU_ADD_OPTION_LABEL)
 		PreventCustomScrollableContextMenuHide() --mandatory to keep LSM open!
@@ -2347,19 +2355,25 @@ function BMU.clickOnZoneName(button, record)
 			end
 			-- favorite list
 			local entries_favorites = {}
-			
+
+			local recordZoneIdSave = record.zoneId
+			local recordZoneNameSave = record.zoneName
+
 			for i=1, teleporterVars.numFavoriteZones, 1 do
 				local favName = ""
+				local zoneIdOfSavedFav = BMU_savedVarsServ.favoriteListZones[i]
 				if BMU_savedVarsServ.favoriteListZones[i] ~= nil then
-					favName = BMU_formatName(GetZoneNameById(BMU_savedVarsServ.favoriteListZones[i]), BMU_savedVarsAcc.formatZoneName)
+					favName = BMU_formatName(GetZoneNameById(zoneIdOfSavedFav), BMU_savedVarsAcc.formatZoneName)
 				end
 				local entry = {
 					label = tos(i) .. ": " .. favName,
-					callback = function() BMU_addFavoriteZone(i, record.zoneId, record.zoneName) end,
+					callback = function(comboBox, itemName, item, selectionChanged, oldItem)
+						BMU_addFavoriteZone(i, recordZoneIdSave, recordZoneNameSave)
+					end,
 					contextMenuCallback = function(...)
 						showZoneFavoriteContextMenu(...)
 					end,
-					zoneId = record.zoneId
+					zoneId = zoneIdOfSavedFav
 				}
 				table_insert(entries_favorites, entry)
 			end
@@ -2481,6 +2495,8 @@ function BMU.clickOnPlayerName(button, record)
 		-- favorite list
 		local entries_favorites = {}
 
+		local recordDisplayNameSave = record.displayName
+
 		for i=1, teleporterVars.numFavoritePlayers, 1 do
 			local favName = ""
 			if BMU.savedVarsServ.favoriteListPlayers[i] ~= nil then
@@ -2489,14 +2505,12 @@ function BMU.clickOnPlayerName(button, record)
 			local entry = {
 				label = tos(i) .. ": " .. favName,
 				callback = function(comboBox, itemName, item, selectionChanged, oldItem)
-					if record.displayName ~= item.displayName then
-						BMU_addFavoritePlayer(i, record.displayName)
-					end
+					BMU_addFavoritePlayer(i, recordDisplayNameSave)
 				end,
 				contextMenuCallback = function(...)
 					showPlayerFavoriteContextMenu(...)
 				end,
-				displayName = record.displayName
+				displayName = favName
 			}
 			table_insert(entries_favorites, entry)
 		end

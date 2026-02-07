@@ -1,4 +1,27 @@
-BMU = {}
+local BMU = BMU --INS251229 Baertram Performancee gain, not searching _G for BMU each time again!
+
+-- -v- INS251229 Baertram BEGIN 0
+--Performance reference
+----variables (defined now, as they were loaded before this file -> see manifest .txt)
+--ZOs variables
+local ton = tonumber
+local tos = tostring
+local string = string
+local string_format = string.format
+local string_lower = string.lower
+
+--String variables
+local textureStrPattern = "|t32:32:%s|t"
+local itemTypeIconPattern = "|t<%f>:<%f>:%s|t"
+local BMU_MediaPath = "/BeamMeUp/media/"
+
+--BMU reference variables
+local BMU_GUILD_DATA = BMU_GUILD_DATA
+local numVars = BMU.numVars
+local SI = BMU.SI
+local BMU_SI_Get = SI.get
+-- -^- INS251229 Baertram BEGIN 0
+
 
 BMU.win =   {
       Main_Control = {},
@@ -8,9 +31,15 @@ BMU.var = {
   appName               = "BeamMeUp",
   appNameAbbr			= "BMU",
   version				= "", -- Will be set by help of function GetAddonVersionFromManifest(), see file BeamMeUp.lua event_add_on_loaded
-  author				= "DeadSoon, Gamer1986PAN",
+  author				= "DeadSoon, Gamer1986PAN, Baertram",
+  feedbackContact		= "@Deadsoon", --INS251229 Baertram Used account for email feedback
   website				= "https://www.esoui.com/downloads/info2143-BeamMeUp-TeleporterFastTravel.html",
   feedback				= "https://www.esoui.com/portal.php?id=283&a=faq", -- FAQ link
+  savedVariablesName	 = "BeamMeUp_SV",
+  -------------------------------------
+  allowedLanguages		= {de=true,en=true,fr=true,ru=true,es=true,pl=true,it=true,jp=true,br=true,kr=true,zh=true,}, --INS251229 Baertram
+  fallbackLang			= "en",																		--INS251229 Baertram
+  -------------------------------------
   controls              = {},
   isAddonLoaded         = false,
   color                 = {
@@ -34,17 +63,95 @@ BMU.var = {
   numFavoriteZones = 10,
   numFavoritePlayers = 5,
   numFavoriteWayshrines = 3,
+
+  --INS251229 Baertram Special zone names to check for, see file TeleporterChecker.lua function BMU.tryMatchZoneToMatchStr(matchStr, zoneId)
+  -->(lowercased already so they aren't reformatetd on each search -> Performance gain)
+	specialZoneNameMatches = {
+		[string_lower("Alik'r")] = "", 			--leave "" if key = value
+		[string_lower("Morneroc")] = "", 		--leave "" if key = value
+		[string_lower("Bleakrock")] = "", 		--leave "" if key = value
+		[string_lower("Orsinium")] = string_lower("Wrothgar"),	--Special zoneName Wrothgar here
+		[string_lower("Graumoorkaverne")] = "",	--leave "" if key = value
+		[string_lower("Griselande")] = "",		--leave "" if key = value
+	},
+
+  	choosenListPlayerFilter = 0, --current list player filter, 0 = Show all
 }
 
--- necessary libraries
-BMU.LibZone = LibZone
-BMU.LAM = LibAddonMenu2
+-- -v- INS251229 Baertram BEGIN 1
+--Local reference variables of BMU - Performance improvement
+local teleporterVars = BMU.var
+local appNameAbbr = teleporterVars.appNameAbbr
+local BMU_colors = teleporterVars.color
+local colorStrToColorCodes = {
+	["gray"] = BMU_colors.colTrash,
+	["yellow"] = BMU_colors.colYellow,
+	["blue"] = BMU_colors.colArcane,
+	["white"] = BMU_colors.colWhite,
+	["red"] = BMU_colors.colRed,
+	["gold"] = BMU_colors.colLegendary,
+	["green"] = BMU_colors.colGreen,
+	["orange"] = BMU_colors.colOrange,
+	["teal"] = BMU_colors.colBlue,
+	["dred"] = BMU_colors.colDarkRed,
+	["lgray"] = BMU_colors.colGray,
+}
+-- -^- INS251229 Baertram BEGIN 1
 
--- optional libraries
-BMU.LSC = LibSlashCommander
-BMU.LibSets = LibSets
-BMU.LibMapPing = LibMapPing2
-BMU.LCMB = LibChatMenuButton
+--v- INS260127 Baertram
+local function getLibraries()
+	-- necessary libraries - Will be updated at EVENT_ADD_ON_LOADED again
+	BMU.LibZone = LibZone
+	BMU.LAM = LibAddonMenu2
+	BMU.LSM = LibScrollableMenu
+
+	-- optional libraries
+	BMU.LSC = LibSlashCommander
+	BMU.LibSets = LibSets
+	BMU.LibMapPing = LibMapPing2
+	BMU.LCMB = LibChatMenuButton
+	BMU.LCM = LibCustomMenu
+end
+BMU.GetLibraries = getLibraries
+getLibraries()
+
+--LibScrollableMenu options for contextMenus
+teleporterVars.LSMVars = {
+	--The options for any LSM contextMenu at the item filter button (surveys, leads)
+	itemFilterContextMenuOptions = {
+		visibleRowsDropdown = 15,	--Rows visible max in the normal main menus (more rows -> scrollbar is shown)
+		visibleRowsSubmenu 	= 15,	--Rows visible max in any (nested) submenu (more rows -> scrollbar is shown)
+		sortEntries         = false,
+		--[[
+			enableFilter        = true, --Show header filter search box
+			headerCollapsible = true,	--Header can be collapsed/expanded
+			headerCollapsed = true, --automatically always collapse the header by default (if this is left false the last state will be saved in LSM SavedVariables, per dropdown)
+			headerToggleTooltip = GetString(SI_SCREEN_NARRATION_EDIT_BOX_SEARCH_NAME), --Tootlip at the header, here: "Search"
+			headerCollapsedIcon = function() return { --Show an icon at the header, here a search "magnifying glass" texture
+				   iconTexture = "/esoui/art/miscellaneous/search_icon.dds",
+				   width       = 20,
+				   height      = 16,
+				   --iconTint=CUSTOM_HIGHLIGHT_TEXT_COLOR,
+				   align       = LEFT,
+				   offsetX     = 20,
+				   offSetY     = 0,
+				}
+			end,
+			--Automatic refresh means if any entry is clicked, automatically refresh all other entries in the same submenu or parent menu(s).
+			-->This is currently done manually via functions called from entry's callback (e.g. survey and/or leads), where needed only! So not enabled here in general, to save performance!
+			--automaticSubmenuRefresh  = false, --Make the submenus automatically refresh if any entry was clicked
+			--automaticRefresh    = true, --Make the normal menus automatically refresh if any entry was clicked (for the e.g. "Logout icon")
+		]]
+	},
+	--The options for any LSM contextMenu at the dungeon filter button (trial, dungeon, ...)
+	dungeonFilterContextMenuOptions = {
+		visibleRowsDropdown = 15,
+		visibleRowsSubmenu 	= 15,
+		sortEntries        	= false,
+	},
+}
+
+--^- INS260127 Baertram
 
 
 -------------VERY FIRST FUNCTIONS---------
@@ -57,37 +164,14 @@ function BMU.mergeTables(t, ...)
 	end
 	return new
 end
+local BMU_mergeTables = BMU.mergeTables
 
 -- colorize text
 function BMU.colorizeText(text, color)
 	if type(color) == "string" then
-		local code = BMU.var.color.colWhite
-		
-		if string.lower(color) == "gray" then
-			code = BMU.var.color.colTrash
-		elseif string.lower(color) == "yellow" then
-			code = BMU.var.color.colYellow
-		elseif string.lower(color) == "blue" then
-			code = BMU.var.color.colArcane
-		elseif string.lower(color) == "white" then
-			code = BMU.var.color.colWhite
-		elseif string.lower(color) == "red" then
-			code = BMU.var.color.colRed
-		elseif string.lower(color) == "gold" then
-			code = BMU.var.color.colLegendary
-		elseif string.lower(color) == "green" then
-			code = BMU.var.color.colGreen
-		elseif string.lower(color) == "orange" then
-			code = BMU.var.color.colOrange
-		elseif string.lower(color) == "teal" then
-			code = BMU.var.color.colBlue
-		elseif string.lower(color) == "dred" then
-			code = BMU.var.color.colDarkRed
-		elseif string.lower(color) == "lgray" then
-			code = BMU.var.color.colGray
-		end
-		
-		return "|c" .. code .. tostring(text) .. "|r"
+		local colorLower = string_lower(color)  													--CHG251229 Baertram Performance boost, instead of 12x the same string.lower call :-(
+		local code = colorStrToColorCodes[colorLower] or BMU_colors.colWhite
+		return "|c" .. code .. tos(text) .. "|r"
 	end
 end
 
@@ -104,7 +188,7 @@ function BMU.printToChat(text, messageType)
 		return
 	else
 		-- print message to chat
-		local prefix = "[" .. BMU.var.appNameAbbr .. "]"
+		local prefix = "[" .. appNameAbbr .. "]"
 		local prefix_colorized = BMU.colorizeText(prefix, "white")
 
 		d(prefix_colorized .. ": " .. text)
@@ -119,115 +203,177 @@ BMU.MSG_UL = 3
 BMU.MSG_DB = 4
 
 -- Textures
-BMU.textures = {
-	tooltipSeperator = "|t120:5:esoui/art/guild/sectiondivider_left.dds|t",
-	anchorMapBtn = "/BeamMeUp/media/dock.dds",
-	anchorMapBtnOver = "/BeamMeUp/media/dock_over.dds",
-	lockClosedBtn = "/BeamMeUp/media/lock_closed.dds",
-	lockClosedBtnOver = "/BeamMeUp/media/lock_closed_over2.dds",
-	lockOpenBtn = "/BeamMeUp/media/lock_open.dds",
-	lockOpenBtnOver = "/BeamMeUp/media/lock_open_over2.dds",
-	swapBtn = "/BeamMeUp/media/swap.dds",
-	swapBtnOver = "/BeamMeUp/media/swap_over.dds",
-	closeBtn = "/BeamMeUp/media/close.dds",
-	closeBtnOver = "/BeamMeUp/media/close_over.dds",
+local textureStrPattern32 = "|t32:32:%s|t"
+local textureStrPattern24 = "|t24:24:%s|t"
+local textureStrPattern20 = "|t20:20:%s|t"
+local BMU_textures = {
+	tooltipSeperatorStr = "|t120:5:esoui/art/guild/sectiondivider_left.dds|t",
+	anchorMapBtn = BMU_MediaPath .. "dock.dds",
+	anchorMapBtnOver = BMU_MediaPath .. "dock_over.dds",
+	lockClosedBtn = BMU_MediaPath .. "lock_closed.dds",
+	lockClosedBtnOver = BMU_MediaPath .. "lock_closed_over2.dds",
+	lockOpenBtn = BMU_MediaPath .. "lock_open.dds",
+	lockOpenBtnOver = BMU_MediaPath .. "lock_open_over2.dds",
+	swapBtn = BMU_MediaPath .. "swap.dds",
+	swapBtnOver = BMU_MediaPath .. "swap_over.dds",
+	closeBtn = BMU_MediaPath .. "close.dds",
+	closeBtnOver = BMU_MediaPath .. "close_over.dds",
 	feedbackBtn = "/esoui/art/mail/mail_tabicon_compose_up.dds",
 	feedbackBtnOver = "/esoui/art/mail/mail_tabicon_compose_down.dds",
-	searchBtn = "/BeamMeUp/media/tradinghouse_browse_tabicon.dds",
-	searchBtnOver = "/BeamMeUp/media/tradinghouse_browse_tabicon_over.dds",
-	refreshBtn = "/BeamMeUp/media/gp_radialicon_trade.dds",
-	refreshBtnOver = "/BeamMeUp/media/gp_radialicon_trade_over.dds",
-	questBtn = "/BeamMeUp/media/quest.dds",
-	questBtnOver = "/BeamMeUp/media/quest_over.dds",
-	wayshrineBtn = "/BeamMeUp/media/poi_wayshrine_complete.dds",
-	wayshrineBtnOver = "/BeamMeUp/media/poi_wayshrine_complete_over.dds",
+	searchBtn = BMU_MediaPath .. "tradinghouse_browse_tabicon.dds",
+	searchBtnOver = BMU_MediaPath .. "tradinghouse_browse_tabicon_over.dds",
+	refreshBtn = BMU_MediaPath .. "gp_radialicon_trade.dds",
+	refreshBtnOver = BMU_MediaPath .. "gp_radialicon_trade_over.dds",
+	questBtn = BMU_MediaPath .. "quest.dds",
+	questBtnOver = BMU_MediaPath .. "quest_over.dds",
+	wayshrineBtn = BMU_MediaPath .. "poi_wayshrine_complete.dds",
+	wayshrineBtnOver = BMU_MediaPath .. "poi_wayshrine_complete_over.dds",
 	-- wayshrine button texture with event cycle
-	wayshrineBtn2 = "/BeamMeUp/media/poi_wayshrine_complete.dds",
-	wayshrineBtnOver2 = "/BeamMeUp/media/poi_wayshrine_complete_over.dds",
-	settingsBtn = "/BeamMeUp/media/menubar_mainmenu.dds",
-	settingsBtnOver = "/BeamMeUp/media/menubar_mainmenu_over.dds",
-	relatedItemsBtn = "/BeamMeUp/media/help_tabicon_overview.dds",
-	relatedItemsBtnOver = "/BeamMeUp/media/help_tabicon_overview_over.dds",
-	currentZoneBtn = "/BeamMeUp/media/menubar_map.dds",
-	currentZoneBtnOver = "/BeamMeUp/media/menubar_map_over.dds",
-	delvesBtn = "/BeamMeUp/media/poi_delve_complete.dds",
-	delvesBtnOver = "/BeamMeUp/media/poi_delve_complete_over.dds",
-	publicDungeonBtn = "/BeamMeUp/media/poi_dungeon_complete.dds",
-	publicDungeonBtnOver = "/BeamMeUp/media/poi_dungeon_complete_over.dds",
-	houseBtn = "/BeamMeUp/media/poi_group_house_owned.dds",
-	houseBtnOver = "/BeamMeUp/media/poi_group_house_owned_over.dds",
-	groupDungeonBtn = "/BeamMeUp/media/poi_groupinstance_complete.dds",
-	groupDungeonBtnOver = "/BeamMeUp/media/poi_groupinstance_complete_over.dds",
-	raidDungeonBtn = "/BeamMeUp/media/poi_raiddungeon_complete.dds",
-	raidDungeonBtnOver = "/BeamMeUp/media/poi_raiddungeon_complete_over.dds",
-	endlessDungeonBtn = "/BeamMeUp/media/poi_endlessdungeon_complete.dds",
-	endlessDungeonBtnOver = "/BeamMeUp/media/poi_endlessdungeon_complete_over.dds",
-	groupZonesBtn = "/BeamMeUp/media/poi_groupdelve_complete.dds",
-	groupZonesBtnOver = "/BeamMeUp/media/poi_groupdelve_complete_over.dds",
-	groupLeaderBtn = "/BeamMeUp/media/lfg_leader_icon.dds",
-	groupLeaderBtnOver = "/BeamMeUp/media/lfg_leader_icon_over.dds",
-	guildBtn = "/BeamMeUp/media/menubar_guilds.dds",
-	guildBtnOver = "/BeamMeUp/media/menubar_guilds_over.dds",
-	guildHouseBtn = "/BeamMeUp/media/guild_hall_temple.dds",
-	guildHouseBtnOver = "/BeamMeUp/media/guild_hall_temple_mouseover.dds",
-	ptfHouseBtn = "/BeamMeUp/media/ptf_house.dds",
-	ptfHouseBtnOver = "/BeamMeUp/media/ptf_house_mouseover.dds",
-	soloArenaBtn = "/BeamMeUp/media/poi_solotrial.dds",
-	soloArenaBtnOver = "/BeamMeUp/media/poi_solotrial_over.dds",
-	dungeonDifficultyNormal = "|t32:32:esoui/art/lfg/lfg_normaldungeon_up.dds|t",
-	dungeonDifficultyVeteran = "|t32:32:esoui/art/lfg/lfg_veterandungeon_up.dds|t",
-	noPlayerBtn = "/BeamMeUp/media/guildstore_sell_tabicon.dds",
-	noPlayerBtnOver = "/BeamMeUp/media/guildstore_sell_tabicon_over.dds",
-	arrowDown = "|t32:32:esoui/art/worldmap/mapnav_downarrow_up.dds|t",
-	arrowUp = "|t32:32:esoui/art/worldmap/mapnav_uparrow_up.dds|t",
-	acceptGreen = "|t16:16:esoui/art/interaction/accept.dds|t",
-	declineRed = "|t16:16:esoui/art/interaction/goodbye.dds|t",
+	wayshrineBtn2 = BMU_MediaPath .. "poi_wayshrine_complete.dds",
+	wayshrineBtnOver2 = BMU_MediaPath .. "poi_wayshrine_complete_over.dds",
+	settingsBtn = BMU_MediaPath .. "menubar_mainmenu.dds",
+	settingsBtnOver = BMU_MediaPath .. "menubar_mainmenu_over.dds",
+	relatedItemsBtn = BMU_MediaPath .. "help_tabicon_overview.dds",
+	relatedItemsBtnOver = BMU_MediaPath .. "help_tabicon_overview_over.dds",
+	currentZoneBtn = BMU_MediaPath .. "menubar_map.dds",
+	currentZoneBtnOver = BMU_MediaPath .. "menubar_map_over.dds",
+	delvesBtn = BMU_MediaPath .. "poi_delve_complete.dds",
+	delvesBtnOver = BMU_MediaPath .. "poi_delve_complete_over.dds",
+	publicDungeonBtn = BMU_MediaPath .. "poi_dungeon_complete.dds",
+	publicDungeonBtnOver = BMU_MediaPath .. "poi_dungeon_complete_over.dds",
+	houseBtn = BMU_MediaPath .. "poi_group_house_owned.dds",
+	houseBtnOver = BMU_MediaPath .. "poi_group_house_owned_over.dds",
+	groupDungeonBtn = BMU_MediaPath .. "poi_groupinstance_complete.dds",
+	groupDungeonBtnOver = BMU_MediaPath .. "poi_groupinstance_complete_over.dds",
+	raidDungeonBtn = BMU_MediaPath .. "poi_raiddungeon_complete.dds",
+	raidDungeonBtnOver = BMU_MediaPath .. "poi_raiddungeon_complete_over.dds",
+	endlessDungeonBtn = BMU_MediaPath .. "poi_endlessdungeon_complete.dds",
+	endlessDungeonBtnOver = BMU_MediaPath .. "poi_endlessdungeon_complete_over.dds",
+	groupZonesBtn = BMU_MediaPath .. "poi_groupdelve_complete.dds",
+	groupZonesBtnOver = BMU_MediaPath .. "poi_groupdelve_complete_over.dds",
+	groupLeaderBtn             = BMU_MediaPath .. "lfg_leader_icon.dds",
+	groupLeaderBtnOver          = BMU_MediaPath .. "lfg_leader_icon_over.dds",
+	guildBtn                    = BMU_MediaPath .. "menubar_guilds.dds",
+	guildBtnOver                = BMU_MediaPath .. "menubar_guilds_over.dds",
+	guildHouseBtn               = BMU_MediaPath .. "guild_hall_temple.dds",
+	guildHouseBtnOver           = BMU_MediaPath .. "guild_hall_temple_mouseover.dds",
+	ptfHouseBtn                 = BMU_MediaPath .. "ptf_house.dds",
+	ptfHouseBtnOver             = BMU_MediaPath .. "ptf_house_mouseover.dds",
+	soloArenaBtn                = BMU_MediaPath .. "poi_solotrial.dds",
+	soloArenaBtnOver            = BMU_MediaPath .. "poi_solotrial_over.dds",
+	dungeonDifficultyNormal  	= "esoui/art/lfg/lfg_normaldungeon_up.dds",
+	dungeonDifficultyVeteran    = "esoui/art/lfg/lfg_veterandungeon_up.dds",
+	noPlayerBtn                 = BMU_MediaPath .. "guildstore_sell_tabicon.dds",
+	noPlayerBtnOver             = BMU_MediaPath .. "guildstore_sell_tabicon_over.dds",
+	arrowDown                   = "esoui/art/worldmap/mapnav_downarrow_up.dds",
+	arrowUp                     = "esoui/art/worldmap/mapnav_uparrow_up.dds",
+	arrowDownStr                = "|t32:32:esoui/art/worldmap/mapnav_downarrow_up.dds|t",
+	arrowUpStr                  = "|t32:32:esoui/art/worldmap/mapnav_uparrow_up.dds|t",
+	acceptGreenStr              = "|t16:16:esoui/art/interaction/accept.dds|t",
+	declineRedStr               = "|t16:16:esoui/art/interaction/goodbye.dds|t",
+
+	--Context menu icons
+	---Antiquity leads
+	antiquity					= "/esoui/art/mappins/antiquity_digsite.dds",
+	leadTypeScryable			= "/esoui/art/treeicons/antiquities_indexicon_scryable_up.dds",
+	leadTypeScried				= "/esoui/art/journal/journal_quest_scrying_selected.dds",
+	leadTypeCompleted			= "/esoui/art/icons/skilllinexp_scrying.dds",
+	---Surveys
+	survey						= "/esoui/art/icons/treasuremap_witchesfestival.dds",
+	surveyTypeAlchemy			= "/esoui/art/inventory/inventory_tabicon_craftbag_alchemy_up.dds",
+	surveyTypeEnchanting		= "/esoui/art/inventory/inventory_tabicon_craftbag_enchanting_up.dds",
+	surveyTypeWoodworker		= "/esoui/art/inventory/inventory_tabicon_craftbag_woodworking_up.dds",
+	surveyTypeBlacksmith		= "/esoui/art/inventory/inventory_tabicon_craftbag_blacksmithing_up.dds",
+	surveyTypeClothier			= "/esoui/art/inventory/inventory_tabicon_craftbag_clothing_up.dds",
+	surveyTypeJewelry			= "/esoui/art/inventory/inventory_tabicon_craftbag_jewelrycrafting_up.dds",
+	---Tales Of Tribute
+	tribute						= "/esoui/art/tribute/tribute_tabicon_tribute_up.dds",
+	---Dungeons
+	endlessDungeon 				= "/esoui/art/treeicons/tutorial_endlessdungeon_up.dds",
+	arena 						= "/esoui/art/treeicons/reconstruction_tabicon_arenasolo_up.dds",
+	groupArena 					= "/esoui/art/treeicons/reconstruction_tabicon_arenagroup_up.dds",
+	trial 						= BMU_MediaPath .. "poi_raiddungeon_complete.dds",
+	groupDungeon 				= BMU_MediaPath .. "poi_groupinstance_complete.dds",
+	---Social
+	friends						= "/esoui/art/campaign/campaignbrowser_friends.dds",
+	group						= "/esoui/art/lfg/lfg_indexicon_group_up.dds",
+	otherHouses					= "/esoui/art/journal/journal_quest_group_housing.dds",
+	abbreviate					= "/esoui/art/buttons/gamepad/heron/nav_heron_view.dds",
+	---Other
+	filter						= "/esoui/art/worldmap/map_indexicon_filters_up.dds",
+	bank						= "/esoui/art/tooltips/icon_bank.dds",
+	treasureMap					= "/esoui/art/tradinghouse/tradinghouse_trophy_treasure_map_up.dds",
+	sortHeader					= "/esoui/art/miscellaneous/list_sortheader_icon_neutral.dds",
+	display						= "/esoui/art/login/login_icon_info.dds", --Alternative: /esoui/art/icons/heraldrycrests_misc_eye_01.dds
+	favorite					= "/esoui/art/Collections/Favorite_StarOnly.dds",
+	timer						= "/esoui/art/miscellaneous/timer_32.dds",
+	add							= "/esoui/art/progression/addpoints_up.dds",
+	remove						= "/esoui/art/progression/removepoints_up.dds",
+	cancel						= "/esoui/art/buttons/cancel_up.dds",
+	voteLeader					= "/esoui/art/champion/actionbar/champion_bar_world_selection.dds", --todo
+	voteKick					= "/esoui/art/champion/actionbar/champion_bar_conditioning_selection.dds", --todo
+	whisper						 = "/esoui/art/hud/radialicon_whisper_up.dds", --todo
+	visitPrimary				 = BMU_MediaPath .. "poi_group_house_owned.dds", --todo
+	mail						 = "/esoui/art/menubar/menubar_mail_up.dds", --todo
+	addFriend					 = "/esoui/art/hud/radialicon_addfriend_up.dds", --todo
+	removeFriend				 = "/esoui/art/hud/radialicon_removefriend_up.dds", --todo
 }
+BMU_textures.leadTypeCompletedStr20			= string_format(textureStrPattern20, BMU_textures.leadTypeCompleted)
+BMU_textures.dungeonDifficultyNormalStr  	= string_format(textureStrPattern32, BMU_textures.dungeonDifficultyNormal)
+BMU_textures.dungeonDifficultyVeteranStr 	= string_format(textureStrPattern32, BMU_textures.dungeonDifficultyVeteran)
+BMU_textures.bankStr20 						= string_format(textureStrPattern20, BMU_textures.bank)
+BMU_textures.timerStr20 					= string_format(textureStrPattern20, BMU_textures.timer)
 
 
+BMU.textures = BMU_textures																			--INS251229 Baertram
+
+local serviceMapPinsDDSPath = "esoui/art/icons/servicemappins/servicepin_"
+local itemTypeIcons = {
+	["alchemist"] = serviceMapPinsDDSPath ..	"alchemy.dds",
+	["enchanter"] = serviceMapPinsDDSPath ..	"enchanting.dds",
+	["woodworker"] = serviceMapPinsDDSPath ..	"woodworking.dds",
+	["blacksmith"] = serviceMapPinsDDSPath ..	"smithy.dds",
+	["clothier"] = serviceMapPinsDDSPath ..		"clothier.dds",
+	["jewelry"] = serviceMapPinsDDSPath ..		"jewelrycrafting.dds",
+	["treasure"] = serviceMapPinsDDSPath ..		"bank.dds",
+	["leads"] = serviceMapPinsDDSPath ..		"antiquities.dds"
+}
 function BMU.getItemTypeIcon(itemType, dimension)
-	local itemTypeIcons = {
-		["alchemist"] = "esoui/art/icons/servicemappins/servicepin_alchemy.dds",
-		["enchanter"] = "esoui/art/icons/servicemappins/servicepin_enchanting.dds",
-		["woodworker"] = "esoui/art/icons/servicemappins/servicepin_woodworking.dds",
-		["blacksmith"] = "esoui/art/icons/servicemappins/servicepin_smithy.dds",
-		["clothier"] = "esoui/art/icons/servicemappins/servicepin_clothier.dds",
-		["jewelry"] = "esoui/art/icons/servicemappins/servicepin_jewelrycrafting.dds",
-		["treasure"] = "esoui/art/icons/servicemappins/servicepin_bank.dds",
-		["leads"] = "esoui/art/icons/servicemappins/servicepin_antiquities.dds"
-	}
-
 	local iconPath = itemTypeIcons[itemType]
-	if iconPath ~= nil and tonumber(dimension) ~= nil then
-		return string.format("|t<%f>:<%f>:%s|t", dimension, dimension, iconPath)
+	if iconPath ~= nil and ton(dimension) ~= nil then
+		return string_format(itemTypeIconPattern, dimension, dimension, iconPath)
 	else
 		return ""
 	end
 end
 
+function BMU.checkIfContextMenuIconShouldShow(iconPath)
+	if iconPath == nil or iconPath == "" or BMU.savedVarsAcc.showContextMenuIcons == false then return nil end
+	return BMU_textures[iconPath]
+end
 
 -- Special textures for event days
 local ld = os.date("*t")
 if ld.month == 2 and ld.day >= 11 and ld.day <= 14 then
 	-- Valentine's Day (val)
-	BMU.textures.wayshrineBtn2 = "/BeamMeUp/media/poi_wayshrine_complete_val.dds"
-	BMU.textures.wayshrineBtnOver2 = "/BeamMeUp/media/poi_wayshrine_complete_over_val.dds"
+	BMU_textures.wayshrineBtn2 = BMU_MediaPath .. "poi_wayshrine_complete_val.dds"
+	BMU_textures.wayshrineBtnOver2 = BMU_MediaPath .. "poi_wayshrine_complete_over_val.dds"
 elseif (ld.month == 3 and ld.day >= 20) or (ld.month == 4 and ld.day <= 25) then
 	-- Ester (egg)
-	BMU.textures.wayshrineBtn2 = "/BeamMeUp/media/poi_wayshrine_complete_egg.dds"
-	BMU.textures.wayshrineBtnOver2 = "/BeamMeUp/media/poi_wayshrine_complete_over_egg.dds"
+	BMU_textures.wayshrineBtn2 = BMU_MediaPath .. "poi_wayshrine_complete_egg.dds"
+	BMU_textures.wayshrineBtnOver2 = BMU_MediaPath .. "poi_wayshrine_complete_over_egg.dds"
 elseif ld.month == 10 and ld.day >= 27 then
 	-- Halloween (hw)
-	BMU.textures.wayshrineBtn2 = "/BeamMeUp/media/poi_wayshrine_complete_hw.dds"
-	BMU.textures.wayshrineBtnOver2 = "/BeamMeUp/media/poi_wayshrine_complete_over_hw.dds"
+	BMU_textures.wayshrineBtn2 = BMU_MediaPath .. "poi_wayshrine_complete_hw.dds"
+	BMU_textures.wayshrineBtnOver2 = BMU_MediaPath .. "poi_wayshrine_complete_over_hw.dds"
 elseif ld.month == 12 and ld.day >= 17 and ld.day <= 26 then
 	-- Christmas (xmas)
-	BMU.textures.wayshrineBtn2 = "/BeamMeUp/media/poi_wayshrine_complete_xmas.dds"
-	BMU.textures.wayshrineBtnOver2 = "/BeamMeUp/media/poi_wayshrine_complete_over_xmas.dds"
+	BMU_textures.wayshrineBtn2 = BMU_MediaPath .. "poi_wayshrine_complete_xmas.dds"
+	BMU_textures.wayshrineBtnOver2 = BMU_MediaPath .. "poi_wayshrine_complete_over_xmas.dds"
 elseif (ld.month == 12 and ld.day >= 29) or (ld.month == 1 and ld.day == 1) or (ld.month == 7 and ld.day == 4 and GetWorldName() == "NA Megaserver") then
 	-- New year (nye) + Independence Day (NA only)
-	BMU.textures.wayshrineBtn2 = "/BeamMeUp/media/poi_wayshrine_complete_nye.dds"
-	BMU.textures.wayshrineBtnOver2 = "/BeamMeUp/media/poi_wayshrine_complete_over_nye.dds"
+	BMU_textures.wayshrineBtn2 = BMU_MediaPath .. "poi_wayshrine_complete_nye.dds"
+	BMU_textures.wayshrineBtnOver2 = BMU_MediaPath .. "poi_wayshrine_complete_over_nye.dds"
 end
 
 -- constant values for the source
@@ -240,6 +386,7 @@ BMU.SOURCE_INDEX_GUILD = {
 	[4] = 6,
 	[5] = 7,
 }
+BMU.SOURCE_INDEX_OWNHOUSES = 8 --INS Baertram 260206
 
 -- constant values for zone categorization
 BMU.ZONE_CATEGORY_UNKNOWN = 0
@@ -257,14 +404,33 @@ BMU.ZONE_CATEGORY_OVERLAND = 100
 -- flag and cache to check if quest data in journal changed
 BMU.questDataCache = {}
 BMU.questDataChanged = true
-		
--- second language dropdown choices/values
-BMU.dropdownSecLangChoices = {"DISABLED", "en", "de", "fr", "ru", "jp", "pl"}
-BMU.dropdownSecLangValues = {1, 2, 3, 4, 5, 6, 7}
 
--- sortings dropdown choices/values
-BMU.dropdownSortChoices = {"zone name", "zone category > zone name", "most used zone > zone name", "most used zone > zone category > zone name", "number of players > zone name", "undiscovered wayshrines > zone category > zone name", "undiscovered skyshards > zone category > zone name", "last used zone > zone name", "last used zone > zone category > zone name", "missing set items > zone category > zone name (LibSets must be installed)", "zone category (zones without free options at the end) > zone name"}
-BMU.dropdownSortValues = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+--------------------------------------------------
+--For LAM settings menu - Dropdowns
+--------------------------------------------------
+-- second language dropdown choices/values
+local BMU_dropdownSecLangChoices = {}
+local BMU_dropdownSecLangValues = {}
+local secLangDropdownEntryPrefix = numVars.secLangDropdownEntryPrefix
+for i=1, numVars.numSecLangDropdownEntries, 1 do
+	BMU_dropdownSecLangChoices[i] = BMU_SI_Get(secLangDropdownEntryPrefix, i)
+	BMU_dropdownSecLangValues[i] = i
+end
+BMU.dropdownSecLangValues = BMU_dropdownSecLangValues
+BMU.dropdownSecLangChoices = BMU_dropdownSecLangChoices
+
+-- sorting dropdown choices/values
+local BMU_dropdownSortChoices = {}
+local BMU_dropdownSortValues = {}
+local sortDropdownEntryPrefix = BMU.numVars.sortDropdownEntryPrefix
+for i=1, numVars.numSortDropdownEntries, 1 do
+	BMU_dropdownSortChoices[i] = BMU_SI_Get(sortDropdownEntryPrefix, i)
+	BMU_dropdownSortValues[i] = i
+end
+BMU.dropdownSortChoices = BMU_dropdownSortChoices
+BMU.dropdownSortValues = BMU_dropdownSortValues
+--------------------------------------------------
+
 
 -- scenario indicies
 -- list/tab or action id
@@ -285,11 +451,11 @@ BMU.indexListGuilds = 13			-- BMU and partner guilds
 BMU.indexListDungeons = 14			-- Dungeon Finder (arenas, dungeons, trials)
 
 -- default tab selection (values represent the "index" value which is handed over to createTable() function)
-BMU.dropdownDefaultTabChoices = {string.format("|t32:32:%s|t", BMU.textures.refreshBtn), string.format("|t32:32:%s|t", BMU.textures.questBtn), string.format("|t32:32:%s|t", BMU.textures.relatedItemsBtn), string.format("|t32:32:%s|t", BMU.textures.currentZoneBtn), string.format("|t32:32:%s|t", BMU.textures.delvesBtn), string.format("|t32:32:%s|t", BMU.textures.houseBtn), string.format("|t32:32:%s|t", BMU.textures.soloArenaBtn)}
+BMU.dropdownDefaultTabChoices = {string_format(textureStrPattern, BMU_textures.refreshBtn), string_format(textureStrPattern, BMU_textures.questBtn), string_format(textureStrPattern, BMU_textures.relatedItemsBtn), string_format(textureStrPattern, BMU_textures.currentZoneBtn), string_format(textureStrPattern, BMU_textures.delvesBtn), string_format(textureStrPattern, BMU_textures.houseBtn), string_format(textureStrPattern, BMU_textures.soloArenaBtn)}
 BMU.dropdownDefaultTabValues = {BMU.indexListMain, BMU.indexListQuests, BMU.indexListItems, BMU.indexListCurrentZone, BMU.indexListDelves, BMU.indexListOwnHouses, BMU.indexListDungeons}
 
 -- prioritization of the sources
-BMU.dropdownPrioSourceChoices = {"Friends"}
+BMU.dropdownPrioSourceChoices = {GetString(SI_WINDOW_TITLE_FRIENDS_LIST)} --"Friends"				--CHG251229 Baertram Added translated entry
 BMU.dropdownPrioSourceValues = {BMU.SOURCE_INDEX_FRIEND}
 for i = 1, GetNumGuilds() do
 	table.insert(BMU.dropdownPrioSourceChoices, GetGuildName(GetGuildId(i)))
@@ -381,7 +547,7 @@ BMU.blacklistHouses = {940, 942, 941, 939, 938, 937, 859, 858, 878, 868, 869, 87
 ----------------------------------------- Whitelists
 
 -- special Whitelist just for group members: Group Arenas, Group Dungeons in Craglorn, 4 men Group Dungeons, 12 men Group Dungeons
-BMU.whitelistGroupMembers = BMU.mergeTables(BMU.blacklistGroupArenas, BMU.blacklistGroupZones, BMU.blacklistGroupDungeons, BMU.blacklistRaids, BMU.blacklistEndlessDungeons)
+BMU.whitelistGroupMembers = BMU_mergeTables(BMU.blacklistGroupArenas, BMU.blacklistGroupZones, BMU.blacklistGroupDungeons, BMU.blacklistRaids, BMU.blacklistEndlessDungeons)
 									
 
 -- List of all Overland-Zones incl. their delves and public dungeons
@@ -1834,8 +2000,8 @@ function BMU.GetMapTypeTable()
 		BMU.mapTypeByItemId = {}
 		for zoneId, zoneTab in pairs(BMU.treasureAndSurveyMaps) do
 			for mapType, zoneIds in pairs(zoneTab) do
-				for _, zoneId in pairs(zoneIds) do
-					BMU.mapTypeByItemId[zoneId] = mapType
+				for _, l_zoneId in pairs(zoneIds) do 												--CHG251229 Baertram Renamed shadowed variable zoneId
+					BMU.mapTypeByItemId[l_zoneId] = mapType
 				end
 			end
 		end
@@ -1848,8 +2014,30 @@ end
 -- returns 7 boolean values at once, representing the filter states (true: map type is shown)
 -- returning values and their order: alchemist, enchanter, woodworker, blacksmith, clothier, jewelry, treasure
 function BMU.GetCurrentMapDisplayFilter()
-	return BMU.savedVarsChar.displayMaps.alchemist, BMU.savedVarsChar.displayMaps.enchanter,
-		BMU.savedVarsChar.displayMaps.woodworker, BMU.savedVarsChar.displayMaps.blacksmith,
-		BMU.savedVarsChar.displayMaps.clothier, BMU.savedVarsChar.displayMaps.jewelry,
-		BMU.savedVarsChar.displayMaps.treasure
+	local BMU_SVChar_displayMaps = BMU.savedVarsChar.displayMaps
+	return BMU_SVChar_displayMaps.alchemist, BMU_SVChar_displayMaps.enchanter,
+		BMU_SVChar_displayMaps.woodworker, BMU_SVChar_displayMaps.blacksmith,
+		BMU_SVChar_displayMaps.clothier, BMU_SVChar_displayMaps.jewelry,
+		BMU_SVChar_displayMaps.treasure
+end
+
+
+--Run a function throttled (check if it should run already and overwrite the old call then with a new one to
+--prevent running it multiple times in a short time)
+function BMU.ThrottledUpdate(callbackName, timer, callback, ...)
+    if not callbackName or callbackName == "" or not callback then return end
+    local args
+    if ... ~= nil then
+        args = {...}
+    end
+    local function Update()
+        EVENT_MANAGER:UnregisterForUpdate(callbackName)
+        if args then
+            callback(unpack(args))
+        else
+            callback()
+        end
+    end
+    EVENT_MANAGER:UnregisterForUpdate(callbackName)
+    EVENT_MANAGER:RegisterForUpdate(callbackName, timer, Update)
 end

@@ -16,6 +16,7 @@ local SM = SCENE_MANAGER
 local worldMapManager = WORLD_MAP_MANAGER
 local playerTag = "player"
 local worldName = GetWorldName()
+local myDisplayName = GetDisplayName()
 local tos = tostring
 local ton = tonumber
 local string = string
@@ -73,6 +74,26 @@ local BMU_ZONE_CATEGORY_OVERLAND = BMU.ZONE_CATEGORY_OVERLAND
 local colorLegendary = ZO_ColorDef:New(teleporterVars.color.colLegendary)
 local guildHousesAtServer = teleporterVars.guildHouse[worldName]
 local BMUGuildsAtServer = teleporterVars.BMUGuilds[worldName]
+
+local BMU_indexListMain 					= BMU.indexListMain
+local BMU_indexListCurrentZone 				= BMU.indexListCurrentZone
+local BMU_indexListSearchPlayer 			= BMU.indexListSearchPlayer
+local BMU_indexListSearchZone 				= BMU.indexListSearchZone
+local BMU_indexListItems					= BMU.indexListItems
+local BMU_indexListDelves 					= BMU.indexListDelves
+local BMU_indexListZoneHidden				= BMU.indexListZoneHidden
+local BMU_indexListSource 					= BMU.indexListSource
+local BMU_indexListZone						= BMU.indexListZone
+local BMU_indexListQuests 					= BMU.indexListQuests
+local BMU_indexListOwnHouses				= BMU.indexListOwnHouses
+local BMU_indexListPTFHouses 				= BMU.indexListPTFHouses
+local BMU_indexListGuilds 					= BMU.indexListGuilds
+local BMU_indexListDungeons					= BMU.indexListDungeons
+
+local BMU_SOURCE_INDEX_FRIEND 				= BMU.SOURCE_INDEX_FRIEND
+local BMU_SOURCE_INDEX_GROUP 				= BMU.SOURCE_INDEX_GROUP
+local BMU_SOURCE_INDEX_GUILD				= BMU.SOURCE_INDEX_GUILD
+local BMU_SOURCE_INDEX_OWNHOUSES			= BMU.SOURCE_INDEX_OWNHOUSES
 
 ----functions
 --ZOs functions
@@ -236,7 +257,7 @@ function BMU.startAutoUnlock(zoneId, loopType, loopZoneList)
 	-- ensure unlock process is not already running
 	if not BMU.uwData or not BMU.uwData.isStarted then
 		local formattedZoneName = BMU_formatName(GetZoneNameById(zoneId), false)
-		local list = BMU_createTable({index=BMU.indexListZone, fZoneId=zoneId, noOwnHouses=true, dontDisplay=true})
+		local list = BMU_createTable({index=BMU_indexListZone, fZoneId=zoneId, noOwnHouses=true, dontDisplay=true})
 		-- check if list is empty
 		local firstRecord = list[1]
 		if #list == 0 or not firstRecord or firstRecord.displayName == "" then
@@ -309,7 +330,7 @@ function BMU.proceedAutoUnlock()
 		end
 		
 		-- get all travel options
-		local list = BMU_createTable({index=BMU.indexListZone, fZoneId=BMU.uwData.zoneId, dontDisplay=true})
+		local list = BMU_createTable({index=BMU_indexListZone, fZoneId=BMU.uwData.zoneId, dontDisplay=true})
 		
 		if #list ~= 0 or list[1].displayName ~= "" then
 			-- re-calculate total steps in case new players come available during process
@@ -540,7 +561,7 @@ function BMU.startAutoUnlockLoopRandom(prevZoneId, loopType)
 	-- go over the zones and find one
 	for _, zoneId in ipairs(shuffled) do
 		if zoneId ~= prevZoneId then -- dont take the same zone twice in a row
-			local list = BMU_createTable({index=BMU.indexListZone, fZoneId=zoneId, noOwnHouses=true, dontDisplay=true})
+			local list = BMU_createTable({index=BMU_indexListZone, fZoneId=zoneId, noOwnHouses=true, dontDisplay=true})
 			-- check if list is empty
 			if #list > 0 and list[1] and list[1].displayName ~= "" then
 				local numWayshrines, numWayshrinesDiscovered = BMU.getZoneWayshrineCompletion(zoneId)
@@ -574,7 +595,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType)
 			-- consider only zones the user has access to (DLC)
 			if CanJumpToPlayerInZone(overlandZoneId) then
 				--table_insert(overlandZoneIds, overlandZoneId)
-				local resultList = BMU_createTable({index=BMU.indexListZone, fZoneId=overlandZoneId, noOwnHouses=true, dontDisplay=true})
+				local resultList = BMU_createTable({index=BMU_indexListZone, fZoneId=overlandZoneId, noOwnHouses=true, dontDisplay=true})
 				if #resultList > 0 and resultList[1] and resultList[1].displayName ~= "" then
 					local numWayshrines, numWayshrinesDiscovered = BMU_getZoneWayshrineCompletion(overlandZoneId)
 					if numWayshrinesDiscovered < numWayshrines then
@@ -614,7 +635,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType)
 	
 	-- at this moment: zoneRecordList was already given or was re-filled right now
 	for index, zoneRecord in pairs(zoneRecordList) do
-		local resultList = BMU_createTable({index=BMU.indexListZone, fZoneId=zoneRecord.zoneId, noOwnHouses=true, dontDisplay=true})
+		local resultList = BMU_createTable({index=BMU_indexListZone, fZoneId=zoneRecord.zoneId, noOwnHouses=true, dontDisplay=true})
 		if #resultList > 0 and resultList[1] and resultList[1].displayName ~= "" then
 			table_remove(zoneRecordList, index)
 			zo_callLater(function()
@@ -877,10 +898,10 @@ function BMU.PortalToPlayer(displayName, sourceIndex, zoneName, zoneId, zoneCate
 		if printToChat then
 			BMU_printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. displayName .. " - " .. zoneName, BMU.MSG_FT)
 		end
-		if sourceIndex == BMU.SOURCE_INDEX_GROUP then
+		if sourceIndex == BMU_SOURCE_INDEX_GROUP then
 			-- 2024/12: a bug was reported, that JumpToGroupLeader() no longer works probably in some cases --> only use JumpToGroupMember()
 			JumpToGroupMember(displayName)
-		elseif sourceIndex == BMU.SOURCE_INDEX_FRIEND then
+		elseif sourceIndex == BMU_SOURCE_INDEX_FRIEND then
 			JumpToFriend(displayName)
 		else
 			-- sourceIndex > 3  -> guild 1-5
@@ -1630,7 +1651,7 @@ function ListView:update()
 				-- hide MouseOver handler
 				list.ColumnNumberPlayersTex:SetHandler("OnMouseExit", function(self) list.ColumnNumberPlayersTex:SetAlpha(0) end)
 				-- set handler for opening
-				list.ColumnNumberPlayersTex:SetHandler("OnMouseUp", function(self, button) if button ~= MOUSE_BUTTON_INDEX_LEFT then return end BMU_createTable({index=BMU.indexListZone, fZoneId=message.zoneId}) end)
+				list.ColumnNumberPlayersTex:SetHandler("OnMouseUp", function(self, button) if button ~= MOUSE_BUTTON_INDEX_LEFT then return end BMU_createTable({index=BMU_indexListZone, fZoneId=message.zoneId}) end)
 			else
 				list.ColumnNumberPlayers:SetText("")
 				-- hide
@@ -1689,7 +1710,7 @@ function ListView:update()
 			end
 			
 			-- check for Group Leader
-			if message.sourceIndexLeading == BMU.SOURCE_INDEX_GROUP and message.isLeader then
+			if message.sourceIndexLeading == BMU_SOURCE_INDEX_GROUP and message.isLeader then
 				-- set Group Leader texture
 				texture_normal = BMU_textures.groupLeaderBtn
 				texture_over = BMU_textures.groupLeaderBtnOver
@@ -1788,12 +1809,12 @@ function BMU.clickOnTeleportToPlayerButton(textureControl, button, message)
 		return
 	end
 	
-	if button == MOUSE_BUTTON_INDEX_RIGHT and IsPlayerInGroup(GetDisplayName()) then
+	if button == MOUSE_BUTTON_INDEX_RIGHT and IsPlayerInGroup(myDisplayName) then
 		-- create and share link to the group channel
 		local linkType = "book"
 		local data1 = 190 -- bookId
 		local data2 = "BMU_S_P" -- signature
-		local data3 = GetDisplayName() -- playerFrom
+		local data3 = myDisplayName -- playerFrom
 		local data4 = message.displayName -- playerTo
 		local text = "Follow me!" -- currently not working because linkType "book" does not allow custom text
 		
@@ -1841,13 +1862,13 @@ function BMU.clickOnTeleportToOwnHouseButton_2(button, message, jumpOutside)
 	end
 
 	-- porting outside of a house cant be shared
-	if button == MOUSE_BUTTON_INDEX_RIGHT and IsPlayerInGroup(GetDisplayName()) and not jumpOutside then
+	if button == MOUSE_BUTTON_INDEX_RIGHT and IsPlayerInGroup(myDisplayName) and not jumpOutside then
 		if BMU.debugMode then d("[BMU] share-link branch taken (right-click inside)") end
 		-- create and share link to the group channel
 		local linkType = "book"
 		local data1 = 190 -- bookId
 		local data2 = "BMU_S_H" -- signature
-		local data3 = GetDisplayName() -- player
+		local data3 = myDisplayName -- player
 		local data4 = message.houseId -- houseId
 		local text = "Follow me!"
 		local link = "|H1:" .. linkType .. ":" .. data1 .. ":" .. data2 .. ":" .. data3 .. ":" .. data4 .. "|h[" .. text .. "]|h"
@@ -1893,7 +1914,7 @@ function BMU.clickOnTeleportToPTFHouseButton(textureControl, button, message)
 			message.displayName = string.sub(message.displayName, position)
 		end
 		
-		if button == MOUSE_BUTTON_INDEX_RIGHT and IsPlayerInGroup(GetDisplayName()) then
+		if button == MOUSE_BUTTON_INDEX_RIGHT and IsPlayerInGroup(myDisplayName) then
 			-- create and share link to the group channel
 			local linkType = "book"
 			local data1 = 190 -- bookId
@@ -1916,7 +1937,7 @@ function BMU.clickOnTeleportToPTFHouseButton(textureControl, button, message)
 		
 		-- port to house anyway
 		CancelCast()
-		if message.displayName == GetDisplayName() or message.displayName == nil or zo_strtrim(message.displayName) == "" then
+		if message.displayName == myDisplayName or message.displayName == nil or zo_strtrim(message.displayName) == "" then
 			-- own house
 			BMU_printToChat(GetString(SI_PROMPT_TITLE_FAST_TRAVEL_CONFIRM) .. ": " .. BMU_formatName(GetZoneNameById(message.zoneId), false), BMU.MSG_FT)
 			RequestJumpToHouse(message.houseId)
@@ -2004,18 +2025,18 @@ function BMU.refreshListAuto(mapChanged)
 	end
 
 	local inputString = ""
-	if BMU.state == BMU.indexListSearchPlayer then
+	if BMU.state == BMU_indexListSearchPlayer then
 		-- catch input string (player)
 		inputString = BMU.win.Searcher_Player:GetText()
-	elseif BMU.state == BMU.indexListSearchZone then
+	elseif BMU.state == BMU_indexListSearchZone then
 		-- catch input string (zone)
 		inputString = BMU.win.Searcher_Zone:GetText()
 	end
 	
-	if BMU.state == BMU.indexListOwnHouses or BMU.state == BMU.indexListGuilds or BMU.state == BMU.indexListDungeons or (BMU.state == BMU.indexListQuests and mapChanged) then
+	if BMU.state == BMU_indexListOwnHouses or BMU.state == BMU_indexListGuilds or BMU.state == BMU_indexListDungeons or (BMU.state == BMU_indexListQuests and mapChanged) then
 		-- if list of own houses or guilds or Dungeon Finder or (related quests and trigger from map change) dont auto refresh
 		return
-	elseif BMU.state == BMU.indexListPTFHouses then
+	elseif BMU.state == BMU_indexListPTFHouses then
 		BMU_createTablePTF()
 	else
 		BMU_createTable({index=BMU.state, inputString=inputString, fZoneId=BMU.stateZoneId, filterSourceIndex=BMU.stateSourceIndex, dontResetSlider=true})
@@ -2280,7 +2301,7 @@ function BMU.clickOnZoneName(button, record)
 			AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_RENAME_HOUSE_NICKNAME), function() ZO_CollectionsBook.ShowRenameDialog(record.collectibleId) end)
 
 			-- 5. paste link to chat
-			AddCustomScrollableMenuEntry(GetString(SI_HOUSING_LINK_IN_CHAT), function() ZO_HousingBook_LinkHouseInChat(record.houseId, GetDisplayName()) end)
+			AddCustomScrollableMenuEntry(GetString(SI_HOUSING_LINK_IN_CHAT), function() ZO_HousingBook_LinkHouseInChat(record.houseId, myDisplayName) end)
 		end
 		
 		-------Quest contextMenu-------
@@ -2481,7 +2502,7 @@ function BMU.clickOnPlayerName(button, record)
 		-- GetGuildMemberInfo(number guildId, number memberIndex) Returns: string name, string note, number rankIndex, number PlayerStatus playerStatus, number secsSinceLogoff
 		-- DoesGuildRankHavePermission(number guildId, number rankIndex, number GuildPermission permission) Returns: boolean hasPermission
 		-- GuildInvite(number guildId, string displayName)
-	
+
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		ClearCustomScrollableMenu()
 
@@ -2519,8 +2540,8 @@ function BMU.clickOnPlayerName(button, record)
 		AddCustomScrollableSubMenuEntry(GetString(SI_COLLECTIBLE_ACTION_ADD_FAVORITE), entries_favorites)
 
 
-		local isAccountInGroup = IsPlayerInGroup(GetDisplayName())
-		
+		local isAccountInGroup = IsPlayerInGroup(myDisplayName)
+
 		local unitTag = nil
 		local entries_group = {}
 		local entries_misc = {}
@@ -2538,35 +2559,63 @@ function BMU.clickOnPlayerName(button, record)
 		end
 
 		-- generate submenu entries for group
+		---Group
 		local isPlayerInGroup = IsUnitGrouped(playerTag)												--CHG251229 Baertram
-		local isGroupPlayerInGroup = IsPlayerInGroup(record.displayName)							--CHG251229 Baertram
+		local isGroupPlayerInGroup = IsPlayerInGroup(record.displayName)								--CHG251229 Baertram
 		local isPlayerGroupLeader = IsUnitGroupLeader(playerTag)										--CHG251229 Baertram
+		local groupSize = GetGroupSize()
+		local groupMembersOnline = 0
+		if isAccountInGroup then
+			for j = 1, groupSize do
+				local groupUnitTag = GetGroupUnitTagByIndex(j)
+				if groupUnitTag ~= nil and GetUnitZoneIndex(groupUnitTag) ~= nil and IsUnitOnline(groupUnitTag) then
+					groupMembersOnline = groupMembersOnline + 1
+				end
+			end
+		end
+		---Friends
+		local numFriends = GetNumFriends()
+		local numFriendsOnline = 0
+		for j = 1, numFriends do
+			local _, _, friendStatus = GetFriendInfo(j)
+			if friendStatus ~= PLAYER_STATUS_OFFLINE then
+				numFriendsOnline = numFriendsOnline + 1
+			end
+		end
+		---Houses
+		local numOwnHouses = NonContiguousCount(COLLECTIONS_BOOK_SINGLETON:GetOwnedHouses()) or 0
 
+		--Group contextMenu entries
+		entries_group[pos] = {
+			label = tos(record.displayName), 		--Other pLayer's displayname
+			entryType = LSM_ENTRY_TYPE_HEADER,
+		}
+		pos = pos + 1
 		if not isGroupPlayerInGroup and IsUnitSoloOrGroupLeader(playerTag) then
 			entries_group[pos] = {
-				label = GetString(SI_CHAT_PLAYER_CONTEXT_ADD_GROUP),
+				label = GetString(SI_CHAT_PLAYER_CONTEXT_ADD_GROUP), 		--Add to group
 				callback = function() GroupInviteByName(record.characterName) end,
 				icon = function() return BMU_checkIfContextMenuIconShouldShow("add") end
 			}
 			pos = pos + 1
 		end
-		
+
 		if isGroupPlayerInGroup and isPlayerGroupLeader then
 			entries_group[pos] = {
-				label = GetString(SI_GROUP_LIST_MENU_PROMOTE_TO_LEADER),
+				label = GetString(SI_GROUP_LIST_MENU_PROMOTE_TO_LEADER),	--Promote to groupleader
 				callback = function() GroupPromote(unitTag) end,
 				icon = function() return BMU_checkIfContextMenuIconShouldShow("groupLeaderBtn") end
 			}
 			pos = pos + 1
-			
+
 			entries_group[pos] = {
-				label = GetString(SI_GROUP_LIST_MENU_KICK_FROM_GROUP),
+				label = GetString(SI_GROUP_LIST_MENU_KICK_FROM_GROUP),		--Kick from group
 				callback = function() GroupKick(unitTag) end,
 				icon = function() return BMU_checkIfContextMenuIconShouldShow("remove") end
 			}
 			pos = pos + 1
 		end
-		
+
 		if isPlayerInGroup and not isPlayerGroupLeader and isGroupPlayerInGroup and not IsUnitGroupLeader(unitTag) then
 			entries_group[pos] = {
 				label = BMU_SI_Get(SI_TELE_UI_VOTE_TO_LEADER),
@@ -2575,15 +2624,8 @@ function BMU.clickOnPlayerName(button, record)
 			}
 			pos = pos + 1
 		end
-		
+
 		if isPlayerInGroup then
-			entries_group[pos] = {
-				label = GetString(SI_GROUP_LIST_MENU_LEAVE_GROUP),
-				callback = function() GroupLeave() end,
-				icon = function() return BMU_checkIfContextMenuIconShouldShow("cancel") end
-			}
-			pos = pos + 1
-			
 			if DoesGroupModificationRequireVote() then
 				entries_group[pos] = {
 					label = GetString(SI_GROUP_LIST_MENU_VOTE_KICK_FROM_GROUP),
@@ -2592,21 +2634,31 @@ function BMU.clickOnPlayerName(button, record)
 				}
 				pos = pos + 1
 			end
+			entries_group[pos] = {
+				entryType = LSM_ENTRY_TYPE_DIVIDER,
+			}
+			pos = pos + 1
+			entries_group[pos] = {
+				label = GetString(SI_GROUP_LIST_MENU_LEAVE_GROUP),
+				callback = function() GroupLeave() end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("cancel") end
+			}
+			pos = pos + 1
 		end
-		
-		
+
+
 		-- generate submenu entries for misc
 		pos = 1
-		
+
 		-- whisper
 		entries_misc[pos] = {
 			label = GetString(SI_SOCIAL_LIST_PANEL_WHISPER),
 			callback = function() StartChatInput("", CHAT_CHANNEL_WHISPER, record.displayName) end,
---			tooltip = "Tooltip Test: Whisper",
+			--			tooltip = "Tooltip Test: Whisper",
 			icon = function() return BMU_checkIfContextMenuIconShouldShow("whisper") end
 		}
 		pos = pos + 1
-		
+
 		-- Jump to House
 		entries_misc[pos] = {
 			label = GetString(SI_SOCIAL_MENU_VISIT_HOUSE),
@@ -2614,14 +2666,14 @@ function BMU.clickOnPlayerName(button, record)
 			icon = function() return BMU_checkIfContextMenuIconShouldShow("visitPrimary") end
 		}
 		pos = pos + 1
-		
+
 		-- Send Mail
 		entries_misc[pos] = {
 			label = GetString(SI_SOCIAL_MENU_SEND_MAIL),
 			callback = function() BMU_createMail(record.displayName, "", "") end,
 			icon = function() return BMU_checkIfContextMenuIconShouldShow("mail") end
 		}
-		pos = pos + 1	
+		pos = pos + 1
 
 		-- Add / Remove Friend
 		if IsFriend(record.displayName) then
@@ -2639,7 +2691,7 @@ function BMU.clickOnPlayerName(button, record)
 			}
 			pos = pos + 1
 		end
-		
+
 		-- Invite to Tribute Card Game
 		entries_misc[pos] = {
 			label = GetString(SI_NOTIFICATIONTYPE30),
@@ -2647,7 +2699,7 @@ function BMU.clickOnPlayerName(button, record)
 			icon = function() return BMU_checkIfContextMenuIconShouldShow("tribute") end
 		}
 		pos = pos + 1
-		
+
 		-- Invite to primary BeamMeUp guild
 		if BMUGuildsAtServer ~= nil then
 			local primaryBMUGuild = BMUGuildsAtServer[1]
@@ -2658,7 +2710,7 @@ function BMU.clickOnPlayerName(button, record)
 				}
 				pos = pos + 1
 			end
-		
+
 			-- Invite to secondary BeamMeUp guild
 			local secondaryBMUGuild = BMUGuildsAtServer[2]
 			if IsPlayerInGuild(secondaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(secondaryBMUGuild, record.displayName) then
@@ -2678,7 +2730,7 @@ function BMU.clickOnPlayerName(button, record)
 				}
 				pos = pos + 1
 			end
-			
+
 			-- Invite to quaternary BeamMeUp guild
 			local quaternaryBMUGuild = BMUGuildsAtServer[4]
 			if IsPlayerInGuild(quaternaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(quaternaryBMUGuild, record.displayName) then
@@ -2690,7 +2742,7 @@ function BMU.clickOnPlayerName(button, record)
 			end
 		end
 		-- add submenu misc
-	    AddCustomScrollableSubMenuEntry(GetString(SI_PLAYER_MENU_MISC), entries_misc)
+		AddCustomScrollableSubMenuEntry(GetString(SI_PLAYER_MENU_MISC), entries_misc)
 
 
 		-- add submenu group
@@ -2703,7 +2755,7 @@ function BMU.clickOnPlayerName(button, record)
 		local entries_filter = {
 			{
 				label = BMU_colorizeText(GetString(SI_TRADING_HOUSE_BROWSE_ITEM_TYPE_ALL), "lgray"), --All
-				callback = function() BMU_createTable({index=BMU.indexListMain}) BMU.var.choosenListPlayerFilter = 0 end,
+				callback = function() BMU_createTable({index=BMU_indexListMain}) BMU.var.choosenListPlayerFilter = 0 end,
 				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
 				buttonGroup = 7,
 				checked = function() return BMU.var.choosenListPlayerFilter == 0 end,
@@ -2711,32 +2763,40 @@ function BMU.clickOnPlayerName(button, record)
 			},
 			{ entryType = LSM_ENTRY_TYPE_DIVIDER },
 			{
-				label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_GROUP_MEMBERS), "orange"), -- Group
-				callback = function() BMU_createTable({index=BMU.indexListSource, filterSourceIndex=BMU.SOURCE_INDEX_GROUP}) BMU.var.choosenListPlayerFilter = BMU.SOURCE_INDEX_GROUP end,
+				label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_GROUP_MEMBERS), "orange") .. (groupSize > 0 and BMU_colorizeText(" (" .. tos(groupMembersOnline) .. "/" .. groupSize .. ")", "gray")) or "", -- Group
+				callback = function() BMU_createTable({index=BMU_indexListSource, filterSourceIndex=BMU_SOURCE_INDEX_GROUP}) BMU.var.choosenListPlayerFilter = BMU_SOURCE_INDEX_GROUP end,
 				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
 				buttonGroup = 7,
-				checked = function() return BMU.var.choosenListPlayerFilter == BMU.SOURCE_INDEX_GROUP end,
+				checked = function() return BMU.var.choosenListPlayerFilter == BMU_SOURCE_INDEX_GROUP end,
 				icon = function() return BMU_checkIfContextMenuIconShouldShow("group") end,
 			},
 			{
-				label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_FRIENDS), "green"), --Friends
-				callback = function() BMU_createTable({index=BMU.indexListSource, filterSourceIndex=BMU.SOURCE_INDEX_FRIEND}) BMU.var.choosenListPlayerFilter = BMU.SOURCE_INDEX_FRIEND end,
+				label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_FRIENDS), "green") .. (numFriends > 0 and BMU_colorizeText(" (" .. tos(numFriendsOnline) .. "/" .. numFriends .. ")", "gray")) or "", --Friends
+				callback = function() BMU_createTable({index=BMU_indexListSource, filterSourceIndex=BMU_SOURCE_INDEX_FRIEND}) BMU.var.choosenListPlayerFilter = BMU_SOURCE_INDEX_FRIEND end,
 				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
 				buttonGroup = 7,
-				checked = function() return BMU.var.choosenListPlayerFilter == BMU.SOURCE_INDEX_FRIEND end,
+				checked = function() return BMU.var.choosenListPlayerFilter == BMU_SOURCE_INDEX_FRIEND end,
 				icon = function() return BMU_checkIfContextMenuIconShouldShow("friends") end,
 			},
 			{
-				label = GetString(SI_MAPFILTER18), --"Houses",
+				label = GetString(SI_MAPFILTER18) .. (numOwnHouses > 0 and " (#" .. tos(numOwnHouses) .. ")") or "", --"Houses",
 				entryType = LSM_ENTRY_TYPE_HEADER,
 			},
 			{
 				label = BMU_colorizeText(BMU_SI_Get(SI_TELE_UI_BTN_PORT_TO_OWN_HOUSE), "teal"), --Own houses
-				callback = function() BMU_createTableHouses() BMU.var.choosenListPlayerFilter = -1 end,
+				callback = function()
+					BMU_createTable({index=BMU_indexListSource, filterSourceIndex=BMU_SOURCE_INDEX_OWNHOUSES}) --INS Baertram 260206
+					BMU.var.choosenListPlayerFilter = BMU_SOURCE_INDEX_OWNHOUSES
+					--BMU_createTableHouses() BMU.var.choosenListPlayerFilter = -1
+				end,
 				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
 				buttonGroup = 7,
-				checked = function() return BMU.var.choosenListPlayerFilter == -1 end,
+				checked = function() return BMU.var.choosenListPlayerFilter == BMU_SOURCE_INDEX_OWNHOUSES end,
 				icon = function() return BMU_checkIfContextMenuIconShouldShow("houseBtn") end,
+				enabled = function()
+					if BMU.savedVarsAcc.hideOwnHouses then return false end
+					return numOwnHouses > 0
+				end,
 			},
 			--[[ Currently not supported as there is no "all houses" list, maybe relevant for house tours in the future
 			{
@@ -2749,7 +2809,7 @@ function BMU.clickOnPlayerName(button, record)
 			},
 			]]
 		}
-			
+
 		-- add all guilds
 		table_insert(entries_filter, {
 			label = GetString(SI_MAIN_MENU_GUILDS), --"Guilds",
@@ -2758,21 +2818,21 @@ function BMU.clickOnPlayerName(button, record)
 		for guildIndex = 1, GetNumGuilds() do
 			local guildId = GetGuildId(guildIndex)
 			local entry = {
-					label = BMU_colorizeText(GetGuildName(guildId), "white"),
-					callback = function() BMU_createTable({index=BMU.indexListSource, filterSourceIndex=2+guildIndex}) BMU.var.choosenListPlayerFilter = 2+guildIndex end,
-					entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
-					buttonGroup = 7,
-					checked = function() return BMU.var.choosenListPlayerFilter == 2+guildIndex  end
-				}
-				table_insert(entries_filter, entry)
-		end		
-		
+				label = BMU_colorizeText(GetGuildName(guildId), "white"),
+				callback = function() BMU_createTable({index=BMU_indexListSource, filterSourceIndex=2+guildIndex}) BMU.var.choosenListPlayerFilter = 2+guildIndex end,
+				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
+				buttonGroup = 7,
+				checked = function() return BMU.var.choosenListPlayerFilter == 2+guildIndex  end
+			}
+			table_insert(entries_filter, entry)
+		end
+
 		AddCustomScrollableSubMenuEntry(GetString(SI_GAMEPAD_BANK_FILTER_HEADER), entries_filter, nil, { icon = function() return BMU_checkIfContextMenuIconShouldShow("filter") end })
-		
+
 		ShowCustomScrollableMenu(nil, { visibleRowsDropdown = 20, visibleRowsSubmenu = 20 })
-		
+
 	else -- left mouse click
-		if record.groupUnitTag then		
+		if record.groupUnitTag then
 			worldMapManager:SetMapByIndex(1)
 			worldMapManager:SetMapByIndex(record.mapIndex)
 			CM:FireCallbacks("OnWorldMapChanged")
@@ -3115,7 +3175,7 @@ function BMU.portToAnyZone()
 	BMU_createTable = BMU_createTable or BMU.createTable
 	BMU_PortalToPlayer = BMU_PortalToPlayer or BMU.PortalToPlayer
 
-	local resultTable = BMU_createTable({index=BMU.indexListMain, noOwnHouses=true, dontDisplay=true})
+	local resultTable = BMU_createTable({index=BMU_indexListMain, noOwnHouses=true, dontDisplay=true})
 	
 	for _, entry in pairs(resultTable) do
 		local entryDisplayName = entry.displayName
@@ -3144,11 +3204,11 @@ function BMU.decideTryAgainPorting(errorCode, zoneId, displayName, sourceIndex, 
 	BMU_portToOwnHouse = BMU_portToOwnHouse or BMU.portToOwnHouse
 
 	-- don't try to port again when: other errors (e.g. solo zone); player is group member; player is favorite; search by player name
-	if (errorCode ~= SOCIAL_RESULT_NO_LOCATION and errorCode ~= SOCIAL_RESULT_CHARACTER_NOT_FOUND) or sourceIndex == BMU.SOURCE_INDEX_GROUP or BMU.isFavoritePlayer(displayName) or BMU.state == BMU.indexListSearchPlayer then
+	if (errorCode ~= SOCIAL_RESULT_NO_LOCATION and errorCode ~= SOCIAL_RESULT_CHARACTER_NOT_FOUND) or sourceIndex == BMU_SOURCE_INDEX_GROUP or BMU.isFavoritePlayer(displayName) or BMU.state == BMU_indexListSearchPlayer then
 		return -- do nothing
 	else
 		-- try to find another player in the zone
-		local result = BMU_createTable({index=BMU.indexListZoneHidden, fZoneId=zoneId, dontDisplay=true})
+		local result = BMU_createTable({index=BMU_indexListZoneHidden, fZoneId=zoneId, dontDisplay=true})
 		for index, record in pairs(result) do
 			if record ~= nil then
 				local recordDisplayName = record.displayName

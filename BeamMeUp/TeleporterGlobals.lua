@@ -386,6 +386,7 @@ BMU.SOURCE_INDEX_GUILD = {
 	[4] = 6,
 	[5] = 7,
 }
+BMU.SOURCE_INDEX_OWNHOUSES = 8 --INS Baertram 260206
 
 -- constant values for zone categorization
 BMU.ZONE_CATEGORY_UNKNOWN = 0

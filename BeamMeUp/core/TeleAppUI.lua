@@ -84,7 +84,13 @@ local textPattern 							= "%s: %d   %s: %d   %s: %d   %s: %d   %s: %d   %s: %d 
 local appendixCurrentOfMaxStrPattern 		= " (%d/%d)"
 --Subtypes
 local subType_Clue 							= "clue"
+--Treasure
 local subType_Treasure 						= "treasure"
+local treasureData = teleporterVars.treasureData
+local treasureTypes = treasureData.treasureTypes
+local treasureTypeTextures = treasureData.treasureTypeTextures
+local treaureType_Treasure = treasureTypes[1]
+
 --Survey type
 local surveyData = teleporterVars.surveyData
 local surveyTypes = surveyData.surveyTypes
@@ -1274,7 +1280,7 @@ local function SetupUI()
 
 		  -- Treasure Maps
 		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_SPECIALIZEDITEMTYPE100), BMU.savedVarsChar[surveySVTab], subType_Treasure, 	function() BMU_CreateTable_IndexListItems() end, nil, {
-				icon = function() return BMU_checkIfContextMenuIconShouldShow("treasureMap") end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow(treasureTypeTextures[treaureType_Treasure]) end,
 		  })
 
 		  -- All Survey Maps

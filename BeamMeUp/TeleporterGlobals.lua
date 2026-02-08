@@ -95,7 +95,7 @@ teleporterVars.surveyData = {
 		subType_Jewelry,
 		subType_Woodworker,
 	},
-	surveyContainers = {
+	surveyTypeContainers = {
 		--ItemIds of survey containers
 		[subType_Alchemist] = 	{ [219853] = true, },
 		[subType_Blacksmith] = 	{ [219849] = true, },
@@ -138,6 +138,17 @@ teleporterVars.dungeonsData = {
 	},
 	dungeonTypeNames = { BMU_SI_Get(SI_TELE_UI_TOGGLE_ENDLESS_DUNGEONS), BMU_SI_Get(SI_TELE_UI_TOGGLE_ARENAS), BMU_SI_Get(SI_TELE_UI_TOGGLE_GROUP_ARENAS), BMU_SI_Get(SI_TELE_UI_TOGGLE_TRIALS), BMU_SI_Get(SI_TELE_UI_TOGGLE_GROUP_DUNGEONS)},
 	dungeonTypeTextures	= { "endlessDungeon" ,"arena", "groupArena", "trial", "groupDungeon" },
+}
+--Treasure maps
+local treaureType_Treasure = "treasure"
+teleporterVars.treasureData = {
+	treasureTypes = {
+		treaureType_Treasure,
+	},
+	treasureTypeContainers = {
+		[treaureType_Treasure] = { [224681] = true}
+	},
+	treasureTypeTextures = { "treasureMap" }
 }
 
 
@@ -601,7 +612,7 @@ BMU.blacklistEndlessDungeons = {1436}
 --------
 
 -- Houses
-BMU.blacklistHouses = {940, 942, 941, 939, 938, 937, 859, 858, 878, 868, 869, 873, 860, 861, 877, 852, 853, 881, 867, 866, 874, 863, 862, 876, 871, 870, 872, 864, 865, 875, 855, 854, 880, 856, 857, 879, 944, 943, 945, 882, 883, 994, 995, 997, 996, 1005, 1008, 1007, 1006, 1042, 1043, 1044, 1045, 1059, 1060, 1061, 1063, 1108, 1109, 1064, 1125, 1126, 1128, 1129, 1130, 1154, 1155, 1192, 1193, 1199, 1200, 1218, 1219, 1220, 1233, 1234, 1264, 1265, 1270, 1271, 1275, 1276, 1277, 1307, 1342, 1343, 1306, 1345, 1363, 1364, 1432, 1433, 1434, 1435, 1437, 1468, 1472, 1473, 1438, 1479, 1487, 1491, 1492, 1494, 1495, 1500, 1501, 1546, 1547, 1554, 1555, 1556, 1560, 1561, 1566, 1567}
+BMU.blacklistHouses = {940, 942, 941, 939, 938, 937, 859, 858, 878, 868, 869, 873, 860, 861, 877, 852, 853, 881, 867, 866, 874, 863, 862, 876, 871, 870, 872, 864, 865, 875, 855, 854, 880, 856, 857, 879, 944, 943, 945, 882, 883, 994, 995, 997, 996, 1005, 1008, 1007, 1006, 1042, 1043, 1044, 1045, 1059, 1060, 1061, 1063, 1108, 1109, 1064, 1125, 1126, 1128, 1129, 1130, 1154, 1155, 1192, 1193, 1199, 1200, 1218, 1219, 1220, 1233, 1234, 1264, 1265, 1270, 1271, 1275, 1276, 1277, 1307, 1342, 1343, 1306, 1345, 1363, 1364, 1432, 1433, 1434, 1435, 1437, 1468, 1472, 1473, 1438, 1479, 1487, 1491, 1492, 1494, 1495, 1500, 1501, 1546, 1547, 1554, 1555, 1556, 1560, 1561, 1566, 1567, 1569} --INS Baertram 260208 1569 Buccaneer Bay
 
 -----------------------------------------
 

@@ -74,13 +74,74 @@ BMU.var = {
 		[string_lower("Graumoorkaverne")] = "",	--leave "" if key = value
 		[string_lower("Griselande")] = "",		--leave "" if key = value
 	},
-
   	choosenListPlayerFilter = 0, --current list player filter, 0 = Show all
 }
-
 -- -v- INS251229 Baertram BEGIN 1
---Local reference variables of BMU - Performance improvement
 local teleporterVars = BMU.var
+--Survey data
+---Do not change the local strings: These are the relevant SavedVariable entry names!
+local subType_Alchemist 					= "alchemist"
+local subType_Blacksmith 					= "blacksmith"
+local subType_Clothier 						= "clothier"
+local subType_Enchanter 					= "enchanter"
+local subType_Jewelry 						= "jewelry"
+local subType_Woodworker 					= "woodworker"
+teleporterVars.surveyData = {
+    surveyTypes = {
+		subType_Alchemist,
+		subType_Blacksmith,
+		subType_Clothier,
+		subType_Enchanter,
+		subType_Jewelry,
+		subType_Woodworker,
+	},
+	surveyContainers = {
+		--ItemIds of survey containers
+		[subType_Alchemist] = 	{ [219853] = true, },
+		[subType_Blacksmith] = 	{ [219849] = true, },
+		[subType_Clothier] = 	{ [219850] = true, },
+		[subType_Enchanter] = 	{ [219851] = true, },
+		[subType_Jewelry] = 	{ [219854] = true, },
+		[subType_Woodworker] = 	{ [219851] = true, },
+	},
+	surveyTypeNames = {GetString(SI_ITEMTYPEDISPLAYCATEGORY14), GetString(SI_ITEMTYPEDISPLAYCATEGORY10), GetString(SI_ITEMTYPEDISPLAYCATEGORY11), GetString(SI_ITEMTYPEDISPLAYCATEGORY15), GetString(SI_ITEMTYPEDISPLAYCATEGORY13), GetString(SI_ITEMTYPEDISPLAYCATEGORY12)},
+	surveyTypeTextures = { "surveyTypeAlchemy", "surveyTypeBlacksmith", "surveyTypeClothier", "surveyTypeEnchanting", "surveyTypeJewelry", "surveyTypeWoodworker" },
+}
+--Leads
+---Do not change the local strings: These are the relevant SavedVariable entry names!
+local leadType_scryable 					= "srcyable"
+local leadType_scried 						= "scried"
+local leadType_completed 					= "completed"
+teleporterVars.leadsData = {
+	leadTypes = {
+		leadType_scryable,
+		leadType_scried,
+		leadType_completed,
+	},
+	leadTypeNames = {GetString(SI_ANTIQUITY_SCRYABLE), GetString(SI_ANTIQUITY_SUBHEADING_IN_PROGRESS), GetString(SI_SCREEN_NARRATION_ACHIEVEMENT_EARNED_ICON_NARRATION) .. " (" .. GetString(SI_ANTIQUITY_LOG_BOOK) .. ")"},
+	leadTypeTextures = { "leadTypeScryable", "leadTypeScried", "leadTypeCompleted" },
+}
+--Dungeons
+---Do not change the local strings: These are the relevant SavedVariable entry names!
+local dungeonType_endlessDungeon			= "showEndlessDungeons"
+local dungeonType_soloArena					= "showArenas"
+local dungeonType_groupArena				= "showGroupArenas"
+local dungeonType_trial						= "showTrials"
+local dungeonType_groupDungeon				= "showDungeons"
+teleporterVars.dungeonsData = {
+	dungeonTypes = {
+		dungeonType_endlessDungeon,
+		dungeonType_soloArena,
+		dungeonType_groupArena,
+		dungeonType_trial,
+		dungeonType_groupDungeon,
+	},
+	dungeonTypeNames = { BMU_SI_Get(SI_TELE_UI_TOGGLE_ENDLESS_DUNGEONS), BMU_SI_Get(SI_TELE_UI_TOGGLE_ARENAS), BMU_SI_Get(SI_TELE_UI_TOGGLE_GROUP_ARENAS), BMU_SI_Get(SI_TELE_UI_TOGGLE_TRIALS), BMU_SI_Get(SI_TELE_UI_TOGGLE_GROUP_DUNGEONS)},
+	dungeonTypeTextures	= { "endlessDungeon" ,"arena", "groupArena", "trial", "groupDungeon" },
+}
+
+
+--Local reference variables of BMU - Performance improvement
 local appNameAbbr = teleporterVars.appNameAbbr
 local BMU_colors = teleporterVars.color
 local colorStrToColorCodes = {

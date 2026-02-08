@@ -2779,7 +2779,7 @@ function BMU.clickOnPlayerName(button, record)
 				icon = function() return BMU_checkIfContextMenuIconShouldShow("friends") end,
 			},
 			{
-				label = GetString(SI_MAPFILTER18) .. (numOwnHouses > 0 and " (#" .. tos(numOwnHouses) .. ")") or "", --"Houses",
+				label = GetString(SI_MAPFILTER18) .. ((numOwnHouses > 0 and " (#" .. tos(numOwnHouses) .. ")") or ""), --"Houses",
 				entryType = LSM_ENTRY_TYPE_HEADER,
 			},
 			{

@@ -90,7 +90,6 @@ local treasureData = teleporterVars.treasureData
 local treasureTypes = treasureData.treasureTypes
 local treasureTypeTextures = treasureData.treasureTypeTextures
 local treaureType_Treasure = treasureTypes[1]
-
 --Survey type
 local surveyData = teleporterVars.surveyData
 local surveyTypes = surveyData.surveyTypes
@@ -1280,7 +1279,7 @@ local function SetupUI()
 
 		  -- Treasure Maps
 		  addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, GetString(SI_SPECIALIZEDITEMTYPE100), BMU.savedVarsChar[surveySVTab], subType_Treasure, 	function() BMU_CreateTable_IndexListItems() end, nil, {
-				icon = function() return BMU_checkIfContextMenuIconShouldShow(treasureTypeTextures[treaureType_Treasure]) end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow(treasureTypeTextures[1]) end,
 		  })
 
 		  -- All Survey Maps

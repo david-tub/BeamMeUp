@@ -408,9 +408,7 @@ function BMU.createTable(args)
 			e.houseTooltip = {e.houseNameFormatted, "\"" .. e.nickName .. "\""}
 
 			e = BMU_addInfo_1(e, currentZoneId, playersZoneId, "")
-d("[BMU]House: " .. tos(e.nickName))
 			if BMU_filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filterSourceIndex) then
-d(">filterAndDecide -> ADD")
 				e = BMU_addInfo_2(e)
 				-- overwrite
 				e.mapIndex = BMU_getMapIndex(houseZoneId)

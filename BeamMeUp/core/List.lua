@@ -2763,7 +2763,7 @@ function BMU.clickOnPlayerName(button, record)
 			},
 			{ entryType = LSM_ENTRY_TYPE_DIVIDER },
 			{
-				label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_GROUP_MEMBERS), "orange") .. (groupSize > 0 and BMU_colorizeText(" (" .. tos(groupMembersOnline) .. "/" .. groupSize .. ")", "gray")) or "", -- Group
+				label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_GROUP_MEMBERS), "orange") .. (groupSize > 0 and BMU_colorizeText(" (" .. tos(groupMembersOnline) .. "/" .. groupSize .. ")", "gray") or ""), -- Group
 				callback = function() BMU_createTable({index=BMU_indexListSource, filterSourceIndex=BMU_SOURCE_INDEX_GROUP}) BMU.var.choosenListPlayerFilter = BMU_SOURCE_INDEX_GROUP end,
 				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
 				buttonGroup = 7,
@@ -2771,7 +2771,7 @@ function BMU.clickOnPlayerName(button, record)
 				icon = function() return BMU_checkIfContextMenuIconShouldShow("group") end,
 			},
 			{
-				label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_FRIENDS), "green") .. (numFriends > 0 and BMU_colorizeText(" (" .. tos(numFriendsOnline) .. "/" .. numFriends .. ")", "gray")) or "", --Friends
+				label = BMU_colorizeText(GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_FRIENDS), "green") .. (numFriends > 0 and BMU_colorizeText(" (" .. tos(numFriendsOnline) .. "/" .. numFriends .. ")", "gray") or ""), --Friends
 				callback = function() BMU_createTable({index=BMU_indexListSource, filterSourceIndex=BMU_SOURCE_INDEX_FRIEND}) BMU.var.choosenListPlayerFilter = BMU_SOURCE_INDEX_FRIEND end,
 				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
 				buttonGroup = 7,

@@ -31,6 +31,52 @@ local BMU_ZONE_CATEGORY_GRPARENA = BMU.ZONE_CATEGORY_GRPARENA
 local BMU_ZONE_CATEGORY_SOLOARENA = BMU.ZONE_CATEGORY_SOLOARENA
 local BMU_ZONE_CATEGORY_OVERLAND = BMU.ZONE_CATEGORY_OVERLAND
 
+--Subtypes
+local clueData = teleporterVars.clueData
+local subTypeClue                 = clueData.clueTypes[1] --"clue"
+--Treasure
+local treasureData = teleporterVars.treasureData
+local treasureTypes = treasureData.treasureTypes
+local treaureType_Treasure = treasureTypes[1]
+local subType_Treasure 						= treaureType_Treasure
+--Survey type
+local surveyData = teleporterVars.surveyData
+local surveyTypes = surveyData.surveyTypes
+local surveyTypeNames = surveyData.surveyTypeNames
+local surveyTypeTextures = surveyData.surveyTypeTextures
+local surveyTypesHeader = surveyData.surveyTypesHeader
+local subType_Surveys						= surveyTypesHeader
+local subType_Alchemist 					= surveyTypes[1]
+local subType_Blacksmith 					= surveyTypes[2]
+local subType_Clothier 						= surveyTypes[3]
+local subType_Enchanter 					= surveyTypes[4]
+local subType_Jewelry 						= surveyTypes[5]
+local subType_Woodworker 					= surveyTypes[6]
+local maxSurveyTypes                 		= #surveyTypes --Currently 6: Alchemist, Enchanter, Woodworker, Blacksmith, Clothier, Jewelry. Add the new entries to table surveyTypes to increase this if new survey types get added (new crafting profession types that got surveys)
+--Lead types
+local leadsData = teleporterVars.leadsData
+local leadTypes = leadsData.leadTypes
+local leadTypeNames = leadsData.leadTypeNames
+local leadTypeTextures = leadsData.leadTypeTextures
+local leadTypesHeader = leadsData.leadTypesHeader
+local subType_Leads 						= leadTypesHeader
+local leadType_scryable 					= leadTypes[1]
+local leadType_scried 						= leadTypes[2]
+local leadType_completed 					= leadTypes[3]
+local maxAntiquityTypes						= #leadTypes --Currently 3: Scryable, In progress, Completed (Codex)
+--Dungeon types
+local dungeonsData = teleporterVars.dungeonsData
+local dungeonTypes = dungeonsData.dungeonTypes
+local dungeonTypeNames = dungeonsData.dungeonTypeNames
+local dungeonTypeTextures = dungeonsData.dungeonTypeTextures
+local dungeonTypesHeader = dungeonsData.dungeonTypesHeader
+local subType_Dungeons						= dungeonTypesHeader
+local dungeonType_endlessDungeon			= dungeonTypes[1]
+local dungeonType_soloArena					= dungeonTypes[2]
+local dungeonType_groupArena				= dungeonTypes[3]
+local dungeonType_trial						= dungeonTypes[4]
+local dungeonType_groupDungeon				= dungeonTypes[5]
+
 ----functions
 --ZOs functions
 local GetZoneNameById = GetZoneNameById
@@ -823,19 +869,19 @@ local function OnAddOnLoaded(eventCode, addOnName)
 			["toggleShowZoneNameDungeonName"] = false,
 		},
 		["displayAntiquityLeads"] = { -- "displayLeads" was already used in the past (boolean)
-			["srcyable"] = true,
-			["scried"] = true,
-			["completed"] = true,
+			[leadType_scryable] = true,
+			[leadType_scried] = true,
+			[leadType_completed] = true,
 		},
 		["displayMaps"] = {
-			["treasure"] = true,
-			["alchemist"] = true,
-			["enchanter"] = true,
-			["woodworker"] = true,
-			["blacksmith"] = true,
-			["clothier"] = true,
-			["jewelry"] = true,
-			["clue"] = true,
+			[subTypeClue] = true,
+			[treaureType_Treasure] = true,
+			[subType_Alchemist] = true,
+			[subType_Blacksmith] = true,
+			[subType_Clothier] = true,
+			[subType_Enchanter] = true,
+			[subType_Jewelry] = true,
+			[subType_Woodworker] = true,
 		},
 		["displayCounterPanel"] = true,
 		["houseNickNames"] = false,

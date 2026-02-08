@@ -45,15 +45,18 @@ local textureDeclineRed = BMU_textures.declineRedStr
 local textureTooltipSeparator = BMU_textures.tooltipSeperatorStr
 local leadTypeCompletedTextureStr = BMU_textures.leadTypeCompletedStr20
 local timerTextureStr             = BMU_textures.timerStr20
-local subTypeClue                 = "clue"
-local colorOrange 							= "orange"
-local colorWhite 							= "white"
-local colorTeal 							= "teal"
-local colorGold 							= "gold"
-local colorGreen 							= "green"
-local colorBlue 							= "blue"
-local colorRed 								= "red"
-local colorGray 							= "gray"
+
+local clueData = teleporterVars.clueData
+local subTypeClue                 = clueData.clueTypes[1] --"clue"
+local colorNames = teleporterVars.colorNames
+local colorOrange 							= colorNames[1]
+local colorWhite 							= colorNames[2]
+local colorTeal 							= colorNames[3]
+local colorGold 							= colorNames[4]
+local colorGreen 							= colorNames[5]
+local colorBlue 							= colorNames[6]
+local colorRed 								= colorNames[7]
+local colorGray 							= colorNames[8]
 local formatStringFirstUppercase 			= "<<C:1>>"
 ----functions
 --ZOs functions

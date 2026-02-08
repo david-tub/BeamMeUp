@@ -83,19 +83,21 @@ local fontPattern							= "%s|$(KB_%s)|%s"
 local textPattern 							= "%s: %d   %s: %d   %s: %d   %s: %d   %s: %d   %s: %d   %s: %d   %s: %d"
 local appendixCurrentOfMaxStrPattern 		= " (%d/%d)"
 --Subtypes
-local subType_Clue 							= "clue"
+local clueData = teleporterVars.clueData
+local subTypeClue                 = clueData.clueTypes[1] --"clue"
 --Treasure
-local subType_Treasure 						= "treasure"
 local treasureData = teleporterVars.treasureData
 local treasureTypes = treasureData.treasureTypes
 local treasureTypeTextures = treasureData.treasureTypeTextures
 local treaureType_Treasure = treasureTypes[1]
+local subType_Treasure 						= treaureType_Treasure
 --Survey type
 local surveyData = teleporterVars.surveyData
 local surveyTypes = surveyData.surveyTypes
 local surveyTypeNames = surveyData.surveyTypeNames
 local surveyTypeTextures = surveyData.surveyTypeTextures
-local subType_Surveys						= "Surveys"
+local surveyTypesHeader = surveyData.surveyTypesHeader
+local subType_Surveys						= surveyTypesHeader
 local subType_Alchemist 					= surveyTypes[1]
 local subType_Blacksmith 					= surveyTypes[2]
 local subType_Clothier 						= surveyTypes[3]
@@ -108,17 +110,19 @@ local leadsData = teleporterVars.leadsData
 local leadTypes = leadsData.leadTypes
 local leadTypeNames = leadsData.leadTypeNames
 local leadTypeTextures = leadsData.leadTypeTextures
-local subType_Leads 						= "leads"
+local leadTypesHeader = leadsData.leadTypesHeader
+local subType_Leads 						= leadTypesHeader
 local leadType_scryable 					= leadTypes[1]
 local leadType_scried 						= leadTypes[2]
 local leadType_completed 					= leadTypes[3]
 local maxAntiquityTypes						= #leadTypes --Currently 3: Scryable, In progress, Completed (Codex)
 --Dungeon types
-local subType_Dungeons						= "dungeons"
 local dungeonsData = teleporterVars.dungeonsData
 local dungeonTypes = dungeonsData.dungeonTypes
 local dungeonTypeNames = dungeonsData.dungeonTypeNames
 local dungeonTypeTextures = dungeonsData.dungeonTypeTextures
+local dungeonTypesHeader = dungeonsData.dungeonTypesHeader
+local subType_Dungeons						= dungeonTypesHeader
 local dungeonType_endlessDungeon			= dungeonTypes[1]
 local dungeonType_soloArena					= dungeonTypes[2]
 local dungeonType_groupArena				= dungeonTypes[3]
@@ -160,9 +164,9 @@ local BMU_getItemTypeIcon, BMU_getDataMapInfo, BMU_OpenTeleporter, BMU_updateCon
 
 --BMU functions
 local BMU_RefreshMainMenuPatternStr = "BMU_Refresh%sMainMenu"
-local refreshLeadsMainMenuEventStr = string_format(BMU_RefreshMainMenuPatternStr, "Leads")
-local refreshSurveysMainMenuEventStr = string_format(BMU_RefreshMainMenuPatternStr, "Surveys")
-local refreshDungeonsMainMenuEventStr = string_format(BMU_RefreshMainMenuPatternStr, "Dungeons")
+local refreshLeadsMainMenuEventStr = string_format(BMU_RefreshMainMenuPatternStr, 		leadTypesHeader)
+local refreshSurveysMainMenuEventStr = string_format(BMU_RefreshMainMenuPatternStr, 	surveyTypesHeader)
+local refreshDungeonsMainMenuEventStr = string_format(BMU_RefreshMainMenuPatternStr, 	dungeonTypesHeader)
 
 local BMU_ThrottledUpdate = BMU.ThrottledUpdate
 

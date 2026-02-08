@@ -55,6 +55,19 @@ BMU.var = {
 	colDarkRed	 = "a20000", -- dark red (for unrelated quests)
 	colGray		 = "8c8c8c", -- light gray for placeholder
   },
+  colorNames = {
+	"orange",
+	"white",
+	"teal",
+	"gold",
+	"green",
+	"blue",
+	"red",
+	"gray",
+	"lgray",
+	"dred",
+	"yellow"
+  },
   
   BMUGuilds = BMU_GUILD_DATA.officialGuilds,
   partnerGuilds = BMU_GUILD_DATA.partnerGuilds,
@@ -64,7 +77,8 @@ BMU.var = {
   numFavoritePlayers = 5,
   numFavoriteWayshrines = 3,
 
-  --INS251229 Baertram Special zone names to check for, see file TeleporterChecker.lua function BMU.tryMatchZoneToMatchStr(matchStr, zoneId)
+-- -v- INS251229 Baertram BEGIN 1
+  --Special zone names to check for, see file TeleporterChecker.lua function BMU.tryMatchZoneToMatchStr(matchStr, zoneId)
   -->(lowercased already so they aren't reformatetd on each search -> Performance gain)
 	specialZoneNameMatches = {
 		[string_lower("Alik'r")] = "", 			--leave "" if key = value
@@ -76,10 +90,22 @@ BMU.var = {
 	},
   	choosenListPlayerFilter = 0, --current list player filter, 0 = Show all
 }
--- -v- INS251229 Baertram BEGIN 1
+
 local teleporterVars = BMU.var
+--Clues
+local clueTypesHeader = "clues"
+local subTypeClue                 = "clue"
+teleporterVars.clueData = {
+    clueTypes = {
+		subTypeClue,
+	},
+	clueTypesHeader = clueTypesHeader,
+	clueTypeNames = {},
+	clueTypeTextures = { "clue", },
+}
 --Survey data
 ---Do not change the local strings: These are the relevant SavedVariable entry names!
+local surveyTypesHeader = "surveys"
 local subType_Alchemist 					= "alchemist"
 local subType_Blacksmith 					= "blacksmith"
 local subType_Clothier 						= "clothier"
@@ -95,6 +121,7 @@ teleporterVars.surveyData = {
 		subType_Jewelry,
 		subType_Woodworker,
 	},
+	surveyTypesHeader = surveyTypesHeader,
 	surveyTypeContainers = {
 		--ItemIds of survey containers
 		[subType_Alchemist] = 	{ [219853] = true, },
@@ -109,6 +136,7 @@ teleporterVars.surveyData = {
 }
 --Leads
 ---Do not change the local strings: These are the relevant SavedVariable entry names!
+local leadTypesHeader = "leads"
 local leadType_scryable 					= "srcyable"
 local leadType_scried 						= "scried"
 local leadType_completed 					= "completed"
@@ -118,11 +146,13 @@ teleporterVars.leadsData = {
 		leadType_scried,
 		leadType_completed,
 	},
+	leadTypesHeader = leadTypesHeader,
 	leadTypeNames = {GetString(SI_ANTIQUITY_SCRYABLE), GetString(SI_ANTIQUITY_SUBHEADING_IN_PROGRESS), GetString(SI_SCREEN_NARRATION_ACHIEVEMENT_EARNED_ICON_NARRATION) .. " (" .. GetString(SI_ANTIQUITY_LOG_BOOK) .. ")"},
 	leadTypeTextures = { "leadTypeScryable", "leadTypeScried", "leadTypeCompleted" },
 }
 --Dungeons
 ---Do not change the local strings: These are the relevant SavedVariable entry names!
+local dungeonTypesHeader = "dungeons"
 local dungeonType_endlessDungeon			= "showEndlessDungeons"
 local dungeonType_soloArena					= "showArenas"
 local dungeonType_groupArena				= "showGroupArenas"
@@ -136,15 +166,18 @@ teleporterVars.dungeonsData = {
 		dungeonType_trial,
 		dungeonType_groupDungeon,
 	},
+	dungeonTypesHeader = dungeonTypesHeader,
 	dungeonTypeNames = { BMU_SI_Get(SI_TELE_UI_TOGGLE_ENDLESS_DUNGEONS), BMU_SI_Get(SI_TELE_UI_TOGGLE_ARENAS), BMU_SI_Get(SI_TELE_UI_TOGGLE_GROUP_ARENAS), BMU_SI_Get(SI_TELE_UI_TOGGLE_TRIALS), BMU_SI_Get(SI_TELE_UI_TOGGLE_GROUP_DUNGEONS)},
 	dungeonTypeTextures	= { "endlessDungeon" ,"arena", "groupArena", "trial", "groupDungeon" },
 }
 --Treasure maps
 local treaureType_Treasure = "treasure"
+local treasureTypesHeader = treaureType_Treasure
 teleporterVars.treasureData = {
 	treasureTypes = {
 		treaureType_Treasure,
 	},
+	treasureTypesHeader = treasureTypesHeader,
 	treasureTypeContainers = {
 		[treaureType_Treasure] = { [224681] = true}
 	},
@@ -155,18 +188,19 @@ teleporterVars.treasureData = {
 --Local reference variables of BMU - Performance improvement
 local appNameAbbr = teleporterVars.appNameAbbr
 local BMU_colors = teleporterVars.color
+local BMU_colorNames = teleporterVars.colorNames
 local colorStrToColorCodes = {
-	["gray"] = BMU_colors.colTrash,
-	["yellow"] = BMU_colors.colYellow,
-	["blue"] = BMU_colors.colArcane,
-	["white"] = BMU_colors.colWhite,
-	["red"] = BMU_colors.colRed,
-	["gold"] = BMU_colors.colLegendary,
-	["green"] = BMU_colors.colGreen,
-	["orange"] = BMU_colors.colOrange,
-	["teal"] = BMU_colors.colBlue,
-	["dred"] = BMU_colors.colDarkRed,
-	["lgray"] = BMU_colors.colGray,
+	[BMU_colorNames[8]] = BMU_colors.colTrash,
+	[BMU_colorNames[11]] = BMU_colors.colYellow,
+	[BMU_colorNames[6]] = BMU_colors.colArcane,
+	[BMU_colorNames[2]] = BMU_colors.colWhite,
+	[BMU_colorNames[7]] = BMU_colors.colRed,
+	[BMU_colorNames[4]] = BMU_colors.colLegendary,
+	[BMU_colorNames[5]] = BMU_colors.colGreen,
+	[BMU_colorNames[1]] = BMU_colors.colOrange,
+	[BMU_colorNames[3]] = BMU_colors.colBlue,
+	[BMU_colorNames[10]] = BMU_colors.colDarkRed,
+	[BMU_colorNames[9]] = BMU_colors.colGray,
 }
 -- -^- INS251229 Baertram BEGIN 1
 
@@ -222,7 +256,6 @@ teleporterVars.LSMVars = {
 		sortEntries        	= false,
 	},
 }
-
 --^- INS260127 Baertram
 
 
@@ -401,14 +434,14 @@ BMU.textures = BMU_textures																			--INS251229 Baertram
 
 local serviceMapPinsDDSPath = "esoui/art/icons/servicemappins/servicepin_"
 local itemTypeIcons = {
-	["alchemist"] = serviceMapPinsDDSPath ..	"alchemy.dds",
-	["enchanter"] = serviceMapPinsDDSPath ..	"enchanting.dds",
-	["woodworker"] = serviceMapPinsDDSPath ..	"woodworking.dds",
-	["blacksmith"] = serviceMapPinsDDSPath ..	"smithy.dds",
-	["clothier"] = serviceMapPinsDDSPath ..		"clothier.dds",
-	["jewelry"] = serviceMapPinsDDSPath ..		"jewelrycrafting.dds",
-	["treasure"] = serviceMapPinsDDSPath ..		"bank.dds",
-	["leads"] = serviceMapPinsDDSPath ..		"antiquities.dds"
+	[subType_Alchemist] = 	serviceMapPinsDDSPath ..	"alchemy.dds",
+	[subType_Blacksmith] = 	serviceMapPinsDDSPath ..	"smithy.dds",
+	[subType_Clothier] = 	serviceMapPinsDDSPath ..	"clothier.dds",
+	[subType_Enchanter] = 	serviceMapPinsDDSPath ..	"enchanting.dds",
+	[subType_Jewelry] = 	serviceMapPinsDDSPath ..	"jewelrycrafting.dds",
+	[subType_Woodworker] = 	serviceMapPinsDDSPath ..	"woodworking.dds",
+	[treasureTypesHeader] = serviceMapPinsDDSPath ..	"bank.dds",
+	[leadTypesHeader] = 	serviceMapPinsDDSPath .. 	"antiquities.dds"
 }
 function BMU.getItemTypeIcon(itemType, dimension)
 	local iconPath = itemTypeIcons[itemType]
@@ -612,7 +645,7 @@ BMU.blacklistEndlessDungeons = {1436}
 --------
 
 -- Houses
-BMU.blacklistHouses = {940, 942, 941, 939, 938, 937, 859, 858, 878, 868, 869, 873, 860, 861, 877, 852, 853, 881, 867, 866, 874, 863, 862, 876, 871, 870, 872, 864, 865, 875, 855, 854, 880, 856, 857, 879, 944, 943, 945, 882, 883, 994, 995, 997, 996, 1005, 1008, 1007, 1006, 1042, 1043, 1044, 1045, 1059, 1060, 1061, 1063, 1108, 1109, 1064, 1125, 1126, 1128, 1129, 1130, 1154, 1155, 1192, 1193, 1199, 1200, 1218, 1219, 1220, 1233, 1234, 1264, 1265, 1270, 1271, 1275, 1276, 1277, 1307, 1342, 1343, 1306, 1345, 1363, 1364, 1432, 1433, 1434, 1435, 1437, 1468, 1472, 1473, 1438, 1479, 1487, 1491, 1492, 1494, 1495, 1500, 1501, 1546, 1547, 1554, 1555, 1556, 1560, 1561, 1566, 1567, 1569} --INS Baertram 260208 1569 Buccaneer Bay
+BMU.blacklistHouses = {940, 942, 941, 939, 938, 937, 859, 858, 878, 868, 869, 873, 860, 861, 877, 852, 853, 881, 867, 866, 874, 863, 862, 876, 871, 870, 872, 864, 865, 875, 855, 854, 880, 856, 857, 879, 944, 943, 945, 882, 883, 994, 995, 997, 996, 1005, 1008, 1007, 1006, 1042, 1043, 1044, 1045, 1059, 1060, 1061, 1063, 1108, 1109, 1064, 1125, 1126, 1128, 1129, 1130, 1154, 1155, 1192, 1193, 1199, 1200, 1218, 1219, 1220, 1233, 1234, 1264, 1265, 1270, 1271, 1275, 1276, 1277, 1307, 1342, 1343, 1306, 1345, 1363, 1364, 1432, 1433, 1434, 1435, 1437, 1468, 1472, 1473, 1438, 1479, 1487, 1491, 1492, 1494, 1495, 1500, 1501, 1546, 1547, 1554, 1555, 1556, 1560, 1561, 1566, 1567, 1568, 1569} --INS Baertram 260208 1568 Nightmarket house, 1569 Buccaneer Bay
 
 -----------------------------------------
 

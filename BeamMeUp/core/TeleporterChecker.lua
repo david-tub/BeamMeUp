@@ -1463,30 +1463,39 @@ function BMU.syncWithItems(p_portalPlayers)															--CHG251229 Baertram R
 					or (BMU_numOfSurveyTypesChecked() > 0 and (isSurveyMap(itemName, specializedItemType) or isStackableSurveyContainer(itemName, specializedItemType)))
 					or (BMU_savedVarsChar.displayMaps.clue and isClueMap(itemId, specializedItemType)) then
 				-- determine subType and itemZoneId from global list
-				local subType, itemZoneId = BMU_getDataMapInfo(itemId)
+				local subType, itemZoneId, isContainerItem = BMU_getDataMapInfo(itemId)
 				if subType then
 					-- filter valid subTypes
 					if isSubtypeEnabled(subType) then
-						-- create item data
-						-- check if item is related to an entry in portalPlayers table (player can port to this location) and get updated record in portalPlayers table
-						local isRelated, updatedRecord, recordIndex = BMU_itemIsRelated(p_portalPlayers, bagId, slotIndex, itemZoneId)
-						if isRelated then
-							-- item is related and connected to an entry in portalPlayers table
-							-- update record in portalPlayers
-							p_portalPlayers[recordIndex] = updatedRecord
-						else
-							-- item cannot be assigned to an entry in portalPlayers table
-							-- but we know the item's zone from global list
-							-- check if a record for the zone already exists
-							local record = unrelatedItemsRecords[itemZoneId]
-							if not record then
-								-- create new record
-								record = BMU_createClickableZoneRecord(itemZoneId)
+						if isContainerItem then
+							if not zonelessRecord then
+								-- create new zoneless info record
+								zonelessRecord = BMU_createZoneLessItemsInfo()
 							end
-							-- add item to the record
-							record = BMU_addItemInformation(record, bagId, slotIndex)
-							-- save updated record
-							unrelatedItemsRecords[itemZoneId] = record
+							-- add item data to record
+							zonelessRecord = BMU_addItemInformation(zonelessRecord, bagId, slotIndex)
+						else
+							-- create item data
+							-- check if item is related to an entry in portalPlayers table (player can port to this location) and get updated record in portalPlayers table
+							local isRelated, updatedRecord, recordIndex = BMU_itemIsRelated(p_portalPlayers, bagId, slotIndex, itemZoneId)
+							if isRelated then
+								-- item is related and connected to an entry in portalPlayers table
+								-- update record in portalPlayers
+								p_portalPlayers[recordIndex] = updatedRecord
+							else
+								-- item cannot be assigned to an entry in portalPlayers table
+								-- but we know the item's zone from global list
+								-- check if a record for the zone already exists
+								local record = unrelatedItemsRecords[itemZoneId]
+								if not record then
+									-- create new record
+									record = BMU_createClickableZoneRecord(itemZoneId)
+								end
+								-- add item to the record
+								record = BMU_addItemInformation(record, bagId, slotIndex)
+								-- save updated record
+								unrelatedItemsRecords[itemZoneId] = record
+							end
 						end
 					end
 				else
@@ -2166,29 +2175,30 @@ BMU_addNumberPlayers = BMU.addNumberPlayers 			--INS251229 Baertram
 -- find itemId in global list and return subType and zoneId
 function BMU.getDataMapInfo(itemId)
 	BMU_has_value = BMU_has_value or BMU.has_value                                 					--INS251229 Baertram
+	--INS260209 Baertram -v-
+	--check survey or treasure map stackable containers with unknown reports/maps:
+	for surveyType, itemIdsTab in pairs(surveyTypeContainers) do
+		for _, itemIdOfSurveyContainer in ipairs(itemIdsTab) do
+			if itemId == itemIdOfSurveyContainer then return surveyType, nil, true end
+		end
+	end
+	for treasureType, itemIdsTab in pairs(treasureTypeContainers) do
+		for _, itemIdOfTreasureMapContainer in ipairs(itemIdsTab) do
+			if itemId == itemIdOfTreasureMapContainer then return subType_Treasure, nil, true end
+		end
+	end
+	--INS260209 Baertram -^-
+
 	-- go over all overland zones in global list
 	for zoneId, typeList in pairs(BMU.treasureAndSurveyMaps) do
 		for mapType, itemList in pairs(typeList) do
 			-- check if itemList contains itemId
 			if BMU_has_value(itemList, itemId) then
-				return mapType, zoneId
+				return mapType, zoneId, false
 			end
 		end
 	end
-	--INS260209 Baertram -v-
-	--check survey or treasure map stackable containers with unknown reports/maps:
-	for _, itemIdsTab in pairs(surveyTypeContainers) do
-		for surveyType, itemIdOfSurveyContainer in ipairs(itemIdsTab) do
-			if itemId == itemIdOfSurveyContainer then return surveyType, nil end
-		end
-	end
-	for _, itemIdsTab in pairs(treasureTypeContainers) do
-		for _, itemIdOfTreasureMapContainer in ipairs(itemIdsTab) do
-			if itemId == itemIdOfTreasureMapContainer then return subType_Treasure, nil end
-		end
-	end
-	--INS260209 Baertram -^-
-	return false
+	return false, nil, false
 end
 BMU_getDataMapInfo = BMU.getDataMapInfo
 

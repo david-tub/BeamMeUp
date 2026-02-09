@@ -124,12 +124,12 @@ teleporterVars.surveyData = {
 	surveyTypesHeader = surveyTypesHeader,
 	surveyTypeContainers = {
 		--ItemIds of survey containers
-		[subType_Alchemist] = 	{ [219853] = true, },
-		[subType_Blacksmith] = 	{ [219849] = true, },
-		[subType_Clothier] = 	{ [219850] = true, },
-		[subType_Enchanter] = 	{ [219851] = true, },
-		[subType_Jewelry] = 	{ [219854] = true, },
-		[subType_Woodworker] = 	{ [219851] = true, },
+		[subType_Alchemist] = 	{ 219853 },
+		[subType_Blacksmith] = 	{ 219849 },
+		[subType_Clothier] = 	{ 219850 },
+		[subType_Enchanter] = 	{ 219852 },
+		[subType_Jewelry] = 	{ 219854 },
+		[subType_Woodworker] = 	{ 219851 },
 	},
 	surveyTypeNames = {GetString(SI_ITEMTYPEDISPLAYCATEGORY14), GetString(SI_ITEMTYPEDISPLAYCATEGORY10), GetString(SI_ITEMTYPEDISPLAYCATEGORY11), GetString(SI_ITEMTYPEDISPLAYCATEGORY15), GetString(SI_ITEMTYPEDISPLAYCATEGORY13), GetString(SI_ITEMTYPEDISPLAYCATEGORY12)},
 	surveyTypeTextures = { "surveyTypeAlchemy", "surveyTypeBlacksmith", "surveyTypeClothier", "surveyTypeEnchanting", "surveyTypeJewelry", "surveyTypeWoodworker" },
@@ -179,7 +179,7 @@ teleporterVars.treasureData = {
 	},
 	treasureTypesHeader = treasureTypesHeader,
 	treasureTypeContainers = {
-		[treaureType_Treasure] = { [224681] = true}
+		[treaureType_Treasure] = { 224681 }
 	},
 	treasureTypeTextures = { "treasureMap" }
 }

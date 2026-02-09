@@ -976,6 +976,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["@Sokarx"] = true,
 		["@Knifekill1984"] = true,
 		["@BeamMeUp-Addon"] = true,
+		--["@Baertram"] = true, for testing only
 	}
 	if adminAccountsAllowed[displayName] == true then
 		-- add context menu in guild roster and application roster

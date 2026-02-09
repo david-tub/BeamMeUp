@@ -1414,8 +1414,11 @@ function ListView:update()
         -- Only show messages that will be displayed within the control
         if message ~= nil and i <= numVisibleLines then
             if i >= numVisibleLines + 1 then return end
-			if message.zoneName == nil then return end
 
+			local messageZoneName = message.zoneName
+			if messageZoneName == nil then return end
+
+			local messageZoneNameClickable = message.zoneNameClickable
 			local displayNameOfMessage = message.displayName
 
 			--------- player tooltip ---------
@@ -1495,13 +1498,13 @@ function ListView:update()
 				cachedSavedVarsAccountSecondLanguage = BMU.savedVarsAcc.secondLanguage  			--INS251229 Baertram Cache the SavedVariables 2nd language until next reloadui or LAm settings changed (which will be checked against BMU.secondLanguageChanged)
 				BMU.secondLanguageChanged = nil
 			end
-			if cachedSavedVarsAccountSecondLanguage ~= 1 and message.zoneNameClickable == true and message.zoneNameSecondLanguage ~= nil then --CHG251229 Baertram
+			if cachedSavedVarsAccountSecondLanguage ~= 1 and messageZoneNameClickable == true and messageZoneNameSecondLanguage ~= nil then --CHG251229 Baertram
 				if #tooltipTextZone > 0 then
 					-- add separator
 					table_insert(tooltipTextZone, tooltipDividerStr)
 				end
 				-- add zone name
-				table_insert(tooltipTextZone, message.zoneNameSecondLanguage)
+				table_insert(tooltipTextZone, messageZoneNameSecondLanguage)
 			end
 			------------------
 
@@ -1531,7 +1534,7 @@ function ListView:update()
 			------------------
 
 			-- wayshrine and skyshard discovery info
-			if message.zoneNameClickable == true and (message.zoneWayhsrineDiscoveryInfo ~= nil or message.zoneSkyshardDiscoveryInfo ~= nil) then
+			if messageZoneNameClickable == true and (message.zoneWayhsrineDiscoveryInfo ~= nil or message.zoneSkyshardDiscoveryInfo ~= nil) then
 				if #tooltipTextZone > 0 then
 					-- add separator
 					table_insert(tooltipTextZone, tooltipDividerStr)
@@ -1546,7 +1549,7 @@ function ListView:update()
 			------------------
 
 			-- public dungeon achievement info (group event / skill point)
-			if message.zoneNameClickable == true and message.publicDungeonAchiementInfo then
+			if messageZoneNameClickable == true and message.publicDungeonAchiementInfo then
 				if #tooltipTextZone > 0 then
 					-- add separator
 					table_insert(tooltipTextZone, tooltipDividerStr)
@@ -1581,18 +1584,18 @@ function ListView:update()
 						end
 					end
 					if totalItemsCountInv > 0 then
-						message.zoneName = message.zoneName .. " (" .. totalItemsCountInv .. ")"
+						messageZoneName = messageZoneName .. " (" .. totalItemsCountInv .. ")"
 					end
 					if totalItemsCountBank > 0 then
-						message.zoneName = message.zoneName .. BMU_colorizeText(" (" .. totalItemsCountBank .. ")", colorGray)
+						messageZoneName = messageZoneName .. BMU_colorizeText(" (" .. totalItemsCountBank .. ")", colorGray)
 					end
 
 					-- add item type icons
-					message.zoneName = message.zoneName .. " "
+					messageZoneName = messageZoneName .. " "
 					for _, itemType in ipairs(message.relatedItemsTypes) do
 						if itemType ~= nil then
 							-- add dimensionized icon (same size as BMU.font1)
-							message.zoneName = message.zoneName .. BMU_getItemTypeIcon(itemType, BMU_round(17*scale, 0))
+							messageZoneName = messageZoneName .. BMU_getItemTypeIcon(itemType, BMU_round(17*scale, 0))
 						end
 					end
 					message.addedTotalItems = true
@@ -1612,7 +1615,7 @@ function ListView:update()
 				-- ensure to add the total number only once
 				if not message.addedTotalQuests then
 					-- add info about number of related quests
-					message.zoneName = message.zoneName .. " (" .. message.countRelatedQuests .. ")"
+					messageZoneName = messageZoneName .. " (" .. message.countRelatedQuests .. ")"
 					message.addedTotalQuests = true
 				end
 
@@ -1660,7 +1663,7 @@ function ListView:update()
 
 			------------------------------------
 			-- Zone Name Column Tooltip & Button Controls
-			if message.zoneNameClickable or #tooltipTextZone > 0 then
+			if messageZoneNameClickable or #tooltipTextZone > 0 then
 				-- set handler for map opening
 				list.ColumnZoneNameTex:SetHidden(false)
 				list.ColumnZoneNameTex:SetHandler("OnMouseEnter", function(self) list.ColumnZoneNameTex:SetAlpha(0.3) BMU_tooltipTextEnter(BMU, list.ColumnZoneNameTex, tooltipTextZone) BMU.pauseAutoRefresh = true end)
@@ -1689,7 +1692,7 @@ function ListView:update()
 
 			-- set text and color
 			list.ColumnPlayerName:SetText(BMU_colorizeText(displayNameOfMessage, message.textColorDisplayName))
-			list.ColumnZoneName:SetText(BMU_colorizeText(message.zoneName, message.textColorZoneName))
+			list.ColumnZoneName:SetText(BMU_colorizeText(messageZoneName, message.textColorZoneName))
 
 			-- number of players
 			if message.numberPlayers then

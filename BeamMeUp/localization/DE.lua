@@ -276,6 +276,8 @@ local strings = {
     -----------------------------------------------------------------------------
     ["SI_CONSTANT_TREASURE_MAP"] = "schatzkarte", -- need a part of the item name that is in every treasure map item the same no matter which zone
     ["SI_CONSTANT_SURVEY_MAP"] = "fundbericht", -- need a part of the item name that is in every survey map item the same no matter which zone and kind of craft
+    ["SI_CONSTANT_TREASURE_MAP_CONTAINER"] = "-schatzkarte", --???
+    ["SI_CONSTANT_SURVEY_MAP_CONTAINER"] = "-fundbericht",
 
 
     -----------------------------------------------------------------------------

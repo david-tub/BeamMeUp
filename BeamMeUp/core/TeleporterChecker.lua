@@ -39,6 +39,19 @@ local BMU_SOURCE_INDEX_GROUP   				= BMU.SOURCE_INDEX_GROUP
 local BMU_SOURCE_INDEX_GUILD     			= BMU.SOURCE_INDEX_GUILD
 local BMU_SOURCE_INDEX_OWNHOUSES 			= BMU.SOURCE_INDEX_OWNHOUSES
 
+local BMU_ZONE_CATEGORY_UNKNOWN = BMU.ZONE_CATEGORY_UNKNOWN
+local BMU_ZONE_CATEGORY_DELVE = BMU.ZONE_CATEGORY_DELVE
+local BMU_ZONE_CATEGORY_PUBDUNGEON = BMU.ZONE_CATEGORY_PUBDUNGEON
+local BMU_ZONE_CATEGORY_HOUSE = BMU.ZONE_CATEGORY_HOUSE
+local BMU_ZONE_CATEGORY_GRPDUNGEON = BMU.ZONE_CATEGORY_GRPDUNGEON
+local BMU_ZONE_CATEGORY_TRAIL = BMU.ZONE_CATEGORY_TRAIL
+local BMU_ZONE_CATEGORY_ENDLESSD = BMU.ZONE_CATEGORY_ENDLESSD
+local BMU_ZONE_CATEGORY_GRPZONES = BMU.ZONE_CATEGORY_GRPZONES
+local BMU_ZONE_CATEGORY_GRPARENA = BMU.ZONE_CATEGORY_GRPARENA
+local BMU_ZONE_CATEGORY_SOLOARENA = BMU.ZONE_CATEGORY_SOLOARENA
+local BMU_ZONE_CATEGORY_OVERLAND = BMU.ZONE_CATEGORY_OVERLAND
+
+
 local BMU_textures                          = BMU.textures
 local textureAcceptGreen = BMU_textures.acceptGreenStr
 local textureDeclineRed = BMU_textures.declineRedStr
@@ -46,8 +59,18 @@ local textureTooltipSeparator = BMU_textures.tooltipSeperatorStr
 local leadTypeCompletedTextureStr = BMU_textures.leadTypeCompletedStr20
 local timerTextureStr             = BMU_textures.timerStr20
 
+local surveyData = teleporterVars.surveyData
+local surveyTypeContainers = surveyData.surveyTypeContainers
+local surveyTypesHeader = surveyData.surveyTypesHeader
+
+local treasureData = teleporterVars.treasureData
+local treasureTypeContainers = treasureData.treasureTypeContainers
+local treasureTypes = treasureData.treasureTypes
+local treaureType_Treasure = treasureTypes[1]
+local subType_Treasure = treaureType_Treasure
 local clueData = teleporterVars.clueData
-local subTypeClue                 = clueData.clueTypes[1] --"clue"
+local subTypeClue = clueData.clueTypes[1] --"clue"
+
 local colorNames = teleporterVars.colorNames
 local colorOrange 							= colorNames[1]
 local colorWhite 							= colorNames[2]
@@ -104,6 +127,9 @@ local BMU_getParentZoneId, BMU_getMapIndex, BMU_categorizeZone, BMU_getCurrentZo
 --Lowercase constants for string comparisons
 local surveyMapStrLower   = 		string_lower(BMU_SI_Get(SI_CONSTANT_SURVEY_MAP))
 local treasureMapStrLower = 		string_lower(BMU_SI_Get(SI_CONSTANT_TREASURE_MAP))
+local surveyMapContainerStrLower   = string_lower(BMU_SI_Get(SI_CONSTANT_SURVEY_MAP_CONTAINER))
+local treasureMapContainerStrLower = string_lower(BMU_SI_Get(SI_CONSTANT_TREASURE_MAP_CONTAINER))
+
 local levelUpRewardSkillPointHeaderStr = GetString(SI_LEVEL_UP_REWARDS_SKILL_POINT_TOOLTIP_HEADER)
 local groupStr = GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_GROUP_MEMBERS)
 local friendsStr = GetString(SI_GAMEPAD_CAMPAIGN_BROWSER_TOOLTIP_FRIENDS)
@@ -902,10 +928,10 @@ function BMU.addInfo_2(e)
 	e.mapIndex = BMU_getMapIndex(e.zoneId)
 
 	-- check public dungeon achievement / skill point
-	if e.category == BMU.ZONE_CATEGORY_OVERLAND then
+	if e.category == BMU_ZONE_CATEGORY_OVERLAND then
 		-- overland zone --> show completion of all public dungeons in the zone
 		e.publicDungeonAchiementInfo = BMU_createPublicDungeonAchiementInfo(e.zoneId)
-	elseif e.category == BMU.ZONE_CATEGORY_PUBDUNGEON then
+	elseif e.category == BMU_ZONE_CATEGORY_PUBDUNGEON then
 		-- specific public dungeon --> show completion of itself
 		e.publicDungeonAchiementInfo = BMU_createPublicDungeonAchiementInfo(e.parentZoneId, e.zoneId)
 	end
@@ -940,7 +966,7 @@ function BMU.addInfo_2(e)
 	elseif e.sourceIndexLeading == BMU_SOURCE_INDEX_GROUP and e.isLeader then
 		-- group leader
 		e.prio = 2
-	elseif e.sourceIndexLeading == BMU_SOURCE_INDEX_GROUP and (e.category == BMU.ZONE_CATEGORY_GRPDUNGEON or e.category == BMU.ZONE_CATEGORY_TRAIL or e.category == BMU.ZONE_CATEGORY_GRPZONES or e.category == BMU.ZONE_CATEGORY_GRPARENA or e.category == BMU.ZONE_CATEGORY_ENDLESSD) then
+	elseif e.sourceIndexLeading == BMU_SOURCE_INDEX_GROUP and (e.category == BMU_ZONE_CATEGORY_GRPDUNGEON or e.category == BMU_ZONE_CATEGORY_TRAIL or e.category == BMU_ZONE_CATEGORY_GRPZONES or e.category == BMU_ZONE_CATEGORY_GRPARENA or e.category == BMU_ZONE_CATEGORY_ENDLESSD) then
 		-- group member is in 4 men Group Dungeons | 12 men Raids (Trials) | Group Zones | Group Arenas | Endless Dungeons
 		e.prio = 3
 	elseif BMU_isFavoritePlayer(e.displayName) and BMU_isFavoriteZone(e.zoneId) then
@@ -1026,7 +1052,7 @@ function BMU.getNumSetCollectionProgressPieces(zoneId, category, parentZoneId)
 			workingZoneId = zoneId
 		end
 
-		if not (numUnlocked and numTotal) and (category == BMU.ZONE_CATEGORY_DELVE or category == BMU.ZONE_CATEGORY_PUBDUNGEON) and parentZoneId then
+		if not (numUnlocked and numTotal) and (category == BMU_ZONE_CATEGORY_DELVE or category == BMU_ZONE_CATEGORY_PUBDUNGEON) and parentZoneId then
 			-- catch possible exceptions | pcall returns false if function call fails, otherwise true
 			if pcall(function() BMU.LibSets.GetNumItemSetCollectionZoneUnlockedPieces(parentZoneId) end) then
 				numUnlocked, numTotal = BMU.LibSets.GetNumItemSetCollectionZoneUnlockedPieces(parentZoneId)
@@ -1089,7 +1115,7 @@ function BMU.filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filt
 	if index == BMU_indexListCurrentZone then
 		-- only add records of the current (displayed) zone (and ensure that a record without player (dark red) is only added if there is no other record -> see BMU_checkOnceOnly())
 		-- OR if displayed zone is not overland and zone is parent of current zone (e.g. to see the parent overland zone in the list if the player is in a delve)
-		if (e.currentZone and BMU_checkOnceOnly(false, e)) or (BMU_categorizeZone(currentZoneId) ~= BMU.ZONE_CATEGORY_OVERLAND and e.zoneId == BMU_getParentZoneId(currentZoneId) and BMU_checkOnceOnly(true, e)) then
+		if (e.currentZone and BMU_checkOnceOnly(false, e)) or (BMU_categorizeZone(currentZoneId) ~= BMU_ZONE_CATEGORY_OVERLAND and e.zoneId == BMU_getParentZoneId(currentZoneId) and BMU_checkOnceOnly(true, e)) then
 			return true
 		end
 
@@ -1117,7 +1143,7 @@ function BMU.filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filt
 			-- add all delves and public dungeons
 			-- zone is delve or public dungeon + not blacklisted + add only once to list
 			local zoneCategory = BMU_categorizeZone(e.zoneId)
-			if (zoneCategory == BMU.ZONE_CATEGORY_DELVE or zoneCategory == BMU.ZONE_CATEGORY_PUBDUNGEON) and not BMU_isBlacklisted(e.zoneId, e.sourceIndexLeading, false) and BMU_checkOnceOnly(BMU_savedVarsAcc.zoneOnceOnly, e) then
+			if (zoneCategory == BMU_ZONE_CATEGORY_DELVE or zoneCategory == BMU_ZONE_CATEGORY_PUBDUNGEON) and not BMU_isBlacklisted(e.zoneId, e.sourceIndexLeading, false) and BMU_checkOnceOnly(BMU_savedVarsAcc.zoneOnceOnly, e) then
 				return true
 			end
 		else
@@ -1356,23 +1382,36 @@ function BMU.categorizeZone(zoneId)
 	if value ~= nil then
 		return value									-- category index
 	else
-		return BMU.ZONE_CATEGORY_UNKNOWN			-- category index (unknown)
+		return BMU_ZONE_CATEGORY_UNKNOWN			-- category index (unknown)
 	end
 end
 BMU_categorizeZone = BMU.categorizeZone
 
 
 -- connect survey and treasure maps from bags to port options and zones
+local function isStackableContainer(specializedItemType)
+	return specializedItemType == SPECIALIZED_ITEMTYPE_CONTAINER_STACKABLE
+end
+local function isStackableSurveyContainer(itemName, specializedItemType)
+	local isStackableContainerItem = isStackableContainer(specializedItemType)
+	return (isStackableContainerItem == true and string_match(string_lower(itemName), surveyMapContainerStrLower)) or false
+end
+local function isStackableTreasureMapContainer(itemName, specializedItemType)
+	local isStackableContainerItem = isStackableContainer(specializedItemType)
+	return (isStackableContainerItem == true and string_match(string_lower(itemName), treasureMapContainerStrLower)) or false
+end
+
 --CHG251229 Baertram Removed local functions from within function BMU.syncWithItems below, so they do not get gedefined & created on each function call of BMU.syncWithItems! -> memory and performance gain
 -- local function to identify the item as survey or treasure map (check itemType and custom mapping as backup)
 local function isSurveyMap(itemName, specializedItemType)
-	return (specializedItemType == SPECIALIZED_ITEMTYPE_TROPHY_SURVEY_REPORT or string_match(string_lower(itemName), surveyMapStrLower)) --CHG251229 Baertram Defined local lower string variables at the top so they aren't rechecked and build expensively on eac string comparison again and again and ...
+	return (specializedItemType == SPECIALIZED_ITEMTYPE_TROPHY_SURVEY_REPORT or string_match(string_lower(itemName), surveyMapStrLower)) --CHG251229 Baertram Defined local lower string variables at the top so they aren't rechecked and build expensively on each string comparison again and again and ...
 end
 local function isTreasureMap(itemName, specializedItemType)
-	return (specializedItemType == SPECIALIZED_ITEMTYPE_TROPHY_TREASURE_MAP or string_match(string_lower(itemName), treasureMapStrLower)) --CHG251229 Baertram Defined local lower string variables at the top so they aren't rechecked and build expensively on eac string comparison again and again and ...
+	return (specializedItemType == SPECIALIZED_ITEMTYPE_TROPHY_TREASURE_MAP or string_match(string_lower(itemName), treasureMapStrLower)) --CHG251229 Baertram Defined local lower string variables at the top so they aren't rechecked and build expensively on each string comparison again and again and ...
 end
 local function isClueMap(itemId, specializedItemType)
-	local subType, _ = BMU.getDataMapInfo(itemId)
+	BMU_getDataMapInfo = BMU_getDataMapInfo or BMU.getDataMapInfo
+	local subType, _ = BMU_getDataMapInfo(itemId)
 	return (specializedItemType == SPECIALIZED_ITEMTYPE_TROPHY_TRIBUTE_CLUE or subType == subTypeClue) --CHG251229 Baertram Defined local string variable at the top so they aren't redefined on each string comparison again and again and ...
 end
 -- local function check if the map type (coming from BMU.treasureAndSurveyMaps) is enabled by the user
@@ -1420,7 +1459,9 @@ function BMU.syncWithItems(p_portalPlayers)															--CHG251229 Baertram R
 			local itemType, specializedItemType = GetItemType(bagId, slotIndex)
 			local itemId = GetItemId(bagId, slotIndex)
 			-- filter for relevant items and consider active option
-			if (BMU_savedVarsChar.displayMaps.treasure and isTreasureMap(itemName, specializedItemType)) or (BMU_numOfSurveyTypesChecked() > 0 and isSurveyMap(itemName, specializedItemType)) or (BMU_savedVarsChar.displayMaps.clue and isClueMap(itemId, specializedItemType)) then
+			if (BMU_savedVarsChar.displayMaps.treasure and (isTreasureMap(itemName, specializedItemType) or isStackableTreasureMapContainer(itemName, specializedItemType)))
+					or (BMU_numOfSurveyTypesChecked() > 0 and (isSurveyMap(itemName, specializedItemType) or isStackableSurveyContainer(itemName, specializedItemType)))
+					or (BMU_savedVarsChar.displayMaps.clue and isClueMap(itemId, specializedItemType)) then
 				-- determine subType and itemZoneId from global list
 				local subType, itemZoneId = BMU_getDataMapInfo(itemId)
 				if subType then
@@ -1556,13 +1597,15 @@ BMU_syncWithItems = BMU_syncWithItems or BMU.syncWithItems  		--INS251229 Baertr
 -- try to find a record that matches with item's zone and update record
 function BMU.itemIsRelated(p_portalPlayers, bagId, slotIndex, itemZoneId)							--CHG251229 Baertram Renamed param portalPlayers: Shadows the in line 6 defined table portalPlayers with same name!
 	BMU_addItemInformation = BMU_addItemInformation or BMU.addItemInformation						--INS251229 Baertram
-	local itemName = GetItemName(bagId, slotIndex)
-	local itemId = GetItemId(bagId, slotIndex)
+	--local itemName = GetItemName(bagId, slotIndex)
+	--local itemId = GetItemId(bagId, slotIndex)
+
+	if itemZoneId == nil then return false, nil, nil end											--INS260209 Baertram
 
 	-- go over all records in portalPlayers
 	for index, record in ipairs(p_portalPlayers) do
 		-- only check overland maps & Cyrodiil
-		if record.category == BMU.ZONE_CATEGORY_OVERLAND or record.zoneId == 181 then
+		if record.category == BMU_ZONE_CATEGORY_OVERLAND or record.zoneId == 181 then
 			-- try to match with zone
 			if record.zoneId == itemZoneId then
 				return true, BMU_addItemInformation(record, bagId, slotIndex), index
@@ -1580,7 +1623,7 @@ function BMU.leadIsRelated(p_portalPlayers, antiquityId)											--CHG251229 B
 	-- go over all records in portalPlayers
 	for index, record in ipairs(p_portalPlayers) do
 		-- only check overland maps
-		if record.category == BMU.ZONE_CATEGORY_OVERLAND then
+		if record.category == BMU_ZONE_CATEGORY_OVERLAND then
 			-- try to match lead with zone
 			if GetAntiquityZoneId(antiquityId) == record.zoneId then
 				return true, BMU_addLeadInformation(record, antiquityId), index
@@ -1595,6 +1638,7 @@ BMU_leadIsRelated = BMU.leadIsRelated
 
 -- add item information to an existing record
 function BMU.addItemInformation(record, bagId, slotIndex)
+	BMU_getDataMapInfo = BMU_getDataMapInfo or BMU.getDataMapInfo
 	--local itemCount = GetItemTotalCount(bagId, slotIndex)
 	local icon, itemCount, sellPrice, meetsUsageRequirement, locked, equipType, itemStyle, quality = GetItemInfo(bagId, slotIndex)
 	local isInInventory = true
@@ -1602,7 +1646,7 @@ function BMU.addItemInformation(record, bagId, slotIndex)
 	local itemName = color:Colorize(BMU_formatName(GetItemName(bagId, slotIndex), false))
 	local itemTooltip = itemName
 	local itemId = GetItemId(bagId, slotIndex)
-	local itemType, _ = BMU.getDataMapInfo(itemId)
+	local itemType, _ = BMU_getDataMapInfo(itemId)
 
 	if itemCount > 1 then
 		-- change item name (add itemCount of this item)
@@ -2131,6 +2175,19 @@ function BMU.getDataMapInfo(itemId)
 			end
 		end
 	end
+	--INS260209 Baertram -v-
+	--check survey or treasure map stackable containers with unknown reports/maps:
+	for _, itemIdsTab in pairs(surveyTypeContainers) do
+		for surveyType, itemIdOfSurveyContainer in ipairs(itemIdsTab) do
+			if itemId == itemIdOfSurveyContainer then return surveyType, nil end
+		end
+	end
+	for _, itemIdsTab in pairs(treasureTypeContainers) do
+		for _, itemIdOfTreasureMapContainer in ipairs(itemIdsTab) do
+			if itemId == itemIdOfTreasureMapContainer then return subType_Treasure, nil end
+		end
+	end
+	--INS260209 Baertram -^-
 	return false
 end
 BMU_getDataMapInfo = BMU.getDataMapInfo

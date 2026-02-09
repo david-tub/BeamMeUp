@@ -275,7 +275,9 @@ local stringsEN = {
     -- ITEM NAMES (PART OF IT) - BACKUP
     -----------------------------------------------------------------------------
     ["SI_CONSTANT_TREASURE_MAP"] = "treasure map", -- need a part of the item name that is in every treasure map item the same no matter which zone
-    ["SI_CONSTANT_SURVEY_MAP"] = "survey:", -- need a part of the item name that is in every survey map item the same no matter which zone and kind of craft
+    ["SI_CONSTANT_SURVEY_MAP"] = "survey:", -- need a part of the item name that is in every survey map item the same no matter which zone and kind of craft --> Survey containers do NOT use the : behind survey! But other items contain survey and are not surveys so we cannot stip the : here
+    ["SI_CONSTANT_TREASURE_MAP_CONTAINER"] = "treasure map", --???
+    ["SI_CONSTANT_SURVEY_MAP_CONTAINER"] = "survey report",
 
 
     -----------------------------------------------------------------------------

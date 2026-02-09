@@ -1340,6 +1340,15 @@ end
 -- update the ListView
 -- Goes through each line control and either shows a message or hides it
 local cachedSavedVarsAccountSecondLanguage = nil													--INS251229 Baertram
+local function disableTooltipAndResetOnMouseUp(list)
+	local ColumnPlayerNameTex = list.ColumnPlayerNameTex
+	list.ColumnNumberPlayers:SetText("")
+	ColumnPlayerNameTex:SetHandler("OnMouseEnter", nil)
+	ColumnPlayerNameTex:SetHandler("OnMouseExit", nil)
+	ColumnPlayerNameTex:SetHandler("OnMouseUp", nil)
+	ColumnPlayerNameTex.tooltipText = nil
+end
+
 function ListView:update()
 	BMU_round = BMU_round or BMU.round
 	BMU_createTable = BMU_createTable or BMU.createTable
@@ -1453,23 +1462,25 @@ function ListView:update()
 				end
 
 				-- set handler for Player context menu
+				list.ColumnPlayerNameTex:SetHandler("OnMouseUp", nil)
 				list.ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnPlayerName(button, message) end)
+
 
 			--House right click menu
 			elseif message.houseId ~= nil then
-				list.ColumnPlayerNameTex:SetHidden(false)
 				--Clear the tooltip
-				list.ColumnNumberPlayers:SetText("")
+				disableTooltipAndResetOnMouseUp(list)
 				list.ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnHouseName(button, message) end)
+				list.ColumnPlayerNameTex:SetHidden(false)
 			--Empty zone right click menu (no player in the zone)
 			elseif message.zoneId ~= nil then
-				list.ColumnPlayerNameTex:SetHidden(false)
 				--Clear the tooltip
-				list.ColumnNumberPlayers:SetText("")
+				disableTooltipAndResetOnMouseUp(list)
 				list.ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnEmptyZoneName(button, message) end)
+				list.ColumnPlayerNameTex:SetHidden(false)
 			else
 				-- make tooltip invisible (no DisplayName of Player -> no Tooltip)
-				list.ColumnNumberPlayers:SetText("")
+				disableTooltipAndResetOnMouseUp(list)
 				list.ColumnPlayerNameTex:SetHidden(true)
 			end
 				------------------

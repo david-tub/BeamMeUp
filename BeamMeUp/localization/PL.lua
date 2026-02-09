@@ -23,7 +23,7 @@ local strings = {
     ["SI_TELE_UI_BTN_TOOLTIP_CONTEXT_MENU"] = "\n|c777777(prawoklik by otworzyć opcje)",
     ---------
     --------- List
-    ["SI_TELE_UI_UNRELATED_ITEMS"] = "Mapy w innej strefie",
+    --["SI_TELE_UI_UNRELATED_ITEMS"] = "Innej strefie",
     ["SI_TELE_UI_UNRELATED_QUESTS"] = "Zadania w innej strefie",
     ["SI_TELE_UI_SAME_INSTANCE"] = "Tożsama lokalizacja",
     ["SI_TELE_UI_DIFFERENT_INSTANCE"] = "Inna lokalizacja",

@@ -23,7 +23,7 @@ local strings = {
     ["SI_TELE_UI_BTN_TOOLTIP_CONTEXT_MENU"] = "\n|c777777(clic droit pour plus d'options)",
     ---------
     --------- List
-    ["SI_TELE_UI_UNRELATED_ITEMS      "] = "Carte dans d'autres zones",
+    --["SI_TELE_UI_UNRELATED_ITEMS      "] = "Autres zones",
     ["SI_TELE_UI_UNRELATED_QUESTS     "] = "Quêtes dans d'autres zones",
     ["SI_TELE_UI_SAME_INSTANCE        "] = "Même instance",
     ["SI_TELE_UI_DIFFERENT_INSTANCE   "] = "Instance différente",

@@ -107,7 +107,7 @@ local BMU_win, BMU_win_Main_Control
 local BMU_HideTeleporter, BMU_toggleZoneGuide, BMU_getZoneSpecificHouse, BMU_getAllPublicDungeons, BMU_getAllDelves,
       BMU_joinBlacklist, BMU_formatName, BMU_startCountdownAutoRefresh, BMU_showNotification, BMU_initializeBlacklist,
       BMU_OpenTeleporter, BMU_clearInputFields, BMU_createTable, BMU_createTableHouses, BMU_createTableDungeons,
-	  BMU_requestGuildData, BMU_createTableGuilds, BMU_closeBtnSwitchTexture, BMU_getParentZoneId
+	  BMU_requestGuildData, BMU_createTableGuilds, BMU_closeBtnSwitchTexture, BMU_getParentZoneId, BMU_resetMainListFilterToAll
 -- -^- INS251229 Baertram END 0
 
 --Old code from TeleUnicorn -> Moved directly to Teleporter to strip the library
@@ -377,10 +377,11 @@ function BMU.OpenTeleporter(refresh)
 	BMU_createTableDungeons = BMU_createTableDungeons or BMU.createTableDungeons					--INS251229 Baertram
 	BMU_closeBtnSwitchTexture = BMU_closeBtnSwitchTexture or BMU.closeBtnSwitchTexture 				--INS251229 Baertram
 	BMU_startCountdownAutoRefresh = BMU_startCountdownAutoRefresh or BMU.startCountdownAutoRefresh	--INS251229 Baertram
+	BMU_resetMainListFilterToAll = BMU_resetMainListFilterToAll or BMU.ResetMainListFilterToAll
 
 	-- show notification (in case)
 	BMU_showNotification()
-	
+
 	if not worldMapZoneStoryTLC_Keyboard:IsHidden() then
 		--hide ZoneGuide
 		BMU_toggleZoneGuide(false)
@@ -393,6 +394,8 @@ function BMU.OpenTeleporter(refresh)
 	
 	-- positioning window
 	BMU_updatePosition()
+
+	BMU_resetMainListFilterToAll()
 
 	if BMU_win.MapOpen then
 		 -- hide open button

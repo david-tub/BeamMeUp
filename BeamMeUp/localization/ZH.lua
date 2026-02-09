@@ -23,7 +23,7 @@ local strings = {
     ["SI_TELE_UI_BTN_TOOLTIP_CONTEXT_MENU"] = "\n|c777777(右键点击查看更多选项))",
     ---------
     --------- List
-    ["SI_TELE_UI_UNRELATED_ITEMS"] = "其他区域地图",
+    --["SI_TELE_UI_UNRELATED_ITEMS"] = "其他区域地图",
     ["SI_TELE_UI_UNRELATED_QUESTS"] = "其他区域任务",
     ["SI_TELE_UI_SAME_INSTANCE"] = "相同情况",
     ["SI_TELE_UI_DIFFERENT_INSTANCE"] = "不同情况",

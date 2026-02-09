@@ -23,7 +23,7 @@ local stringsEN = {
     ["SI_TELE_UI_BTN_TOOLTIP_CONTEXT_MENU"] = "\n|c777777(right-click for more options)",
     ---------
     --------- List
-    ["SI_TELE_UI_UNRELATED_ITEMS"] = "Maps in other Zones",
+    ["SI_TELE_UI_UNRELATED_ITEMS"] = GetString(SI_BUGCATEGORY10), -- "Other" -> Was before: "Other Zones",
     ["SI_TELE_UI_UNRELATED_QUESTS"] = "Quests in other Zones",
     ["SI_TELE_UI_SAME_INSTANCE"] = "Same Instance",
     ["SI_TELE_UI_DIFFERENT_INSTANCE"] = "Different Instance",

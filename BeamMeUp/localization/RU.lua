@@ -23,7 +23,7 @@ local strings = {
     ["SI_TELE_UI_BTN_TOOLTIP_CONTEXT_MENU"] = "\n|c777777(правый клик для параметров)",
     ---------
     --------- List
-    ["SI_TELE_UI_UNRELATED_ITEMS"] = "Другие карты сокровищ.",
+    --["SI_TELE_UI_UNRELATED_ITEMS"] = "Другие карты сокровищ.",
     ["SI_TELE_UI_UNRELATED_QUESTS"] = "Квесты в других зонах",
     ["SI_TELE_UI_SAME_INSTANCE"] = "Тот же инстанс",
     ["SI_TELE_UI_DIFFERENT_INSTANCE"] = "Разные инстансы",

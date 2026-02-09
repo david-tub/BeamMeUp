@@ -80,7 +80,7 @@ local colorGreen 							= colorNames[5]
 local colorBlue 							= colorNames[6]
 local colorRed 								= colorNames[7]
 local colorGray 							= colorNames[8]
-local formatStringFirstUppercase 			= "<<C:1>>"
+local formatStringFirstUppercase = teleporterVars.formatStringFirstUppercase
 ----functions
 --ZOs functions
 local string = string

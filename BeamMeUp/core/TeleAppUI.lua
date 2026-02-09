@@ -82,6 +82,9 @@ local colorRed 								= "red"
 local fontPattern							= "%s|$(KB_%s)|%s"
 local textPattern 							= "%s: %d   %s: %d   %s: %d   %s: %d   %s: %d   %s: %d   %s: %d   %s: %d"
 local appendixCurrentOfMaxStrPattern 		= " (%d/%d)"
+
+local BMU_SOURCE_INDEX_ALL = BMU.SOURCE_INDEX_ALL
+
 --Subtypes
 local clueData = teleporterVars.clueData
 local subTypeClue                 = clueData.clueTypes[1] --"clue"
@@ -289,6 +292,12 @@ local function addDynamicLSMContextMenuEntry(entryType, entryText, SVsettings, S
 		)
 	end
 end
+
+--Reset the actual main list filter to "All"
+local function resetMainListFilterToAll()
+	teleporterVars.choosenListPlayerFilter = BMU_SOURCE_INDEX_ALL
+end
+BMU.ResetMainListFilterToAll = resetMainListFilterToAll
 ---^- INS BEARTRAM 20260125 LibScrollableMenu helpers
 
 
@@ -957,7 +966,7 @@ local function SetupUI()
 		else
 			BMU_createTable({index=BMU.indexListMain})
 		end
-		teleporterVars.choosenListPlayerFilter = 0
+	  	resetMainListFilterToAll()
   end)
 
   teleporterWin_Main_Control_RefreshTexture:SetHandler("OnMouseEnter", function(teleporterWin_Main_Control_RefreshTextureCtrl)

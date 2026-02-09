@@ -23,7 +23,7 @@ local strings = {
     ["SI_TELE_UI_BTN_TOOLTIP_CONTEXT_MENU"] = "\n|c777777(右クリックで追加オプション)",
     ---------
     --------- List
-    ["SI_TELE_UI_UNRELATED_ITEMS"] = "他のゾーンの地図",
+    --["SI_TELE_UI_UNRELATED_ITEMS"] = "他のゾーンの地図",
     ["SI_TELE_UI_UNRELATED_QUESTS"] = "他のゾーンのクエスト",
     ["SI_TELE_UI_SAME_INSTANCE"] = "同一インスタンス",
     ["SI_TELE_UI_DIFFERENT_INSTANCE"] = "別インスタンス",

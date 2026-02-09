@@ -27,7 +27,7 @@ local strings = {
 ["SI_TELE_UI_BTN_TOOLTIP_CONTEXT_MENU"] = "\n|c777777(click com botão direito p/ mais informações)",
 ---------
 --------- List
-["SI_TELE_UI_UNRELATED_ITEMS"] = "Mapas em outras zonas",
+--["SI_TELE_UI_UNRELATED_ITEMS"] = "Outras zonas",
 ["SI_TELE_UI_UNRELATED_QUESTS"] = "Missões em outras zonas",
 ["SI_TELE_UI_SAME_INSTANCE"] = "Mesma Instância",
 ["SI_TELE_UI_DIFFERENT_INSTANCE"] = "Instância Diferentes",

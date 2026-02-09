@@ -23,6 +23,34 @@ local BMU_SI_Get = SI.get
 -- -^- INS251229 Baertram BEGIN 0
 
 
+-- constant values for the source
+local BMU_SOURCE_INDEX_ALL = 0
+BMU.SOURCE_INDEX_ALL = BMU_SOURCE_INDEX_ALL
+BMU.SOURCE_INDEX_GROUP = 1
+BMU.SOURCE_INDEX_FRIEND = 2
+BMU.SOURCE_INDEX_GUILD = {
+	[1] = 3,
+	[2] = 4,
+	[3] = 5,
+	[4] = 6,
+	[5] = 7,
+}
+BMU.SOURCE_INDEX_OWNHOUSES = 8 --INS Baertram 260206
+
+-- constant values for zone categorization
+BMU.ZONE_CATEGORY_UNKNOWN = 0
+BMU.ZONE_CATEGORY_DELVE = 1
+BMU.ZONE_CATEGORY_PUBDUNGEON = 2
+BMU.ZONE_CATEGORY_HOUSE = 3
+BMU.ZONE_CATEGORY_GRPDUNGEON = 4
+BMU.ZONE_CATEGORY_TRAIL = 5
+BMU.ZONE_CATEGORY_ENDLESSD = 6
+BMU.ZONE_CATEGORY_GRPZONES = 7
+BMU.ZONE_CATEGORY_GRPARENA = 8
+BMU.ZONE_CATEGORY_SOLOARENA = 9
+BMU.ZONE_CATEGORY_OVERLAND = 100
+
+
 BMU.win =   {
       Main_Control = {},
 }
@@ -68,6 +96,7 @@ BMU.var = {
 	"dred",
 	"yellow"
   },
+  formatStringFirstUppercase = "<<C:1>>",
   
   BMUGuilds = BMU_GUILD_DATA.officialGuilds,
   partnerGuilds = BMU_GUILD_DATA.partnerGuilds,
@@ -88,7 +117,7 @@ BMU.var = {
 		[string_lower("Graumoorkaverne")] = "",	--leave "" if key = value
 		[string_lower("Griselande")] = "",		--leave "" if key = value
 	},
-  	choosenListPlayerFilter = 0, --current list player filter, 0 = Show all
+  	choosenListPlayerFilter = BMU_SOURCE_INDEX_ALL, --current list player filter, 0 = Show all
 }
 
 local teleporterVars = BMU.var
@@ -480,31 +509,6 @@ elseif (ld.month == 12 and ld.day >= 29) or (ld.month == 1 and ld.day == 1) or (
 	BMU_textures.wayshrineBtn2 = BMU_MediaPath .. "poi_wayshrine_complete_nye.dds"
 	BMU_textures.wayshrineBtnOver2 = BMU_MediaPath .. "poi_wayshrine_complete_over_nye.dds"
 end
-
--- constant values for the source
-BMU.SOURCE_INDEX_GROUP = 1
-BMU.SOURCE_INDEX_FRIEND = 2
-BMU.SOURCE_INDEX_GUILD = {
-	[1] = 3,
-	[2] = 4,
-	[3] = 5,
-	[4] = 6,
-	[5] = 7,
-}
-BMU.SOURCE_INDEX_OWNHOUSES = 8 --INS Baertram 260206
-
--- constant values for zone categorization
-BMU.ZONE_CATEGORY_UNKNOWN = 0
-BMU.ZONE_CATEGORY_DELVE = 1
-BMU.ZONE_CATEGORY_PUBDUNGEON = 2
-BMU.ZONE_CATEGORY_HOUSE = 3
-BMU.ZONE_CATEGORY_GRPDUNGEON = 4
-BMU.ZONE_CATEGORY_TRAIL = 5
-BMU.ZONE_CATEGORY_ENDLESSD = 6
-BMU.ZONE_CATEGORY_GRPZONES = 7
-BMU.ZONE_CATEGORY_GRPARENA = 8
-BMU.ZONE_CATEGORY_SOLOARENA = 9
-BMU.ZONE_CATEGORY_OVERLAND = 100
 
 -- flag and cache to check if quest data in journal changed
 BMU.questDataCache = {}

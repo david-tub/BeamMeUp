@@ -115,9 +115,6 @@ local leadTypeNames = leadsData.leadTypeNames
 local leadTypeTextures = leadsData.leadTypeTextures
 local leadTypesHeader = leadsData.leadTypesHeader
 local subType_Leads 						= leadTypesHeader
-local leadType_scryable 					= leadTypes[1]
-local leadType_scried 						= leadTypes[2]
-local leadType_completed 					= leadTypes[3]
 local maxAntiquityTypes						= #leadTypes --Currently 3: Scryable, In progress, Completed (Codex)
 --Dungeon types
 local dungeonsData = teleporterVars.dungeonsData
@@ -126,11 +123,6 @@ local dungeonTypeNames = dungeonsData.dungeonTypeNames
 local dungeonTypeTextures = dungeonsData.dungeonTypeTextures
 local dungeonTypesHeader = dungeonsData.dungeonTypesHeader
 local subType_Dungeons						= dungeonTypesHeader
-local dungeonType_endlessDungeon			= dungeonTypes[1]
-local dungeonType_soloArena					= dungeonTypes[2]
-local dungeonType_groupArena				= dungeonTypes[3]
-local dungeonType_trial						= dungeonTypes[4]
-local dungeonType_groupDungeon				= dungeonTypes[5]
 local maxDungeonTypes						= #dungeonTypes --Currently 5: Endless dungeon, Solo Arena, Group Arena, Trial, Group dungeon
 
 --Lookup for the table to loop for checkboxes of the type
@@ -1254,7 +1246,7 @@ local function SetupUI()
 				  label = leadTypeName,
 				  callback = function(comboBox, itemName, item, checked, data)
 					  BMU.savedVarsChar[leadsSVTab][leadType] = checked
-					  BMU_ThrottledUpdate(refreshLeadsMainMenuEventStr, 250, refreshLeadsMainMenu, comboBox)
+					  BMU_ThrottledUpdate(refreshLeadsMainMenuEventStr, 150, refreshLeadsMainMenu, comboBox)
 				  end,
 				  entryType = LSM_ENTRY_TYPE_CHECKBOX,
 				  checked = function() return BMU.savedVarsChar[leadsSVTab][leadType] end,
@@ -1276,7 +1268,7 @@ local function SetupUI()
 					  allLeadFiltersEnabled = BMU_checkCheckboxesCurrentStatus(subType_Leads, allLeadFiltersEnabled)
 					  -- check all subTypes (1) or uncheck all subtypes (2)
 					  BMU_updateCheckboxLeadsMap(allLeadFiltersEnabled and 1 or 2)
-					  BMU_ThrottledUpdate(refreshLeadsMainMenuEventStr, 250, refreshLeadsMainMenu, comboBox)
+					  BMU_ThrottledUpdate(refreshLeadsMainMenuEventStr, 150, refreshLeadsMainMenu, comboBox)
 			    end,
 				{ --additionalData
 					tooltip = BMU_SI_Get(SI_CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL),
@@ -1304,7 +1296,7 @@ local function SetupUI()
 				  label = surveyTypeName,
 				  callback = function(comboBox, itemName, item, checked, data)
 					  BMU.savedVarsChar[surveySVTab][surveyType] = checked
-					  BMU_ThrottledUpdate(refreshSurveysMainMenuEventStr, 250, refreshSurveyMapMainAndSubMenu, comboBox)
+					  BMU_ThrottledUpdate(refreshSurveysMainMenuEventStr, 150, refreshSurveyMapMainAndSubMenu, comboBox)
 				  end,
 				  entryType = LSM_ENTRY_TYPE_CHECKBOX,
 				  checked = function() return BMU.savedVarsChar[surveySVTab][surveyType] end,
@@ -1326,7 +1318,7 @@ local function SetupUI()
 					  allSurveyFiltersEnabled = BMU_checkCheckboxesCurrentStatus(subType_Surveys, allSurveyFiltersEnabled)
 					  -- check all subTypes (1) or uncheck all subtypes (2)
 					  BMU_updateCheckboxSurveyMap(allSurveyFiltersEnabled and 1 or 2)
-					  BMU_ThrottledUpdate(refreshSurveysMainMenuEventStr, 250, refreshSurveyMapMainAndSubMenu, comboBox)
+					  BMU_ThrottledUpdate(refreshSurveysMainMenuEventStr, 150, refreshSurveyMapMainAndSubMenu, comboBox)
 			    end,
 				{ --additionalData
 					tooltip = BMU_SI_Get(SI_CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL),
@@ -1547,7 +1539,7 @@ local function SetupUI()
 				  label = leadTypeName,
 				  callback = function(comboBox, itemName, item, checked, data)
 					  BMU.savedVarsChar[dungeonsSVTab][dungeonType] = checked
-					  BMU_ThrottledUpdate(refreshDungeonsMainMenuEventStr, 250, refreshDungeonsMainMenu, comboBox)
+					  BMU_ThrottledUpdate(refreshDungeonsMainMenuEventStr, 150, refreshDungeonsMainMenu, comboBox)
 				  end,
 				  entryType = LSM_ENTRY_TYPE_CHECKBOX,
 				  checked = function() return BMU.savedVarsChar[dungeonsSVTab][dungeonType] end,
@@ -1569,7 +1561,7 @@ local function SetupUI()
 					  allDungeonFiltersEnabled = BMU_checkCheckboxesCurrentStatus(subType_Dungeons, allDungeonFiltersEnabled)
 					  -- check all subTypes (1) or uncheck all subtypes (2)
 					  BMU_updateCheckboxDungeonMap(allDungeonFiltersEnabled and 1 or 2)
-					  BMU_ThrottledUpdate(refreshDungeonsMainMenuEventStr, 250, refreshDungeonsMainMenu, comboBox)
+					  BMU_ThrottledUpdate(refreshDungeonsMainMenuEventStr, 150, refreshDungeonsMainMenu, comboBox)
 			    end,
 				{ --additionalData
 					tooltip = BMU_SI_Get(SI_CONSTANT_LSM_CLICK_SUBMENU_TOGGLE_ALL),

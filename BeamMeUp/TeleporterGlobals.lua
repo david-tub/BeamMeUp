@@ -65,7 +65,19 @@ BMU.var = {
   feedback				= "https://www.esoui.com/portal.php?id=283&a=faq", -- FAQ link
   savedVariablesName	 = "BeamMeUp_SV",
   -------------------------------------
-  allowedLanguages		= {de=true,en=true,fr=true,ru=true,es=true,pl=true,it=true,jp=true,br=true,kr=true,zh=true,}, --INS251229 Baertram
+  --[[
+  	["SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_1"] = "DISABLED",
+    ["SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_2"] = "English",
+    ["SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_3"] = "German",
+    ["SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_4"] = "French",
+    ["SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_5"] = "Russian",
+    ["SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_6"] = "Japanese",
+    ["SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_7"] = "Polish",
+    Attention: Do not change the allowedLanguagesIndex order! This must match the SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_1 to n entries
+    in order to make the LibZone's secondLanguage work in function  BMU.getZoneNameSecondLanguage
+  ]]
+  allowedLanguages		= {en=true,de=true,fr=true,ru=true,jp=true,pl=true,es=true,it=true,br=true,kr=true,zh=true}, --INS251229 Baertram
+  allowedLanguagesIndex = {[1]="None",[2]="en",[3]="de",[4]="fr",[5]="ru",[6]="jp",[7]="pl",[8]="es",[9]="it",[10]="br",[11]="kr",[12]="zh"}, --INS251229 Baertram
   fallbackLang			= "en",																		--INS251229 Baertram
   -------------------------------------
   controls              = {},
@@ -121,6 +133,9 @@ BMU.var = {
 }
 
 local teleporterVars = BMU.var
+--local allowedLanguages = teleporterVars.allowedLanguages
+local allowedLanguagesIndex = teleporterVars.allowedLanguagesIndex
+
 --Clues
 local clueTypesHeader = "clues"
 local subTypeClue                 = "clue"
@@ -472,6 +487,7 @@ local itemTypeIcons = {
 	[treasureTypesHeader] = serviceMapPinsDDSPath ..	"bank.dds",
 	[leadTypesHeader] = 	serviceMapPinsDDSPath .. 	"antiquities.dds"
 }
+--Get the survey, antiquity etc. itemtype's icon for the list row entries
 function BMU.getItemTypeIcon(itemType, dimension)
 	local iconPath = itemTypeIcons[itemType]
 	if iconPath ~= nil and ton(dimension) ~= nil then
@@ -481,6 +497,8 @@ function BMU.getItemTypeIcon(itemType, dimension)
 	end
 end
 
+
+--Check if the contextMenus should show any icon
 function BMU.checkIfContextMenuIconShouldShow(iconPath)
 	if iconPath == nil or iconPath == "" or BMU.savedVarsAcc.showContextMenuIcons == false then return nil end
 	return BMU_textures[iconPath]
@@ -519,14 +537,17 @@ BMU.questDataChanged = true
 --------------------------------------------------
 -- second language dropdown choices/values
 local BMU_dropdownSecLangChoices = {}
+local BMU_dropdownSecLangChoicesShort = {}
 local BMU_dropdownSecLangValues = {}
 local secLangDropdownEntryPrefix = numVars.secLangDropdownEntryPrefix
 for i=1, numVars.numSecLangDropdownEntries, 1 do
 	BMU_dropdownSecLangChoices[i] = BMU_SI_Get(secLangDropdownEntryPrefix, i)
 	BMU_dropdownSecLangValues[i] = i
+	BMU_dropdownSecLangChoicesShort[i] = allowedLanguagesIndex[i] --Add the short language like "en" to the table so we can use it for LibZone's secondLanguage properly (via BMU.savedVarsAcc.secondLanguage)
 end
 BMU.dropdownSecLangValues = BMU_dropdownSecLangValues
 BMU.dropdownSecLangChoices = BMU_dropdownSecLangChoices
+BMU.dropdownSecLangChoicesShort = BMU_dropdownSecLangChoicesShort
 
 -- sorting dropdown choices/values
 local BMU_dropdownSortChoices = {}

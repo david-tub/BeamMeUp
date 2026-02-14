@@ -142,7 +142,7 @@ end
 
 
 local function BMU_sc_switchLanguage(option)
-	if allowedLanguages[option] then																--CHG251229 Baertram Usage of dynamic languaes allowed table, tor educe redundancy and manual code changes if languages get added
+	if allowedLanguages[option] then																--CHG251229 Baertram Usage of dynamic languaes allowed table, to reduce redundancy and manual code changes if languages get added
 		SetCVar("language.2",option)
 	else
 		BMU_printToChat("invalid language code: " ..tos(option))

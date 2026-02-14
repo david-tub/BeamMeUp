@@ -1345,8 +1345,8 @@ end
 -- Goes through each line control and either shows a message or hides it
 local cachedSavedVarsAccountSecondLanguage = nil													--INS251229 Baertram
 local function disableTooltipAndResetOnMouseUp(list)
-	local ColumnPlayerNameTex = list.ColumnPlayerNameTex
 	list.ColumnNumberPlayers:SetText("")
+	local ColumnPlayerNameTex = list.ColumnPlayerNameTex
 	ColumnPlayerNameTex:SetHandler("OnMouseEnter", nil)
 	ColumnPlayerNameTex:SetHandler("OnMouseExit", nil)
 	ColumnPlayerNameTex:SetHandler("OnMouseUp", nil)
@@ -1459,6 +1459,9 @@ function ListView:update()
 
 				if 	#tooltipTextPlayer > 0 then
 					-- show tooltip handler
+					disableTooltipAndResetOnMouseUp(rowControlOfList)
+					--rowControlOfList.ColumnPlayerNameTex:SetHandler("OnMouseEnter", nil)
+					--rowControlOfList.ColumnPlayerNameTex:SetHandler("OnMouseExit", nil)
 					rowControlOfList.ColumnPlayerNameTex:SetHandler("OnMouseEnter", function(self)
 						if message.playerNameClickable then
 							rowControlOfList.ColumnPlayerNameTex:SetAlpha(0.3)
@@ -1604,7 +1607,8 @@ function ListView:update()
 					for _, itemType in ipairs(message.relatedItemsTypes) do
 						if itemType ~= nil then
 							-- add dimensionized icon (same size as BMU.font1)
-							messageZoneName = messageZoneName .. BMU_getItemTypeIcon(itemType, BMU_round(17*scale, 0))
+							--> add the survey, antiquity, treasure map icons at the rows
+							messageZoneName = messageZoneName .. BMU_getItemTypeIcon(itemType, BMU_round(16*scale, 0))
 						end
 					end
 					message.addedTotalItems = true

@@ -120,7 +120,7 @@ local BMU_getParentZoneId, BMU_getMapIndex, BMU_categorizeZone, BMU_getCurrentZo
       BMU_getDataMapInfo, BMU_itemIsRelated, BMU_createZoneLessItemsInfo, BMU_createClickableZoneRecord, BMU_addItemInformation,
    	  BMU_addLeadInformation, BMU_cleanUnrelatedRecords, BMU_cleanUnrelatedRecords2, BMU_findExactQuestLocation, BMU_createNoResultsInfo,
       BMU_decidePrioDisplay, BMU_addNumberPlayers, BMU_getZoneGuideDiscoveryInfo, BMU_createPublicDungeonAchiementInfo,
-	  BMU_createBlankRecord, BMU_createDungeonRecord, BMU_createTableGuilds, BMU_getIndexFromValue, BMU_leadIsRelated
+	  BMU_createBlankRecord, BMU_createDungeonRecord, BMU_createTableGuilds, BMU_getIndexFromValue, BMU_leadIsRelated, BMU_dropdownSecLangChoicesShort
 ----functions (defined inline in code below, upon first usage, as they are still nil at this line)
 
 --String text variables
@@ -795,18 +795,27 @@ BMU_getIndexFromValue = BMU.getIndexFromValue														--INS251229 Baertram
 
 -- add alternative zone name (second language) if feature active (see translation array)
 local cachedSavedVarsAccountSecondLanguage = nil													--INS251229 Baertram
+local cachedSecondLanguageISO = nil
 function BMU.getZoneNameSecondLanguage(zoneId)
 	BMU_LibZoneGivenZoneData = BMU_LibZoneGivenZoneData or BMU.LibZoneGivenZoneData					--INS251229 Baertram
 	-- check if enabled
 	if cachedSavedVarsAccountSecondLanguage == nil or BMU.secondLanguageChanged then
 		cachedSavedVarsAccountSecondLanguage = BMU.savedVarsAcc.secondLanguage  					--INS251229 Baertram Cache the SavedVariables 2nd language until next reloadui or LAm settings changed (which will be checked against BMU.secondLanguageChanged)
 		BMU.secondLanguageChanged = nil
+		BMU.cachedSecondLanguageISO = nil
 	end
+--d("[BMU]cachedSavedVarsAccountSecondLanguage: " ..tos(cachedSavedVarsAccountSecondLanguage))
 	if cachedSavedVarsAccountSecondLanguage ~= 1 then
-		local language = BMU.dropdownSecLangChoices[BMU.savedVarsAcc.secondLanguage]
+		BMU_dropdownSecLangChoicesShort = BMU_dropdownSecLangChoicesShort or BMU.dropdownSecLangChoicesShort
+		local language = (cachedSecondLanguageISO ~= nil and cachedSecondLanguageISO) or BMU_dropdownSecLangChoicesShort[BMU.savedVarsAcc.secondLanguage]
+		cachedSecondLanguageISO = language
+--d(">SecondLanguage short ISO: " ..tos(language))
+		if language == nil then return end
 		local localizedZoneIdData = BMU_LibZoneGivenZoneData[language]  							--CHG251229 Baertram
+--d(">>localizedZoneIdData: " .. tos(localizedZoneIdData))
 		if localizedZoneIdData == nil then return end
 		local localizedZoneName = localizedZoneIdData[zoneId]
+--d(">>localizedZoneName: " .. tos(localizedZoneName))
 		if localizedZoneName == nil or type(localizedZoneName) ~= stringType then return end
 
 		return localizedZoneName
@@ -846,7 +855,7 @@ function BMU.addInfo_1(e, currentZoneId, playersZoneId, sourceIndexLeading)
 	end
 
 	-- add second zone name
-	e.zoneNameSecondLanguage = BMU.getZoneNameSecondLanguage(e.zoneId)
+	e.zoneNameSecondLanguage = BMU_getZoneNameSecondLanguage(e.zoneId)
 
 	if e.displayName ~= "" and e.displayName ~= nil then
 		-- format character name
@@ -1513,7 +1522,8 @@ function BMU.syncWithItems(p_portalPlayers)															--CHG251229 Baertram R
 		end
 	end
 
-	if BMU_savedVarsChar.displayAntiquityLeads.scried or BMU_savedVarsChar.displayAntiquityLeads.srcyable then
+	local BMU_SV_Char_displayAntiquityLeads = BMU_savedVarsChar.displayAntiquityLeads
+	if BMU_SV_Char_displayAntiquityLeads.scried or BMU_SV_Char_displayAntiquityLeads.srcyable then
 		local leadsFound = {} --table of leads, with each subtable per quality
 		-- seperately: go over all leads and add them to "portalPlayers" and "unrelatedItemsRecords"
 		local antiquityId = GetNextAntiquityId()
@@ -1522,13 +1532,13 @@ function BMU.syncWithItems(p_portalPlayers)															--CHG251229 Baertram R
 				local zoneId = GetAntiquityZoneId(antiquityId)
 				local achievedGoals = GetNumGoalsAchievedForAntiquity(antiquityId)
 					-- leads that are already scried (at least one "achieved goal" in lead scry progress)
-				if ((BMU_savedVarsChar.displayAntiquityLeads.scried and achievedGoals > 0)
+				if ((BMU_SV_Char_displayAntiquityLeads.scried and achievedGoals > 0)
 					or
 					-- leads that are are scryable (no progress)
-					(BMU_savedVarsChar.displayAntiquityLeads.srcyable and achievedGoals == 0))
+					(BMU_SV_Char_displayAntiquityLeads.srcyable and achievedGoals == 0))
 					and
 					-- include or filter completed leads (codex)
-					(BMU_savedVarsChar.displayAntiquityLeads.completed or GetNumAntiquityLoreEntries(antiquityId) ~= GetNumAntiquityLoreEntriesAcquired(antiquityId))
+					(BMU_SV_Char_displayAntiquityLeads.completed or GetNumAntiquityLoreEntries(antiquityId) ~= GetNumAntiquityLoreEntriesAcquired(antiquityId))
 				then
 					local quality = GetAntiquityQuality(antiquityId)
 					local name = GetAntiquityName(antiquityId)
@@ -2191,6 +2201,7 @@ function BMU.getDataMapInfo(itemId)
 
 	-- go over all overland zones in global list
 	for zoneId, typeList in pairs(BMU.treasureAndSurveyMaps) do
+		--Check itemList per mapType
 		for mapType, itemList in pairs(typeList) do
 			-- check if itemList contains itemId
 			if BMU_has_value(itemList, itemId) then

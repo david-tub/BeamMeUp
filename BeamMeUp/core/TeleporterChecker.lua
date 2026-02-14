@@ -796,28 +796,26 @@ BMU_getIndexFromValue = BMU.getIndexFromValue														--INS251229 Baertram
 -- add alternative zone name (second language) if feature active (see translation array)
 local cachedSavedVarsAccountSecondLanguage = nil													--INS251229 Baertram
 local cachedSecondLanguageISO = nil
+local cachedSecondLanguageZoneData = nil
 function BMU.getZoneNameSecondLanguage(zoneId)
 	BMU_LibZoneGivenZoneData = BMU_LibZoneGivenZoneData or BMU.LibZoneGivenZoneData					--INS251229 Baertram
 	-- check if enabled
 	if cachedSavedVarsAccountSecondLanguage == nil or BMU.secondLanguageChanged then
 		cachedSavedVarsAccountSecondLanguage = BMU.savedVarsAcc.secondLanguage  					--INS251229 Baertram Cache the SavedVariables 2nd language until next reloadui or LAm settings changed (which will be checked against BMU.secondLanguageChanged)
 		BMU.secondLanguageChanged = nil
-		BMU.cachedSecondLanguageISO = nil
+		cachedSecondLanguageISO = nil
+		cachedSecondLanguageZoneData = nil
 	end
---d("[BMU]cachedSavedVarsAccountSecondLanguage: " ..tos(cachedSavedVarsAccountSecondLanguage))
 	if cachedSavedVarsAccountSecondLanguage ~= 1 then
 		BMU_dropdownSecLangChoicesShort = BMU_dropdownSecLangChoicesShort or BMU.dropdownSecLangChoicesShort
 		local language = (cachedSecondLanguageISO ~= nil and cachedSecondLanguageISO) or BMU_dropdownSecLangChoicesShort[BMU.savedVarsAcc.secondLanguage]
 		cachedSecondLanguageISO = language
---d(">SecondLanguage short ISO: " ..tos(language))
 		if language == nil then return end
-		local localizedZoneIdData = BMU_LibZoneGivenZoneData[language]  							--CHG251229 Baertram
---d(">>localizedZoneIdData: " .. tos(localizedZoneIdData))
+		local localizedZoneIdData = (cachedSecondLanguageZoneData ~= nil and cachedSecondLanguageZoneData) or BMU_LibZoneGivenZoneData[language]  							--CHG251229 Baertram
+		cachedSecondLanguageZoneData = localizedZoneIdData
 		if localizedZoneIdData == nil then return end
 		local localizedZoneName = localizedZoneIdData[zoneId]
---d(">>localizedZoneName: " .. tos(localizedZoneName))
 		if localizedZoneName == nil or type(localizedZoneName) ~= stringType then return end
-
 		return localizedZoneName
 	else
 		return nil

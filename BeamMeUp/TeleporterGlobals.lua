@@ -466,6 +466,9 @@ local BMU_textures = {
 	mail						 = "/esoui/art/menubar/menubar_mail_up.dds", --todo
 	addFriend					 = "/esoui/art/hud/radialicon_addfriend_up.dds", --todo
 	removeFriend				 = "/esoui/art/hud/radialicon_removefriend_up.dds", --todo
+
+	rowSecondDivider 			 = "/esoui/art/guild/sectiondivider_left.dds",
+	slider						 = "/esoui/art/miscellaneous/scrollbox_elevator.dds"
 }
 BMU_textures.leadTypeCompletedStr20			= string_format(textureStrPattern20, BMU_textures.leadTypeCompleted)
 BMU_textures.dungeonDifficultyNormalStr  	= string_format(textureStrPattern32, BMU_textures.dungeonDifficultyNormal)

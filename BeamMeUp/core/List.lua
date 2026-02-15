@@ -28,6 +28,8 @@ local table = table
 local table_insert = table.insert
 local table_remove = table.remove
 local table_sort = table.sort
+local math = math
+local math_floor = math.floor
 --Other addon variables
 local BMU_LibZone = BMU.LibZone
 local BMU_LibSets = BMU.LibSets
@@ -60,6 +62,9 @@ end
 
 --BMU variables
 local BMU_textures = BMU.textures
+local rowSecondDividerTexture = BMU_textures.rowSecondDivider 	--"/esoui/art/guild/sectiondivider_left.dds"
+local sliderTexture = BMU_textures.slider	   					--"/esoui/art/miscellaneous/scrollbox_elevator.dds"
+
 local BMU_ZONE_CATEGORY_UNKNOWN = BMU.ZONE_CATEGORY_UNKNOWN
 local BMU_ZONE_CATEGORY_DELVE = BMU.ZONE_CATEGORY_DELVE
 local BMU_ZONE_CATEGORY_PUBDUNGEON = BMU.ZONE_CATEGORY_PUBDUNGEON
@@ -108,7 +113,7 @@ local colorBlue 							= colorNames[6]
 local colorRed 								= colorNames[7]
 local colorGray 							= colorNames[8]
 
-local BMU_TeleporterListUpdateEventName =  "TeleportList_Update"
+local BMU_TeleporterListUpdateEventName =  "BMU_TeleportList_Update"
 
 ----functions
 --ZOs functions
@@ -1014,252 +1019,266 @@ end
 
 
 -- Private API
-local function _set_line_counts(self)
-    --self.num_visible_lines = math.floor((self.control:GetHeight() - LINES_OFFSET*BMU.savedVarsAcc.Scale) / self.line_height)
+local function _set_line_counts(listView)
+    --self.num_visible_lines = math_floor((self.control:GetHeight() - LINES_OFFSET*BMU.savedVarsAcc.Scale) / self.line_height)
     --self.num_visible_lines = math.min(self.num_visible_lines, #self.lines)
-	self.num_visible_lines = math.min(BMU.savedVarsAcc.numberLines, #self.lines)
+	listView.num_visible_lines = math.min(BMU.savedVarsAcc.numberLines, #listView.lines)
 
-    self.num_hidden_lines = math.max(0, #self.lines - self.num_visible_lines)
-    if self.num_hidden_lines == 0 then
-        self.offset = 0
+    listView.num_hidden_lines  = math.max(0, #listView.lines - listView.num_visible_lines)
+    if listView.num_hidden_lines == 0 then
+        listView.offset = 0
     end
 end
 
-local function _create_listview_row(self, i)
-    local control = self.control
+
+local function _create_listview_row(listView, i)
+    local control = listView.control
     local name = control:GetName() .. "_list" .. i
 
 	-- get zone id of current zone (zoneIndex changes at each API update, zoneId is more robust)
-	local currentZoneId = GetZoneId(GetCurrentMapZoneIndex())
+	--local currentZoneId = GetZoneId(GetCurrentMapZoneIndex())
 
 	local scale = BMU.savedVarsAcc.Scale
 
     local rowControlOfList = wm:CreateControl(name, control, CT_CONTROL)
-    rowControlOfList:SetHeight(self.line_height)
+    rowControlOfList:SetHeight(listView.line_height)
 
-    local message = self.lines[i]
+    local message = listView.lines[i]
 
     if message ~= nil then
 		-- RGB color code for mouse over feedback
 		local bmuGoldColorRGB = colorLegendary
-
-		rowControlOfList.ColumnNumberPlayers = wm:CreateControl(name .. "_NumberPlayers", rowControlOfList, CT_LABEL)
-		rowControlOfList.ColumnNumberPlayers:SetDimensions(35*scale, 20*scale)
-		rowControlOfList.ColumnNumberPlayers:SetFont(BMU.font1)
-		rowControlOfList.ColumnNumberPlayers:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
-		rowControlOfList.ColumnNumberPlayers:SetAnchor(0, rowControlOfList, 0, LEFT -40*scale, 50*scale)
+		local rowControlOfList_ColumnNumberPlayers = wm:CreateControl(name .. "_NumberPlayers", rowControlOfList, CT_LABEL)
+		rowControlOfList.ColumnNumberPlayers = rowControlOfList_ColumnNumberPlayers
+		rowControlOfList_ColumnNumberPlayers:SetDimensions(35*scale, 20*scale)
+		rowControlOfList_ColumnNumberPlayers:SetFont(BMU.font1)
+		rowControlOfList_ColumnNumberPlayers:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+		rowControlOfList_ColumnNumberPlayers:SetAnchor(0, rowControlOfList, 0, LEFT -40*scale, 50*scale)
 
 		--Create another control (Texture) for MouseOver interactions
-		rowControlOfList.ColumnNumberPlayersTex = WINDOW_MANAGER:CreateControl(name .. "_NumberPlayersOver", rowControlOfList.ColumnNumberPlayers, CT_TEXTURE)
-		rowControlOfList.ColumnNumberPlayersTex:SetAnchorFill(rowControlOfList.ColumnNumberPlayers)
-		rowControlOfList.ColumnNumberPlayersTex:SetMouseEnabled(true)
-		rowControlOfList.ColumnNumberPlayersTex:SetDrawLayer(2)
+		local rowControlOfList_ColumnNumberPlayersTex = WINDOW_MANAGER:CreateControl(name .. "_NumberPlayersOver", rowControlOfList_ColumnNumberPlayers, CT_TEXTURE)
+		rowControlOfList.ColumnNumberPlayersTex = rowControlOfList_ColumnNumberPlayersTex
+		rowControlOfList_ColumnNumberPlayersTex:SetAnchorFill(rowControlOfList_ColumnNumberPlayers)
+		rowControlOfList_ColumnNumberPlayersTex:SetMouseEnabled(true)
+		rowControlOfList_ColumnNumberPlayersTex:SetDrawLayer(2)
 		-- set rgb color instead of texture
-		rowControlOfList.ColumnNumberPlayersTex:SetColor(bmuGoldColorRGB:UnpackRGBA())
-		rowControlOfList.ColumnNumberPlayersTex:SetAlpha(0)
+		rowControlOfList_ColumnNumberPlayersTex:SetColor(bmuGoldColorRGB:UnpackRGBA())
+		rowControlOfList_ColumnNumberPlayersTex:SetAlpha(0)
 
 
 		-- COLUMN PLAYER NAME
-		rowControlOfList.ColumnPlayerName = wm:CreateControl(name .. "_Player", rowControlOfList, CT_LABEL)
-		rowControlOfList.ColumnPlayerName:SetDimensions(150*scale, 25*scale)
-		rowControlOfList.ColumnPlayerName:SetFont(BMU.font1)
-		rowControlOfList.ColumnPlayerName:SetAnchor(0, rowControlOfList, 0, LEFT, 50*scale)
+		local rowControlOfList_ColumnPlayerName = wm:CreateControl(name .. "_Player", rowControlOfList, CT_LABEL)
+		rowControlOfList.ColumnPlayerName = rowControlOfList_ColumnPlayerName
+		rowControlOfList_ColumnPlayerName:SetDimensions(150*scale, 25*scale)
+		rowControlOfList_ColumnPlayerName:SetFont(BMU.font1)
+		rowControlOfList_ColumnPlayerName:SetAnchor(0, rowControlOfList, 0, LEFT, 50*scale)
 
 		--Create another control (Texture) for Mouse interaction
-		rowControlOfList.ColumnPlayerNameTex = WINDOW_MANAGER:CreateControl(name .. "_PlayerOver", rowControlOfList.ColumnPlayerName, CT_TEXTURE)
-		rowControlOfList.ColumnPlayerNameTex:SetAnchorFill(rowControlOfList.ColumnPlayerName)
-		rowControlOfList.ColumnPlayerNameTex:SetMouseEnabled(true)
-		rowControlOfList.ColumnPlayerNameTex:SetDrawLayer(2)
+		local rowControlOfList_ColumnPlayerNameTex = WINDOW_MANAGER:CreateControl(name .. "_PlayerOver", rowControlOfList_ColumnPlayerName, CT_TEXTURE)
+		rowControlOfList.ColumnPlayerNameTex = rowControlOfList_ColumnPlayerNameTex
+		rowControlOfList_ColumnPlayerNameTex:SetAnchorFill(rowControlOfList_ColumnPlayerName)
+		rowControlOfList_ColumnPlayerNameTex:SetMouseEnabled(true)
+		rowControlOfList_ColumnPlayerNameTex:SetDrawLayer(2)
 		-- set rgb color instead of texture
-		rowControlOfList.ColumnPlayerNameTex:SetColor(bmuGoldColorRGB:UnpackRGBA())
-		rowControlOfList.ColumnPlayerNameTex:SetAlpha(0)
+		rowControlOfList_ColumnPlayerNameTex:SetColor(bmuGoldColorRGB:UnpackRGBA())
+		rowControlOfList_ColumnPlayerNameTex:SetAlpha(0)
 
 
 		controlWidth           = control:GetWidth()
-		rowControlOfList.frame = wm:CreateControl(name .. "_frame", rowControlOfList, CT_TEXTURE)
-		rowControlOfList.frame:SetDimensions(controlWidth + 30*scale, 3*scale)
-		rowControlOfList.frame:SetAnchor(0, rowControlOfList, 0, LEFT - 40*scale, 42*scale)
-
-		rowControlOfList.frame:SetTexture("/esoui/art/guild/sectiondivider_left.dds")
-		rowControlOfList.frame:SetTextureCoords(0, 1, 0, 1)
-		rowControlOfList.frame:SetAlpha(0.7)
+		local rowControlOfList_frame = wm:CreateControl(name .. "_frame", rowControlOfList, CT_TEXTURE)
+		rowControlOfList.frame = rowControlOfList_frame
+		rowControlOfList_frame:SetDimensions(controlWidth + 30*scale, 3*scale)
+		rowControlOfList_frame:SetAnchor(0, rowControlOfList, 0, LEFT - 40*scale, 42*scale)
+		rowControlOfList_frame:SetTexture(rowSecondDividerTexture)
+		rowControlOfList_frame:SetTextureCoords(0, 1, 0, 1)
+		rowControlOfList_frame:SetAlpha(0.7)
 
 
 		-- COLUMN ZONE NAME
-		rowControlOfList.ColumnZoneName = wm:CreateControl(name .. "_Zone", rowControlOfList, CT_LABEL)
-		rowControlOfList.ColumnZoneName:SetDimensions(240*scale, 25*scale)
-		rowControlOfList.ColumnZoneName:SetFont(BMU.font1)
-		rowControlOfList.ColumnZoneName:SetAnchor(0, rowControlOfList, 0, LEFT + 165*scale, 50*scale)
+		local rowControlOfList_ColumnZoneName = wm:CreateControl(name .. "_Zone", rowControlOfList, CT_LABEL)
+		rowControlOfList.ColumnZoneName = rowControlOfList_ColumnZoneName
+		rowControlOfList_ColumnZoneName:SetDimensions(240*scale, 25*scale)
+		rowControlOfList_ColumnZoneName:SetFont(BMU.font1)
+		rowControlOfList_ColumnZoneName:SetAnchor(0, rowControlOfList, 0, LEFT + 165*scale, 50*scale)
 
 		-- Create another control (Texture) for Mouse interaction
-		rowControlOfList.ColumnZoneNameTex = WINDOW_MANAGER:CreateControl(name .. "_ZoneOver", rowControlOfList.ColumnZoneName, CT_TEXTURE)
-		rowControlOfList.ColumnZoneNameTex:SetAnchorFill(rowControlOfList.ColumnZoneName)
-		rowControlOfList.ColumnZoneNameTex:SetMouseEnabled(true)
-		rowControlOfList.ColumnZoneNameTex:SetDrawLayer(2)
+		local rowControlOfList_ColumnZoneNameTex = WINDOW_MANAGER:CreateControl(name .. "_ZoneOver", rowControlOfList_ColumnZoneName, CT_TEXTURE)
+		rowControlOfList.ColumnZoneNameTex = rowControlOfList_ColumnZoneNameTex
+		rowControlOfList_ColumnZoneNameTex:SetAnchorFill(rowControlOfList_ColumnZoneName)
+		rowControlOfList_ColumnZoneNameTex:SetMouseEnabled(true)
+		rowControlOfList_ColumnZoneNameTex:SetDrawLayer(2)
 		-- set rgb color instead of texture
-		rowControlOfList.ColumnZoneNameTex:SetColor(bmuGoldColorRGB:UnpackRGBA())
-		rowControlOfList.ColumnZoneNameTex:SetAlpha(0)
+		rowControlOfList_ColumnZoneNameTex:SetColor(bmuGoldColorRGB:UnpackRGBA())
+		rowControlOfList_ColumnZoneNameTex:SetAlpha(0)
 
-
-		rowControlOfList.portalToPlayerTex = WINDOW_MANAGER:CreateControl(name .. "_TeleTex", rowControlOfList, CT_TEXTURE)
-		rowControlOfList.portalToPlayerTex:SetDimensions(45*scale, 45*scale)
-		rowControlOfList.portalToPlayerTex:SetAnchor(0, rowControlOfList, 0, LEFT + 400*scale, 41*scale) --490 ... 15
-		rowControlOfList.portalToPlayerTex:SetMouseEnabled(true)
-		rowControlOfList.portalToPlayerTex:SetDrawLayer(2)
+		local rowControlOfList_portalToPlayerTex = WINDOW_MANAGER:CreateControl(name .. "_TeleTex", rowControlOfList, CT_TEXTURE)
+		rowControlOfList.portalToPlayerTex = rowControlOfList_portalToPlayerTex
+		rowControlOfList_portalToPlayerTex:SetDimensions(45*scale, 45*scale)
+		rowControlOfList_portalToPlayerTex:SetAnchor(0, rowControlOfList, 0, LEFT + 400*scale, 41*scale) --490 ... 15
+		rowControlOfList_portalToPlayerTex:SetMouseEnabled(true)
+		rowControlOfList_portalToPlayerTex:SetDrawLayer(2)
 
         return rowControlOfList
     end
 end
 
 
-local function _create_listview_lines_if_needed(self)
-    local control = self.control
+local function _create_listview_lines_if_needed(listView)
+    local control = listView.control
 
-	local scale = BMU.savedVarsAcc.Scale
+	local lineOffsetWithScale = LINES_OFFSET * BMU.savedVarsAcc.Scale
 
     -- Makes sure that the main control is filled up with line controls at all times.
-    for i = 1, self.num_visible_lines do
+    for i = 1, listView.num_visible_lines do
         if control.lines[i] == nil then
-            local line = _create_listview_row(self, i)
+            local line = _create_listview_row(listView, i)
             control.lines[i] = line
-			if i == 1 then
-				line:SetAnchor(TOPLEFT, control, TOPLEFT, 0, LINES_OFFSET*scale)
-			else
-				line:SetAnchor(TOPLEFT, control.lines[i - 1], BOTTOMLEFT, 0, 0)
-			end
+			local isFirstLine = i == 1
+			line:SetAnchor(TOPLEFT, (isFirstLine and control) or control.lines[i - 1], (isFirstLine and TOPLEFT) or BOTTOMLEFT, 0, (isFirstLine and lineOffsetWithScale) or 0)
         end
     end
 end
 
 
-local function _on_resize(self)
+local function _on_resize(listView)
 	BMU_round = BMU_round or BMU.round
-    BMU.control_global_2 = self.control
+	BMU_calculateListHeight = BMU_calculateListHeight or BMU.calculateListHeight
+    BMU.control_global_2 = listView.control
+	local BMU_control_global_2 = BMU.control_global_2
 
     -- Need to calculate num_visible_lines etc. for the rest of this function.
-    _set_line_counts(self)
+    _set_line_counts(listView)
 
-    _create_listview_lines_if_needed(self)
-
-	local scale = BMU.savedVarsAcc.Scale
+    _create_listview_lines_if_needed(listView)
 
     -- Represent how many lines are visible atm.
 	-- on initialization #self.lines can be 0 -> prevent division with 0
 	local viewable_lines_pct = 1
-	if #self.lines > 0 then
-		viewable_lines_pct = BMU_round(self.num_visible_lines / #self.lines, 1) or 1
+	if #listView.lines > 0 then
+		viewable_lines_pct = BMU_round(listView.num_visible_lines / #listView.lines, 1) or 1
 	end
 
+	local slider = BMU_control_global_2.slider
     -- Can we see all the lines?
     if viewable_lines_pct >= 1.0 then
-        BMU.control_global_2.slider:SetHidden(true)
+        slider:SetHidden(true)
     else
         -- If not, make sure the slider is showing.
-        BMU.control_global_2.slider:SetHidden(false)
-        self.control.slider:SetMinMax(0, self.num_hidden_lines)
+        slider:SetHidden(false)
+        slider:SetMinMax(0, listView.num_hidden_lines)
 
-		local totalListHeight = BMU.calculateListHeight()
+		local totalListHeight = BMU_calculateListHeight()
 		-- slider height = totalListHeight  *  percentage of visible lines
 		local sliderHeight = totalListHeight*viewable_lines_pct
 		-- while the list control is heigher than the visible space (because of the leaking backgroundin the bottom), we just cut a percentage
 		local listHeightForSlider = (0.82*totalListHeight) -- no need of scaling because totalListHeight is already scaled
 
-		BMU.control_global_2.slider:SetHeight(listHeightForSlider)
+		slider:SetHeight(listHeightForSlider)
         -- The more lines we can see, the bigger the slider should be.
-        local tex = self.slider_texture
-        BMU.control_global_2.slider:SetThumbTexture(tex, tex, tex, SLIDER_WIDTH*scale, sliderHeight, 0, 0, 1, 1)
+        local tex = listView.slider_texture
+        slider:SetThumbTexture(tex, tex, tex, SLIDER_WIDTH*BMU.savedVarsAcc.Scale, sliderHeight, 0, 0, 1, 1)
 	end
 
     -- Update line widths in case we just resized self.control.
-    local line_width = BMU.control_global_2:GetWidth()
-    if not BMU.control_global_2.slider:IsControlHidden() then
+    local line_width = BMU_control_global_2:GetWidth()
+    if not slider:IsControlHidden() then
 
-        line_width = line_width - BMU.control_global_2.slider:GetWidth()
+        line_width = line_width - slider:GetWidth()
     end
 
-    for _, line in pairs(BMU.control_global_2.lines) do
+    for _, line in pairs(BMU_control_global_2.lines) do
         line:SetWidth(line_width)
     end
 end
 
 
 local function _initialize_listview(self_listview, width, height, left, top)
+	BMU_formatGold = BMU_formatGold or BMU.formatGold
+
 	BMU.control_global = self_listview.control
+	local BMU_control_global = BMU.control_global
 	BMU_tooltipTextEnter = BMU_tooltipTextEnter or BMU.tooltipTextEnter
     --local control = self_listview.control
-    local name = BMU.control_global:GetName()
+    local name = BMU_control_global:GetName()
 
-	local scale = BMU.savedVarsAcc.Scale
+	local BMU_SVAcc = BMU.savedVarsAcc
+	local scale = BMU_SVAcc.Scale
+	
+	local BMU_font2 = BMU.font2
 
     -- main control
-    BMU.control_global:SetDimensions(width, height)
-    BMU.control_global:SetHidden(true)
-    BMU.control_global:SetMouseEnabled(true)
-    BMU.control_global:SetClampedToScreen(true)
-	--BMU.control_global:SetResizeHandleSize(MOUSE_CURSOR_RESIZE_NS)
+    BMU_control_global:SetDimensions(width, height)
+    BMU_control_global:SetHidden(true)
+    BMU_control_global:SetMouseEnabled(true)
+    BMU_control_global:SetClampedToScreen(true)
+	--BMU_control_global:SetResizeHandleSize(MOUSE_CURSOR_RESIZE_NS)
 
 
 	-- create Backdrop / BackGround
-	BMU.control_global.bd = WINDOW_MANAGER:CreateControl(nil, BMU.control_global, CT_TEXTURE)
-	BMU.control_global.bd:SetMouseEnabled(true)
+	local BMU_control_global_bd = WINDOW_MANAGER:CreateControl(nil, BMU_control_global, CT_TEXTURE)
+	BMU_control_global.bd = BMU_control_global_bd
+	BMU_control_global_bd:SetMouseEnabled(true)
 	-- Users with Full-HD resolution run into problems because of the space!!
-	--BMU.control_global.bd:SetClampedToScreen(true)
+	--BMU_control_global_bd:SetClampedToScreen(true)
 
 	-- set position
-	BMU.control_global.bd:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, LEFT + BMU.savedVarsAcc.pos_x, BMU.savedVarsAcc.pos_y)
+	BMU_control_global_bd:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, LEFT + BMU_SVAcc.pos_x, BMU_SVAcc.pos_y)
 	-- set dimensions
-	BMU.control_global.bd:SetDimensions(BMU.control_global:GetWidth() + 110*scale, BMU.control_global:GetHeight() + 300*scale)
+	BMU_control_global_bd:SetDimensions(BMU_control_global:GetWidth() + 110*scale, BMU_control_global:GetHeight() + 300*scale)
 	-- set texture
-	BMU.control_global.bd:SetTexture("/esoui/art/miscellaneous/centerscreen_left.dds")
+	BMU_control_global_bd:SetTexture("/esoui/art/miscellaneous/centerscreen_left.dds")
 
 	-- !! anchor & place main control on backdrop !!
-	BMU.control_global:SetAnchor(CENTER, BMU.control_global.bd, nil, 15*scale)
+	BMU_control_global:SetAnchor(CENTER, BMU_control_global_bd, nil, 15*scale)
 	-- set moveable
-	BMU.control_global.bd:SetMovable(not BMU.savedVarsAcc.fixedWindow)
+	BMU_control_global_bd:SetMovable(not BMU_SVAcc.fixedWindow)
 	-- bring BMU window from draw layer 1 (default) to draw layer 2, to make sure that other addons and map scene are not in front of BMU window
 	--> Hint Baertram 260209: You should not change the drawLayer here and you should use the constants defined in the game not any fixed values like 1 or 2!
 	--> UI elements should stay on normal layer DL_CONTROL, unless they are context menus and other special UI elements.
 	--> 2 (DL_TEXT) means it is text and should draw above controls. So your addon is making other addon or vanilla text maybe draw wrong then if they overlay each other...
 	---> Rather use DrawLayer DL_CONTROLS and DrawLevel "a high value" to make the UI of BMU show above others on the same DrawLayer but still make text and other DL* > 1 draw above your UI as intended.
-	BMU.control_global:SetDrawLayer(DL_TEXT) --2
+	BMU_control_global:SetDrawLayer(DL_TEXT) --2
 
 
 	------------------------------------------------------------------------------------------------------------------------
     --------------------------------------------------------------------------------------------------------------------
 	-- Total & Statistics
+	local BMU_control_global_statisticGold = wm:CreateControl(name .. "_StatisticGold", BMU_control_global, CT_LABEL)
+	BMU_control_global.statisticGold = BMU_control_global_statisticGold
+	BMU_control_global_statisticGold:SetFont(BMU_font2)
+    BMU_control_global_statisticGold:SetAnchor(TOPLEFT, BMU_control_global, TOPLEFT, TOPLEFT-35*scale, 25*scale)
+	BMU_control_global_statisticGold:SetText(BMU_SI_Get(SI_TELE_UI_GOLD) .. " " .. BMU_formatGold(BMU_SVAcc.savedGold))
 
-	BMU.control_global.statisticGold = wm:CreateControl(name .. "_StatisticGold", BMU.control_global, CT_LABEL)
-	BMU.control_global.statisticGold:SetFont(BMU.font2)
-    BMU.control_global.statisticGold:SetAnchor(TOPLEFT, BMU.control_global, TOPLEFT, TOPLEFT-35*scale, 25*scale)
-	BMU.control_global.statisticGold:SetText(BMU_SI_Get(SI_TELE_UI_GOLD) .. " " .. BMU.formatGold(BMU.savedVarsAcc.savedGold))
+	local BMU_control_global_statisticTotal = wm:CreateControl(name .. "_StatisticTotal", BMU_control_global, CT_LABEL)
+	BMU_control_global.statisticTotal = BMU_control_global_statisticTotal
+	BMU_control_global_statisticTotal:SetFont(BMU_font2)
+    BMU_control_global_statisticTotal:SetAnchor(TOPLEFT, BMU_control_global, TOPLEFT, TOPLEFT-35*scale, 45*scale)
+	BMU_control_global_statisticTotal:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL_PORTS) .. " " .. BMU_formatGold(BMU_SVAcc.totalPortCounter))
 
-	BMU.control_global.statisticTotal = wm:CreateControl(name .. "_StatisticTotal", BMU.control_global, CT_LABEL)
-	BMU.control_global.statisticTotal:SetFont(BMU.font2)
-    BMU.control_global.statisticTotal:SetAnchor(TOPLEFT, BMU.control_global, TOPLEFT, TOPLEFT-35*scale, 45*scale)
-	BMU.control_global.statisticTotal:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL_PORTS) .. " " .. BMU.formatGold(BMU.savedVarsAcc.totalPortCounter))
-
-	BMU.control_global.total = wm:CreateControl(name .. "_Total", BMU.control_global, CT_LABEL)
-    BMU.control_global.total:SetFont(BMU.font2)
-    BMU.control_global.total:SetAnchor(TOPLEFT, BMU.control_global, TOPLEFT, TOPLEFT-35*scale, 65*scale)
+	local BMU_control_global_total = wm:CreateControl(name .. "_Total", BMU_control_global, CT_LABEL)
+	BMU_control_global.total = BMU_control_global_total
+    BMU_control_global_total:SetFont(BMU_font2)
+    BMU_control_global_total:SetAnchor(TOPLEFT, BMU_control_global, TOPLEFT, TOPLEFT-35*scale, 65*scale)
 
     -- slider
-    local tex = self_listview.slider_texture
-    BMU.control_global.slider = wm:CreateControl(name .. "_Slider", BMU.control_global, CT_SLIDER)
-    BMU.control_global.slider:SetWidth(SLIDER_WIDTH*scale)
-    BMU.control_global.slider:SetMouseEnabled(true)
-    BMU.control_global.slider:SetValue(0)
-    BMU.control_global.slider:SetValueStep(1)
-    BMU.control_global.slider:SetAnchor(TOPRIGHT, BMU.control_global, TOPRIGHT, 25*scale, 90*scale)
+    --local tex = self_listview.slider_texture
+	local BMU_control_global_slider = wm:CreateControl(name .. "_Slider", BMU_control_global, CT_SLIDER)
+    BMU_control_global.slider = BMU_control_global_slider
+    BMU_control_global_slider:SetWidth(SLIDER_WIDTH*scale)
+    BMU_control_global_slider:SetMouseEnabled(true)
+    BMU_control_global_slider:SetValue(0)
+    BMU_control_global_slider:SetValueStep(1)
+    BMU_control_global_slider:SetAnchor(TOPRIGHT, BMU_control_global, TOPRIGHT, 25*scale, 90*scale)
 
     -- lines
-    BMU.control_global.lines = {}
+    BMU_control_global.lines = {}
     _on_resize(self_listview) -- sets important datastructures
     _create_listview_lines_if_needed(self_listview)
 
     -- event: mwheel / scrolling
-    BMU.control_global:SetHandler("OnMouseWheel", function(self, delta)
+    BMU_control_global:SetHandler("OnMouseWheel", function(listView, delta)
         local new_value = clamp(self_listview.offset - delta, 0, self_listview.num_hidden_lines)
-		self.slider:SetValue(new_value)
+		listView.slider:SetValue(new_value)
 
 		-- if the mouse hovers over the list, we need to update the current tooltip
 		-- because the control under the mouse changed by scrolling
@@ -1269,13 +1288,14 @@ local function _initialize_listview(self_listview, width, height, left, top)
 		-- get control where the mouse is currently over
 		local control = moc()
 		-- show new tooltip
-		if control.tooltipText then
-			BMU_tooltipTextEnter(BMU, control, control.tooltipText)
+		local tooltipText = control.tooltipText
+		if tooltipText then
+			BMU_tooltipTextEnter(BMU, control, tooltipText)
 		end
     end)
 
     -- event: slider
-    BMU.control_global.slider:SetHandler("OnValueChanged", function(self, value, eventReason)
+    BMU_control_global_slider:SetHandler("OnValueChanged", function(sliderCtrl, value, eventReason)
         -- update offset
 		self_listview.offset = value
 		-- update the list view accoring to slider offset (slider's new position)
@@ -1283,26 +1303,26 @@ local function _initialize_listview(self_listview, width, height, left, top)
     end)
 
     -- just for preventing multiple reszisings at the samt ime
-    BMU.control_global:SetHandler("OnResizeStart", function(self)
+    BMU_control_global:SetHandler("OnResizeStart", function(listView)
         self_listview.currently_resizing = true
     end)
 
-    BMU.control_global:SetHandler("OnResizeStop", function(self)
+    BMU_control_global:SetHandler("OnResizeStop", function(listView)
         self_listview.currently_resizing = false
         _on_resize(self_listview)
         self_listview:update()
     end)
 
     -- event: backdrop control update position
-    BMU.control_global.bd:SetHandler("OnMouseUp", function(self)
+    BMU_control_global_bd:SetHandler("OnMouseUp", function()
 		if SM:IsShowing("worldMap") then
-			if not BMU.savedVarsAcc.anchorOnMap then
-				BMU.savedVarsAcc.pos_MapScene_x = math.floor(BMU.control_global.bd:GetLeft())
-				BMU.savedVarsAcc.pos_MapScene_y = math.floor(BMU.control_global.bd:GetTop())
+			if not BMU_SVAcc.anchorOnMap then
+				BMU_SVAcc.pos_MapScene_x = math_floor(BMU_control_global_bd:GetLeft())
+				BMU_SVAcc.pos_MapScene_y = math_floor(BMU_control_global_bd:GetTop())
 			end
 		else
-			BMU.savedVarsAcc.pos_x = math.floor(BMU.control_global.bd:GetLeft())
-			BMU.savedVarsAcc.pos_y = math.floor(BMU.control_global.bd:GetTop())
+			BMU_SVAcc.pos_x = math_floor(BMU_control_global_bd:GetLeft())
+			BMU_SVAcc.pos_y = math_floor(BMU_control_global_bd:GetTop())
 		end
     end)
 end
@@ -1319,7 +1339,7 @@ function ListView.new(control, name, settings)
 
     self = {
         line_height = 40*scale,
-        slider_texture = settings.slider_texture or "/esoui/art/miscellaneous/scrollbox_elevator.dds",
+        slider_texture = settings.slider_texture or sliderTexture,
         title = settings.title, -- can be nil
 
         control = control,
@@ -1375,11 +1395,13 @@ function ListView:update()
 	local isResizing = self.currently_resizing
 	local showHouseNickNames = BMU.savedVarsChar.houseNickNames
 
+	local listControl = self.control
+	
 	-- suggestion by otac0n (Discord, 2022_10)
 	-- To make it robust, you may want to create a unique ID per ListView.  This assumes a singleton.
 	EM:UnregisterForUpdate(BMU_TeleporterListUpdateEventName)
 
-	local throttle_time = isResizing and 0.02 or 0.1
+	--local throttle_time = (isResizing and 0.02) or 0.1
     if BMU_throttle(self, 0.05) then
 		-- suggestion by otac0n (Discord, 2022_10)
 		EM:RegisterForUpdate(BMU_TeleporterListUpdateEventName, 100, function() self:update() end)
@@ -1392,26 +1414,28 @@ function ListView:update()
         _on_resize(self)
     end
 
+
     -- Clean the list !!!
-	for i, list in pairs(self.control.lines) do
-		list:SetHidden(true)
+	local listLines = listControl.lines
+	for i, listLine in pairs(listLines) do
+		listLine:SetHidden(true)
 	end
 
 	-- show total entries
 	local firstRecord = self.lines[1]
+	local listLineBeforeTotalPortals = self.lines[totalPortals-1]
 	if firstRecord.displayName == "" and firstRecord.zoneNameClickable ~= true then
 		-- no entries, only no matches info
-		self.control.total:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL) .. " " .. "0")
-	elseif #self.lines > 1 and self.lines[totalPortals-1].displayName == "" and self.lines[totalPortals-1].zoneNameClickable ~= true then
+		listControl.total:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL) .. " " .. "0")
+	elseif #self.lines > 1 and listLineBeforeTotalPortals.displayName == "" and listLineBeforeTotalPortals.zoneNameClickable ~= true then
 		-- last entry is "maps in other zones"
-		self.control.total:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL) .. " " .. totalPortals - 1)
+		listControl.total:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL) .. " " .. totalPortals - 1)
 	else
 		-- normal
-		self.control.total:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL) .. " " .. totalPortals)
+		listControl.total:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL) .. " " .. totalPortals)
 	end
 
-	local numVisibleLines = self.num_visible_lines
-    for i, rowControlOfList in pairs(self.control.lines) do
+    for i, rowControlOfList in pairs(listLines) do
         local message = self.lines[i + self.offset] -- self.offset = how much we've scrolled down
 		local tooltipTextPlayer = {}
 		local tooltipTextZone = {}
@@ -1419,6 +1443,7 @@ function ListView:update()
 		local isHouseEntry = false
 
         -- Only show messages that will be displayed within the control
+		local numVisibleLines = self.num_visible_lines
         if message ~= nil and i <= numVisibleLines then
             if i >= numVisibleLines + 1 then return end
 
@@ -3100,9 +3125,11 @@ end
 
 -- calculate the height of the main control depending on the number of lines
 function BMU.calculateListHeight()
+	local BMU_svAcc = BMU.savedVarsAcc
 	-- 300 => 6 lines, add 46 for each additional line (line_height is only 40)
-	return (300 + ((BMU.savedVarsAcc.numberLines - 6) * 46))*BMU.savedVarsAcc.Scale
+	return (300 + ((BMU_svAcc.numberLines - 6) * 46))*BMU_svAcc.Scale
 end
+BMU_calculateListHeight = BMU.calculateListHeight
 
 
 function BMU.createMail(to, subject, body)

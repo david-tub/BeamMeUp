@@ -731,6 +731,29 @@ function BMU.portToOwnHouseWithZonePreference(useCurrentZone, explicitZoneId, ju
 	BMU_portToOwnHouse(true, nil, goOutside, nil)
 end
 
+local function fixSVs()
+	--SecondLanguage a string? Should not occur, must be a number!
+
+	local currentSecondLang = BMU.savedVarsAcc.secondLanguage
+	local secondLangStrSVFixed = false
+	if type(currentSecondLang) == "string" then
+		--Most probably an entry of BMU.dropdownSecLangChoices, e.g. "English" was written to SV then
+		--Fix it and replace it with same index of BMU.dropdownSecLangChoices
+		for idx, langStr in ipairs(BMU.dropdownSecLangValues) do
+			if not secondLangStrSVFixed and langStr == currentSecondLang then
+				BMU.savedVarsAcc.secondLanguage = BMU.dropdownSecLangChoices[idx]
+				secondLangStrSVFixed = true
+				break
+			end
+		end
+		if not secondLangStrSVFixed then
+			--No language entry found because e.g. you had set it to "Deutsch" while palying with de client but now playing with en client?
+			--Reset it to none
+			BMU.savedVarsAcc.secondLanguage = 1
+			secondLangStrSVFixed = true
+		end
+	end
+end
 
 local function OnAddOnLoaded(eventCode, addOnName)
     if (appName ~= addOnName) then return end
@@ -892,6 +915,10 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	BMU.savedVarsServ = ZO_SavedVars:NewAccountWide(SVTabName, 			3, nil, BMU.DefaultsServer, 	GetWorldName())
 	BMU.savedVarsChar = ZO_SavedVars:NewCharacterIdSettings(SVTabName, 	3, nil, BMU.DefaultsCharacter, 	nil)
 	local BMU_savedVarsAcc = BMU.savedVarsAcc
+
+	--Fix some SavedVariables entries
+	fixSVs()
+
 	
 	BMU.TeleporterSetupUI(addOnName)
 	

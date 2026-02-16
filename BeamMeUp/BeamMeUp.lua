@@ -731,9 +731,11 @@ function BMU.portToOwnHouseWithZonePreference(useCurrentZone, explicitZoneId, ju
 	BMU_portToOwnHouse(true, nil, goOutside, nil)
 end
 
+--[[
 local function fixSVs()
-	--SecondLanguage a string? Should not occur, must be a number!
+	--anything to fix in the SVs?
 
+	--SecondLanguage a string? Should not occur, must be a number! -> 20260217 nit working! LAM setting are somewhat using the wrong strings then?
 	local currentSecondLang = BMU.savedVarsAcc.secondLanguage
 	local secondLangStrSVFixed = false
 	if type(currentSecondLang) == "string" then
@@ -754,6 +756,7 @@ local function fixSVs()
 		end
 	end
 end
+]]
 
 local function OnAddOnLoaded(eventCode, addOnName)
     if (appName ~= addOnName) then return end
@@ -917,7 +920,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	local BMU_savedVarsAcc = BMU.savedVarsAcc
 
 	--Fix some SavedVariables entries
-	fixSVs()
+	--fixSVs()
 
 	
 	BMU.TeleporterSetupUI(addOnName)

@@ -45,13 +45,11 @@ local AddCustomScrollableSubMenuEntry 	= AddCustomScrollableSubMenuEntry
 local ShowCustomScrollableMenu 			= ShowCustomScrollableMenu
 local GetCustomScrollableMenuRowData    = GetCustomScrollableMenuRowData
 local PreventCustomScrollableContextMenuHide = PreventCustomScrollableContextMenuHide
---local PreventCustomScrollableContextMenuEntryClickHide = PreventCustomScrollableContextMenuEntryClickHide
-local RefreshCustomScrollableMenu = RefreshCustomScrollableMenu
-local LSM_UPDATE_MODE_BOTH 			= LSM_UPDATE_MODE_BOTH
 local LSM_ENTRY_TYPE_HEADER			= LSM_ENTRY_TYPE_HEADER
 local LSM_ENTRY_TYPE_RADIOBUTTON    = LSM_ENTRY_TYPE_RADIOBUTTON
 local LSM_ENTRY_TYPE_DIVIDER 		= LSM_ENTRY_TYPE_DIVIDER
 local teleportStr = GetString(SI_GAMEPAD_HELP_UNSTUCK_TELEPORT_KEYBIND_TEXT)
+local wayshrineCollectibleIdFinvirsTrinket = 336
 
 --[[
 local function refreshLSMMainAndSubMenuOfMOC(control, comboBox)
@@ -81,11 +79,11 @@ local guildHousesAtServer = teleporterVars.guildHouse[worldName]
 local BMUGuildsAtServer = teleporterVars.BMUGuilds[worldName]
 
 local BMU_indexListMain 					= BMU.indexListMain
-local BMU_indexListCurrentZone 				= BMU.indexListCurrentZone
+--local BMU_indexListCurrentZone 				= BMU.indexListCurrentZone
 local BMU_indexListSearchPlayer 			= BMU.indexListSearchPlayer
 local BMU_indexListSearchZone 				= BMU.indexListSearchZone
-local BMU_indexListItems					= BMU.indexListItems
-local BMU_indexListDelves 					= BMU.indexListDelves
+--local BMU_indexListItems					= BMU.indexListItems
+--local BMU_indexListDelves 					= BMU.indexListDelves
 local BMU_indexListZoneHidden				= BMU.indexListZoneHidden
 local BMU_indexListSource 					= BMU.indexListSource
 local BMU_indexListZone						= BMU.indexListZone
@@ -98,7 +96,7 @@ local BMU_indexListDungeons					= BMU.indexListDungeons
 local BMU_SOURCE_INDEX_ALL					= BMU.SOURCE_INDEX_ALL
 local BMU_SOURCE_INDEX_FRIEND 				= BMU.SOURCE_INDEX_FRIEND
 local BMU_SOURCE_INDEX_GROUP 				= BMU.SOURCE_INDEX_GROUP
-local BMU_SOURCE_INDEX_GUILD				= BMU.SOURCE_INDEX_GUILD
+--local BMU_SOURCE_INDEX_GUILD				= BMU.SOURCE_INDEX_GUILD
 local BMU_SOURCE_INDEX_OWNHOUSES			= BMU.SOURCE_INDEX_OWNHOUSES
 
 local formatStringFirstUppercase = teleporterVars.formatStringFirstUppercase
@@ -109,7 +107,7 @@ local colorWhite 							= colorNames[2]
 local colorTeal 							= colorNames[3]
 local colorGold 							= colorNames[4]
 local colorGreen 							= colorNames[5]
-local colorBlue 							= colorNames[6]
+--local colorBlue 							= colorNames[6]
 local colorRed 								= colorNames[7]
 local colorGray 							= colorNames[8]
 
@@ -118,7 +116,6 @@ local BMU_TeleporterListUpdateEventName =  "BMU_TeleportList_Update"
 ----functions
 --ZOs functions
 local GetZoneNameById = GetZoneNameById
-local GetCurrentMapZoneIndex = GetCurrentMapZoneIndex
 local GetZoneId = GetZoneId
 local select = select
 local RequestJumpToHouse = RequestJumpToHouse
@@ -185,14 +182,14 @@ local BMU_isZoneOverlandZone, BMU_categorizeZone, BMU_showDialogSimple, BMU_prep
 	  BMU_findExactQuestLocation, BMU_sc_porting, BMU_getParentZoneId, BMU_clickOnTeleportToOwnHouseButton, BMU_clickOnTeleportToOwnHouseButton_2,
       BMU_tooltipTextEnter, BMU_clickOnTeleportToPTFHouseButton, BMU_clickOnOpenGuild, BMU_clickOnTeleportToDungeonButton, BMU_clickOnTeleportToPlayerButton,
 	  BMU_checkIfContextMenuIconShouldShow, BMU_clickOnPlayerName, BMU_clickOnHouseName, BMU_clickOnEmptyZoneName, BMU_throttle, BMU_calculateListHeight,
-      BMU_getHouseNameByHouseId
+      BMU_getHouseNameByHouseId, BMU_decideTryAgainPorting, BMU_updateStatistic, BMU_clickOnZoneName
 -- -^- INS251229 Baertram END 0
 
 
 local LINES_OFFSET = 45
 local SLIDER_WIDTH = 25
 -- Make self available to everything in this file
-local self = {}
+local BMU_listViews_self = {}
 --local mColor = {}
 local controlWidth = 0
 local totalPortals = 0
@@ -205,7 +202,7 @@ local mutexCounter = 0
 
 -- Utility / local functions
 
-local function clamp(val, min_, max_)
+local function clamp(val, min_, max_) --todo: 260223 maybe use zo_clamp instead?
     val = math.max(val, min_)
     return math.min(val, max_)
 end
@@ -849,7 +846,7 @@ function BMU.getZoneWayshrineCompletion(zoneId)
 	for activityIndex = 1, countTotal do
 		local isActivityComplete = IsZoneStoryActivityComplete(zoneId, ZONE_COMPLETION_TYPE_WAYSHRINES, activityIndex)
 		local activityId = GetZoneActivityIdForZoneCompletionType(zoneId, ZONE_COMPLETION_TYPE_WAYSHRINES, activityIndex)
-		local normalizedX, normalizedZ, normalizedRadius, isInCurrentMap = GetNormalizedPositionForZoneStoryActivityId(zoneId, ZONE_COMPLETION_TYPE_WAYSHRINES, activityId)
+		local _, _, _, isInCurrentMap = GetNormalizedPositionForZoneStoryActivityId(zoneId, ZONE_COMPLETION_TYPE_WAYSHRINES, activityId)
 		if isInCurrentMap then
 			-- wayshrine of the current map
 			numWayshrines = numWayshrines + 1
@@ -885,7 +882,24 @@ BMU_isZoneOverlandZone = BMU.isZoneOverlandZone
 ----------------------------------------------------
 --- Function to Port to Players
 -----------------------------------------------------
+-- if necessary show center screen message that the player is still offline
+function BMU.showOfflineNote(_, messageType)
+	local BMU_savedVarsServ = BMU.savedVarsServ
+	local currentTime = GetTimeStamp()
+	-- option is enabled + player does not set to offline since last reload + a blank call or it is outgoing whisper message + player is set to offline + last message was 24 hours ago
+	if BMU.savedVarsAcc.showOfflineReminder and not BMU.playerStatusChangedToOffline
+		and (not messageType or messageType == CHAT_CHANNEL_WHISPER_SENT)
+			and GetPlayerStatus() == PLAYER_STATUS_OFFLINE
+			and (currentTime - BMU_savedVarsServ.lastofflineReminder > 86400) then
+		BMU_savedVarsServ.lastofflineReminder = currentTime
+		CENTER_SCREEN_ANNOUNCE:AddMessage(0, CSA_CATEGORY_LARGE_TEXT, "Justice_NowKOS", BMU_SI_Get(SI_TELE_CENTERSCREEN_OFFLINE_NOTE_HEAD), BMU_SI_Get(SI_TELE_CENTERSCREEN_OFFLINE_NOTE_BODY), nil, nil, nil, nil, 10000, nil)
+	end
+end
+local BMU_showOfflineNote = BMU.showOfflineNote
+
 function BMU.PortalToPlayer(displayName, sourceIndex, zoneName, zoneId, zoneCategory, updateSavedGold, tryAgainOnError, printToChat)
+	BMU_decideTryAgainPorting = BMU_decideTryAgainPorting or BMU.decideTryAgainPorting
+	BMU_updateStatistic = BMU_updateStatistic or BMU.updateStatistic
 
 	-- cut the numbers coming from "item related zones"
 	local position = string.find(zoneName, "%(")
@@ -937,17 +951,17 @@ function BMU.PortalToPlayer(displayName, sourceIndex, zoneName, zoneId, zoneCate
 					BMU_printToChat(GetString(SI_FASTTRAVELKEEPRESULT9))
 				end
 				if tryAgainOnError then
-					BMU.decideTryAgainPorting(BMU.flagSocialErrorWhilePorting, zoneId, displayName, sourceIndex, updateSavedGold)
+					BMU_decideTryAgainPorting(BMU.flagSocialErrorWhilePorting, zoneId, displayName, sourceIndex, updateSavedGold)
 				end
 			else
 				-- update saved gold
 				if updateSavedGold then
-					BMU.updateStatistic(zoneCategory, zoneId)
+					BMU_updateStatistic(zoneCategory, zoneId)
 				end
 			end
 		end, 1800)
 		-- if necessary show center screen message that the player is still offline
-		BMU.showOfflineNote()
+		BMU_showOfflineNote()
 	else
 		if printToChat then
 			-- display message, that porting is not possible at the moment
@@ -960,9 +974,8 @@ BMU_PortalToPlayer = BMU.PortalToPlayer
 
 -- shows special animation while teleporting by using a collectible ("Finvir's Trinket")
 function BMU.showTeleportAnimation()
-	local collectibleId = 336
-	if IsCollectibleUnlocked(collectibleId) and IsCollectibleUsable(collectibleId) and GetCollectibleCooldownAndDuration(collectibleId) == 0 then
-		UseCollectible(collectibleId)
+	if IsCollectibleUnlocked(wayshrineCollectibleIdFinvirsTrinket) and IsCollectibleUsable(wayshrineCollectibleIdFinvirsTrinket) and GetCollectibleCooldownAndDuration(wayshrineCollectibleIdFinvirsTrinket) == 0 then
+		UseCollectible(wayshrineCollectibleIdFinvirsTrinket)
 	end
 end
 
@@ -978,7 +991,7 @@ function BMU.PortalToZone(zoneId)
 	local mapIndex = BMU_getMapIndex(zoneId)
 	worldMapManager:SetMapByIndex(mapIndex)
 	for nodeIndex = 1, GetNumFastTravelNodes() do
-		local known, name, normalizedX, normalizedY, icon, glowIcon, poiType, isShownInCurrentMap, linkedCollectibleIsLocked = GetFastTravelNodeInfo(nodeIndex)
+		local known, _, _, _, _, _, poiType, isShownInCurrentMap, linkedCollectibleIsLocked = GetFastTravelNodeInfo(nodeIndex)
 		if known and isShownInCurrentMap and poiType == POI_TYPE_WAYSHRINE then
 			if GetInteractionType() == INTERACTION_FAST_TRAVEL then
 				-- player is at wayshrine and travels for free -> dont show any chat printouts
@@ -1005,16 +1018,6 @@ function BMU.PortalToZone(zoneId)
 	end
 	-- found no wayshrine
 	BMU_printToChat(BMU_SI_Get(SI_TELE_CHAT_NO_FAST_TRAVEL))
-end
-
-
--- if necessary show center screen message that the player is still offline
-function BMU.showOfflineNote(_, messageType)
-	-- option is enabled + player does not set to offline since last reload + a blank call or it is outgoing whisper message + player is set to offline + last message was 24 hours ago
-	if BMU.savedVarsAcc.showOfflineReminder and not BMU.playerStatusChangedToOffline and (not messageType or messageType == CHAT_CHANNEL_WHISPER_SENT) and GetPlayerStatus() == PLAYER_STATUS_OFFLINE and (GetTimeStamp() - BMU.savedVarsServ.lastofflineReminder > 86400) then
-		CENTER_SCREEN_ANNOUNCE:AddMessage(0, CSA_CATEGORY_LARGE_TEXT, "Justice_NowKOS", BMU_SI_Get(SI_TELE_CENTERSCREEN_OFFLINE_NOTE_HEAD), BMU_SI_Get(SI_TELE_CENTERSCREEN_OFFLINE_NOTE_BODY), nil, nil, nil, nil, 10000, nil)
-		BMU.savedVarsServ.lastofflineReminder = GetTimeStamp()
-	end
 end
 
 
@@ -1337,7 +1340,7 @@ function ListView.new(control, name, settings)
 
 	local scale = BMU.savedVarsAcc.Scale
 
-    self = {
+    BMU_listViews_self = {
         line_height = 40*scale,
         slider_texture = settings.slider_texture or sliderTexture,
         title = settings.title, -- can be nil
@@ -1355,9 +1358,9 @@ function ListView.new(control, name, settings)
     local top = 150*scale
 
     -- TODO: Translate self:SetHidden() etc. to self.control:SetHidden()
-    setmetatable(self, { __index = ListView })
-    _initialize_listview(self, width, height, left, top)
-    return self
+    setmetatable(BMU_listViews_self, { __index = ListView })
+    _initialize_listview(BMU_listViews_self, width, height, left, top)
+    return BMU_listViews_self
 end
 
 
@@ -1389,29 +1392,30 @@ function ListView:update()
 	BMU_isFavoritePlayer = BMU_isFavoritePlayer or BMU.isFavoritePlayer
 	BMU_getHouseNameByHouseId = BMU_getHouseNameByHouseId or BMU.getHouseNameByHouseId
 	BMU_formatName = BMU_formatName or BMU.formatName
+	BMU_clickOnZoneName = BMU_clickOnZoneName or BMU.clickOnZoneName
 
 	local tooltipDividerStr = BMU_textures.tooltipSeperatorStr
 
-	local isResizing = self.currently_resizing
+	local isResizing = BMU_listViews_self.currently_resizing
 	local showHouseNickNames = BMU.savedVarsChar.houseNickNames
 
-	local listControl = self.control
+	local listControl = BMU_listViews_self.control
 	
 	-- suggestion by otac0n (Discord, 2022_10)
 	-- To make it robust, you may want to create a unique ID per ListView.  This assumes a singleton.
 	EM:UnregisterForUpdate(BMU_TeleporterListUpdateEventName)
 
 	--local throttle_time = (isResizing and 0.02) or 0.1
-    if BMU_throttle(self, 0.05) then
+    if BMU_throttle(BMU_listViews_self, 0.05) then
 		-- suggestion by otac0n (Discord, 2022_10)
-		EM:RegisterForUpdate(BMU_TeleporterListUpdateEventName, 100, function() self:update() end)
+		EM:RegisterForUpdate(BMU_TeleporterListUpdateEventName, 100, function() BMU_listViews_self:update() end)
         return
     end
 
 	local scale = BMU.savedVarsAcc.Scale
 
     if isResizing then
-        _on_resize(self)
+        _on_resize(BMU_listViews_self)
     end
 
 
@@ -1422,12 +1426,12 @@ function ListView:update()
 	end
 
 	-- show total entries
-	local firstRecord = self.lines[1]
-	local listLineBeforeTotalPortals = self.lines[totalPortals-1]
+	local firstRecord = BMU_listViews_self.lines[1]
+	local listLineBeforeTotalPortals = BMU_listViews_self.lines[totalPortals-1]
 	if firstRecord.displayName == "" and firstRecord.zoneNameClickable ~= true then
 		-- no entries, only no matches info
 		listControl.total:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL) .. " " .. "0")
-	elseif #self.lines > 1 and listLineBeforeTotalPortals.displayName == "" and listLineBeforeTotalPortals.zoneNameClickable ~= true then
+	elseif #BMU_listViews_self.lines > 1 and listLineBeforeTotalPortals.displayName == "" and listLineBeforeTotalPortals.zoneNameClickable ~= true then
 		-- last entry is "maps in other zones"
 		listControl.total:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL) .. " " .. totalPortals - 1)
 	else
@@ -1436,14 +1440,17 @@ function ListView:update()
 	end
 
     for i, rowControlOfList in pairs(listLines) do
-        local message = self.lines[i + self.offset] -- self.offset = how much we've scrolled down
+        local message = BMU_listViews_self.lines[i + BMU_listViews_self.offset] -- self.offset = how much we've scrolled down
 		local tooltipTextPlayer = {}
 		local tooltipTextZone = {}
 		local tooltipTextLevel = ""
 		local isHouseEntry = false
 
+		local ColumnNumberPlayersTex = rowControlOfList.ColumnNumberPlayersTex
+		local ColumnPlayerNameTex = rowControlOfList.ColumnPlayerNameTex
+
         -- Only show messages that will be displayed within the control
-		local numVisibleLines = self.num_visible_lines
+		local numVisibleLines = BMU_listViews_self.num_visible_lines
         if message ~= nil and i <= numVisibleLines then
             if i >= numVisibleLines + 1 then return end
 
@@ -1457,7 +1464,7 @@ function ListView:update()
 			--------- player tooltip ---------
 			local championRank = message.championRank
 			if displayNameOfMessage ~= "" and championRank then
-				rowControlOfList.ColumnPlayerNameTex:SetHidden(false)
+				ColumnPlayerNameTex:SetHidden(false)
 
 				-- set level text for player tooltip
 				if championRank >= 1 then
@@ -1485,24 +1492,24 @@ function ListView:update()
 				if 	#tooltipTextPlayer > 0 then
 					-- show tooltip handler
 					disableTooltipAndResetOnMouseUp(rowControlOfList)
-					--rowControlOfList.ColumnPlayerNameTex:SetHandler("OnMouseEnter", nil)
-					--rowControlOfList.ColumnPlayerNameTex:SetHandler("OnMouseExit", nil)
-					rowControlOfList.ColumnPlayerNameTex:SetHandler("OnMouseEnter", function(self)
+					--ColumnPlayerNameTex:SetHandler("OnMouseEnter", nil)
+					--ColumnPlayerNameTex:SetHandler("OnMouseExit", nil)
+					ColumnPlayerNameTex:SetHandler("OnMouseEnter", function(self)
 						if message.playerNameClickable then
-							rowControlOfList.ColumnPlayerNameTex:SetAlpha(0.3)
+							ColumnPlayerNameTex:SetAlpha(0.3)
 						end
-						BMU_tooltipTextEnter(BMU, rowControlOfList.ColumnPlayerNameTex, tooltipTextPlayer)
+						BMU_tooltipTextEnter(BMU, ColumnPlayerNameTex, tooltipTextPlayer)
 						BMU.pauseAutoRefresh = true
 					end)
 					-- hide tooltip handler
-					rowControlOfList.ColumnPlayerNameTex:SetHandler("OnMouseExit", function(self) rowControlOfList.ColumnPlayerNameTex:SetAlpha(0) BMU_tooltipTextEnter(BMU, rowControlOfList.ColumnPlayerNameTex) BMU.pauseAutoRefresh = false end)
+					ColumnPlayerNameTex:SetHandler("OnMouseExit", function(self) ColumnPlayerNameTex:SetAlpha(0) BMU_tooltipTextEnter(BMU, ColumnPlayerNameTex) BMU.pauseAutoRefresh = false end)
 					-- link tooltip text to control (for update on scroll / mouse wheel)
-					rowControlOfList.ColumnPlayerNameTex.tooltipText = tooltipTextPlayer
+					ColumnPlayerNameTex.tooltipText = tooltipTextPlayer
 				end
 
 				-- set handler for Player context menu
-				rowControlOfList.ColumnPlayerNameTex:SetHandler("OnMouseUp", nil)
-				rowControlOfList.ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnPlayerName(button, message) end)
+				ColumnPlayerNameTex:SetHandler("OnMouseUp", nil)
+				ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnPlayerName(button, message) end)
 
 
 			--House right click menu
@@ -1510,18 +1517,18 @@ function ListView:update()
 				isHouseEntry = true
 				--Clear the tooltip
 				disableTooltipAndResetOnMouseUp(rowControlOfList)
-				rowControlOfList.ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnHouseName(button, message) end)
-				rowControlOfList.ColumnPlayerNameTex:SetHidden(false)
+				ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnHouseName(button, message) end)
+				ColumnPlayerNameTex:SetHidden(false)
 			--Empty zone right click menu (no player in the zone)
 			elseif message.zoneId ~= nil then
 				--Clear the tooltip
 				disableTooltipAndResetOnMouseUp(rowControlOfList)
-				rowControlOfList.ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnEmptyZoneName(button, message) end)
-				rowControlOfList.ColumnPlayerNameTex:SetHidden(false)
+				ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnEmptyZoneName(button, message) end)
+				ColumnPlayerNameTex:SetHidden(false)
 			else
 				-- make tooltip invisible (no DisplayName of Player -> no Tooltip)
 				disableTooltipAndResetOnMouseUp(rowControlOfList)
-				rowControlOfList.ColumnPlayerNameTex:SetHidden(true)
+				ColumnPlayerNameTex:SetHidden(true)
 			end
 				------------------
 
@@ -1705,7 +1712,7 @@ function ListView:update()
 				-- set handler for map opening
 				rowControlOfList.ColumnZoneNameTex:SetHidden(false)
 				rowControlOfList.ColumnZoneNameTex:SetHandler("OnMouseEnter", function(self) rowControlOfList.ColumnZoneNameTex:SetAlpha(0.3) BMU_tooltipTextEnter(BMU, rowControlOfList.ColumnZoneNameTex, tooltipTextZone) BMU.pauseAutoRefresh = true end)
-				rowControlOfList.ColumnZoneNameTex:SetHandler("OnMouseUp", function(self, button) BMU.clickOnZoneName(button, message) end)
+				rowControlOfList.ColumnZoneNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnZoneName(button, message) end)
 				rowControlOfList.ColumnZoneNameTex:SetHandler("OnMouseExit", function(self) rowControlOfList.ColumnZoneNameTex:SetAlpha(0) BMU_tooltipTextEnter(BMU, rowControlOfList.ColumnZoneNameTex) BMU.pauseAutoRefresh = false end)
 				-- link tooltip text to control (for update on scroll / mouse wheel)
 				rowControlOfList.ColumnZoneNameTex.tooltipText = tooltipTextZone
@@ -1742,19 +1749,19 @@ function ListView:update()
 			-- number of players
 			if message.numberPlayers then
 				-- show
-				rowControlOfList.ColumnNumberPlayersTex:SetHidden(false)
+				ColumnNumberPlayersTex:SetHidden(false)
 				-- set text
 				rowControlOfList.ColumnNumberPlayers:SetText("(" .. message.numberPlayers .. ")")
 				-- show MouseOver handler
-				rowControlOfList.ColumnNumberPlayersTex:SetHandler("OnMouseEnter", function(self) rowControlOfList.ColumnNumberPlayersTex:SetAlpha(0.3) end)
+				ColumnNumberPlayersTex:SetHandler("OnMouseEnter", function(self) ColumnNumberPlayersTex:SetAlpha(0.3) end)
 				-- hide MouseOver handler
-				rowControlOfList.ColumnNumberPlayersTex:SetHandler("OnMouseExit", function(self) rowControlOfList.ColumnNumberPlayersTex:SetAlpha(0) end)
+				ColumnNumberPlayersTex:SetHandler("OnMouseExit", function(self) ColumnNumberPlayersTex:SetAlpha(0) end)
 				-- set handler for opening
-				rowControlOfList.ColumnNumberPlayersTex:SetHandler("OnMouseUp", function(self, button) if button ~= MOUSE_BUTTON_INDEX_LEFT then return end BMU_createTable({ index =BMU_indexListZone, fZoneId =message.zoneId}) end)
+				ColumnNumberPlayersTex:SetHandler("OnMouseUp", function(self, button) if button ~= MOUSE_BUTTON_INDEX_LEFT then return end BMU_createTable({ index =BMU_indexListZone, fZoneId =message.zoneId}) end)
 			else
 				rowControlOfList.ColumnNumberPlayers:SetText("")
 				-- hide
-				rowControlOfList.ColumnNumberPlayersTex:SetHidden(true)
+				ColumnNumberPlayersTex:SetHidden(true)
 			end
 
 
@@ -2144,15 +2151,15 @@ end
 
 
 function ListView:add_messages(message, dontResetSlider)
-	self.lines = message
-    totalPortals = #self.lines
-    _on_resize(self) -- adjusts slider size according to number of lines
+	BMU_listViews_self.lines = message
+    totalPortals             = #BMU_listViews_self.lines
+    _on_resize(BMU_listViews_self) -- adjusts slider size according to number of lines
 	if (not dontResetSlider) and BMU.control_global.slider:GetValue() ~= 0 then -- OnValueChanged Handler will not be triggered if value stays the same
 		-- reset slider position
 		-- OnValueChanged Handler will also do the self:update
 		BMU.control_global.slider:SetValue(0)
 	else
-		self:update() -- adjusts list view according to slider offset
+		BMU_listViews_self:update() -- adjusts list view according to slider offset
 	end
 
 	-- fire callback (for gamepad addon)
@@ -2564,6 +2571,7 @@ function BMU.clickOnZoneName(button, record)
 		ShowCustomScrollableMenu()
 	end
 end
+BMU_clickOnZoneName = BMU.clickOnZoneName
 
 local function showPlayerFavoriteContextMenu(comboBox, control, data)
 	if data == nil and control ~= nil then data = GetCustomScrollableMenuRowData(control) end
@@ -3099,11 +3107,11 @@ function BMU.updateStatistic(category, zoneId)
 		-- regard only Overland zones for gold statistics
 		if category == BMU_ZONE_CATEGORY_OVERLAND then
 			BMU.savedVarsAcc.savedGold = BMU.savedVarsAcc.savedGold + GetRecallCost()
-			self.control.statisticGold:SetText(BMU_SI_Get(SI_TELE_UI_GOLD) .. " " .. BMU_formatGold(BMU.savedVarsAcc.savedGold))
+			BMU_listViews_self.control.statisticGold:SetText(BMU_SI_Get(SI_TELE_UI_GOLD) .. " " .. BMU_formatGold(BMU.savedVarsAcc.savedGold))
 		end
 		-- increase total port counter
 		BMU.savedVarsAcc.totalPortCounter = BMU.savedVarsAcc.totalPortCounter + 1
-		self.control.statisticTotal:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL_PORTS) .. " " .. BMU_formatGold(BMU.savedVarsAcc.totalPortCounter))
+		BMU_listViews_self.control.statisticTotal:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL_PORTS) .. " " .. BMU_formatGold(BMU.savedVarsAcc.totalPortCounter))
 		-- update port counter per zone statistic
 		if BMU.savedVarsAcc.portCounterPerZone[zoneId] == nil then
 			BMU.savedVarsAcc.portCounterPerZone[zoneId] = 1
@@ -3121,6 +3129,7 @@ function BMU.updateStatistic(category, zoneId)
 	-- start cooldown
 	BMU_coolDownGold()
 end
+BMU_updateStatistic = BMU.updateStatistic
 
 
 -- calculate the height of the main control depending on the number of lines
@@ -3365,6 +3374,7 @@ function BMU.decideTryAgainPorting(errorCode, zoneId, displayName, sourceIndex, 
 		end
 	end
 end
+BMU_decideTryAgainPorting = BMU.decideTryAgainPorting
 
 
 -- TOOLTIP (show and hide)

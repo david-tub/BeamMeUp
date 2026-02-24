@@ -2754,6 +2754,8 @@ function BMU.clickOnPlayerName(button, record)
 		-- DoesGuildRankHavePermission(number guildId, number rankIndex, number GuildPermission permission) Returns: boolean hasPermission
 		-- GuildInvite(number guildId, string displayName)
 
+	local addedInviteToBMUGuildDivider = false
+
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		ClearCustomScrollableMenu()
 
@@ -2923,8 +2925,18 @@ function BMU.clickOnPlayerName(button, record)
 
 		-- Invite to primary BeamMeUp guild
 		if BMUGuildsAtServer ~= nil then
+			local BMU_GuildsName = teleporterVars.appName .. " - " .. GetString(SI_CHATCHANNELCATEGORYHEADERS10)
+
 			local primaryBMUGuild = BMUGuildsAtServer[1]
 			if IsPlayerInGuild(primaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(primaryBMUGuild, displayNameOfRecord) then
+				if not addedInviteToBMUGuildDivider then
+					entries_misc[pos] = {
+						entryType = LSM_ENTRY_TYPE_HEADER,
+						label = BMU_GuildsName
+					}
+					pos = pos + 1
+					addedInviteToBMUGuildDivider = true
+				end
 				entries_misc[pos] = {
 					label = BMU_SI_Get(SI_TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp",
 					callback = function() GuildInvite(primaryBMUGuild, displayNameOfRecord) end,
@@ -2935,6 +2947,14 @@ function BMU.clickOnPlayerName(button, record)
 			-- Invite to secondary BeamMeUp guild
 			local secondaryBMUGuild = BMUGuildsAtServer[2]
 			if IsPlayerInGuild(secondaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(secondaryBMUGuild, displayNameOfRecord) then
+				if not addedInviteToBMUGuildDivider then
+					entries_misc[pos] = {
+						entryType = LSM_ENTRY_TYPE_HEADER,
+						label = BMU_GuildsName
+					}
+					pos = pos + 1
+					addedInviteToBMUGuildDivider = true
+				end
 				entries_misc[pos] = {
 					label = BMU_SI_Get(SI_TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp-Two",
 					callback = function() GuildInvite(secondaryBMUGuild, displayNameOfRecord) end,
@@ -2945,6 +2965,14 @@ function BMU.clickOnPlayerName(button, record)
 			-- Invite to tertiary BeamMeUp guild
 			local tertiaryBMUGuild = BMUGuildsAtServer[3]
 			if IsPlayerInGuild(tertiaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(tertiaryBMUGuild, displayNameOfRecord) then
+				if not addedInviteToBMUGuildDivider then
+					entries_misc[pos] = {
+						entryType = LSM_ENTRY_TYPE_HEADER,
+						label = BMU_GuildsName
+					}
+					pos = pos + 1
+					addedInviteToBMUGuildDivider = true
+				end
 				entries_misc[pos] = {
 					label = BMU_SI_Get(SI_TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp-Three",
 					callback = function() GuildInvite(tertiaryBMUGuild, displayNameOfRecord) end,
@@ -2955,6 +2983,14 @@ function BMU.clickOnPlayerName(button, record)
 			-- Invite to quaternary BeamMeUp guild
 			local quaternaryBMUGuild = BMUGuildsAtServer[4]
 			if IsPlayerInGuild(quaternaryBMUGuild) and not GetGuildMemberIndexFromDisplayName(quaternaryBMUGuild, displayNameOfRecord) then
+				if not addedInviteToBMUGuildDivider then
+					entries_misc[pos] = {
+						entryType = LSM_ENTRY_TYPE_HEADER,
+						label = BMU_GuildsName
+					}
+					pos = pos + 1
+					addedInviteToBMUGuildDivider = true
+				end
 				entries_misc[pos] = {
 					label = BMU_SI_Get(SI_TELE_UI_INVITE_BMU_GUILD) .. ": BeamMeUp-Four",
 					callback = function() GuildInvite(quaternaryBMUGuild, displayNameOfRecord) end,

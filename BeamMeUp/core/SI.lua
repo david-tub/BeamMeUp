@@ -34,7 +34,7 @@ numVars.teleDropdownPrefix = "SI_TELE_DROPDOWN_"
 local teleDropdownPrefix = numVars.teleDropdownPrefix
 
 --Language selction dropdown
-numVars.numSecLangDropdownEntries = 7
+numVars.numSecLangDropdownEntries = 9
 numVars.secLangDropdownEntryPrefix = teleDropdownPrefix .. "SECOND_LANG_CHOICE_"
 
 --Sort dropdown

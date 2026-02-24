@@ -318,6 +318,8 @@ local strings = {
     ["SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_5"] = "Russisch",
     ["SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_6"] = "Japanisch",
     ["SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_7"] = "Polnisch",
+    ["SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_8"] = "Spanisch",
+    ["SI_TELE_DROPDOWN_SECOND_LANG_CHOICE_9"] = "Chinesisch",
 
     --Sorting
     ["SI_TELE_DROPDOWN_SORT_CHOICE_1"] = "Zonen Name",

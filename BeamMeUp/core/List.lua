@@ -1289,7 +1289,6 @@ local function _initialize_listview(self_listview, width, height, left, top)
     end)
 
 	local function refreshBMU_UI_List(p_listview)
-		BMU_clickOnZoneName = BMU_clickOnZoneName or BMU.clickOnZoneName
 		p_listview:update()
 
 		-- if the mouse hovers over the list, we need to update the current tooltip
@@ -1314,12 +1313,13 @@ local function _initialize_listview(self_listview, width, height, left, top)
 
 		-- update the list view accoring to slider offset (slider's new position)
 		-->Throttle this so not each scrolling portion will update the list instantly, only as we stop to scroll
-		BMU_ThrottledUpdate(refreshBMU_ListEventStr, 50, refreshBMU_UI_List, self_listview)
+		--BMU_ThrottledUpdate(refreshBMU_ListEventStr, 50, refreshBMU_UI_List, self_listview)
 		--[[
 		if BMU.state == BMU.indexListItems then
 			--Try to refresh the list to draw all actual row's survey textures etc.
 		end
 		]]
+		refreshBMU_UI_List(self_listview)
     end)
 
     -- just for preventing multiple reszisings at the samt ime

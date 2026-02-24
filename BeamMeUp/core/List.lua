@@ -1315,6 +1315,11 @@ local function _initialize_listview(self_listview, width, height, left, top)
 		-- update the list view accoring to slider offset (slider's new position)
 		-->Throttle this so not each scrolling portion will update the list instantly, only as we stop to scroll
 		BMU_ThrottledUpdate(refreshBMU_ListEventStr, 100, refreshBMU_UI_List, self_listview)
+		--[[
+		if BMU.state == BMU.indexListItems then
+			--Try to refresh the list to draw all actual row's survey textures etc.
+		end
+		]]
     end)
 
     -- just for preventing multiple reszisings at the samt ime
@@ -2208,7 +2213,7 @@ local function showZoneFavoriteContextMenu(comboBox, control, data)
 	end
 end
 
-function BMU.clickOnZoneName(button, record, onlySimulateClick)
+function BMU.clickOnZoneName(button, record)
 	BMU_createTableDungeons = BMU_createTableDungeons or BMU.createTableDungeons
 	BMU_createTablePTF = BMU_createTablePTF or BMU.createTablePTF
 	BMU_OpenTeleporter = BMU_OpenTeleporter or BMU.OpenTeleporter
@@ -2237,86 +2242,84 @@ function BMU.clickOnZoneName(button, record, onlySimulateClick)
 
 
 	if button == MOUSE_BUTTON_INDEX_LEFT then
-		if not onlySimulateClick then
-			-- PTF house tab
-			if record.PTFHouseOpen then
-				-- hide world map if open
-				SM:Hide("worldMap")
-				-- hide UI if open
-				BMU_HideTeleporter()
-				zo_callLater(function() PortToFriend.OpenWindow(function() zo_callLater(function() SetGameCameraUIMode(true) BMU_OpenTeleporter(false) BMU_createTablePTF() end, 150) end) end, 150)
-				--SetGameCameraUIMode(true)
-				return
+		-- PTF house tab
+		if record.PTFHouseOpen then
+			-- hide world map if open
+			SM:Hide("worldMap")
+			-- hide UI if open
+			BMU_HideTeleporter()
+			zo_callLater(function() PortToFriend.OpenWindow(function() zo_callLater(function() SetGameCameraUIMode(true) BMU_OpenTeleporter(false) BMU_createTablePTF() end, 150) end) end, 150)
+			--SetGameCameraUIMode(true)
+			return
+		end
+
+		------ display map ------
+		-- switch to Tamriel and back to players map in order to reset any subzone or zoom
+		if record.mapIndex ~= nil then
+			SM:Show("worldMap")
+			worldMapManager:SetMapByIndex(1)
+			worldMapManager:SetMapByIndex(record.mapIndex)
+			CM:FireCallbacks("OnWorldMapChanged")
+		end
+
+		------ display poi on map (in case of delve, dungeon etc.) ------
+		if record.parentZoneId ~= nil and (record.category ~= BMU_ZONE_CATEGORY_OVERLAND or record.forceOutside) then
+			local normalizedX
+			local normalizedZ
+			local _
+			-- primary: use LibZone function
+			local parentZoneId, parentZoneIndex, poiIndex = BMU_LibZone:GetZoneMapPinInfo(record.zoneId, record.parentZoneId)
+			if poiIndex ~= nil and poiIndex ~= 0 then
+				normalizedX, normalizedZ, _, _, _, _ = GetPOIMapInfo(parentZoneIndex, poiIndex)
 			end
 
-			------ display map ------
-			-- switch to Tamriel and back to players map in order to reset any subzone or zoom
-			if record.mapIndex ~= nil then
-				SM:Show("worldMap")
-				worldMapManager:SetMapByIndex(1)
-				worldMapManager:SetMapByIndex(record.mapIndex)
-				CM:FireCallbacks("OnWorldMapChanged")
+			------------------
+			-- temp. fallback: search corresponding pin by name
+			if not normalizedX or not normalizedZ then
+				local toSearch = record.zoneNameUnformatted
+				if record.forceOutside then
+					toSearch = record.houseNameUnformatted
+				end
+
+				-- find out coordinates in order to Ping on Map (e.g. Delves, Public Dungeons)
+				--local coordinate_x = 0
+				--local coordinate_z = 0
+				local zoneIndex = GetZoneIndex(record.parentZoneId)
+				for i = 0, GetNumPOIs(zoneIndex) do
+					local e = {}
+					e.normalizedX, e.normalizedZ, e.poiPinType, e.icon, e.isShownInCurrentMap, e.linkedCollectibleIsLocked = GetPOIMapInfo(zoneIndex, i)
+					e.objectiveName, e.objectiveLevel, e.startDescription, e.finishedDescription = GetPOIInfo(zoneIndex, i)
+
+					-- because of inconsistency with zone names coming from API and coming from map (POI), we have to test all 4 cases / combinations
+					local objectiveNameWithArticle = string_lower(BMU_formatName(e.objectiveName, false))
+					local zoneNameWithArticle = string_lower(BMU_formatName(toSearch, false))
+					--local objectiveNameWithoutArticle = string_lower(BMU_formatName(e.objectiveName, true))
+					local zoneNameWithoutArcticle = string_lower(BMU_formatName(toSearch, true))
+
+					-- solve bug with "-"
+					if zoneNameWithArticle ~= nil then
+						zoneNameWithArticle = string_gsub(zoneNameWithArticle, "-", "--")
+					end
+
+					local iconLower = string_lower(e.icon)
+					-- check (if zoneNameWithArticle is found in objectiveNameWithArticle) or if (zoneNameWithoutArcticle is found in objectiveNameWithArticle) AND objective has no wayshrine or portal icon (to prevent matches with wayshrines and dolmen)
+					if (BMU_isWholeWordInString(objectiveNameWithArticle, zoneNameWithArticle) or BMU_isWholeWordInString(objectiveNameWithArticle, zoneNameWithoutArcticle)) and not string_match(iconLower, "wayshrine") and not string_match(iconLower, "portal") then
+						normalizedX = e.normalizedX
+						normalizedZ = e.normalizedZ
+						break
+					end
+				end
 			end
+			------------------
 
-			------ display poi on map (in case of delve, dungeon etc.) ------
-			if record.parentZoneId ~= nil and (record.category ~= BMU_ZONE_CATEGORY_OVERLAND or record.forceOutside) then
-				local normalizedX
-				local normalizedZ
-				local _
-				-- primary: use LibZone function
-				local parentZoneId, parentZoneIndex, poiIndex = BMU_LibZone:GetZoneMapPinInfo(record.zoneId, record.parentZoneId)
-				if poiIndex ~= nil and poiIndex ~= 0 then
-					normalizedX, normalizedZ, _, _, _, _ = GetPOIMapInfo(parentZoneIndex, poiIndex)
+			if normalizedX and normalizedZ then
+				-- Map Ping
+				if BMU_savedVarsAcc.useMapPing and BMU.LibMapPing then
+					PingMap(MAP_PIN_TYPE_RALLY_POINT, MAP_TYPE_LOCATION_CENTERED, normalizedX, normalizedZ)
 				end
-
-				------------------
-				-- temp. fallback: search corresponding pin by name
-				if not normalizedX or not normalizedZ then
-					local toSearch = record.zoneNameUnformatted
-					if record.forceOutside then
-						toSearch = record.houseNameUnformatted
-					end
-
-					-- find out coordinates in order to Ping on Map (e.g. Delves, Public Dungeons)
-					--local coordinate_x = 0
-					--local coordinate_z = 0
-					local zoneIndex = GetZoneIndex(record.parentZoneId)
-					for i = 0, GetNumPOIs(zoneIndex) do
-						local e = {}
-						e.normalizedX, e.normalizedZ, e.poiPinType, e.icon, e.isShownInCurrentMap, e.linkedCollectibleIsLocked = GetPOIMapInfo(zoneIndex, i)
-						e.objectiveName, e.objectiveLevel, e.startDescription, e.finishedDescription = GetPOIInfo(zoneIndex, i)
-
-						-- because of inconsistency with zone names coming from API and coming from map (POI), we have to test all 4 cases / combinations
-						local objectiveNameWithArticle = string_lower(BMU_formatName(e.objectiveName, false))
-						local zoneNameWithArticle = string_lower(BMU_formatName(toSearch, false))
-						--local objectiveNameWithoutArticle = string_lower(BMU_formatName(e.objectiveName, true))
-						local zoneNameWithoutArcticle = string_lower(BMU_formatName(toSearch, true))
-
-						-- solve bug with "-"
-						if zoneNameWithArticle ~= nil then
-							zoneNameWithArticle = string_gsub(zoneNameWithArticle, "-", "--")
-						end
-
-						local iconLower = string_lower(e.icon)
-						-- check (if zoneNameWithArticle is found in objectiveNameWithArticle) or if (zoneNameWithoutArcticle is found in objectiveNameWithArticle) AND objective has no wayshrine or portal icon (to prevent matches with wayshrines and dolmen)
-						if (BMU_isWholeWordInString(objectiveNameWithArticle, zoneNameWithArticle) or BMU_isWholeWordInString(objectiveNameWithArticle, zoneNameWithoutArcticle)) and not string_match(iconLower, "wayshrine") and not string_match(iconLower, "portal") then
-							normalizedX = e.normalizedX
-							normalizedZ = e.normalizedZ
-							break
-						end
-					end
-				end
-				------------------
-
-				if normalizedX and normalizedZ then
-					-- Map Ping
-					if BMU_savedVarsAcc.useMapPing and BMU.LibMapPing then
-						PingMap(MAP_PIN_TYPE_RALLY_POINT, MAP_TYPE_LOCATION_CENTERED, normalizedX, normalizedZ)
-					end
-					-- Pan and Zoom
-					if BMU_savedVarsAcc.usePanAndZoom then
-						zo_callLater(function() ZO_WorldMap_PanToNormalizedPosition(normalizedX, normalizedZ) end, 200)
-					end
+				-- Pan and Zoom
+				if BMU_savedVarsAcc.usePanAndZoom then
+					zo_callLater(function() ZO_WorldMap_PanToNormalizedPosition(normalizedX, normalizedZ) end, 200)
 				end
 			end
 		end

@@ -193,7 +193,6 @@ local LINES_OFFSET = 45
 local SLIDER_WIDTH = 25
 -- Make self available to everything in this file
 local BMU_listViews_self = {}
-BMU._BMU_listViews_self = BMU_listViews_self --todo for debugging only!
 --local mColor = {}
 local controlWidth = 0
 local totalPortals = 0
@@ -1410,30 +1409,31 @@ function ListView:update()
 	BMU_getHouseNameByHouseId = BMU_getHouseNameByHouseId or BMU.getHouseNameByHouseId
 	BMU_formatName = BMU_formatName or BMU.formatName
 	BMU_clickOnZoneName = BMU_clickOnZoneName or BMU.clickOnZoneName
-
-	local tooltipDividerStr = BMU_textures.tooltipSeperatorStr
-
-	local isResizing = BMU_listViews_self.currently_resizing
-	local showHouseNickNames = BMU.savedVarsChar.houseNickNames
-
-	local listControl = BMU_listViews_self.control
+	BMU_isFavoriteZone = BMU_isFavoriteZone or BMU.isFavoriteZone
 
 	-- suggestion by otac0n (Discord, 2022_10)
 	-- To make it robust, you may want to create a unique ID per ListView.  This assumes a singleton.
 	EM:UnregisterForUpdate(BMU_TeleporterListUpdateEventName)
+	local selfVar = self
 	--local throttle_time = (isResizing and 0.02) or 0.1
-    if BMU_throttle(BMU_listViews_self, 0.05) then
+    if BMU_throttle(self, 0.05) then
 		-- suggestion by otac0n (Discord, 2022_10)
-		EM:RegisterForUpdate(BMU_TeleporterListUpdateEventName, 100, function() BMU_listViews_self:update() end)
+		EM:RegisterForUpdate(BMU_TeleporterListUpdateEventName, 100, function() selfVar:update() end)
         return
     end
 
+	local tooltipDividerStr = BMU_textures.tooltipSeperatorStr
 	local scale = BMU.savedVarsAcc.Scale
 
-    if isResizing then
-        _on_resize(BMU_listViews_self)
-    end
+	local isResizing = self.currently_resizing
+	local showHouseNickNames = BMU.savedVarsChar.houseNickNames
 
+	local listControl = self.control
+
+	--Resizing?
+    if isResizing then
+        _on_resize(self)
+    end
 
     -- Clean the list !!!
 	local listLines = listControl.lines
@@ -1442,12 +1442,12 @@ function ListView:update()
 	end
 
 	-- show total entries
-	local firstRecord = BMU_listViews_self.lines[1]
-	local listLineBeforeTotalPortals = BMU_listViews_self.lines[totalPortals-1]
+	local firstRecord = self.lines[1]
+	local listLineBeforeTotalPortals = self.lines[totalPortals-1]
 	if firstRecord.displayName == "" and firstRecord.zoneNameClickable ~= true then
 		-- no entries, only no matches info
 		listControl.total:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL) .. " " .. "0")
-	elseif #BMU_listViews_self.lines > 1 and listLineBeforeTotalPortals.displayName == "" and listLineBeforeTotalPortals.zoneNameClickable ~= true then
+	elseif #self.lines > 1 and listLineBeforeTotalPortals.displayName == "" and listLineBeforeTotalPortals.zoneNameClickable ~= true then
 		-- last entry is "maps in other zones"
 		listControl.total:SetText(BMU_SI_Get(SI_TELE_UI_TOTAL) .. " " .. totalPortals - 1)
 	else
@@ -1456,7 +1456,7 @@ function ListView:update()
 	end
 
     for i, rowControlOfList in pairs(listLines) do
-        local message = BMU_listViews_self.lines[i + BMU_listViews_self.offset] -- self.offset = how much we've scrolled down
+        local message = self.lines[i + self.offset] -- self.offset = how much we've scrolled down
 		local tooltipTextPlayer = {}
 		local tooltipTextZone = {}
 		local tooltipTextLevel = ""
@@ -1466,7 +1466,7 @@ function ListView:update()
 		local ColumnPlayerNameTex = rowControlOfList.ColumnPlayerNameTex
 
         -- Only show messages that will be displayed within the control
-		local numVisibleLines = BMU_listViews_self.num_visible_lines
+		local numVisibleLines = self.num_visible_lines
         if message ~= nil and i <= numVisibleLines then
             if i >= numVisibleLines + 1 then return end
 
@@ -1707,7 +1707,7 @@ function ListView:update()
 			------------------
 
 			-- Info if zone is favorite
-			local favSlot = BMU.isFavoriteZone(message.zoneId)
+			local favSlot = BMU_isFavoriteZone(message.zoneId)
 			if favSlot then
 				table_insert(tooltipTextZone, tooltipDividerStr)
 				table_insert(tooltipTextZone, BMU_colorizeText(BMU_SI_Get(SI_TELE_UI_FAVORITE_ZONE) .. " " .. tos(favSlot), colorGold))
@@ -2167,15 +2167,15 @@ end
 
 
 function ListView:add_messages(message, dontResetSlider)
-	BMU_listViews_self.lines = message
-    totalPortals             = #BMU_listViews_self.lines
-    _on_resize(BMU_listViews_self) -- adjusts slider size according to number of lines
+	self.lines = message
+    totalPortals             = #self.lines
+    _on_resize(self) -- adjusts slider size according to number of lines
 	if (not dontResetSlider) and BMU.control_global.slider:GetValue() ~= 0 then -- OnValueChanged Handler will not be triggered if value stays the same
 		-- reset slider position
 		-- OnValueChanged Handler will also do the self:update
 		BMU.control_global.slider:SetValue(0)
 	else
-		BMU_listViews_self:update() -- adjusts list view according to slider offset
+		self:update() -- adjusts list view according to slider offset
 	end
 
 	-- fire callback (for gamepad addon)
@@ -3060,6 +3060,7 @@ function BMU.isFavoriteZone(zoneId)
 	BMU_has_value = BMU_has_value or BMU.has_value
 	return BMU_has_value(BMU.savedVarsServ.favoriteListZones, zoneId)
 end
+BMU_isFavoriteZone = BMU.isFavoriteZone
 
 -- checks if specific player is a favorite
 function BMU.isFavoritePlayer(displayName)

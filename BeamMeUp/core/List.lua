@@ -1314,7 +1314,7 @@ local function _initialize_listview(self_listview, width, height, left, top)
 
 		-- update the list view accoring to slider offset (slider's new position)
 		-->Throttle this so not each scrolling portion will update the list instantly, only as we stop to scroll
-		BMU_ThrottledUpdate(refreshBMU_ListEventStr, 100, refreshBMU_UI_List, self_listview)
+		BMU_ThrottledUpdate(refreshBMU_ListEventStr, 50, refreshBMU_UI_List, self_listview)
 		--[[
 		if BMU.state == BMU.indexListItems then
 			--Try to refresh the list to draw all actual row's survey textures etc.

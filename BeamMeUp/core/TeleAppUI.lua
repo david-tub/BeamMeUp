@@ -1203,14 +1203,17 @@ local function SetupUI()
 	  refreshLSMMainAndSubMenuOfMOC(comboBox)
 	  BMU_CreateTable_IndexListItems()
   end
+  BMU.RefreshSurveyMapMainAndSubMenu = refreshSurveyMapMainAndSubMenu
   local function refreshLeadsMainMenu(comboBox)
 	  --Currently the same as surveyMaps so use that func too!
 	  refreshSurveyMapMainAndSubMenu(comboBox)
   end
+  BMU.RefreshLeadsMainMenu = refreshLeadsMainMenu
   local function refreshDungeonsMainMenu(comboBox)
 	  refreshLSMMainAndSubMenuOfMOC(comboBox)
 	  BMU_createTableDungeons()
   end
+  BMU.RefreshDungeonsMainMenu = refreshDungeonsMainMenu
 
   local allSurveyFiltersEnabled = true --Variable to toggle the survey filters submenu checkboxes all on/off if the submenu openingControl is clicked
   local allLeadFiltersEnabled = true	--Variable to toggle the leads filters submenu checkboxes all on/off if the submenu openingControl is clicked

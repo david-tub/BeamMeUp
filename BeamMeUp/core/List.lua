@@ -24,6 +24,7 @@ local string_match = string.match
 local string_lower = string.lower
 local string_gsub = string.gsub
 local string_format = string.format
+local zo_plainstrfind = zo_plainstrfind
 local table = table
 local table_insert = table.insert
 local table_remove = table.remove
@@ -165,7 +166,9 @@ local BMU_SI_Get 							= SI.get
 local BMU_colorizeText 						= BMU.colorizeText
 local BMU_printToChat 						= BMU.printToChat
 local BMU_getItemTypeIcon 					= BMU.getItemTypeIcon
+local BMU_ThrottledUpdate 					= BMU.ThrottledUpdate
 
+local refreshBMU_ListEventStr = "BMU_Refresh_UI_List"
 
 ----variables (defined inline in code below, upon first usage, as they are still nil at this line)
 --BMU UI variables
@@ -190,6 +193,7 @@ local LINES_OFFSET = 45
 local SLIDER_WIDTH = 25
 -- Make self available to everything in this file
 local BMU_listViews_self = {}
+BMU._BMU_listViews_self = BMU_listViews_self --todo for debugging only!
 --local mColor = {}
 local controlWidth = 0
 local totalPortals = 0
@@ -1280,8 +1284,13 @@ local function _initialize_listview(self_listview, width, height, left, top)
 
     -- event: mwheel / scrolling
     BMU_control_global:SetHandler("OnMouseWheel", function(listView, delta)
-        local new_value = clamp(self_listview.offset - delta, 0, self_listview.num_hidden_lines)
-		listView.slider:SetValue(new_value)
+		local new_value = clamp(self_listview.offset - delta, 0, self_listview.num_hidden_lines)
+		listView.slider:SetValue(new_value) --calls BMU_control_global_slider:SetHandler("OnValueChanged" below
+    end)
+
+	local function refreshBMU_UI_List(p_listview)
+		BMU_clickOnZoneName = BMU_clickOnZoneName or BMU.clickOnZoneName
+		p_listview:update()
 
 		-- if the mouse hovers over the list, we need to update the current tooltip
 		-- because the control under the mouse changed by scrolling
@@ -1291,18 +1300,21 @@ local function _initialize_listview(self_listview, width, height, left, top)
 		-- get control where the mouse is currently over
 		local control = moc()
 		-- show new tooltip
-		local tooltipText = control.tooltipText
+		local tooltipText = (control ~= nil and control.tooltipText) or nil
 		if tooltipText then
+			--Show the tooltip now
 			BMU_tooltipTextEnter(BMU, control, tooltipText)
 		end
-    end)
+	end
 
     -- event: slider
     BMU_control_global_slider:SetHandler("OnValueChanged", function(sliderCtrl, value, eventReason)
         -- update offset
 		self_listview.offset = value
+
 		-- update the list view accoring to slider offset (slider's new position)
-        self_listview:update()
+		-->Throttle this so not each scrolling portion will update the list instantly, only as we stop to scroll
+		BMU_ThrottledUpdate(refreshBMU_ListEventStr, 100, refreshBMU_UI_List, self_listview)
     end)
 
     -- just for preventing multiple reszisings at the samt ime
@@ -1400,11 +1412,10 @@ function ListView:update()
 	local showHouseNickNames = BMU.savedVarsChar.houseNickNames
 
 	local listControl = BMU_listViews_self.control
-	
+
 	-- suggestion by otac0n (Discord, 2022_10)
 	-- To make it robust, you may want to create a unique ID per ListView.  This assumes a singleton.
 	EM:UnregisterForUpdate(BMU_TeleporterListUpdateEventName)
-
 	--local throttle_time = (isResizing and 0.02) or 0.1
     if BMU_throttle(BMU_listViews_self, 0.05) then
 		-- suggestion by otac0n (Discord, 2022_10)
@@ -2197,7 +2208,7 @@ local function showZoneFavoriteContextMenu(comboBox, control, data)
 	end
 end
 
-function BMU.clickOnZoneName(button, record)
+function BMU.clickOnZoneName(button, record, onlySimulateClick)
 	BMU_createTableDungeons = BMU_createTableDungeons or BMU.createTableDungeons
 	BMU_createTablePTF = BMU_createTablePTF or BMU.createTablePTF
 	BMU_OpenTeleporter = BMU_OpenTeleporter or BMU.OpenTeleporter
@@ -2226,84 +2237,86 @@ function BMU.clickOnZoneName(button, record)
 
 
 	if button == MOUSE_BUTTON_INDEX_LEFT then
-		-- PTF house tab
-		if record.PTFHouseOpen then
-			-- hide world map if open
-			SM:Hide("worldMap")
-			-- hide UI if open
-			BMU_HideTeleporter()
-			zo_callLater(function() PortToFriend.OpenWindow(function() zo_callLater(function() SetGameCameraUIMode(true) BMU_OpenTeleporter(false) BMU_createTablePTF() end, 150) end) end, 150)
-			--SetGameCameraUIMode(true)
-			return
-		end
-
-		------ display map ------
-		-- switch to Tamriel and back to players map in order to reset any subzone or zoom
-		if record.mapIndex ~= nil then
-			SM:Show("worldMap")
-			worldMapManager:SetMapByIndex(1)
-			worldMapManager:SetMapByIndex(record.mapIndex)
-			CM:FireCallbacks("OnWorldMapChanged")
-		end
-
-		------ display poi on map (in case of delve, dungeon etc.) ------
-		if record.parentZoneId ~= nil and (record.category ~= BMU_ZONE_CATEGORY_OVERLAND or record.forceOutside) then
-			local normalizedX
-			local normalizedZ
-			local _
-			-- primary: use LibZone function
-			local parentZoneId, parentZoneIndex, poiIndex = BMU_LibZone:GetZoneMapPinInfo(record.zoneId, record.parentZoneId)
-			if poiIndex ~= nil and poiIndex ~= 0 then
-				normalizedX, normalizedZ, _, _, _, _ = GetPOIMapInfo(parentZoneIndex, poiIndex)
+		if not onlySimulateClick then
+			-- PTF house tab
+			if record.PTFHouseOpen then
+				-- hide world map if open
+				SM:Hide("worldMap")
+				-- hide UI if open
+				BMU_HideTeleporter()
+				zo_callLater(function() PortToFriend.OpenWindow(function() zo_callLater(function() SetGameCameraUIMode(true) BMU_OpenTeleporter(false) BMU_createTablePTF() end, 150) end) end, 150)
+				--SetGameCameraUIMode(true)
+				return
 			end
 
-			------------------
-			-- temp. fallback: search corresponding pin by name
-			if not normalizedX or not normalizedZ then
-				local toSearch = record.zoneNameUnformatted
-				if record.forceOutside then
-					toSearch = record.houseNameUnformatted
-				end
-
-				-- find out coordinates in order to Ping on Map (e.g. Delves, Public Dungeons)
-				local coordinate_x = 0
-				local coordinate_z = 0
-				local zoneIndex = GetZoneIndex(record.parentZoneId)
-				for i = 0, GetNumPOIs(zoneIndex) do
-					local e = {}
-					e.normalizedX, e.normalizedZ, e.poiPinType, e.icon, e.isShownInCurrentMap, e.linkedCollectibleIsLocked = GetPOIMapInfo(zoneIndex, i)
-					e.objectiveName, e.objectiveLevel, e.startDescription, e.finishedDescription = GetPOIInfo(zoneIndex, i)
-
-					-- because of inconsistency with zone names coming from API and coming from map (POI), we have to test all 4 cases / combinations
-					local objectiveNameWithArticle = string_lower(BMU_formatName(e.objectiveName, false))
-					local zoneNameWithArticle = string_lower(BMU_formatName(toSearch, false))
-					--local objectiveNameWithoutArticle = string_lower(BMU_formatName(e.objectiveName, true))
-					local zoneNameWithoutArcticle = string_lower(BMU_formatName(toSearch, true))
-
-					-- solve bug with "-"
-					if zoneNameWithArticle ~= nil then
-						zoneNameWithArticle = string_gsub(zoneNameWithArticle, "-", "--")
-					end
-
-					local iconLower = string_lower(e.icon)
-					-- check (if zoneNameWithArticle is found in objectiveNameWithArticle) or if (zoneNameWithoutArcticle is found in objectiveNameWithArticle) AND objective has no wayshrine or portal icon (to prevent matches with wayshrines and dolmen)
-					if (BMU_isWholeWordInString(objectiveNameWithArticle, zoneNameWithArticle) or BMU_isWholeWordInString(objectiveNameWithArticle, zoneNameWithoutArcticle)) and not string_match(iconLower, "wayshrine") and not string_match(iconLower, "portal") then
-						normalizedX = e.normalizedX
-						normalizedZ = e.normalizedZ
-						break
-					end
-				end
+			------ display map ------
+			-- switch to Tamriel and back to players map in order to reset any subzone or zoom
+			if record.mapIndex ~= nil then
+				SM:Show("worldMap")
+				worldMapManager:SetMapByIndex(1)
+				worldMapManager:SetMapByIndex(record.mapIndex)
+				CM:FireCallbacks("OnWorldMapChanged")
 			end
-			------------------
 
-			if normalizedX and normalizedZ then
-				-- Map Ping
-				if BMU_savedVarsAcc.useMapPing and BMU.LibMapPing then
-					PingMap(MAP_PIN_TYPE_RALLY_POINT, MAP_TYPE_LOCATION_CENTERED, normalizedX, normalizedZ)
+			------ display poi on map (in case of delve, dungeon etc.) ------
+			if record.parentZoneId ~= nil and (record.category ~= BMU_ZONE_CATEGORY_OVERLAND or record.forceOutside) then
+				local normalizedX
+				local normalizedZ
+				local _
+				-- primary: use LibZone function
+				local parentZoneId, parentZoneIndex, poiIndex = BMU_LibZone:GetZoneMapPinInfo(record.zoneId, record.parentZoneId)
+				if poiIndex ~= nil and poiIndex ~= 0 then
+					normalizedX, normalizedZ, _, _, _, _ = GetPOIMapInfo(parentZoneIndex, poiIndex)
 				end
-				-- Pan and Zoom
-				if BMU_savedVarsAcc.usePanAndZoom then
-					zo_callLater(function() ZO_WorldMap_PanToNormalizedPosition(normalizedX, normalizedZ) end, 200)
+
+				------------------
+				-- temp. fallback: search corresponding pin by name
+				if not normalizedX or not normalizedZ then
+					local toSearch = record.zoneNameUnformatted
+					if record.forceOutside then
+						toSearch = record.houseNameUnformatted
+					end
+
+					-- find out coordinates in order to Ping on Map (e.g. Delves, Public Dungeons)
+					--local coordinate_x = 0
+					--local coordinate_z = 0
+					local zoneIndex = GetZoneIndex(record.parentZoneId)
+					for i = 0, GetNumPOIs(zoneIndex) do
+						local e = {}
+						e.normalizedX, e.normalizedZ, e.poiPinType, e.icon, e.isShownInCurrentMap, e.linkedCollectibleIsLocked = GetPOIMapInfo(zoneIndex, i)
+						e.objectiveName, e.objectiveLevel, e.startDescription, e.finishedDescription = GetPOIInfo(zoneIndex, i)
+
+						-- because of inconsistency with zone names coming from API and coming from map (POI), we have to test all 4 cases / combinations
+						local objectiveNameWithArticle = string_lower(BMU_formatName(e.objectiveName, false))
+						local zoneNameWithArticle = string_lower(BMU_formatName(toSearch, false))
+						--local objectiveNameWithoutArticle = string_lower(BMU_formatName(e.objectiveName, true))
+						local zoneNameWithoutArcticle = string_lower(BMU_formatName(toSearch, true))
+
+						-- solve bug with "-"
+						if zoneNameWithArticle ~= nil then
+							zoneNameWithArticle = string_gsub(zoneNameWithArticle, "-", "--")
+						end
+
+						local iconLower = string_lower(e.icon)
+						-- check (if zoneNameWithArticle is found in objectiveNameWithArticle) or if (zoneNameWithoutArcticle is found in objectiveNameWithArticle) AND objective has no wayshrine or portal icon (to prevent matches with wayshrines and dolmen)
+						if (BMU_isWholeWordInString(objectiveNameWithArticle, zoneNameWithArticle) or BMU_isWholeWordInString(objectiveNameWithArticle, zoneNameWithoutArcticle)) and not string_match(iconLower, "wayshrine") and not string_match(iconLower, "portal") then
+							normalizedX = e.normalizedX
+							normalizedZ = e.normalizedZ
+							break
+						end
+					end
+				end
+				------------------
+
+				if normalizedX and normalizedZ then
+					-- Map Ping
+					if BMU_savedVarsAcc.useMapPing and BMU.LibMapPing then
+						PingMap(MAP_PIN_TYPE_RALLY_POINT, MAP_TYPE_LOCATION_CENTERED, normalizedX, normalizedZ)
+					end
+					-- Pan and Zoom
+					if BMU_savedVarsAcc.usePanAndZoom then
+						zo_callLater(function() ZO_WorldMap_PanToNormalizedPosition(normalizedX, normalizedZ) end, 200)
+					end
 				end
 			end
 		end
@@ -2673,11 +2686,14 @@ local function addCommonContextMenuEntries(button, record)
 			checked = function() return BMU.var.choosenListPlayerFilter == BMU_SOURCE_INDEX_FRIEND end,
 			icon = function() return BMU_checkIfContextMenuIconShouldShow("friends") end,
 		},
-		{
+	}
+	--Player owns any houses?
+	if numOwnHouses > 0 then
+		entries_filter[#entries_filter+1] = {
 			label = GetString(SI_MAPFILTER18) .. ((numOwnHouses > 0 and " (#" .. tos(numOwnHouses) .. ")") or ""), --"Houses",
 			entryType = LSM_ENTRY_TYPE_HEADER,
-		},
-		{
+		}
+		entries_filter[#entries_filter+1] = {
 			label = BMU_colorizeText(BMU_SI_Get(SI_TELE_UI_BTN_PORT_TO_OWN_HOUSE), colorTeal), --Own houses
 			callback = function()
 				BMU_createTable({index=BMU_indexListSource, filterSourceIndex=BMU_SOURCE_INDEX_OWNHOUSES}) --INS Baertram 260206
@@ -2692,8 +2708,8 @@ local function addCommonContextMenuEntries(button, record)
 				if BMU.savedVarsAcc.hideOwnHouses then return false end
 				return numOwnHouses > 0
 			end,
-		},
-	}
+		}
+	end
 
 	-- add all guilds
 	table_insert(entries_filter, {

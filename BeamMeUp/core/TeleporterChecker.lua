@@ -2131,7 +2131,7 @@ function BMU.getExistingEntry(zoneId)
 			return record
 		end
 	end
-	d("NOT FOUND: " .. zoneId)
+	d("[BMU]NOT FOUND, zoneId: " .. tos(zoneId))
 end
 BMU_getExistingEntry = BMU.getExistingEntry							--INS251229 Baertram
 

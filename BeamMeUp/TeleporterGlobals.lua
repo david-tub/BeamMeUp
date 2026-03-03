@@ -2176,3 +2176,7 @@ function BMU.ThrottledUpdate(callbackName, timer, callback, ...)
     EVENT_MANAGER:UnregisterForUpdate(callbackName)
     EVENT_MANAGER:RegisterForUpdate(callbackName, timer, Update)
 end
+
+function BMU.IsNotKeyboard()
+  return IsInGamepadPreferredMode() or IsConsoleUI()
+end

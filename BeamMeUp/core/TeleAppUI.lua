@@ -2,6 +2,7 @@ local BMU = BMU --INS251229 Baertram Performancee gain, not searching _G for BMU
 
 local LAM2 = BMU.LAM
 local SI = BMU.SI ---- used for localization
+local CS = BMU.CS
 
 local teleporterVars    = BMU.var
 local appName           = teleporterVars.appName
@@ -31,7 +32,7 @@ local worldName 							= GetWorldName()
 local typeFunc = "function"
 
 
-local zo_WorldMapZoneStoryTopLevel_Keyboard = ZO_WorldMapZoneStoryTopLevel_Keyboard
+local WorldMapZoneStoryTopLevel = ZO_WorldMapZoneStoryTopLevel_Keyboard
 local zo_ChatWindow                         = ZO_ChatWindow
 --Other addon variables
 ---v- INS BEARTRAM 20260125 LibScrollableMenu
@@ -155,7 +156,7 @@ local BMU_getItemTypeIcon, BMU_getDataMapInfo, BMU_OpenTeleporter, BMU_updateCon
       BMU_createTableDungeons, BMU_createTableGuilds, BMU_numOfSurveyTypesChecked, BMU_updateCheckboxSurveyMap, BMU_numOfAntiquityTypesChecked,
       BMU_updateCheckboxLeadsMap, BMU_checkCheckboxesCurrentStatus, BMU_createTableHouses, BMU_getCurrentDungeonDifficulty, BMU_setDungeonDifficulty, BMU_PortalToPlayer, BMU_printToChat,
 	  BMU_has_value, BMU_showNotification, LSM_ButtonGroupDefaultContextMenu, BMU_checkIfContextMenuIconShouldShow,
-	  BMU_updateContextMenuEntryDungeonAll, BMU_getContextMenuEntryDungeonAllAppendix, BMU_numOfDungeonTypesChecked, BMU_updateCheckboxDungeonMap
+	  BMU_updateContextMenuEntryDungeonAll, BMU_getContextMenuEntryDungeonAllAppendix, BMU_numOfDungeonTypesChecked, BMU_updateCheckboxDungeonMap, BMU_IsNotKeyboard
 
 --BMU functions
 local BMU_RefreshMainMenuPatternStr = "BMU_Refresh%sMainMenu"
@@ -166,6 +167,14 @@ local refreshDungeonsMainMenuEventStr = string_format(BMU_RefreshMainMenuPattern
 local BMU_ThrottledUpdate = BMU.ThrottledUpdate
 
 -- -^- INS251229 Baertram END 0
+
+local FontGame = ZoFontGame
+local FontBookTablet = ZoFontBookTablet
+if BMU.IsNotKeyboard() then
+  FontGame = ZoFontGamepad36
+  FontBookTablet = ZoFontGamepadBookTablet
+  WorldMapZoneStoryTopLevel = ZO_WorldMapZoneStoryTopLevel_Gamepad
+end
 
 -- list of tuples (guildId & displayname) for invite queue (only for admin)
 local inviteQueue = {}
@@ -449,13 +458,13 @@ local function SetupUI()
 	
 	-- default font
 	local fontSize = BMU_round(17*scale, 0)   --CHG251229 Baertram
-	local fontStyle = ZoFontGame:GetFontInfo()
+	local fontStyle = FontGame:GetFontInfo()
 	local fontWeight = "soft-shadow-thin"
 	BMU.font1 = string_format(fontPattern, fontStyle, fontSize, fontWeight)
 	
 	-- font of statistics
 	fontSize = BMU_round(13*scale, 0)       --CHG251229 Baertram
-	fontStyle = ZoFontBookTablet:GetFontInfo()
+	fontStyle = FontBookTablet:GetFontInfo()
 	--fontStyle = "EsoUI/Common/Fonts/consola.ttf"
 	fontWeight = "soft-shadow-thin"
 	BMU.font2 = string_format(fontPattern, fontStyle, fontSize, fontWeight)
@@ -556,10 +565,10 @@ local function SetupUI()
   --------------------------------------------------------------------------------------------------------------------
   -- Switch BUTTON ON ZoneGuide window
   --------------------------------------------------------------------------------------------------------------------
-  teleporterWin_zoneGuideSwapTexture = wm:CreateControl(nil, zo_WorldMapZoneStoryTopLevel_Keyboard, CT_TEXTURE) --CHG251229 Baertram Performance improvement
+  teleporterWin_zoneGuideSwapTexture = wm:CreateControl(nil, WorldMapZoneStoryTopLevel, CT_TEXTURE) --CHG251229 Baertram Performance improvement
   teleporterWin.zoneGuideSwapTexture = teleporterWin_zoneGuideSwapTexture --CHG251229 Baertram Performance improvement
   teleporterWin_zoneGuideSwapTexture:SetDimensions(50*scale, 50*scale) --CHG251229 Baertram Performance improvement
-  teleporterWin_zoneGuideSwapTexture:SetAnchor(TOPRIGHT, zo_WorldMapZoneStoryTopLevel_Keyboard, TOPRIGHT, TOPRIGHT -10*scale, -35*scale) --CHG251229 Baertram Performance improvement
+  teleporterWin_zoneGuideSwapTexture:SetAnchor(TOPRIGHT, WorldMapZoneStoryTopLevel, TOPRIGHT, TOPRIGHT -10*scale, -35*scale) --CHG251229 Baertram Performance improvement
   teleporterWin_zoneGuideSwapTexture:SetTexture(BMU_textures.swapBtn) --CHG251229 Baertram Performance improvement
   teleporterWin_zoneGuideSwapTexture:SetMouseEnabled(true) --CHG251229 Baertram Performance improvement
 
@@ -579,6 +588,10 @@ local function SetupUI()
       teleporterWinZoneGuideSwapTextureCtrl:SetTexture(BMU_textures.swapBtn) --CHG251229 Baertram Performance improvement
       BMU_tooltipTextEnter(BMU, teleporterWinZoneGuideSwapTextureCtrl) --CHG251229 Baertram Performance improvement
   end)
+  
+  if BMU.IsNotKeyboard() then
+    teleporterWin_zoneGuideSwapTexture:SetHidden(true)
+  end
 
   --------------------------------------------------------------------------------------------------------------------
   -- Feedback BUTTON
@@ -2115,7 +2128,11 @@ end
 function BMU.TeleporterSetupUI(addOnName)
 	if appName ~= addOnName then return end
 		addOnName = appName .. " - Teleporter"
-		BMU.SetupOptionsMenu(addOnName)
+		if BMU.IsNotKeyboard() then
+      CS.SetupOptionsMenu(addOnName)
+		else
+		  BMU.SetupOptionsMenu(addOnName)
+		end
 		SetupUI()
 end
 

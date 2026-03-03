@@ -110,6 +110,7 @@ local BMU_changeState 						= BMU.changeState
 local BMU_isFavoriteZone 					= BMU.isFavoriteZone
 local BMU_isFavoritePlayer 					= BMU.isFavoritePlayer
 local BMU_updateRelatedItemsCounterPanel 	= BMU.updateRelatedItemsCounterPanel
+local BMU_IsNotKeyboard = BMU.IsNotKeyboard
 
 ----variables (defined inline in code below, upon first usage, as they are still nil at this line)
 local BMU_LibZoneGivenZoneData
@@ -413,8 +414,20 @@ function BMU.createTable(args)
 	if not BMU_savedVarsAcc.hideOwnHouses and not noOwnHouses then
 		-- 4. go over own houses
 		-- player can port outside own houses -> check own houses and add parent zone entries if not already in list
-		for _, house in pairs(COLLECTIONS_BOOK_SINGLETON:GetOwnedHouses()) do
-			local houseZoneId = GetHouseZoneId(house.houseId)
+		local ownedHouses = {}
+		if BMU_IsNotKeyboard() then
+		  ownedHouses = ZO_COLLECTIBLE_DATA_MANAGER:GetAllCollectibleDataObjects({ ZO_CollectibleCategoryData.IsHousingCategory }, { ZO_CollectibleData.IsUnlocked })
+		else
+		  ownedHouses = COLLECTIONS_BOOK_SINGLETON:GetOwnedHouses()
+    end
+		for _, house in pairs(ownedHouses) do
+		  local houseId
+		  if BMU_IsNotKeyboard() then
+        houseId = house:GetReferenceId()
+      else
+        houseId = house.houseId
+      end
+			local houseZoneId = GetHouseZoneId(houseId)
 			--local mapIndex = BMU_getMapIndex(houseZoneId)
 			local parentZoneId = BMU_getParentZoneId(houseZoneId)
 			-- check if parent zone not already in result list
@@ -425,7 +438,7 @@ function BMU.createTable(args)
 			e.parentZoneName = BMU_formatName(GetZoneNameById(e.parentZoneId))
 			e.zoneId = e.parentZoneId
 			e.displayName = ""
-			e.houseId = house.houseId
+			e.houseId = houseId
 			e.isOwnHouse = true
 			-- add flag to port outside the house
 			e.forceOutside = true
@@ -2239,11 +2252,17 @@ function BMU.createTableHouses()
 
 	BMU_changeState(BMU_indexListOwnHouses)
 	local resultList = {}
-
-	for _, house in pairs(COLLECTIONS_BOOK_SINGLETON:GetOwnedHouses()) do
+  local ownedHouses = {}
+  if BMU_IsNotKeyboard() then
+    ownedHouses = ZO_COLLECTIBLE_DATA_MANAGER:GetAllCollectibleDataObjects({ ZO_CollectibleCategoryData.IsHousingCategory }, { ZO_CollectibleData.IsUnlocked })
+  else
+    ownedHouses = COLLECTIONS_BOOK_SINGLETON:GetOwnedHouses()
+  end
+	for _, house in pairs(ownedHouses) do
 		local houseEntry   = BMU_createBlankRecord()
-		houseEntry.houseId = house.houseId
-		if IsPrimaryHouse(house.houseId) then
+		local houseId = house.houseId or house:GetReferenceId()
+		houseEntry.houseId = houseId
+		if IsPrimaryHouse(houseId) then
 			houseEntry.prio              = 1
 			houseEntry.textColorZoneName = colorGold
 		else
@@ -2251,7 +2270,7 @@ function BMU.createTableHouses()
 			houseEntry.textColorZoneName = colorWhite
 		end
 		houseEntry.isOwnHouse           = true
-		houseEntry.zoneId               = GetHouseZoneId(house.houseId)
+		houseEntry.zoneId               = GetHouseZoneId(houseId)
 		houseEntry.zoneNameUnformatted  = GetZoneNameById(houseEntry.zoneId)
 		houseEntry.textColorDisplayName = colorGray
 		houseEntry.zoneNameClickable    = true

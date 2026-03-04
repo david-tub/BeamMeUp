@@ -429,14 +429,26 @@ function BMU.HideTeleporter()
 	ClearCustomScrollableMenu() -- close all submenus
 	ZO_Tooltips_HideTextTooltip() -- close all tooltips
 	
-	if SCENE_MANAGER:IsShowing("worldMap") then
-		-- show button only when main window is hidden and world map is open
-		if BMU_win.MapOpen then
-			BMU_win.MapOpen:SetHidden(false)
-		end
-		
-		-- show ZoneGuide
-		BMU_toggleZoneGuide(true)
+	if not BMU_IsNotKeyboard() then
+    if SCENE_MANAGER:IsShowing("worldMap") then
+      -- show button only when main window is hidden and world map is open
+      if BMU_win.MapOpen then
+        BMU_win.MapOpen:SetHidden(false)
+      end
+      
+      -- show ZoneGuide
+      BMU_toggleZoneGuide(true)
+    end
+	else
+	  if worldMapScene_Gamepad:IsShowing() then
+      -- show button only when main window is hidden and world map is open
+      if BMU_win.MapOpen then
+        BMU_win.MapOpen:SetHidden(false)
+      end
+      
+      -- show ZoneGuide
+      BMU_toggleZoneGuide(true)
+    end
 	end
 end
 BMU_HideTeleporter = BMU.HideTeleporter

@@ -157,10 +157,13 @@ local addon = ZO_DeferredInitializingObject:Subclass()
 BMU.IJA = addon
 
 local BMU = BMU
+local BMU_savedVarsAcc = BMU.savedVarsAcc or {}
 local em = EVENT_MANAGER
 local cm = CALLBACK_MANAGER
 
 function addon:Init(self, control)
+    BMU_savedVarsAcc["gamepad_settings"] = BMU_savedVarsAcc["gamepad_settings"] or {}
+    self.savedVars = BMU_savedVarsAcc["gamepad_settings"]
     self.categoryList = self.subclassTable.categoryList:New(self, control)
 		self.teleportList = self.subclassTable.teleportList:New(self, IJA_BMU_TeleportList_Gamepad)
 

@@ -154,7 +154,6 @@ end
 
 function addon:AutoUnlockCancel()
 --	em:UnregisterForUpdate(updateName)
-  BMU_uwData.isStarted = false
 	self:UnregisterAutoUnlockEvents()
 end
 

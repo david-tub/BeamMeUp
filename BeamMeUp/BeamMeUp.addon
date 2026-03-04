@@ -19,21 +19,21 @@ GuildData.lua
 TeleporterGlobals.lua
 
 
-## Gamepad / Console
-Console/i18n/en.lua
-Console/i18n/$(language).lua
+## Gamepad
+Gamepad/i18n/en.lua
+Gamepad/i18n/$(language).lua
 
-Console/globals.lua
+Gamepad/globals.lua
 
-Console/IsJustaBmuGamepadPlugin.lua
-Console/IsJustaBmuGamepadPlugin.xml
-Console/core/autoUnlock.lua
-Console/core/dialogues.lua
-Console/core/listClassShared.lua
-Console/core/entryData.lua
-Console/core/categoryList.lua
-Console/core/telportList.lua
-Console/Settings.lua
+Gamepad/IsJustaBmuGamepadPlugin.lua
+Gamepad/IsJustaBmuGamepadPlugin.xml
+Gamepad/core/autoUnlock.lua
+Gamepad/core/dialogues.lua
+Gamepad/core/listClassShared.lua
+Gamepad/core/entryData.lua
+Gamepad/core/categoryList.lua
+Gamepad/core/telportList.lua
+Gamepad/Settings.lua
 
 
 core/List.lua

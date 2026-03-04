@@ -429,7 +429,7 @@ function BMU.HideTeleporter()
 	ClearCustomScrollableMenu() -- close all submenus
 	ZO_Tooltips_HideTextTooltip() -- close all tooltips
 	
-	if SCENE_MANAGER:IsShowing(worldMap) then
+	if SCENE_MANAGER:IsShowing("worldMap") then
 		-- show button only when main window is hidden and world map is open
 		if BMU_win.MapOpen then
 			BMU_win.MapOpen:SetHidden(false)

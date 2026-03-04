@@ -156,13 +156,14 @@ local BMU_getItemTypeIcon, BMU_getDataMapInfo, BMU_OpenTeleporter, BMU_updateCon
       BMU_createTableDungeons, BMU_createTableGuilds, BMU_numOfSurveyTypesChecked, BMU_updateCheckboxSurveyMap, BMU_numOfAntiquityTypesChecked,
       BMU_updateCheckboxLeadsMap, BMU_checkCheckboxesCurrentStatus, BMU_createTableHouses, BMU_getCurrentDungeonDifficulty, BMU_setDungeonDifficulty, BMU_PortalToPlayer, BMU_printToChat,
 	  BMU_has_value, BMU_showNotification, LSM_ButtonGroupDefaultContextMenu, BMU_checkIfContextMenuIconShouldShow,
-	  BMU_updateContextMenuEntryDungeonAll, BMU_getContextMenuEntryDungeonAllAppendix, BMU_numOfDungeonTypesChecked, BMU_updateCheckboxDungeonMap, BMU_IsNotKeyboard
+	  BMU_updateContextMenuEntryDungeonAll, BMU_getContextMenuEntryDungeonAllAppendix, BMU_numOfDungeonTypesChecked, BMU_updateCheckboxDungeonMap
 
 --BMU functions
 local BMU_RefreshMainMenuPatternStr = "BMU_Refresh%sMainMenu"
 local refreshLeadsMainMenuEventStr = string_format(BMU_RefreshMainMenuPatternStr, 		leadTypesHeader)
 local refreshSurveysMainMenuEventStr = string_format(BMU_RefreshMainMenuPatternStr, 	surveyTypesHeader)
 local refreshDungeonsMainMenuEventStr = string_format(BMU_RefreshMainMenuPatternStr, 	dungeonTypesHeader)
+local BMU_IsNotKeyboard = BMU.IsNotKeyboard
 
 local BMU_ThrottledUpdate = BMU.ThrottledUpdate
 
@@ -170,7 +171,7 @@ local BMU_ThrottledUpdate = BMU.ThrottledUpdate
 
 local FontGame = ZoFontGame
 local FontBookTablet = ZoFontBookTablet
-if BMU.IsNotKeyboard() then
+if BMU_IsNotKeyboard() then
   FontGame = ZoFontGamepad36
   FontBookTablet = ZoFontGamepadBookTablet
   WorldMapZoneStoryTopLevel = ZO_WorldMapZoneStoryTopLevel_Gamepad
@@ -589,7 +590,7 @@ local function SetupUI()
       BMU_tooltipTextEnter(BMU, teleporterWinZoneGuideSwapTextureCtrl) --CHG251229 Baertram Performance improvement
   end)
   
-  if BMU.IsNotKeyboard() then
+  if BMU_IsNotKeyboard() then
     teleporterWin_zoneGuideSwapTexture:SetHidden(true)
   end
 
@@ -2128,7 +2129,7 @@ end
 function BMU.TeleporterSetupUI(addOnName)
 	if appName ~= addOnName then return end
 		addOnName = appName .. " - Teleporter"
-		if BMU.IsNotKeyboard() then
+		if BMU_IsNotKeyboard() then
       CS.SetupOptionsMenu(addOnName)
 		else
 		  BMU.SetupOptionsMenu(addOnName)

@@ -1168,7 +1168,9 @@ function TeleportClass_Shared:ShouldShowGuildInvite(guildId)
 	if self.socialData and self.socialData.displayName and self.socialData.displayName ~= '' then
 		local displayName = self.socialData.displayName
 		local a, b = displayName:find('@.*')
-		displayName = displayName:sub(a, b)
+		if a~=nil and b~=nil then
+		  displayName = displayName:sub(a, b)
+		end
 
 		if GUILD_ROSTER_MANAGER:FindDataByDisplayName(displayName) == nil then
 			return self:ShouldAddPlayerOption() and DoesPlayerHaveGuildPermission(guildId, GUILD_PERMISSION_INVITE)

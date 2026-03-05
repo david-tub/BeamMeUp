@@ -14,6 +14,7 @@ local strings = {
 	SI_BMU_GAMEPAD_MANAGE_FAVORITES			= 'Manage Favorites',
 	
 	SI_BMU_GAMEPAD_ZONE_CATEGORY_GRPZONES	= 'Group area',
+	SI_BMU_GAMEPAD_PLEASE_RELOAD = BMU.colorizeText("BeamMeUp: ", "red").."Gamepad mode changed\n Use /reloadui for full addon support",
 
 
 	SI_BMU_GAMEPAD_NOTIFICATION_TYPE_WAYSHRINE_UNLOCK		= BMU.colorizeText(BMU.var.appName, "gold") .. BMU.colorizeText(" - Teleporter", "white"),

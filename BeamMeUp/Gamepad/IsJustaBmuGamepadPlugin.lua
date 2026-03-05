@@ -579,6 +579,10 @@ function addon:RegisterEvents()
 	em:RegisterForEvent(self.name, EVENT_QUEST_ADDED, refreshOnEvent)
 	em:RegisterForEvent(self.name, EVENT_QUEST_REMOVED, refreshOnEvent)
 	em:RegisterForEvent(self.name, EVENT_QUEST_CONDITION_COUNTER_CHANGED, refreshOnEvent)
+	
+	em:RegisterForEvent(self.name, EVENT_GAMEPAD_PREFERRED_MODE_CHANGED, function(eventCode, newInputType)
+      ZO_Alert(UI_ALERT_CATEGORY_ALERT, SOUNDS.NEW_NOTIFICATION, GetString(SI_BMU_GAMEPAD_PLEASE_RELOAD))
+  end)
 
 	local trackedItems = {
 		[SPECIALIZED_ITEMTYPE_TROPHY_SURVEY_REPORT] = true,

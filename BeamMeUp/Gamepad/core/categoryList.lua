@@ -1,6 +1,26 @@
 local addon = IJA_BMU_GAMEPAD_PLUGIN
 local TeleportClass_Shared = addon.subclassTable.list_Shared
 local BMU_savedVarsChar = BMU.savedVarsChar
+local categoryListVars = BMU.var
+
+local surveyData = categoryListVars.surveyData
+local surveyTypes = surveyData.surveyTypes
+local subType_Alchemist 					= surveyTypes[1]
+local subType_Blacksmith 					= surveyTypes[2]
+local subType_Clothier 						= surveyTypes[3]
+local subType_Enchanter 					= surveyTypes[4]
+local subType_Jewelry 						= surveyTypes[5]
+local subType_Woodworker 					= surveyTypes[6]
+
+local treasureData = categoryListVars.treasureData
+local treasureTypes = treasureData.treasureTypes
+local treasureType_Treasure = treasureTypes[1]
+
+local leadsData = categoryListVars.leadsData
+local leadTypes = leadsData.leadTypes
+local leadType_scryable 					= leadTypes[1]
+local leadType_scried 						= leadTypes[2]
+local leadType_completed 					= leadTypes[3]
 
 local CATEGORY_TYPE_GROUP		= 0
 local CATEGORY_TYPE_ALL			= 1
@@ -69,6 +89,12 @@ end
 local function getTeleporterSetting(index)
   if BMU_savedVarsChar == nil then return end
 	local setting = BMU_savedVarsChar[index]
+	return setting
+end
+
+local function getTeleporterSettingByKey(index, key)
+  if BMU_savedVarsChar == nil then return end
+	local setting = BMU_savedVarsChar[key][index]
 	return setting
 end
 
@@ -520,15 +546,9 @@ function categoryList:BuildItemsCategoryOptions(groupId)
 		return categoryData.categoryType == CATEGORY_TYPE_ITEMS
 	end
 
-	local surveyReports = {
-		'displaySurveyMapsAlchemist', 'displaySurveyMapsEnchanter', 'displaySurveyMapsWoodworker',
-		'displaySurveyMapsBlacksmith', 'displaySurveyMapsClothier', 'displaySurveyMapsJewelry'
-	}
-
-
 	local function areSurveysActive()
-		for k, index in pairs(surveyReports) do
-			if not getTeleporterSetting(index) then
+		for k, index in pairs(surveyTypes) do
+			if not getTeleporterSettingByKey(index, "displayMaps") then
 				return false
 			end
 		end
@@ -539,16 +559,16 @@ function categoryList:BuildItemsCategoryOptions(groupId)
 		{ -- displayTreasureMaps
 			filterName = GetString(SI_SPECIALIZEDITEMTYPE100),
 			callback = function(data)
-				self:ToggleBMUSetting('displayTreasureMaps', data.checked)
+				self:ToggleBMUSettingByKey(treasureType_Treasure, data.checked, "displayMaps")
 			end,
-			checked = function() return getTeleporterSetting('displayTreasureMaps') end,
+			checked = function() return getTeleporterSettingByKey(treasureType_Treasure, 'displayMaps') end,
 		},
 		{ -- displayLeads
 			filterName = GetString(SI_ANTIQUITY_LEAD_TOOLTIP_TAG),
 			callback = function(data)
-				self:ToggleBMUSetting('displayLeads', data.checked)
+				self:ToggleBMUSettingByKey(leadType_scryable, data.checked, 'displayAntiquityLeads')
 			end,
-			checked = function() return getTeleporterSetting('displayLeads') end,
+			checked = function() return getTeleporterSettingByKey(leadType_scryable, 'displayAntiquityLeads') end,
 		},
 		{ -- scanBankForMaps
 			filterName = GetString(SI_CRAFTING_INCLUDE_BANKED),
@@ -560,8 +580,8 @@ function categoryList:BuildItemsCategoryOptions(groupId)
 		{-- surveyReports
 			filterName = GetString(SI_SPECIALIZEDITEMTYPE101),
 			callback = function(data)
-				for k, index in pairs(surveyReports) do
-					self:ToggleBMUSetting(index, data.checked)
+				for k, index in pairs(surveyTypes) do
+					self:ToggleBMUSettingByKey(index, data.checked, "displayMaps")
 				end
 					-- reset all suvey filters
 				--	self:ShowOptionsDialog()
@@ -578,105 +598,50 @@ function categoryList:BuildItemsCategoryOptions(groupId)
 		{
 			filterName = GetString(SI_ITEMTYPEDISPLAYCATEGORY14),
 			callback = function(checked)
-				self:ToggleBMUSetting('displaySurveyMapsAlchemist', checked)
+				self:ToggleBMUSettingByKey(subType_Alchemist, checked, "displayMaps")
 			end,
-			checked = function() return getTeleporterSetting('displaySurveyMapsAlchemist') end,
+			checked = function() return getTeleporterSettingByKey(subType_Alchemist, "displayMaps") end,
 		},
 		{
 			filterName = GetString(SI_ITEMTYPEDISPLAYCATEGORY15),
 			callback = function(checked)
-				self:ToggleBMUSetting('displaySurveyMapsEnchanter', checked)
+				self:ToggleBMUSettingByKey(subType_Enchanter, checked, "displayMaps")
 			end,
-			checked = function() return getTeleporterSetting('displaySurveyMapsEnchanter') end,
+			checked = function() return getTeleporterSettingByKey(subType_Enchanter, "displayMaps") end,
 		},
 		{
 			filterName = GetString(SI_ITEMTYPEDISPLAYCATEGORY12),
 			callback = function(checked)
-				self:ToggleBMUSetting('displaySurveyMapsWoodworker', checked)
+				self:ToggleBMUSettingByKey(subType_Woodworker, checked, "displayMaps")
 			end,
-			checked = function() return getTeleporterSetting('displaySurveyMapsWoodworker') end,
+			checked = function() return getTeleporterSettingByKey(subType_Woodworker, "displayMaps") end,
 		},
 		{
 			filterName = GetString(SI_ITEMTYPEDISPLAYCATEGORY10),
 			callback = function(checked)
-				self:ToggleBMUSetting('displaySurveyMapsBlacksmith', checked)
+				self:ToggleBMUSettingByKey(subType_Blacksmith, checked, "displayMaps")
 			end,
-			checked = function() return getTeleporterSetting('displaySurveyMapsBlacksmith') end,
+			checked = function() return getTeleporterSettingByKey(subType_Blacksmith, "displayMaps") end,
 		},
 		{
 			filterName = GetString(SI_ITEMTYPEDISPLAYCATEGORY11),
 			callback = function(checked)
-				self:ToggleBMUSetting('displaySurveyMapsClothier', checked)
+				self:ToggleBMUSettingByKey(subType_Clothier, checked, "displayMaps")
 			end,
-			checked = function() return getTeleporterSetting('displaySurveyMapsClothier') end,
+			checked = function() return getTeleporterSettingByKey(subType_Clothier, "displayMaps") end,
 		},
 		{
 			filterName = GetString(SI_ITEMTYPEDISPLAYCATEGORY13),
 			callback = function(checked)
-				self:ToggleBMUSetting('displaySurveyMapsJewelry', checked)
+				self:ToggleBMUSettingByKey(subType_Jewelry, checked, "displayMaps")
 			end,
-			checked = function() return getTeleporterSetting('displaySurveyMapsJewelry') end,
+			checked = function() return getTeleporterSettingByKey(subType_Jewelry, "displayMaps") end,
 		},
 	}
 
 	local filtersGroupId = self:AddOptionTemplateGroup(function() return GetString(SI_ITEMTYPEDISPLAYCATEGORY13) end)
 
 	self:AddOptionTemplate(filtersGroupId, function() return self:BuildMultiSelectDropdown(SI_SPECIALIZEDITEMTYPE101, nil, filterData, icon, areSurveysActive) end, conditionFunction)
-	--[[
-
-	for filterIndex, currentFilter in ipairs(filterData) do
-		self:AddOptionTemplate(filtersGroupId, function() return self:BuildCheckbox(SI_GAMEPAD_CRAFTING_OPTIONS_FILTERS, label, currentFilter, icon) end, conditionFunction)
-	end
-	]]
-	
-
-
-	--[[
-	local filterData = {
-		{
-			filterName = GetString(SI_ITEMTYPEDISPLAYCATEGORY14),
-			callback = function(data)
-				self:ToggleBMUSetting('displaySurveyMapsAlchemist', data.checked)
-			end,
-			checked = getTeleporterSetting('displaySurveyMapsAlchemist'),
-		},
-		{
-			filterName = GetString(SI_ITEMTYPEDISPLAYCATEGORY15),
-			callback = function(data)
-				self:ToggleBMUSetting('displaySurveyMapsEnchanter', data.checked)
-			end,
-			checked = getTeleporterSetting('displaySurveyMapsEnchanter'),
-		},
-		{
-			filterName = GetString(SI_ITEMTYPEDISPLAYCATEGORY12),
-			callback = function(data)
-				self:ToggleBMUSetting('displaySurveyMapsWoodworker', data.checked)
-			end,
-			checked = getTeleporterSetting('displaySurveyMapsWoodworker'),
-		},
-		{
-			filterName = GetString(SI_ITEMTYPEDISPLAYCATEGORY10),
-			callback = function(data)
-				self:ToggleBMUSetting(displaySurveyMapsBlacksmith)
-			end,
-			checked = getTeleporterSetting('displaySurveyMapsBlacksmith'),
-		},
-		{
-			filterName = GetString(SI_ITEMTYPEDISPLAYCATEGORY11),
-			callback = function(data)
-				self:ToggleBMUSetting('displaySurveyMapsClothier', data.checked)
-			end,
-			checked = getTeleporterSetting('displaySurveyMapsClothier'),
-		},
-		{
-			filterName = GetString(SI_ITEMTYPEDISPLAYCATEGORY13),
-			callback = function(data)
-				self:ToggleBMUSetting('displaySurveyMapsJewelry', data.checked)
-			end,
-			checked = getTeleporterSetting('displaySurveyMapsJewelry'),
-		},
-	}
-	]]
 end
 
 function categoryList:BuildDungeonsCategoryOptions(groupId)
@@ -687,32 +652,39 @@ function categoryList:BuildDungeonsCategoryOptions(groupId)
 	end
 	local filterData = {
 		{
+			filterName = GetString(SI_TELE_UI_TOGGLE_ENDLESS),
+			callback = function(data)
+				self:ToggleBMUSettingByKey('showEndlessDungeons', data.checked, "dungeonFinder")
+			end,
+			checked = getTeleporterSettingByKey('showEndlessDungeons', "dungeonFinder"),
+		},
+		{
 			filterName = GetString(SI_TELE_UI_TOGGLE_ARENAS),
 			callback = function(data)
-				self:ToggleBMUSetting('df_showArenas', data.checked)
+				self:ToggleBMUSettingByKey('showArenas', data.checked, "dungeonFinder")
 			end,
-			checked = getTeleporterSetting('df_showArenas'),
+			checked = getTeleporterSettingByKey('showArenas', "dungeonFinder"),
 		},
 		{
 			filterName = GetString(SI_TELE_UI_TOGGLE_GROUP_ARENAS),
 			callback = function(data)
-				self:ToggleBMUSetting('df_showGroupArenas', data.checked)
+				self:ToggleBMUSettingByKey('showGroupArenas', data.checked, "dungeonFinder")
 			end,
-			checked = getTeleporterSetting('df_showGroupArenas'),
+			checked = getTeleporterSettingByKey('showGroupArenas', "dungeonFinder"),
 		},
 		{
 			filterName = GetString(SI_TELE_UI_TOGGLE_TRIALS),
 			callback = function(data)
-				self:ToggleBMUSetting('df_showTrials', data.checked)
+				self:ToggleBMUSettingByKey('showTrials', data.checked, "dungeonFinder")
 			end,
-			checked = getTeleporterSetting('df_showTrials'),
+			checked = getTeleporterSettingByKey('showTrials', "dungeonFinder"),
 		},
 		{
 			filterName = GetString(SI_TELE_UI_TOGGLE_GROUP_DUNGEONS),
 			callback = function(data)
-				self:ToggleBMUSetting('df_showDungeons', data.checked)
+				self:ToggleBMUSettingByKey('showDungeons', data.checked, "dungeonFinder")
 			end,
-			checked = getTeleporterSetting('df_showDungeons'),
+			checked = getTeleporterSettingByKey('showDungeons', "dungeonFinder"),
 		},
 	}
 	for filterIndex, currentFilter in ipairs(filterData) do
@@ -773,6 +745,16 @@ end
 ---------------------------------------------------------------------------------------------------------------
 function categoryList:ToggleBMUSetting(index, checked)
 	BMU.savedVarsChar[index] = checked
+	self.owner:UpdatePortalPlayers()
+	self:Refresh()
+end
+
+function categoryList:ToggleBMUSettingByKey(index, checked, key)
+  if key == nil then
+    self:ToggleBMUSetting(index, checked)
+    return
+  end
+	BMU.savedVarsChar[key][index] = checked
 	self.owner:UpdatePortalPlayers()
 	self:Refresh()
 end

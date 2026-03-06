@@ -4,6 +4,12 @@
 
 local strings = {
 	SI_BMU_GAMEPAD_CATEGORY_DELVES			= "Delves and open Dungeons",
+	SI_TELE_UI_TOGGLE_ALL_DELVES        = "Show all delves",
+	SI_TELE_UI_TOGGLE_ARENAS            = "Show all arenas",
+	SI_TELE_UI_TOGGLE_GROUP_DUNGEONS    = "Show group dungeons",
+	SI_TELE_UI_TOGGLE_GROUP_ARENAS      = "Show group arenas",
+	SI_TELE_UI_TOGGLE_TRIALS            = "Show trials",
+	SI_TELE_UI_TOGGLE_ENDLESS           = "Show Endless Archive",
 	
 	SI_BMU_GAMEPAD_PAN						= "Focus in on map pin",
 	SI_BMU_GAMEPAD_PAN_TOOLTIP				= "Enabled: If a destination has a map pin, on selection the map will auto-focus in on the pin.",

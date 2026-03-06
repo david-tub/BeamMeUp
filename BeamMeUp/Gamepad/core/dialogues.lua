@@ -368,19 +368,6 @@ ZO_Dialogs_RegisterCustomDialog("BMU_GAMEPAD_AUTO_UNLOCK_DIALOG",
 		},
 		{
 			template = "ZO_GamepadTextFieldSubmitItem",
-			header = SI_get(SI_TELE_DIALOG_AUTO_UNLOCK_LOOP_OPTION),
-			templateData = {
-				text = GetString(SI_TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION0),
-				setup = zo_SharedGamepadEntry_OnSetup,
-				callback = function(dialog)
-					ReleaseDialog("BMU_GAMEPAD_AUTO_UNLOCK_DIALOG")
-					BMU.uwData.isStarted = true
-					IJA_BMU_GAMEPAD_PLUGIN:PrepareAutoUnlock(nil, true, "guildbyguild", BMU.savedVarsAcc.autoUnlockChatLogging)
-				end,
-			},
-		},
-		{
-			template = "ZO_GamepadTextFieldSubmitItem",
 			templateData = {
 				text = GetString(SI_TELE_DIALOG_AUTO_UNLOCK_ORDER_OPTION1),
 				setup = zo_SharedGamepadEntry_OnSetup,

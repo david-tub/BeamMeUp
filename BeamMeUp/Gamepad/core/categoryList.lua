@@ -385,29 +385,6 @@ function categoryList:BuildCategories()
 		},
 	}
 
-	if dev then
-		local cataegory = { -- test
-			filterType = 3,
-			categoryType = CATEGORY_TYPE_TEST,
-			name = 'Test ZONES',
-			icon = BMU.textures.ptfHouseBtn,
-
-			enabled = true,
-			visible = true,
-
-			filter = {
-				index = 1,
-			},
-			callback = function(currentFilter)
-				zo_callLater(function()
-					self.owner:CreateTestList(currentFilter)
-				end, 100)
-			end,
-		}
-
-		table.insert(categories, cataegory)
-	end
-
 	self.categories = categories
 end
 

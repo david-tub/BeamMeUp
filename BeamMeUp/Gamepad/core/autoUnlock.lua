@@ -184,7 +184,7 @@ function addon:StartAutoUnlock(zoneId, isChatLogging, loopType, loopZoneList)
 	-- ensure unlock process is not already running
 
   local formattedZoneName = BMU.formatName(GetZoneNameById(zoneId), false)
-  local list = BMU_createTable({index=8, fZoneId=zoneId, noOwnHouses=true, dontDisplay=true})
+  local list = BMU_createTable({index=8, fZoneId=zoneId, noOwnHouses=true, dontDisplay=true}) or {}
   -- check if list is empty
   provider.formattedZoneName = formattedZoneName
   local firstRecord = list[1]

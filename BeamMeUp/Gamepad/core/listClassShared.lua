@@ -154,12 +154,11 @@ local function getTargetTooltipData(targetData)
 	end
 	------------------
 
-
-	-- wayhsrine and skyshard discovery info
-	if targetData.zoneNameClickable == true and (targetData.zoneWayhsrineDiscoveryInfo ~= nil or targetData.zoneSkyshardDiscoveryInfo ~= nil) then
+	-- wayhsrine and skyshard discovery and group dungeon achievement info
+	if targetData.zoneNameClickable == true and (targetData.zoneWayhsrineDiscoveryInfo ~= nil or targetData.zoneSkyshardDiscoveryInfo ~= nil or targetData.publicDungeonAchiementInfo ~= nil) then
 		if #tooltipData > 0 then
 			-- add separator
-	--		table.insert(tooltipData, 1, BMU_textures.tooltipSeperator)
+			table.insert(tooltipData, 1, BMU_textures.tooltipSeperator)
 		end
 		
 		local discoveryInfo = {}
@@ -169,6 +168,9 @@ local function getTargetTooltipData(targetData)
 		end
 		if targetData.zoneSkyshardDiscoveryInfo ~= nil then
 			table.insert(discoveryInfo, targetData.zoneSkyshardDiscoveryInfo)
+		end
+		if targetData.publicDungeonAchiementInfo ~= nil then
+			table.insert(discoveryInfo, targetData.publicDungeonAchiementInfo)
 		end
 		
 		addTooltipData(tooltipData, discoveryInfo)
@@ -380,6 +382,26 @@ function TeleportClass_Shared:RefreshKeybind()
 	KEYBIND_STRIP:UpdateKeybindButtonGroup(self.keybindStripDescriptor)
 end
 
+local function flattenToString(value)
+    if type(value) == "string" then
+        return value
+    elseif type(value) == "table" then
+        local result = {}
+        for _, v in pairs(value) do
+            if type(v) == "table" then
+                -- recursively flatten nested table into result directly
+                for _, str in pairs(v) do
+                    table.insert(result, flattenToString(str))
+                end
+            elseif v ~= nil then
+                table.insert(result, tostring(v))
+            end
+        end
+        return table.concat(result, "\n")
+    end
+    return tostring(value)
+end
+
 function TeleportClass_Shared:UpdateTooltip(targetData)
 	if not targetData then
 		self:RefreshKeybind()
@@ -464,7 +486,7 @@ function TeleportClass_Shared:UpdateTooltip(targetData)
 	end
 	
 	
-	tooltipControl:LayoutTitleAndMultiSectionDescriptionTooltip(targetData.text, unpack(tooltipData))
+	tooltipControl:LayoutTitleAndMultiSectionDescriptionTooltip(targetData.text, flattenToString(tooltipData))
 	self:RefreshKeybind()
 end
 

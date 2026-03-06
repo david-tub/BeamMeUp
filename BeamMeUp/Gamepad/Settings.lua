@@ -1,6 +1,12 @@
 local CS = {}
 local BMU = BMU
 local LHAS = LibHarvensAddonSettings
+
+if not LHAS then
+  d("Please install LibVotans on console or LibHarvensAddonSettings for gamepad settings to work.")
+  return
+end
+
 local SI = BMU.SI ---- used for localization
 local BMU_SI_get = SI.get
 local BMU_colorizeText = BMU.colorizeText

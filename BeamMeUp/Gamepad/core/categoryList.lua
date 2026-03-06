@@ -652,7 +652,7 @@ function categoryList:BuildDungeonsCategoryOptions(groupId)
 	end
 	local filterData = {
 		{
-			filterName = GetString(SI_TELE_UI_TOGGLE_ENDLESS),
+			filterName = GetString(SI_TELE_UI_TOGGLE_ENDLESS_DUNGEONS),
 			callback = function(data)
 				self:ToggleBMUSettingByKey('showEndlessDungeons', data.checked, "dungeonFinder")
 			end,

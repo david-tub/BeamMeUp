@@ -521,6 +521,16 @@ function teleportList:ToggleBUISetting(index, checked, key)
 	self:Refresh()
 end
 
+function teleportList:ToggleBMUSettingByKey(index, checked, key)
+  if key == nil then
+    self:ToggleBUISetting(index, checked)
+    return
+  end
+	BMU.savedVarsChar[key][index] = checked
+	self.owner:UpdatePortalPlayers()
+	self:Refresh()
+end
+
 function teleportList:GetBUISetting(index, key)
 	key = self:GetBUISettingKey(index, key)
 	local savedVars = BMU.savedVarsServ[index]

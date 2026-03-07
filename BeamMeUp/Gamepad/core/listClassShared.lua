@@ -163,7 +163,7 @@ local function getTargetTooltipData(targetData)
 		
 		local discoveryInfo = {}
 		
-    if BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName and targetData.acronym ~= nil then
+    if targetData.acronym ~= nil then
       table.insert(discoveryInfo, targetData.acronym)
     end
 		-- add discovery info

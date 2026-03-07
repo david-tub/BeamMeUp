@@ -155,13 +155,17 @@ local function getTargetTooltipData(targetData)
 	------------------
 
 	-- wayhsrine and skyshard discovery and group dungeon achievement info
-	if targetData.zoneNameClickable == true and (targetData.zoneWayhsrineDiscoveryInfo ~= nil or targetData.zoneSkyshardDiscoveryInfo ~= nil or targetData.publicDungeonAchiementInfo ~= nil) then
+	if targetData.zoneNameClickable == true and (targetData.zoneWayhsrineDiscoveryInfo ~= nil or targetData.zoneSkyshardDiscoveryInfo ~= nil or targetData.publicDungeonAchiementInfo ~= nil or BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName) then
 		if #tooltipData > 0 then
 			-- add separator
 			table.insert(tooltipData, 1, BMU_textures.tooltipSeperator)
 		end
 		
 		local discoveryInfo = {}
+		
+    if BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName and targetData.acronym ~= nil then
+      table.insert(discoveryInfo, targetData.acronym)
+    end
 		-- add discovery info
 		if targetData.zoneWayhsrineDiscoveryInfo ~= nil then
 			table.insert(discoveryInfo, targetData.zoneWayhsrineDiscoveryInfo)

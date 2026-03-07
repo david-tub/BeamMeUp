@@ -251,6 +251,15 @@ function CS.SetupOptionsMenu(index) --index == Addon name
               setFunction = function(value) BMU_savedVarsAcc.showZonesWithoutPlayers2 = value end,
 			  default = BMU_DefaultsAccount["showZonesWithoutPlayers2"],
 			           },
+     {
+         type = LHAS.ST_CHECKBOX,
+					label = BMU_SI_get(SI_TELE_UI_TOGGLE_ACRONYM),
+					getFunction = function()
+						return BMU_savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName
+					end,
+					setFunction = function(value) BMU_savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName = value end,
+					default = false,
+				},
 		 {
               type = LHAS.ST_CHECKBOX,
               label = BMU_SI_get(SI_TELE_SETTINGS_ONLY_MAPS),

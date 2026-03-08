@@ -201,6 +201,7 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
               type = "divider",
 			  submenu = "deps",
          },
+		--[[
 	     {
               type = "description",
               title = "|cFF00FFIsJusta|r Beam Me Up Gamepad Plugin",
@@ -220,6 +221,7 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
               text = BMU_SI_Get(SI_TELE_ADDON_EXT_IJAGBMUGP_DESC),
 			  submenu = "deps",
          },
+		--]]
 		 {
               type = "slider",
               name = BMU_SI_Get(SI_TELE_SETTINGS_NUMBER_LINES),
@@ -1135,4 +1137,5 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
 	-- TODO: add submenu1
 	LAM2:RegisterOptionControls(appName .. "Options", {submenu1, submenu2, submenu3, submenu4, submenu5, submenu6, submenu7, submenu8, submenu9})
 end
+
 BMU.SetupOptionsMenu = SetupOptionsMenu

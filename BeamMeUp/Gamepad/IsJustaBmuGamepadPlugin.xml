@@ -1,0 +1,43 @@
+<GuiXml>
+	<Controls>
+        <Control name="IJA_BMU_GamepadTextFieldSubmitItem" inherits="ZO_GamepadMenuEntryDimensionsTemplate ZO_GamepadMenuEntryLabelSizedTemplate" virtual="true">
+            <Controls>
+                <Label name="$(parent)Label" font="ZoFontGamepad18" verticalAlignment="CENTER" wrapMode="ELLIPSIS" modifyTextType="UPPERCASE">
+					<Anchor point="TOPLEFT"/>
+					<Dimensions x="ZO_GAMEPAD_DEFAULT_LIST_ENTRY_WIDTH_AFTER_INDENT"/>
+                </Label>
+            </Controls>
+        </Control>
+
+		<Control name="IJA_BMU_List_Template" virtual="true">
+			<AnchorFill/>
+			<Controls>
+				<Control name="$(parent)SideContent" inherits="ZO_GamepadGrid_NavQuadrant_4_Anchors">
+					<Controls>
+						<Control name="$(parent)Tooltip" inherits="ZO_ScrollTooltip_Gamepad ZO_GamepadGrid_NavQuadrant_ContainerAnchors"/>
+					</Controls>
+				</Control>
+				<Control name="$(parent)Main" inherits="ZO_WorldMapInfoContent_Gamepad">
+					<Controls>
+						<Control name="$(parent)List" inherits="ZO_VerticalParametricScrollListTemplate">
+							<AnchorFill/>
+							<Controls>
+								<Label name="$(parent)NoItemsLabel" override="true" font="ZoFontGamepadCondensed36" horizontalAlignment="CENTER" verticalAlignment="CENTER" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_NORMAL">
+									<Anchor point="CENTER"/>
+									<Dimensions x="ZO_GAMEPAD_CONTENT_WIDTH"/>
+								</Label>
+							</Controls>
+						</Control>
+					</Controls>
+				</Control>
+			</Controls>
+		</Control>
+		
+		<TopLevelControl name="IJA_BMU_TeleportList_Gamepad" inherits="IJA_BMU_List_Template" hidden="true"/>
+		
+		<TopLevelControl name="IJA_BMU_Category_Gamepad" inherits="IJA_BMU_List_Template" hidden="true">
+			<AnchorFill/>
+			<OnInitialized> IJA_BMU_Initialize(self) </OnInitialized>
+		</TopLevelControl>
+	</Controls>
+</GuiXml>

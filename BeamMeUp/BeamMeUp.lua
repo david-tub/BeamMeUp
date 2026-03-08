@@ -14,7 +14,18 @@ local CM = CALLBACK_MANAGER
 local LH = LINK_HANDLER
 local SharedInv = SHARED_INVENTORY
 local worldMapScene_Keyboard				= WORLD_MAP_SCENE
+local worldMap = worldMapScene_Keyboard
 local worldMapScene_Gamepad					= GAMEPAD_WORLD_MAP_SCENE
+local WorldMapZoneStoryTopLevel = ZO_WorldMapZoneStoryTopLevel_Keyboard
+local worldMapZoneStoryFragment = WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT
+
+local BMU_IsNotKeyboard = BMU.IsNotKeyboard
+
+if BMU_IsNotKeyboard() then
+  worldMap = worldMapScene_Gamepad
+  WorldMapZoneStoryTopLevel = ZO_WorldMapZoneStoryTopLevel_Gamepad
+  worldMapZoneStoryFragment = WORLD_MAP_ZONE_STORY_GAMEPAD_FRAGMENT
+end
 local worldMapZoneStoryTLC_Keyboard			= ZO_WorldMapZoneStoryTopLevel_Keyboard
 local ClearCustomScrollableMenu 			= ClearCustomScrollableMenu --LSM
 --Other addon variables
@@ -343,6 +354,7 @@ local BMU_onWorldMapChanged = BMU.onWorldMapChanged
 
 
 function BMU.OpenTeleporter(refresh)
+  if BMU_IsNotKeyboard() then return end
 	BMU_toggleZoneGuide = BMU_toggleZoneGuide or BMU.toggleZoneGuide								--INS251229 Baertram
 	BMU_showNotification = BMU_showNotification or BMU.showNotification								--INS251229 Baertram
 	BMU_initializeBlacklist = BMU_initializeBlacklist or BMU.initializeBlacklist					--INS251229 Baertram
@@ -359,7 +371,7 @@ function BMU.OpenTeleporter(refresh)
 	-- show notification (in case)
 	BMU_showNotification()
 
-	if not worldMapZoneStoryTLC_Keyboard:IsHidden() then
+	if not WorldMapZoneStoryTopLevel:IsHidden() then
 		--hide ZoneGuide
 		BMU_toggleZoneGuide(false)
 		-- show swap button
@@ -408,6 +420,7 @@ BMU_OpenTeleporter = BMU.OpenTeleporter
 
 
 function BMU.HideTeleporter()
+  if BMU_IsNotKeyboard() then return end
 	BMU_toggleZoneGuide = BMU_toggleZoneGuide or BMU.toggleZoneGuide								--INS251229 Baertram
 	BMU_win = BMU_win or BMU.win
 	BMU_win_Main_Control = BMU_win_Main_Control or BMU_win.Main_Control
@@ -416,14 +429,26 @@ function BMU.HideTeleporter()
 	ClearCustomScrollableMenu() -- close all submenus
 	ZO_Tooltips_HideTextTooltip() -- close all tooltips
 	
-	if SCENE_MANAGER:IsShowing("worldMap") then
-		-- show button only when main window is hidden and world map is open
-		if BMU_win.MapOpen then
-			BMU_win.MapOpen:SetHidden(false)
-		end
-		
-		-- show ZoneGuide
-		BMU_toggleZoneGuide(true)
+	if not BMU_IsNotKeyboard() then
+    if SCENE_MANAGER:IsShowing("worldMap") then
+      -- show button only when main window is hidden and world map is open
+      if BMU_win.MapOpen then
+        BMU_win.MapOpen:SetHidden(false)
+      end
+      
+      -- show ZoneGuide
+      BMU_toggleZoneGuide(true)
+    end
+	else
+	  if worldMapScene_Gamepad:IsShowing() then
+      -- show button only when main window is hidden and world map is open
+      if BMU_win.MapOpen then
+        BMU_win.MapOpen:SetHidden(false)
+      end
+      
+      -- show ZoneGuide
+      BMU_toggleZoneGuide(true)
+    end
 	end
 end
 BMU_HideTeleporter = BMU.HideTeleporter
@@ -433,7 +458,7 @@ BMU_HideTeleporter = BMU.HideTeleporter
 function BMU.cameraModeChanged()
 	if not BMU.savedVarsAcc.windowStay then
 		-- hide window, when player moved or camera mode changed
-		if not IsGameCameraUIModeActive() then
+		if IsGameCameraUIModeActive and not IsGameCameraUIModeActive() then
 			BMU_HideTeleporter()
 		end
 	end
@@ -463,12 +488,12 @@ function BMU.toggleZoneGuide(show)
 		-- show ZoneGuide
 		--ZO_WorldMapZoneStoryTopLevel_Keyboard:SetHidden(false)
 		--ZO_SharedMediumLeftPanelBackground:SetHidden(false)
-		worldMapScene_Keyboard:AddFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
+		worldMap:AddFragment(worldMapZoneStoryFragment)
 	else
 		-- hide ZoneGuide
 		--ZO_WorldMapZoneStoryTopLevel_Keyboard:SetHidden(true)
 		--ZO_SharedMediumLeftPanelBackground:SetHidden(true)
-		worldMapScene_Keyboard:RemoveFragment(WORLD_MAP_ZONE_STORY_KEYBOARD_FRAGMENT)
+		worldMap:RemoveFragment(worldMapZoneStoryFragment)
 	end
 end
 BMU_toggleZoneGuide = BMU.toggleZoneGuide
@@ -782,7 +807,9 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	teleporterVars.version = tostring(GetAddonVersionFromManifest())
 
     teleporterVars.isAddonLoaded = true
-
+    
+    local anchorOnMap = not BMU_IsNotKeyboard()
+    local showOpenButtonOnMap = not BMU_IsNotKeyboard()
 
     BMU.DefaultsAccount = {
 		["pos_MapScene_x"] = -15,
@@ -791,7 +818,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["pos_y"] = 63,
 		["anchorMapOffset_x"] = 0,
 		["anchorMapOffset_y"] = 0,
-		["anchorOnMap"] = true,
+		["anchorOnMap"] = anchorOnMap,
         ["ShowOnMapOpen"] = true,
 		["HideOnMapClose"] = true,
         ["AutoPortFreq"]  = 300,
@@ -826,7 +853,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["surveyMapsNotification"] = false,
 		["infoFavoritePlayerStatusNotification"] = false, -- false = not yet read
 		["infoSurveyMapsNotification"] = false, -- false = not yet read
-		["showOpenButtonOnMap"] = true,
+		["showOpenButtonOnMap"] = showOpenButtonOnMap,
 		["surveyMapsNotificationSound"] = true,
 		["wayshrineTravelAutoConfirm"] = false,
 		["currentZoneAlwaysTop"] = false,
@@ -932,7 +959,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 
 	CM:RegisterCallback("OnWorldMapChanged", BMU_onWorldMapChanged)
 
-	ZO_PreHookHandler(worldMapZoneStoryTLC_Keyboard, "OnShow", BMU_onZoneGuideShow)
+	ZO_PreHookHandler(WorldMapZoneStoryTopLevel, "OnShow", BMU_onZoneGuideShow)
 		
 	EM:RegisterForEvent(appName, EVENT_GAME_CAMERA_UI_MODE_CHANGED, BMU_cameraModeChanged)
 	

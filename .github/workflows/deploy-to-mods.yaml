@@ -30,7 +30,7 @@ jobs:
           RUN_NUM=${{ github.run_number }}
           PADDED=$(printf "%03d" $RUN_NUM)
           VERSION=${GITHUB_REF#refs/heads/console/v}
-          echo "nextStrict=${VERSION}${PADDED}" >> $GITHUB_OUTPUT
+          echo "nextStrict=${VERSION}.${PADDED}" >> $GITHUB_OUTPUT
 
       - name: get repo name
         run: echo "REPO_NAME=${{ github.event.repository.name }}" >> $GITHUB_ENV

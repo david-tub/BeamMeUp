@@ -1,0 +1,85 @@
+name:  Deploy Addon
+
+on:
+  push:
+    branches:
+    - console/*
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref }}
+      - name: Checkout LibZone
+        uses: actions/checkout@v5
+        with:
+          repository: Baertram/LibZone
+          ref: master
+          path: BeamMeUp/Console/lib
+          sparse-checkout: |
+            LibZone
+          sparse-checkout-cone-mode: false
+          
+      - name: Get branch name as version
+        id: semver
+        run: |
+          RUN_NUM=${{ github.run_number }}
+          PADDED=$(printf "%03d" $RUN_NUM)
+          VERSION=${GITHUB_REF#refs/heads/console/v}
+          echo "nextStrict=${VERSION}.${PADDED}" >> $GITHUB_OUTPUT
+
+      - name: get repo name
+        run: echo "REPO_NAME=${{ github.event.repository.name }}" >> $GITHUB_ENV
+
+      - name: Create env variables
+        run: |
+          addon_name="${{ env.REPO_NAME }}"
+          version="${{ steps.semver.outputs.nextStrict }}"
+          formatted_version=$( echo "${version//./}" )
+
+          echo "ADDON_NAME=$addon_name" >> $GITHUB_ENV
+          echo "ADDON_VERSION=$version" >> $GITHUB_ENV
+          echo "ADDON_FORMATTED_VERSION=$formatted_version" >> $GITHUB_ENV
+
+          echo "ZIP_FULL_NAME=${addon_name}-${version}.zip" >> $GITHUB_ENV
+      - name: Create addon file
+        run: |
+          cat ${{ github.workspace }}/${{ env.REPO_NAME }}.addon.template | envsubst > ${{ github.workspace }}/${{ env.REPO_NAME }}/${{ env.REPO_NAME }}.addon
+          cat ${{ github.workspace }}/${{ env.REPO_NAME }}/${{ env.REPO_NAME }}.addon
+      - name: Create ZIP archive
+        run: |
+          REPO_FOLDER=${{ github.workspace }}/${{ env.ADDON_NAME }}
+          TMP_FOLDER="/tmp/${{ env.ADDON_NAME }}"
+
+          # Define the path to the ignore pattern file
+          ignore_file=".build-ignore"
+
+          # Read and process ignore patterns into a single line
+          exclude_patterns=$(cat "$ignore_file" | awk '{print "--exclude " $0}' | tr '\n' ' ')
+
+          # Make folder and copy content
+          mkdir -p $TMP_FOLDER
+          rsync -a --quiet $exclude_patterns "$REPO_FOLDER/" "$TMP_FOLDER/"
+          ls -la $TMP_FOLDER
+
+          # create zip
+          (cd /tmp && zip -r "$REPO_FOLDER/${{ env.ZIP_FULL_NAME }}" "${{ env.ADDON_NAME }}")
+
+      - name: Extract latest changelog entry
+        run: |
+          awk '/^## / { if (!found) { found=1; print; next } else { exit } } found' CHANGELOG.md > latest_changes.md
+          cat latest_changes.md
+
+      - name: Upload to BNET
+        uses: m00nyONE/bnet-upload@main
+        with:
+          BNET_USERNAME: ${{ secrets.BNET_USERNAME }}
+          BNET_PASSWORD: ${{ secrets.BNET_PASSWORD }}
+          addon_id: ${{ vars.ADDON_ID }}
+          version: ${{ env.ADDON_VERSION }}
+          zip_file: "${{ github.workspace }}/${{ env.ADDON_NAME }}/${{ env.ZIP_FULL_NAME }}"
+          release_notes_file: latest_changes.md

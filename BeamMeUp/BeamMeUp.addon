@@ -1,0 +1,52 @@
+## Title: |cd5b526BeamMeUp|r - Teleporter
+## Description: Free fast travel to available players from your friend list, guilds and group. Authors who contributed to the development of the addon in its current form: Baertram, Treuce, IsJustaGhost (Gamepad UI), Saranicole1980 (Console/Gamepad integration)
+## Author: DeadSoon, Gamer1986PAN and others (see description)
+## APIVersion: 101048 101049
+## SavedVariables: BeamMeUp_SV
+## Version: 4.0.0
+## AddOnVersion: 400
+## IsLibrary: false
+## ConsoleDependsOn: LibVotans
+## DependsOn: LibAddonMenu-2.0>=41 LibScrollableMenu>=020401 LibZone>=0895
+## OptionalDependsOn: LibCustomMenu LibSlashCommander LibSets LibMapPing LibChatMenuButton PortToFriendsHouse BanditsUserInterface MorrowindStyleUI
+
+## Core translation files
+core/SI.lua
+localization/EN.lua
+localization/$(language).lua
+
+## Globals / data sets
+GuildData.lua
+TeleporterGlobals.lua
+
+
+## Gamepad
+Gamepad/i18n/en.lua
+Gamepad/i18n/$(language).lua
+
+Gamepad/globals.lua
+
+Gamepad/IsJustaBmuGamepadPlugin.lua
+Gamepad/IsJustaBmuGamepadPlugin.xml
+Gamepad/core/autoUnlock.lua
+Gamepad/core/dialogues.lua
+Gamepad/core/listClassShared.lua
+Gamepad/core/entryData.lua
+Gamepad/core/categoryList.lua
+Gamepad/core/telportList.lua
+Gamepad/Settings.lua
+
+
+core/List.lua
+core/SettingsMenu.lua
+core/TeleAppUI.lua
+core/TeleSlashCommands.lua
+core/TeleporterChecker.lua
+
+
+## Bindings
+bindings/bindings.lua
+bindings/bindings.xml
+
+
+BeamMeUp.lua

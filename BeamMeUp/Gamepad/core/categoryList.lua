@@ -1,6 +1,6 @@
 local addon = IJA_BMU_GAMEPAD_PLUGIN
 local TeleportClass_Shared = addon.subclassTable.list_Shared
-local BMU_savedVarsChar = BMU.savedVarsChar
+local BMU = BMU
 local categoryListVars = BMU.var
 
 local surveyData = categoryListVars.surveyData
@@ -87,14 +87,14 @@ local function categoryFilter_Group(data)
 end
 
 local function getTeleporterSetting(index)
-  if BMU_savedVarsChar == nil then return end
-	local setting = BMU_savedVarsChar[index]
+  if BMU.savedVarsChar == nil then return end
+	local setting = BMU.savedVarsChar[index]
 	return setting
 end
 
 local function getTeleporterSettingByKey(index, key)
-  if BMU_savedVarsChar == nil then return end
-	local setting = BMU_savedVarsChar[key][index]
+  if BMU.savedVarsChar == nil then return end
+	local setting = BMU.savedVarsChar[key][index]
 	return setting
 end
 
@@ -147,7 +147,6 @@ function categoryList:Initialize(owner, control)
 			self:OnShown()
 		elseif newState == SCENE_HIDDEN then
 			KEYBIND_STRIP:RemoveKeybindButtonGroup(self.keybindStripDescriptor)
-			
 			self:Deactivate()
 			self:RefreshHeader()
 		end
@@ -525,11 +524,11 @@ function categoryList:BuildItemsCategoryOptions(groupId)
 
 	local function areSurveysActive()
 		for k, index in pairs(surveyTypes) do
-			if not getTeleporterSettingByKey(index, "displayMaps") then
-				return false
+			if getTeleporterSettingByKey(index, "displayMaps") then
+				return true
 			end
 		end
-		return true
+		return false
 	end
 
 	local filterData = {

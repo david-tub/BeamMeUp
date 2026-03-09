@@ -1,7 +1,7 @@
 local addon = IJA_BMU_GAMEPAD_PLUGIN
+local BMU = BMU
 local BMU_textures = BMU.textures
 local BMU_var_color = BMU.var.color
-local BMU_savedVarsChar = BMU.savedVarsChar
 
 local CATEGORY_TYPE_GROUP		= 0
 local CATEGORY_TYPE_ALL			= 1
@@ -973,8 +973,7 @@ function TeleportClass_Shared:BuildItemsCategoryOptions(groupId)
 					self:ToggleBMUSettingByKey(index, data.checked, "displayMaps")
 				end
 			end,
-			checked = function() return areSurveysActive() end,
-			disabled = false
+			checked = function() return areSurveysActive() end
 		},
 	}
 

@@ -46,11 +46,6 @@ end
 local addon = ZO_DeferredInitializingObject:Subclass()
 BMU.IJA = addon
 
-BMU.IJA.gameplayInfo = {
-  newInputType = nil,
-  eventCode = nil
-}
-
 local BMU = BMU
 local em = EVENT_MANAGER
 local cm = CALLBACK_MANAGER

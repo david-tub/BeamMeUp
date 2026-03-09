@@ -458,11 +458,12 @@ function categoryList:BuildOptionsList()
 	self.conditionResults = {}
 
 	self:BuildPortToFriendOption()
+	local settingsGroupId = self:AddOptionTemplateGroup(function() return GetString(SI_GAME_MENU_SETTINGS) end)
 	local filtersGroupId = self:AddOptionTemplateGroup(function() return GetString(SI_GAMEPAD_CRAFTING_OPTIONS_FILTERS) end)
 --	self:BuildAutoUnlockOptions(filtersGroupId)
 	self:BuildMainCategroyOptions(filtersGroupId)
 	self:BuildItemsCategoryOptions(filtersGroupId)
-	self:BuildDungeonsCategoryOptions(filtersGroupId)
+	self:BuildDungeonsCategoryOptions(filtersGroupId, settingsGroupId)
 	self:BuildDelvesCategoryOptions(filtersGroupId)
 end
 
@@ -620,12 +621,22 @@ function categoryList:BuildItemsCategoryOptions(groupId)
 	self:AddOptionTemplate(filtersGroupId, function() return self:BuildMultiSelectDropdown(SI_SPECIALIZEDITEMTYPE101, nil, filterData, icon, areSurveysActive) end, conditionFunction)
 end
 
-function categoryList:BuildDungeonsCategoryOptions(groupId)
+function categoryList:BuildDungeonsCategoryOptions(groupId, settingsGroupId)
 	local function conditionFunction()
 		local categoryData = self:GetTargetData()
 		if not categoryData then return false end
 		return categoryData.categoryType == CATEGORY_TYPE_DUNGEON
 	end
+	local settingsData = {
+    {
+			filterName = GetString(SI_TELE_UI_TOGGLE_ACRONYM),
+			callback = function(data)
+				self:ToggleBMUSettingByKey('toggleShowAcronymUpdateName', data.checked, "dungeonFinder")
+			end,
+			checked = getTeleporterSettingByKey('toggleShowAcronymUpdateName', "dungeonFinder"),
+		}
+	}
+	
 	local filterData = {
 		{
 			filterName = GetString(SI_TELE_UI_TOGGLE_ENDLESS_DUNGEONS),
@@ -663,6 +674,11 @@ function categoryList:BuildDungeonsCategoryOptions(groupId)
 			checked = getTeleporterSettingByKey('showDungeons', "dungeonFinder"),
 		},
 	}
+	if settingsGroupId then
+    for settingsIndex, currentSetting in ipairs(settingsData) do
+      self:AddOptionTemplate(settingsGroupId, function() return self:BuildCheckbox(SI_GAME_MENU_SETTINGS, label, currentSetting, icon) end, conditionFunction)
+    end
+	end
 	for filterIndex, currentFilter in ipairs(filterData) do
 		self:AddOptionTemplate(groupId, function() return self:BuildCheckbox(SI_GAMEPAD_CRAFTING_OPTIONS_FILTERS, label, currentFilter, icon) end, conditionFunction)
 	end

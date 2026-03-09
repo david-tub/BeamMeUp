@@ -1,4 +1,5 @@
 local addon = IJA_BMU_GAMEPAD_PLUGIN
+local BMU = BMU
 local BMU_textures = BMU.textures
 local BMU_var_color = BMU.var.color
 
@@ -140,6 +141,12 @@ local function addTooltipData(tooltipData, data)
 	else
 		table.insert(tooltipData, BMU_textures.tooltipSeperator)
 	end
+end
+
+local function getTeleporterSettingByKey(index, key)
+  if BMU.savedVarsChar == nil then return end
+	local setting = BMU.savedVarsChar[key][index]
+	return setting
 end
 
 local function getTargetTooltipData(targetData)
@@ -930,11 +937,11 @@ function TeleportClass_Shared:BuildItemsCategoryOptions(groupId)
 
 	local function areSurveysActive()
 		for k, index in pairs(surveyTypes) do
-			if not getTeleporterSettingByKey(index, "displayMaps") then
-				return false
+			if getTeleporterSettingByKey(index, "displayMaps") then
+				return true
 			end
 		end
-		return true
+		return false
 	end
 
 	local filterData = {
@@ -966,7 +973,7 @@ function TeleportClass_Shared:BuildItemsCategoryOptions(groupId)
 					self:ToggleBMUSettingByKey(index, data.checked, "displayMaps")
 				end
 			end,
-			checked = function() return areSurveysActive() end,
+			checked = function() return areSurveysActive() end
 		},
 	}
 

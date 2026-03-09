@@ -56,7 +56,15 @@ ZO_Dialogs_RegisterCustomDialog("BMU_GAMEPAD_SOCIAL_OPTIONS_DIALOG",
 				ReleaseDialog("BMU_GAMEPAD_SOCIAL_OPTIONS_DIALOG")
 			end,
 		},
-	}
+	},
+  onHidingCallback = function(dialog)
+    if dialog.dropdowns then
+        for _, dropdown in ipairs(dialog.dropdowns) do
+            dropdown:Deactivate()
+        end
+    end
+    dialog.dropdowns = nil
+  end
 })
 
 local function buildCheckbox(header, label, entryData, finishedCallback, icon)
@@ -257,7 +265,15 @@ ZO_Dialogs_RegisterCustomDialog("BMU_GAMEPAD_MULTIPLE_SELECTIONS_DIALOG",
 				ReleaseDialog("BMU_GAMEPAD_MULTIPLE_SELECTIONS_DIALOG")
 			end,
 		},
-	}
+	},
+  onHidingCallback = function(dialog)
+    if dialog.dropdowns then
+        for _, dropdown in ipairs(dialog.dropdowns) do
+            dropdown:Deactivate()
+        end
+    end
+    dialog.dropdowns = nil
+  end
 })
 
 local function tryToPort(target, isVet)
@@ -445,5 +461,13 @@ ZO_Dialogs_RegisterCustomDialog("BMU_GAMEPAD_AUTO_UNLOCK_DIALOG",
 				ReleaseDialog("BMU_GAMEPAD_AUTO_UNLOCK_DIALOG")
 			end,
 		},
-	}
+	},
+  onHidingCallback = function(dialog)
+    if dialog.dropdowns then
+        for _, dropdown in ipairs(dialog.dropdowns) do
+            dropdown:Deactivate()
+        end
+    end
+    dialog.dropdowns = nil
+  end
 })

@@ -11,6 +11,7 @@ local strings = {
 	SI_TELE_UI_TOGGLE_TRIALS            = "Show trials",
 	SI_TELE_UI_TOGGLE_ENDLESS_DUNGEONS  = "Show Endless Archive",
 	
+	
 	SI_BMU_GAMEPAD_PAN						= "Focus in on map pin",
 	SI_BMU_GAMEPAD_PAN_TOOLTIP				= "Enabled: If a destination has a map pin, on selection the map will auto-focus in on the pin.",
 	

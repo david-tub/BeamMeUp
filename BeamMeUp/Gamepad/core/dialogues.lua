@@ -25,7 +25,7 @@ ZO_Dialogs_RegisterCustomDialog("BMU_GAMEPAD_SOCIAL_OPTIONS_DIALOG",
 		dialog:setupFunc()
 	end,
 	finishedCallback = function(dialog)
-		if finishedCallback then
+		if finishedCallback and type(finishedCallback) == "function" then
 			finishedCallback(dialog)
 		end
 	end,
@@ -140,7 +140,7 @@ ZO_Dialogs_RegisterCustomDialog("BMU_GAMEPAD_MANAGE_FAVORITES_DIALOG",
 		allowShowOnNextScene = true,
 	},
 	finishedCallback = function(dialog)
-		if finishedCallback then
+		if finishedCallback and type(finishedCallback) == "function" then
 			finishedCallback(dialog)
 		end
 	end,

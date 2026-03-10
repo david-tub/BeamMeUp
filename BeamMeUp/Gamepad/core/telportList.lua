@@ -130,7 +130,7 @@ function teleportList:InitializeKeybindDescriptor()
 
 				if targetData then
 					if targetData.categoryType == CATEGORY_TYPE_BMU then
-						ZO_LinkHandler_OnLinkClicked("|H1:guild:" .. targetData.guildId .. "|hGuild|h", 1, nil)
+						GUILD_BROWSER_GAMEPAD:ShowGuildInfo(targetData.guildId)
 					else
 						if targetData.numberPlayers and BMU.savedVarsAcc.zoneOnceOnly then
 							local categoryList = self.owner.categoryList

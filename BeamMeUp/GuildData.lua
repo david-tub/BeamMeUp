@@ -5,6 +5,7 @@ BMU_GUILD_DATA = {
         -- per server displayName and houseId
         ["EU Megaserver"]	= {"@DeadSoon", 81},
         ["NA Megaserver"]	= {"@Ladytala", 47},
+        ["XB1live"]       = {"@Saranicole1980", 90}
     },
     
     -- official BMU guilds maintained by the addon developers (DeadSoon & Gamer1968PAN)
@@ -21,6 +22,10 @@ BMU_GUILD_DATA = {
             708141,			-- "BeamMeUp-Three"				| @Pandora959
             720529,			-- "BeamMeUp-Four"				| @Sokarx
         },
+        ["XB1live"] = {
+            1273043,     -- "BeamMeUp-Soon"
+        
+        }
     },
 
     -- partner guilds that are independently maintained by other users
@@ -101,6 +106,7 @@ BMU_GUILD_DATA = {
             986137,         -- "Don't Talk to Me"           |@Cadence_Nightingale discord neurotopia
             978203,         -- "The Daedric Wastelanders"   |@K1LL3R-Cfrags discord shade_k1ller
         },
+        ["XB1live"] = {},
     }
 
 }

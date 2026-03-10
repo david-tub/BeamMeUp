@@ -34,47 +34,6 @@ local CATEGORY_TYPE_TEST		= 10
 
 local CURRENT_CATEGORY_TYPE = 0
 
---[[
-local defaultHeaders = {
-	[1] = getHeaderString('ENTRY', 1),
-	[2] = getHeaderString('ENTRY', 2),
-	[3] = getHeaderString('ENTRY', 3),
-	[4] = GetString(SI_TELE_UI_TOGGLE_GROUP_DUNGEONS),
-	[5] = GetString(SI_TELE_UI_TOGGLE_TRIALS),
-	[6] = getHeaderString('ENTRY', 2),
-	[7] = GetString(SI_TELE_UI_TOGGLE_GROUP_ARENAS),
-	[8] = GetString(SI_TELE_UI_TOGGLE_ARENAS),
-	[9] = getHeaderString('ENTRY', 9),
-	[BMU.ZONE_CATEGORY_OVERLAND] = getHeaderString('ENTRY', 9),
-}
-
-
-BMU.ZONE_CATEGORY_UNKNOWN = 0
-BMU.ZONE_CATEGORY_DELVE = 1
-BMU.ZONE_CATEGORY_PUBDUNGEON = 2
-BMU.ZONE_CATEGORY_HOUSE = 3
-BMU.ZONE_CATEGORY_GRPDUNGEON = 4
-BMU.ZONE_CATEGORY_TRAIL = 5
-BMU.ZONE_CATEGORY_ENDLESSD = 6
-BMU.ZONE_CATEGORY_GRPZONES = 7
-BMU.ZONE_CATEGORY_GRPARENA = 8
-BMU.ZONE_CATEGORY_SOLOARENA = 9
-BMU.ZONE_CATEGORY_OVERLAND = 100
-
-BMU.blacklistHouses[zoneId]
-
-local zoneCategory = {
-	[1306] = BMU.ZONE_CATEGORY_HOUSE,
-	[1468] = BMU.ZONE_CATEGORY_HOUSE,
-}
-local function updateZoneCategory(entry)
-	local zoneId = entry.zoneId
-	return BMU.blacklistHouses[zoneId] and BMU.ZONE_CATEGORY_HOUSE or
-	entry.category or BMU.ZONE_CATEGORY_UNKNOWN
-end
-
-]]
-
 local defaultHeaders = {
 	[SORT_ORDER_FAVORITE]			= GetString(SI_TELE_UI_SUBMENU_FAVORITES), -- Favorites
 	[BMU.ZONE_CATEGORY_UNKNOWN]		= GetString(SI_CHAT_CHANNEL_NAME_ZONE), -- Zone

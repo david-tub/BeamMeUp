@@ -3,7 +3,7 @@ name:  Deploy Addon
 on:
   push:
     branches:
-    - console/*
+    - console/v*
 
 jobs:
   release:
@@ -68,6 +68,18 @@ jobs:
 
           # create zip
           (cd /tmp && zip -r "$REPO_FOLDER/${{ env.ZIP_FULL_NAME }}" "${{ env.ADDON_NAME }}")
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: "${{ env.ADDON_VERSION }}"
+          commit: ${{ github.ref }}
+          tag: "${{ env.ADDON_VERSION }}"
+          artifacts: "${{ github.workspace }}/${{ env.ADDON_NAME }}/${{ env.ZIP_FULL_NAME }}"
+          artifactContentType: application/zip
+          bodyFile: latest_changes.md
+          allowUpdates: true
+          makeLatest: true
 
       - name: Extract latest changelog entry
         run: |

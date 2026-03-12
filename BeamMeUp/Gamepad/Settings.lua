@@ -12,7 +12,6 @@ local BMU_SI_get = SI.get
 local BMU_colorizeText = BMU.colorizeText
 
 local teleporterVars    = BMU.var
-local appName           = teleporterVars.appName
 local wm                = WINDOW_MANAGER
 
 -- list of tuples (guildId & displayname) for invite queue (only for admin)
@@ -48,7 +47,7 @@ function CS.SetupOptionsMenu(index) --index == Addon name
     local BMU_DefaultsAccount = BMU.DefaultsAccount
     local BMU_getIndexFromValue = BMU.getIndexFromValue
 
-    local panel = LHAS:AddAddon(appName .. "Options", {
+    CS.SettingsPanel = LHAS:AddAddon(BMU.var.appName .. "Options", {
       allowDefaults = false,  -- Show "Reset to Defaults" button
       allowRefresh = false    -- Enable automatic control updates
     })
@@ -619,7 +618,7 @@ function CS.SetupOptionsMenu(index) --index == Addon name
 						end,
 			           }
     }
-    BMU.SettingsPanel = panel:AddSettings(optionsData)
+    CS.SettingsPanel:AddSettings(optionsData)
 end
 
 -- function CS.SetupUI()

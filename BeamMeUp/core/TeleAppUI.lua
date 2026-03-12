@@ -1128,6 +1128,8 @@ local function SetupUI()
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		-- toggle between nicknames and standard names
 		addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_SI_Get(SI_TELE_UI_TOGGLE_HOUSE_NICKNAME), BMU.savedVarsChar , "houseNickNames", function() BMU.clearInputFields() BMU.createTableHouses() end, nil, nil)
+    addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_SI_Get(SI_TELE_UI_TOOGLE_ZONE_NAME), BMU.savedVarsChar , "houseZoneNames", function() BMU.clearInputFields() BMU.createTableHouses() end, nil, nil)
+
 
 		-- divider
 		AddCustomScrollableMenuDivider()

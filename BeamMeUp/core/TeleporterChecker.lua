@@ -2295,12 +2295,10 @@ function BMU.createTableHouses()
 			table_insert(houseEntry.houseTooltip, tooltipFurnitureCount)
 		end
 
--- 		if BMU.savedVarsChar.houseNickNames then
--- 			-- show nick name instead of real house name
--- 			houseEntry.zoneName = houseEntry.nickName
--- 			--Future feature? Show nickname (houseName)
--- 			--houseEntry.zoneName = string_format(houseWithNicknameStrPattern, houseEntry.nickName, houseEntry.zoneName)  --For future feature INS BAERTRAM20260124
--- 		end
+		if BMU.savedVarsChar.houseZoneNames then
+			-- show nick name instead of real house name
+			houseEntry.zoneName = houseEntry.parentZoneName
+		end
 
 		table_insert(resultList, houseEntry)
 	end
@@ -2361,6 +2359,7 @@ function BMU.createTablePTF()
 			else
 				PTFentry.prio = 2
 			end
+
 			PTFentry.isPTFHouse           = true
 			PTFentry.displayName          = IdAsText .. favorite.name
 			PTFentry.houseId              = favorite.houseId
@@ -2374,7 +2373,7 @@ function BMU.createTablePTF()
 			PTFentry.collectibleId        = GetCollectibleIdForHouse(PTFentry.houseId)
 			PTFentry.houseCategoryType    = GetString("SI_HOUSECATEGORYTYPE", GetHouseCategoryType(PTFentry.houseId))
 			PTFentry.zoneName             = BMU_formatName(PTFentry.zoneNameUnformatted)
-
+      
 			_, _, PTFentry.houseIcon      = GetCollectibleInfo(PTFentry.collectibleId)
 			PTFentry.houseBackgroundImage = GetHousePreviewBackgroundImage(PTFentry.houseId)
 			PTFentry.houseTooltip         = { PTFentry.zoneName, PTFentry.parentZoneName, "", "", "|t75:75:" .. PTFentry.houseIcon .. "|t", "", "", PTFentry.houseCategoryType}

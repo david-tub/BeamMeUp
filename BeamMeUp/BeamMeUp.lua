@@ -923,6 +923,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		},
 		["displayCounterPanel"] = true,
 		["houseNickNames"] = false,
+		["houseZoneNames"] = false,
 		["ptfHouseZoneNames"] = false,
 	}
 

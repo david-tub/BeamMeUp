@@ -169,14 +169,6 @@ local BMU_ThrottledUpdate = BMU.ThrottledUpdate
 
 -- -^- INS251229 Baertram END 0
 
-local FontGame = ZoFontGame
-local FontBookTablet = ZoFontBookTablet
-if BMU_IsNotKeyboard() then
-  FontGame = ZoFontGamepad36
-  FontBookTablet = ZoFontGamepadBookTablet
-  WorldMapZoneStoryTopLevel = ZO_WorldMapZoneStoryTopLevel_Gamepad
-end
-
 -- list of tuples (guildId & displayname) for invite queue (only for admin)
 local inviteQueue = {}
 
@@ -459,6 +451,15 @@ local function SetupUI()
 	
 	-- default font
 	local fontSize = BMU_round(17*scale, 0)   --CHG251229 Baertram
+	
+	local function toCapitalized(s)
+    s = s:lower()
+    return s:sub(1,1):upper() .. s:sub(2)
+  end
+	
+  local FontGame = ZoFontGame
+  local FontBookTablet = BMU.GetConstByInputModeBase("ZoFontPLACEBookTablet", toCapitalized(BMU.InputModeToString()), "PLACE")
+
 	local fontStyle = FontGame:GetFontInfo()
 	local fontWeight = "soft-shadow-thin"
 	BMU.font1 = string_format(fontPattern, fontStyle, fontSize, fontWeight)

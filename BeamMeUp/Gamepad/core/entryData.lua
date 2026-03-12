@@ -490,7 +490,10 @@ end
 local Entry_Class_House = Entry_Class:Subclass()
 
 function Entry_Class_House:GetLabels()
-	local name = self.houseNameFormatted or self.zoneName
+	local name = self.houseNameFormatted
+	if BMU.savedVarsChar.houseNickNames then
+	  name = self.nickName
+	end
 
 	return BMU.colorizeText(name, self.textColorZoneName), (self.parentZoneName or nil)
 end

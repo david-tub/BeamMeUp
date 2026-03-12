@@ -444,7 +444,7 @@ function BMU.createTable(args)
 			e.forceOutside = true
 			e.zoneName = GetZoneNameById(e.zoneId)
 			e.houseNameUnformatted = GetZoneNameById(houseZoneId)
-			e.houseNameFormatted = BMU_formatName(e.houseNameUnformatted)
+			e.houseNameFormatted = BMU_formatName(GetCollectibleDefaultNickname(e.collectibleId))
 			e.collectibleId = GetCollectibleIdForHouse(e.houseId)
 			e.nickName = BMU_formatName(GetCollectibleNickname(e.collectibleId))
 			e.houseTooltip = {e.houseNameFormatted, "\"" .. e.nickName .. "\""}
@@ -2270,7 +2270,7 @@ function BMU.createTableHouses()
 			houseEntry.textColorZoneName = colorWhite
 		end
 		houseEntry.isOwnHouse           = true
-		houseEntry.zoneId               = GetHouseZoneId(houseId)
+		houseEntry.zoneId               = GetHouseZoneId(houseEntry.houseId)
 		houseEntry.zoneNameUnformatted  = GetZoneNameById(houseEntry.zoneId)
 		houseEntry.textColorDisplayName = colorGray
 		houseEntry.zoneNameClickable    = true
@@ -2281,6 +2281,7 @@ function BMU.createTableHouses()
 		houseEntry.collectibleId        = GetCollectibleIdForHouse(houseEntry.houseId)
 		houseEntry.houseCategoryType    = GetString("SI_HOUSECATEGORYTYPE", GetHouseCategoryType(houseEntry.houseId))
 		houseEntry.nickName             = BMU_formatName(GetCollectibleNickname(houseEntry.collectibleId))
+		houseEntry.houseNameFormatted   = BMU_formatName(GetCollectibleDefaultNickname(houseEntry.collectibleId))
 		houseEntry.zoneName             = BMU_formatName(houseEntry.zoneNameUnformatted, BMU.savedVarsAcc.formatZoneName)
 
 		_, _, houseEntry.houseIcon      = GetCollectibleInfo(houseEntry.collectibleId)
@@ -2294,12 +2295,12 @@ function BMU.createTableHouses()
 			table_insert(houseEntry.houseTooltip, tooltipFurnitureCount)
 		end
 
-		if BMU.savedVarsChar.houseNickNames then
-			-- show nick name instead of real house name
-			houseEntry.zoneName = houseEntry.nickName
-			--Future feature? Show nickname (houseName)
-			--houseEntry.zoneName = string_format(houseWithNicknameStrPattern, houseEntry.nickName, houseEntry.zoneName)  --For future feature INS BAERTRAM20260124
-		end
+-- 		if BMU.savedVarsChar.houseNickNames then
+-- 			-- show nick name instead of real house name
+-- 			houseEntry.zoneName = houseEntry.nickName
+-- 			--Future feature? Show nickname (houseName)
+-- 			--houseEntry.zoneName = string_format(houseWithNicknameStrPattern, houseEntry.nickName, houseEntry.zoneName)  --For future feature INS BAERTRAM20260124
+-- 		end
 
 		table_insert(resultList, houseEntry)
 	end

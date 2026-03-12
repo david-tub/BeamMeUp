@@ -315,6 +315,14 @@ function CS.SetupOptionsMenu(index) --index == Addon name
 			           },
 		 {
               type = LHAS.ST_CHECKBOX,
+              label = BMU_SI_get(SI_TELE_UI_TOGGLE_HOUSE_NICKNAME),
+              tooltip = BMU_SI_get(SI_TELE_UI_TOGGLE_HOUSE_NICKNAME) .. " [DEFAULT: " .. tostring(BMU_DefaultsAccount["houseNickNames"]) .. "]",
+              getFunction = function() return BMU_savedVarsChar.houseNickNames end,
+              setFunction = function(value) BMU_savedVarsChar.houseNickNames = value end,
+			  default = BMU_DefaultsAccount["BMU_savedVarsChar"],
+			           },
+		 {
+              type = LHAS.ST_CHECKBOX,
               label = BMU_SI_get(SI_TELE_SETTINGS_HIDE_HOUSES),
               tooltip = BMU_SI_get(SI_TELE_SETTINGS_HIDE_HOUSES_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU_DefaultsAccount["hideHouses"]) .. "]",
               getFunction = function() return BMU_savedVarsAcc.hideHouses end,

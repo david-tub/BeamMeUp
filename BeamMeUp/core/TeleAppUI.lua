@@ -43,6 +43,12 @@ local LSM_ENTRY_TYPE_RADIOBUTTON	= LSM_ENTRY_TYPE_RADIOBUTTON
 local LSM_UPDATE_MODE_BOTH 			= LSM_UPDATE_MODE_BOTH
 
 local ClearCustomScrollableMenu 		= ClearCustomScrollableMenu
+if not BMU.LSM then
+  local function noop()
+    return
+  end
+  ClearCustomScrollableMenu = noop
+end
 local AddCustomScrollableMenuDivider    = AddCustomScrollableMenuDivider
 local AddCustomScrollableMenuCheckbox 	= AddCustomScrollableMenuCheckbox
 local RefreshCustomScrollableMenu 		= RefreshCustomScrollableMenu

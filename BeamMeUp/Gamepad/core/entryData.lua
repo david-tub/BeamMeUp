@@ -490,8 +490,8 @@ end
 local Entry_Class_House = Entry_Class:Subclass()
 
 function Entry_Class_House:GetLabels()
-	local name = self.houseNameFormatted
-	if BMU.savedVarsChar.houseNickNames then
+	local name = self.houseNameUnformatted or self.houseNameFormatted
+	if BMU.savedVarsChar.houseNickNames and self.nickName then
 	  name = self.nickName
 	end
 

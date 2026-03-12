@@ -27,6 +27,14 @@ if BMU_IsNotKeyboard() then
   worldMapZoneStoryFragment = WORLD_MAP_ZONE_STORY_GAMEPAD_FRAGMENT
 end
 local ClearCustomScrollableMenu 			= ClearCustomScrollableMenu --LSM
+
+if not BMU.LSM then
+  local function noop()
+    return
+  end
+  ClearCustomScrollableMenu = noop
+end
+
 --Other addon variables
 local BMU_LibZone = BMU.LibZone
 --BMU variables

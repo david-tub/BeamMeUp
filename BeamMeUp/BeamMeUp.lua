@@ -357,6 +357,7 @@ local function toCapitalized(s)
 end
 
 function BMU.OpenTeleporter(refresh)
+  if IsConsoleUI() then return end
 	BMU_toggleZoneGuide = BMU_toggleZoneGuide or BMU.toggleZoneGuide								--INS251229 Baertram
 	BMU_showNotification = BMU_showNotification or BMU.showNotification								--INS251229 Baertram
 	BMU_initializeBlacklist = BMU_initializeBlacklist or BMU.initializeBlacklist					--INS251229 Baertram
@@ -424,6 +425,7 @@ BMU_OpenTeleporter = BMU.OpenTeleporter
 
 
 function BMU.HideTeleporter()
+  if IsConsoleUI() then return end
 	BMU_toggleZoneGuide = BMU_toggleZoneGuide or BMU.toggleZoneGuide								--INS251229 Baertram
 	BMU_win = BMU_win or BMU.win
 	BMU_win_Main_Control = BMU_win_Main_Control or BMU_win.Main_Control
@@ -487,6 +489,7 @@ local BMU_onZoneGuideShow = BMU.onZoneGuideShow
 
 -- show/hide ZoneGuide window
 function BMU.toggleZoneGuide(show)
+  if IsConsoleUI() then return end
   local worldMap1 = BMU.GetConstByInputModeBase("PLACE_WORLD_MAP_SCENE", string.upper(BMU.InputModeToString().."_"), "PLACE_")
   local worldMapZoneStoryFragment1 = BMU.GetConstByInputMode("WORLD_MAP_ZONE_STORY_PLACE_FRAGMENT", string.upper(BMU.InputModeToString()), "PLACE")
 	if show then

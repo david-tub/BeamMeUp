@@ -459,8 +459,13 @@ local function SetupUI()
 	
   local FontGame = ZoFontGame
   local FontBookTablet = BMU.GetConstByInputModeBase("ZoFontPLACEBookTablet", toCapitalized(BMU.InputModeToString()), "PLACE")
-
-	local fontStyle = FontGame:GetFontInfo()
+  
+  local fontStyle
+  if IsConsoleUI() then
+    fontStyle = ZoFontGamepad36:GetFontInfo()
+  else
+	  fontStyle = FontGame:GetFontInfo()
+	end
 	local fontWeight = "soft-shadow-thin"
 	BMU.font1 = string_format(fontPattern, fontStyle, fontSize, fontWeight)
 	
@@ -567,32 +572,31 @@ local function SetupUI()
   --------------------------------------------------------------------------------------------------------------------
   -- Switch BUTTON ON ZoneGuide window
   --------------------------------------------------------------------------------------------------------------------
-  teleporterWin_zoneGuideSwapTexture = wm:CreateControl(nil, WorldMapZoneStoryTopLevel, CT_TEXTURE) --CHG251229 Baertram Performance improvement
-  teleporterWin.zoneGuideSwapTexture = teleporterWin_zoneGuideSwapTexture --CHG251229 Baertram Performance improvement
-  teleporterWin_zoneGuideSwapTexture:SetDimensions(50*scale, 50*scale) --CHG251229 Baertram Performance improvement
-  teleporterWin_zoneGuideSwapTexture:SetAnchor(TOPRIGHT, WorldMapZoneStoryTopLevel, TOPRIGHT, TOPRIGHT -10*scale, -35*scale) --CHG251229 Baertram Performance improvement
-  teleporterWin_zoneGuideSwapTexture:SetTexture(BMU_textures.swapBtn) --CHG251229 Baertram Performance improvement
-  teleporterWin_zoneGuideSwapTexture:SetMouseEnabled(true) --CHG251229 Baertram Performance improvement
-
-  teleporterWin_zoneGuideSwapTexture:SetHandler("OnMouseUp", function(self, button)
-	  if button ~= MOUSE_BUTTON_INDEX_LEFT then return end  --INS BAERTRAM20260124
-      BMU_OpenTeleporter = BMU_OpenTeleporter or BMU.OpenTeleporter --INS251229 Baertram performance improvement for multiple used variable reference
-	  BMU_OpenTeleporter(true) ----CHG251229 Baertram Performance improvement by using local
-	end)
-
-  teleporterWin_zoneGuideSwapTexture:SetHandler("OnMouseEnter", function(teleporterWinZoneGuideSwapTextureCtrl) --CHG251229 Baertram Performance improvement
-      teleporterWinZoneGuideSwapTextureCtrl:SetTexture(BMU_textures.swapBtnOver) --CHG251229 Baertram Performance improvement
-      BMU_tooltipTextEnter(BMU, teleporterWinZoneGuideSwapTextureCtrl,
-          BMU_SI_Get(SI_TELE_UI_BTN_TOGGLE_ZONE_GUIDE)) --CHG251229 Baertram Performance improvement
-  end)
-
-  teleporterWin_zoneGuideSwapTexture:SetHandler("OnMouseExit", function(teleporterWinZoneGuideSwapTextureCtrl) --CHG251229 Baertram Performance improvement
-      teleporterWinZoneGuideSwapTextureCtrl:SetTexture(BMU_textures.swapBtn) --CHG251229 Baertram Performance improvement
-      BMU_tooltipTextEnter(BMU, teleporterWinZoneGuideSwapTextureCtrl) --CHG251229 Baertram Performance improvement
-  end)
   
-  if BMU_IsNotKeyboard() then
-    teleporterWin_zoneGuideSwapTexture:SetHidden(true)
+  if not IsConsoleUI() then
+    teleporterWin_zoneGuideSwapTexture = wm:CreateControl(nil, WorldMapZoneStoryTopLevel, CT_TEXTURE) --CHG251229 Baertram Performance improvement
+    teleporterWin.zoneGuideSwapTexture = teleporterWin_zoneGuideSwapTexture --CHG251229 Baertram Performance improvement
+    teleporterWin_zoneGuideSwapTexture:SetDimensions(50*scale, 50*scale) --CHG251229 Baertram Performance improvement
+    teleporterWin_zoneGuideSwapTexture:SetAnchor(TOPRIGHT, WorldMapZoneStoryTopLevel, TOPRIGHT, TOPRIGHT -10*scale, -35*scale) --CHG251229 Baertram Performance improvement
+    teleporterWin_zoneGuideSwapTexture:SetTexture(BMU_textures.swapBtn) --CHG251229 Baertram Performance improvement
+    teleporterWin_zoneGuideSwapTexture:SetMouseEnabled(true) --CHG251229 Baertram Performance improvement
+  
+    teleporterWin_zoneGuideSwapTexture:SetHandler("OnMouseUp", function(self, button)
+      if button ~= MOUSE_BUTTON_INDEX_LEFT then return end  --INS BAERTRAM20260124
+        BMU_OpenTeleporter = BMU_OpenTeleporter or BMU.OpenTeleporter --INS251229 Baertram performance improvement for multiple used variable reference
+      BMU_OpenTeleporter(true) ----CHG251229 Baertram Performance improvement by using local
+    end)
+  
+    teleporterWin_zoneGuideSwapTexture:SetHandler("OnMouseEnter", function(teleporterWinZoneGuideSwapTextureCtrl) --CHG251229 Baertram Performance improvement
+        teleporterWinZoneGuideSwapTextureCtrl:SetTexture(BMU_textures.swapBtnOver) --CHG251229 Baertram Performance improvement
+        BMU_tooltipTextEnter(BMU, teleporterWinZoneGuideSwapTextureCtrl,
+            BMU_SI_Get(SI_TELE_UI_BTN_TOGGLE_ZONE_GUIDE)) --CHG251229 Baertram Performance improvement
+    end)
+  
+    teleporterWin_zoneGuideSwapTexture:SetHandler("OnMouseExit", function(teleporterWinZoneGuideSwapTextureCtrl) --CHG251229 Baertram Performance improvement
+        teleporterWinZoneGuideSwapTextureCtrl:SetTexture(BMU_textures.swapBtn) --CHG251229 Baertram Performance improvement
+        BMU_tooltipTextEnter(BMU, teleporterWinZoneGuideSwapTextureCtrl) --CHG251229 Baertram Performance improvement
+    end)
   end
 
   --------------------------------------------------------------------------------------------------------------------

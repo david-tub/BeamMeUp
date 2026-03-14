@@ -217,15 +217,15 @@ teleporterVars.dungeonsData = {
 	dungeonTypeTextures	= { "endlessDungeon" ,"arena", "groupArena", "trial", "groupDungeon" },
 }
 --Treasure maps
-local treaureType_Treasure = "treasure"
-local treasureTypesHeader = treaureType_Treasure
+local treasureType_Treasure = "treasure"
+local treasureTypesHeader = treasureType_Treasure
 teleporterVars.treasureData = {
 	treasureTypes = {
-		treaureType_Treasure,
+		treasureType_Treasure,
 	},
 	treasureTypesHeader = treasureTypesHeader,
 	treasureTypeContainers = {
-		[treaureType_Treasure] = { 224681 }
+		[treasureType_Treasure] = { 224681 }
 	},
 	treasureTypeTextures = { "treasureMap" }
 }

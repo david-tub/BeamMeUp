@@ -66,8 +66,8 @@ local surveyTypesHeader = surveyData.surveyTypesHeader
 local treasureData = teleporterVars.treasureData
 local treasureTypeContainers = treasureData.treasureTypeContainers
 local treasureTypes = treasureData.treasureTypes
-local treaureType_Treasure = treasureTypes[1]
-local subType_Treasure = treaureType_Treasure
+local treasureType_Treasure = treasureTypes[1]
+local subType_Treasure = treasureType_Treasure
 local clueData = teleporterVars.clueData
 local subTypeClue = clueData.clueTypes[1] --"clue"
 

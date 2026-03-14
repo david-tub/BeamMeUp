@@ -48,7 +48,7 @@ local subTypeClue                 = clueData.clueTypes[1] --"clue"
 --Treasure
 local treasureData = teleporterVars.treasureData
 local treasureTypes = treasureData.treasureTypes
-local treaureType_Treasure = treasureTypes[1]
+local treasureType_Treasure = treasureTypes[1]
 --Survey type
 local surveyData = teleporterVars.surveyData
 local surveyTypes = surveyData.surveyTypes
@@ -908,7 +908,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		},
 		["displayMaps"] = {
 			[subTypeClue] = true,
-			[treaureType_Treasure] = true,
+			[treasureType_Treasure] = true,
 			[subType_Alchemist] = true,
 			[subType_Blacksmith] = true,
 			[subType_Clothier] = true,

@@ -1,4 +1,4 @@
-local addon = IJA_BMU_GAMEPAD_PLUGIN
+local addon = BMU_BMU_GAMEPAD_PLUGIN
 local TeleportClass_Shared = addon.subclassTable.list_Shared
 local BMU = BMU
 local categoryListVars = BMU.var

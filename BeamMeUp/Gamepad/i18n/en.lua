@@ -29,7 +29,6 @@ local strings = {
 	-- Used to append strings to Notifications
 	SI_NOTIFICATIONS_AUTO_WAYSHRINE_UNLOCK_STATUS = '<<2>> out of <<1>> wayshrines discovered.',
 	SI_NOTIFICATIONS_AUTO_WAYSHRINE_UNLOCK_NOTE2 = '',
-	
 }
 
 for stringId, stringValue in pairs(strings) do

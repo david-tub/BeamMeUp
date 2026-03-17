@@ -4,7 +4,7 @@
 local addonData = {
 	displayName = "|r Beam Me Up Gamepad|r",
 	name = "BeamMeUp",
-	prefix = "IJA_BMU",
+	prefix = "BMU_BMU",
 	version = "1.4.2",
 }
 
@@ -52,7 +52,7 @@ local cm = CALLBACK_MANAGER
 
 function addon:Init(self, control)
     self.categoryList = self.subclassTable.categoryList:New(self, control)
-		self.teleportList = self.subclassTable.teleportList:New(self, IJA_BMU_TeleportList_Gamepad)
+		self.teleportList = self.subclassTable.teleportList:New(self, BMU_BMU_TeleportList_Gamepad)
 
 		self.currentFragment = self.categoryList.fragment
 
@@ -437,10 +437,9 @@ end
 ---------------------------------------------------------------------------------------------------------------
 --
 ---------------------------------------------------------------------------------------------------------------
-function IJA_BMU_Initialize( ... )
-	IJA_BMU_GAMEPAD_PLUGIN = addon:New( ... )
+function BMU_BMU_Initialize( ... )
+	BMU_BMU_GAMEPAD_PLUGIN = addon:New( ... )
 end
-	
 
 function locTest()
     local locations = WORLD_MAP_LOCATIONS

@@ -28,11 +28,11 @@ Gamepad/i18n/$(language).lua
 Gamepad/globals.lua
 
 ## LibZone
-Console/lib/LibZone_Constants.lua
-Console/lib/LibZone_Data.lua
-Console/lib/LibZone_GeoData.lua
-Console/lib/LibZone_Maps.xlsx
-Console/lib/LibZone.lua
+Console/lib/LibZone/LibZone_Constants.lua
+Console/lib/LibZone/LibZone_Data.lua
+Console/lib/LibZone/LibZone_GeoData.lua
+Console/lib/LibZone/LibZone_Maps.xlsx
+Console/lib/LibZone/LibZone.lua
 
 Gamepad/IsJustaBmuGamepadPlugin.lua
 Gamepad/IsJustaBmuGamepadPlugin.xml

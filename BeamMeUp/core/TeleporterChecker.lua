@@ -2317,7 +2317,7 @@ function BMU.createTableHouses()
 			return cSortingA > cSortingB
 		end
 		-- name
-		return a.zoneName < b.zoneName
+		return a.nickName < b.nickName
 	end)
 
 	-- in case of no results, add message with information

@@ -75,13 +75,14 @@ jobs:
 
       - name: Extract latest changelog entry
         run: |
-          awk '/^## / { if (!found) { found=1; print; next } else { exit } } found' CHANGELOG.md > latest_changes.md
+          echo "Console Release Only" > latest_changes.md
+          awk '/^## / { if (!found) { found=1; print; next } else { exit } } found' CHANGELOG.md >> latest_changes.md
           cat latest_changes.md
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          name: "${{ env.ADDON_VERSION }}"
+          name: "Console Version Only - ${{ env.ADDON_VERSION }}"
           commit: ${{ github.ref }}
           tag: "${{ env.ADDON_VERSION }}"
           artifacts: "${{ github.workspace }}/${{ env.ADDON_NAME }}/${{ env.ZIP_FULL_NAME }}"

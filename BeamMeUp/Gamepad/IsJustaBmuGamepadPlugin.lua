@@ -4,7 +4,7 @@
 local addonData = {
 	displayName = "|r Beam Me Up Gamepad|r",
 	name = "BeamMeUp",
-	prefix = "IJA_BMU",
+	prefix = "BMU_BMU",
 	version = "1.4.2",
 }
 
@@ -52,7 +52,7 @@ local cm = CALLBACK_MANAGER
 
 function addon:Init(self, control)
     self.categoryList = self.subclassTable.categoryList:New(self, control)
-		self.teleportList = self.subclassTable.teleportList:New(self, IJA_BMU_TeleportList_Gamepad)
+		self.teleportList = self.subclassTable.teleportList:New(self, BMU_BMU_TeleportList_Gamepad)
 
 		self.currentFragment = self.categoryList.fragment
 
@@ -269,109 +269,6 @@ function addon:UpdatePortalPlayers()
 	-- BMU.changeState(index)
 end
 
-function addon:CreateTestList(filter)
-	if not self.teleportList then return end
-	
-	local portalPlayers = {}
-	playersPerZone = {}
-
-	local categoryData = self.categoryList:GetTargetData()
-
-	local myZoneId = GetUnitZone("player")
-	
-	local teleporterList = {}
-		
-	if filter.index == 0 then
-		WORLD_MAP_HOUSES_DATA:RefreshHouseList()
-		local houses = WORLD_MAP_HOUSES_DATA:GetHouseList()
-		for i = 1, #houses do
-			local house = houses[i]
-			local entry = BMU.createBlankRecord()
-			entry.isOwnHouse = house.unlocked
-			entry.zoneId = GetHouseZoneId(house.houseId)
-			entry.zoneNameUnformatted = GetZoneNameById(entry.zoneId)
-			entry.textColorDisplayName = BMU.var.color.colTrash
-			entry.zoneNameClickable = true
-			entry.mapIndex = BMU.getMapIndex(entry.zoneId)
-			entry.parentZoneId = BMU.getParentZoneId(entry.zoneId)
-			entry.parentZoneName = BMU.formatName(GetZoneNameById(entry.parentZoneId))
-			entry.category = BMU.categorizeZone(entry.zoneId)
-			entry.collectibleId = GetCollectibleIdForHouse(entry.houseId)
-			entry.houseCategoryType = GetString("SI_HOUSECATEGORYTYPE", GetHouseCategoryType(entry.houseId))
-			entry.nickName = BMU.formatName(GetCollectibleNickname(entry.collectibleId))
-			entry.zoneName = BMU.formatName(entry.zoneNameUnformatted, BMU.savedVarsAcc.formatZoneName)
-			
-			_, _, entry.houseIcon = GetCollectibleInfo(entry.collectibleId)
-			entry.houseBackgroundImage = GetHousePreviewBackgroundImage(entry.houseId)
-			entry.houseTooltip = {entry.zoneName, "\"" .. entry.nickName .. "\"", entry.parentZoneName, "", "", "|t75:75:" .. entry.houseIcon .. "|t", "", "", entry.houseCategoryType}
-		
-			if BMU.savedVarsAcc.houseNickNames then
-				-- show nick name instead of real house name
-				entry.zoneName = entry.nickName
-			end
-			
-			table.insert(teleporterList, entry)
-		end
-	else
-		for zoneIndex = 1, GetNumZones() do
-			local zoneId = GetZoneId(zoneIndex)
-			local zoneName = GetZoneNameById(zoneId)
-			
-		--	if zoneName ~= '' then
-				local entry = BMU.createBlankRecord()
-				
-				entry.zoneId = zoneId
-				entry.zoneNameUnformatted = zoneName
-				entry.textColorDisplayName = BMU.var.color.colTrash
-				entry.zoneNameClickable = true
-				entry.mapIndex = BMU.getMapIndex(zoneId)
-				entry.parentZoneId = BMU.getParentZoneId(zoneId)
-				entry.parentZoneName = BMU.formatName(GetZoneNameById(parentZoneId))
-				entry.category = BMU.categorizeZone(zoneId)
-				entry.zoneName = BMU.formatName(zoneName)
-				entry.textColorZoneName = BMU.var.color.colWhite
-				
-				table.insert(teleporterList, entry)
-		--	end
-		end
-	end
-
-	for k, data in pairs(teleporterList) do
-	--	if data.category and data.category > 0 or data.guildId ~= nil then
-			if not categoryData.categoryFilter or categoryData.categoryFilter(data) then
-
-				data.categoryType = categoryData.categoryType
-				data.category = BMU.categorizeZone(data.zoneId) or 9
-				if categoryData.filter.index > 9 then
-					BMU_Gamepad_EntryData:CreateMultiEntry(data, dataTable)
-				else
-					local entry = BMU_Gamepad_EntryData:CreateNewEntry(data, data.zoneId == myZoneId)
-					if entry then
-						table.insert(portalPlayers, entry)
-					end
-				end
-			end
-	--	end
-	end
-
-	BMU.changeState(0)
-	
-	self.portalPlayers = portalPlayers
-
-	self:RefreshHeader()
-
---[[
-	if not self.categoryList.fragment:IsHidden() then
-		self.categoryList:RefreshKeybind()
-	elseif not self.teleportList.fragment:IsHidden() then
-		self.teleportList:Refresh()
-	end
-]]
-		
---	GAMEPAD_WORLD_MAP_LOCATIONS.data.mapData = nil
-	GAMEPAD_WORLD_MAP_LOCATIONS:BuildLocationList()
-end
-
 function addon:IsShowing()
 	local categoryListShowing = not self.categoryList.fragment:IsHidden()
 	local teleportListShowing = not self.teleportList.fragment:IsHidden()
@@ -540,10 +437,9 @@ end
 ---------------------------------------------------------------------------------------------------------------
 --
 ---------------------------------------------------------------------------------------------------------------
-function IJA_BMU_Initialize( ... )
-	IJA_BMU_GAMEPAD_PLUGIN = addon:New( ... )
+function BMU_BMU_Initialize( ... )
+	BMU_BMU_GAMEPAD_PLUGIN = addon:New( ... )
 end
-	
 
 function locTest()
     local locations = WORLD_MAP_LOCATIONS

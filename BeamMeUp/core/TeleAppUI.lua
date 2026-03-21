@@ -43,6 +43,12 @@ local LSM_ENTRY_TYPE_RADIOBUTTON	= LSM_ENTRY_TYPE_RADIOBUTTON
 local LSM_UPDATE_MODE_BOTH 			= LSM_UPDATE_MODE_BOTH
 
 local ClearCustomScrollableMenu 		= ClearCustomScrollableMenu
+if not BMU.LSM then
+  local function noop()
+    return
+  end
+  ClearCustomScrollableMenu = noop
+end
 local AddCustomScrollableMenuDivider    = AddCustomScrollableMenuDivider
 local AddCustomScrollableMenuCheckbox 	= AddCustomScrollableMenuCheckbox
 local RefreshCustomScrollableMenu 		= RefreshCustomScrollableMenu
@@ -93,8 +99,8 @@ local subTypeClue                 = clueData.clueTypes[1] --"clue"
 local treasureData = teleporterVars.treasureData
 local treasureTypes = treasureData.treasureTypes
 local treasureTypeTextures = treasureData.treasureTypeTextures
-local treaureType_Treasure = treasureTypes[1]
-local subType_Treasure 						= treaureType_Treasure
+local treasureType_Treasure = treasureTypes[1]
+local subType_Treasure 						= treasureType_Treasure
 --Survey type
 local surveyData = teleporterVars.surveyData
 local surveyTypes = surveyData.surveyTypes
@@ -168,14 +174,6 @@ local BMU_IsNotKeyboard = BMU.IsNotKeyboard
 local BMU_ThrottledUpdate = BMU.ThrottledUpdate
 
 -- -^- INS251229 Baertram END 0
-
-local FontGame = ZoFontGame
-local FontBookTablet = ZoFontBookTablet
-if BMU_IsNotKeyboard() then
-  FontGame = ZoFontGamepad36
-  FontBookTablet = ZoFontGamepadBookTablet
-  WorldMapZoneStoryTopLevel = ZO_WorldMapZoneStoryTopLevel_Gamepad
-end
 
 -- list of tuples (guildId & displayname) for invite queue (only for admin)
 local inviteQueue = {}
@@ -459,7 +457,21 @@ local function SetupUI()
 	
 	-- default font
 	local fontSize = BMU_round(17*scale, 0)   --CHG251229 Baertram
-	local fontStyle = FontGame:GetFontInfo()
+	
+	local function toCapitalized(s)
+    s = s:lower()
+    return s:sub(1,1):upper() .. s:sub(2)
+  end
+	
+  local FontGame = ZoFontGame
+  local FontBookTablet = BMU.GetConstByInputModeBase("ZoFontPLACEBookTablet", toCapitalized(BMU.InputModeToString()), "PLACE")
+  
+  local fontStyle
+  if IsConsoleUI() then
+    fontStyle = ZoFontGamepad36:GetFontInfo()
+  else
+	  fontStyle = FontGame:GetFontInfo()
+	end
 	local fontWeight = "soft-shadow-thin"
 	BMU.font1 = string_format(fontPattern, fontStyle, fontSize, fontWeight)
 	
@@ -566,32 +578,31 @@ local function SetupUI()
   --------------------------------------------------------------------------------------------------------------------
   -- Switch BUTTON ON ZoneGuide window
   --------------------------------------------------------------------------------------------------------------------
-  teleporterWin_zoneGuideSwapTexture = wm:CreateControl(nil, WorldMapZoneStoryTopLevel, CT_TEXTURE) --CHG251229 Baertram Performance improvement
-  teleporterWin.zoneGuideSwapTexture = teleporterWin_zoneGuideSwapTexture --CHG251229 Baertram Performance improvement
-  teleporterWin_zoneGuideSwapTexture:SetDimensions(50*scale, 50*scale) --CHG251229 Baertram Performance improvement
-  teleporterWin_zoneGuideSwapTexture:SetAnchor(TOPRIGHT, WorldMapZoneStoryTopLevel, TOPRIGHT, TOPRIGHT -10*scale, -35*scale) --CHG251229 Baertram Performance improvement
-  teleporterWin_zoneGuideSwapTexture:SetTexture(BMU_textures.swapBtn) --CHG251229 Baertram Performance improvement
-  teleporterWin_zoneGuideSwapTexture:SetMouseEnabled(true) --CHG251229 Baertram Performance improvement
-
-  teleporterWin_zoneGuideSwapTexture:SetHandler("OnMouseUp", function(self, button)
-	  if button ~= MOUSE_BUTTON_INDEX_LEFT then return end  --INS BAERTRAM20260124
-      BMU_OpenTeleporter = BMU_OpenTeleporter or BMU.OpenTeleporter --INS251229 Baertram performance improvement for multiple used variable reference
-	  BMU_OpenTeleporter(true) ----CHG251229 Baertram Performance improvement by using local
-	end)
-
-  teleporterWin_zoneGuideSwapTexture:SetHandler("OnMouseEnter", function(teleporterWinZoneGuideSwapTextureCtrl) --CHG251229 Baertram Performance improvement
-      teleporterWinZoneGuideSwapTextureCtrl:SetTexture(BMU_textures.swapBtnOver) --CHG251229 Baertram Performance improvement
-      BMU_tooltipTextEnter(BMU, teleporterWinZoneGuideSwapTextureCtrl,
-          BMU_SI_Get(SI_TELE_UI_BTN_TOGGLE_ZONE_GUIDE)) --CHG251229 Baertram Performance improvement
-  end)
-
-  teleporterWin_zoneGuideSwapTexture:SetHandler("OnMouseExit", function(teleporterWinZoneGuideSwapTextureCtrl) --CHG251229 Baertram Performance improvement
-      teleporterWinZoneGuideSwapTextureCtrl:SetTexture(BMU_textures.swapBtn) --CHG251229 Baertram Performance improvement
-      BMU_tooltipTextEnter(BMU, teleporterWinZoneGuideSwapTextureCtrl) --CHG251229 Baertram Performance improvement
-  end)
   
-  if BMU_IsNotKeyboard() then
-    teleporterWin_zoneGuideSwapTexture:SetHidden(true)
+  if not IsConsoleUI() then
+    teleporterWin_zoneGuideSwapTexture = wm:CreateControl(nil, WorldMapZoneStoryTopLevel, CT_TEXTURE) --CHG251229 Baertram Performance improvement
+    teleporterWin.zoneGuideSwapTexture = teleporterWin_zoneGuideSwapTexture --CHG251229 Baertram Performance improvement
+    teleporterWin_zoneGuideSwapTexture:SetDimensions(50*scale, 50*scale) --CHG251229 Baertram Performance improvement
+    teleporterWin_zoneGuideSwapTexture:SetAnchor(TOPRIGHT, WorldMapZoneStoryTopLevel, TOPRIGHT, TOPRIGHT -10*scale, -35*scale) --CHG251229 Baertram Performance improvement
+    teleporterWin_zoneGuideSwapTexture:SetTexture(BMU_textures.swapBtn) --CHG251229 Baertram Performance improvement
+    teleporterWin_zoneGuideSwapTexture:SetMouseEnabled(true) --CHG251229 Baertram Performance improvement
+  
+    teleporterWin_zoneGuideSwapTexture:SetHandler("OnMouseUp", function(self, button)
+      if button ~= MOUSE_BUTTON_INDEX_LEFT then return end  --INS BAERTRAM20260124
+        BMU_OpenTeleporter = BMU_OpenTeleporter or BMU.OpenTeleporter --INS251229 Baertram performance improvement for multiple used variable reference
+      BMU_OpenTeleporter(true) ----CHG251229 Baertram Performance improvement by using local
+    end)
+  
+    teleporterWin_zoneGuideSwapTexture:SetHandler("OnMouseEnter", function(teleporterWinZoneGuideSwapTextureCtrl) --CHG251229 Baertram Performance improvement
+        teleporterWinZoneGuideSwapTextureCtrl:SetTexture(BMU_textures.swapBtnOver) --CHG251229 Baertram Performance improvement
+        BMU_tooltipTextEnter(BMU, teleporterWinZoneGuideSwapTextureCtrl,
+            BMU_SI_Get(SI_TELE_UI_BTN_TOGGLE_ZONE_GUIDE)) --CHG251229 Baertram Performance improvement
+    end)
+  
+    teleporterWin_zoneGuideSwapTexture:SetHandler("OnMouseExit", function(teleporterWinZoneGuideSwapTextureCtrl) --CHG251229 Baertram Performance improvement
+        teleporterWinZoneGuideSwapTextureCtrl:SetTexture(BMU_textures.swapBtn) --CHG251229 Baertram Performance improvement
+        BMU_tooltipTextEnter(BMU, teleporterWinZoneGuideSwapTextureCtrl) --CHG251229 Baertram Performance improvement
+    end)
   end
 
   --------------------------------------------------------------------------------------------------------------------
@@ -1127,6 +1138,8 @@ local function SetupUI()
 	if button == MOUSE_BUTTON_INDEX_RIGHT then
 		-- toggle between nicknames and standard names
 		addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_SI_Get(SI_TELE_UI_TOGGLE_HOUSE_NICKNAME), BMU.savedVarsChar , "houseNickNames", function() BMU.clearInputFields() BMU.createTableHouses() end, nil, nil)
+    addDynamicLSMContextMenuEntry(LSM_ENTRY_TYPE_CHECKBOX, BMU_SI_Get(SI_TELE_UI_TOOGLE_ZONE_NAME), BMU.savedVarsChar , "houseZoneNames", function() BMU.clearInputFields() BMU.createTableHouses() end, nil, nil)
+
 
 		-- divider
 		AddCustomScrollableMenuDivider()

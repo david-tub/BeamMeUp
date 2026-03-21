@@ -217,15 +217,15 @@ teleporterVars.dungeonsData = {
 	dungeonTypeTextures	= { "endlessDungeon" ,"arena", "groupArena", "trial", "groupDungeon" },
 }
 --Treasure maps
-local treaureType_Treasure = "treasure"
-local treasureTypesHeader = treaureType_Treasure
+local treasureType_Treasure = "treasure"
+local treasureTypesHeader = treasureType_Treasure
 teleporterVars.treasureData = {
 	treasureTypes = {
-		treaureType_Treasure,
+		treasureType_Treasure,
 	},
 	treasureTypesHeader = treasureTypesHeader,
 	treasureTypeContainers = {
-		[treaureType_Treasure] = { 224681 }
+		[treasureType_Treasure] = { 224681 }
 	},
 	treasureTypeTextures = { "treasureMap" }
 }
@@ -2179,4 +2179,29 @@ end
 
 function BMU.IsNotKeyboard()
   return IsInGamepadPreferredMode() or IsConsoleUI()
+end
+
+function BMU.InputModeToString()
+  if IsInGamepadPreferredMode() or IsConsoleUI() then
+    return "gamepad"
+  else
+    return "keyboard"
+  end
+end
+
+function BMU.GetConstByInputMode(constName, inputMode, placeholder)
+  placeholder = placeholder or "PLACE"
+  local name = constName:gsub(placeholder, inputMode)
+  return _G[name]
+end
+
+function BMU.GetConstByInputModeBase(constName, inputMode, placeholder)
+  placeholder = placeholder or "PLACE"
+  local name
+  if string.find(string.lower(inputMode),"keyboard") then
+    name = constName:gsub(placeholder, "")
+  else
+    name = constName:gsub(placeholder, inputMode)
+  end
+  return _G[name]
 end

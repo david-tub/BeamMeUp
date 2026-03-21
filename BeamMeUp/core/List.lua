@@ -1756,7 +1756,11 @@ function ListView:update()
 				--respect nicknames of houses
 				local houseName = BMU_getHouseNameByHouseId(message.houseId)
 				local houseNickName = (showHouseNickNames == true and BMU_formatName(GetCollectibleNickname(GetCollectibleIdForHouse((message.houseId))))) or ""
-				rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText((houseNickName ~= "" and houseNickName) or zo_strformat(formatStringFirstUppercase, houseName), "lime"))
+				if message.isPTFHouse then
+				  rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText(message.displayName, "lime"))
+				else
+				  rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText((houseNickName ~= "" and houseNickName) or zo_strformat(formatStringFirstUppercase, houseName), "lime"))
+			  end
 			else
 				rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText(displayNameOfMessage, message.textColorDisplayName))
 			end

@@ -12,7 +12,6 @@ local BMU_SI_get = SI.get
 local BMU_colorizeText = BMU.colorizeText
 
 local teleporterVars    = BMU.var
-local appName           = teleporterVars.appName
 local wm                = WINDOW_MANAGER
 
 -- list of tuples (guildId & displayname) for invite queue (only for admin)
@@ -48,7 +47,7 @@ function CS.SetupOptionsMenu(index) --index == Addon name
     local BMU_DefaultsAccount = BMU.DefaultsAccount
     local BMU_getIndexFromValue = BMU.getIndexFromValue
 
-    local panel = LHAS:AddAddon(appName .. "Options", {
+    CS.SettingsPanel = LHAS:AddAddon(BMU.var.appName .. "Options", {
       allowDefaults = false,  -- Show "Reset to Defaults" button
       allowRefresh = false    -- Enable automatic control updates
     })
@@ -312,6 +311,14 @@ function CS.SetupOptionsMenu(index) --index == Addon name
               setFunction = function(value) BMU_savedVarsAcc.hidePublicDungeons = value end,
 			  disabled = function() return BMU_savedVarsAcc.onlyMaps end,
 			  default = BMU_DefaultsAccount["hidePublicDungeons"],
+			           },
+		 {
+              type = LHAS.ST_CHECKBOX,
+              label = BMU_SI_get(SI_TELE_UI_TOGGLE_HOUSE_NICKNAME),
+              tooltip = BMU_SI_get(SI_TELE_UI_TOGGLE_HOUSE_NICKNAME) .. " [DEFAULT: " .. tostring(BMU_DefaultsAccount["houseNickNames"]) .. "]",
+              getFunction = function() return BMU_savedVarsChar.houseNickNames end,
+              setFunction = function(value) BMU_savedVarsChar.houseNickNames = value end,
+			  default = BMU_DefaultsAccount["BMU_savedVarsChar"],
 			           },
 		 {
               type = LHAS.ST_CHECKBOX,
@@ -611,7 +618,7 @@ function CS.SetupOptionsMenu(index) --index == Addon name
 						end,
 			           }
     }
-    BMU.SettingsPanel = panel:AddSettings(optionsData)
+    CS.SettingsPanel:AddSettings(optionsData)
 end
 
 -- function CS.SetupUI()

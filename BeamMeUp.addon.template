@@ -29,10 +29,13 @@ Gamepad/globals.lua
 
 ## LibZone
 Console/lib/LibZone/LibZone_Constants.lua
+
+##LibZone API functions
+Console/lib/LibZone/LibZone.lua
+
+##LibZone preloaded zonedata and names
 Console/lib/LibZone/LibZone_Data.lua
 Console/lib/LibZone/LibZone_GeoData.lua
-Console/lib/LibZone/LibZone_Maps.xlsx
-Console/lib/LibZone/LibZone.lua
 
 Gamepad/IsJustaBmuGamepadPlugin.lua
 Gamepad/IsJustaBmuGamepadPlugin.xml

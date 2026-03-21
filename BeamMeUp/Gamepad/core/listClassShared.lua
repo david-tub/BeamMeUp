@@ -1,4 +1,4 @@
-local addon = IJA_BMU_GAMEPAD_PLUGIN
+local addon = BMU_BMU_GAMEPAD_PLUGIN
 local BMU = BMU
 local BMU_textures = BMU.textures
 local BMU_var_color = BMU.var.color
@@ -764,7 +764,7 @@ end
 function TeleportClass_Shared:BuildTextFieldSubmitItem(header, label, callback, icon)
 	local entry =
 	{
-		template = "IJA_BMU_GamepadTextFieldSubmitItem",
+		template = "BMU_BMU_GamepadTextFieldSubmitItem",
 		header = header or self.currentGroupingHeader,
 		templateData = {
 			text = label,

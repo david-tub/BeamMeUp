@@ -2180,3 +2180,28 @@ end
 function BMU.IsNotKeyboard()
   return IsInGamepadPreferredMode() or IsConsoleUI()
 end
+
+function BMU.InputModeToString()
+  if IsInGamepadPreferredMode() or IsConsoleUI() then
+    return "gamepad"
+  else
+    return "keyboard"
+  end
+end
+
+function BMU.GetConstByInputMode(constName, inputMode, placeholder)
+  placeholder = placeholder or "PLACE"
+  local name = constName:gsub(placeholder, inputMode)
+  return _G[name]
+end
+
+function BMU.GetConstByInputModeBase(constName, inputMode, placeholder)
+  placeholder = placeholder or "PLACE"
+  local name
+  if string.find(string.lower(inputMode),"keyboard") then
+    name = constName:gsub(placeholder, "")
+  else
+    name = constName:gsub(placeholder, inputMode)
+  end
+  return _G[name]
+end

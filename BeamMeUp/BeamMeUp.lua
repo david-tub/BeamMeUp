@@ -26,8 +26,15 @@ if BMU_IsNotKeyboard() then
   WorldMapZoneStoryTopLevel = ZO_WorldMapZoneStoryTopLevel_Gamepad
   worldMapZoneStoryFragment = WORLD_MAP_ZONE_STORY_GAMEPAD_FRAGMENT
 end
-local worldMapZoneStoryTLC_Keyboard			= ZO_WorldMapZoneStoryTopLevel_Keyboard
 local ClearCustomScrollableMenu 			= ClearCustomScrollableMenu --LSM
+
+if not BMU.LSM then
+  local function noop()
+    return
+  end
+  ClearCustomScrollableMenu = noop
+end
+
 --Other addon variables
 local BMU_LibZone = BMU.LibZone
 --BMU variables
@@ -352,9 +359,13 @@ function BMU.onWorldMapChanged(wasNavigateIn)
 end
 local BMU_onWorldMapChanged = BMU.onWorldMapChanged
 
+local function toCapitalized(s)
+    s = s:lower()
+    return s:sub(1,1):upper() .. s:sub(2)
+end
 
 function BMU.OpenTeleporter(refresh)
-  if BMU_IsNotKeyboard() then return end
+  if IsConsoleUI() then return end
 	BMU_toggleZoneGuide = BMU_toggleZoneGuide or BMU.toggleZoneGuide								--INS251229 Baertram
 	BMU_showNotification = BMU_showNotification or BMU.showNotification								--INS251229 Baertram
 	BMU_initializeBlacklist = BMU_initializeBlacklist or BMU.initializeBlacklist					--INS251229 Baertram
@@ -370,8 +381,10 @@ function BMU.OpenTeleporter(refresh)
 
 	-- show notification (in case)
 	BMU_showNotification()
+	
+	local WorldMapZoneStoryTopLeve1 = BMU.GetConstByInputMode("ZO_WorldMapZoneStoryTopLevel_PLACE", toCapitalized(BMU.InputModeToString()), "PLACE")
 
-	if not WorldMapZoneStoryTopLevel:IsHidden() then
+	if not WorldMapZoneStoryTopLeve1:IsHidden() then
 		--hide ZoneGuide
 		BMU_toggleZoneGuide(false)
 		-- show swap button
@@ -420,7 +433,7 @@ BMU_OpenTeleporter = BMU.OpenTeleporter
 
 
 function BMU.HideTeleporter()
-  if BMU_IsNotKeyboard() then return end
+  if IsConsoleUI() then return end
 	BMU_toggleZoneGuide = BMU_toggleZoneGuide or BMU.toggleZoneGuide								--INS251229 Baertram
 	BMU_win = BMU_win or BMU.win
 	BMU_win_Main_Control = BMU_win_Main_Control or BMU_win.Main_Control
@@ -474,7 +487,7 @@ function BMU.onZoneGuideShow()
 	BMU_win_Main_Control = BMU_win_Main_Control or BMU_win.Main_Control
 
 	--check if Teleporter is displayed
-	if not BMU_win_Main_Control:IsHidden() then
+	if BMU_win_Main_Control and not BMU_win_Main_Control:IsHidden() then
 		-- Teleporter is displayed -> hide ZoneGuide
 		BMU_toggleZoneGuide(false)
 	end
@@ -484,16 +497,19 @@ local BMU_onZoneGuideShow = BMU.onZoneGuideShow
 
 -- show/hide ZoneGuide window
 function BMU.toggleZoneGuide(show)
+  if IsConsoleUI() then return end
+  local worldMap1 = BMU.GetConstByInputModeBase("PLACE_WORLD_MAP_SCENE", string.upper(BMU.InputModeToString().."_"), "PLACE_")
+  local worldMapZoneStoryFragment1 = BMU.GetConstByInputMode("WORLD_MAP_ZONE_STORY_PLACE_FRAGMENT", string.upper(BMU.InputModeToString()), "PLACE")
 	if show then
 		-- show ZoneGuide
 		--ZO_WorldMapZoneStoryTopLevel_Keyboard:SetHidden(false)
 		--ZO_SharedMediumLeftPanelBackground:SetHidden(false)
-		worldMap:AddFragment(worldMapZoneStoryFragment)
+		worldMap1:AddFragment(worldMapZoneStoryFragment1)
 	else
 		-- hide ZoneGuide
 		--ZO_WorldMapZoneStoryTopLevel_Keyboard:SetHidden(true)
 		--ZO_SharedMediumLeftPanelBackground:SetHidden(true)
-		worldMap:RemoveFragment(worldMapZoneStoryFragment)
+		worldMap1:RemoveFragment(worldMapZoneStoryFragment1)
 	end
 end
 BMU_toggleZoneGuide = BMU.toggleZoneGuide
@@ -918,6 +934,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		},
 		["displayCounterPanel"] = true,
 		["houseNickNames"] = false,
+		["houseZoneNames"] = false,
 		["ptfHouseZoneNames"] = false,
 	}
 

@@ -1,4 +1,4 @@
-local addon = IJA_BMU_GAMEPAD_PLUGIN
+local addon = BMU_BMU_GAMEPAD_PLUGIN
 local TeleportClass_Shared = addon.subclassTable.list_Shared
 local data_manager = ZO_COLLECTIBLE_DATA_MANAGER
 local zo_Dialogs_ReleaseAllDialogsOfName = ZO_Dialogs_ReleaseAllDialogsOfName
@@ -648,7 +648,7 @@ function teleportList:SetMapToTarget(selectedData)
 end
 
 function teleportList:OnSelectedDataChangedCallback(selectedData)
-	jo_callLater('IJA_BMU_Gamepad_SetMapToTarget', function()
+	jo_callLater('BMU_BMU_Gamepad_SetMapToTarget', function()
 		if self.isMoving then
 			return self:OnSelectedDataChangedCallback(selectedData)
 		end

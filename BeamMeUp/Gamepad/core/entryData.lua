@@ -1,4 +1,4 @@
-local addon = IJA_BMU_GAMEPAD_PLUGIN
+local addon = BMU_BMU_GAMEPAD_PLUGIN
 local em = EVENT_MANAGER
 local BMU = BMU
 
@@ -490,7 +490,10 @@ end
 local Entry_Class_House = Entry_Class:Subclass()
 
 function Entry_Class_House:GetLabels()
-	local name = self.houseNameFormatted or self.zoneName
+	local name = self.houseNameUnformatted or self.houseNameFormatted
+	if BMU.savedVarsChar.houseNickNames and self.nickName then
+	  name = self.nickName
+	end
 
 	return BMU.colorizeText(name, self.textColorZoneName), (self.parentZoneName or nil)
 end

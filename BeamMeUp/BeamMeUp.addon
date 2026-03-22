@@ -7,7 +7,7 @@
 ## AddOnVersion: 402
 ## IsLibrary: false
 ## DependsOn: LibAddonMenu-2.0>=41 LibZone>=0895 LibHarvensAddonSettings>=20102
-## PCDependsOn: LibScrollableMenu
+## PCDependsOn: LibScrollableMenu>=020401
 ## OptionalDependsOn: LibCustomMenu LibSlashCommander LibSets LibMapPing LibChatMenuButton PortToFriendsHouse BanditsUserInterface MorrowindStyleUI
 
 ## Core translation files

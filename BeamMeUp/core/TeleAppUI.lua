@@ -94,7 +94,7 @@ local BMU_SOURCE_INDEX_ALL = BMU.SOURCE_INDEX_ALL
 
 --Subtypes
 local clueData = teleporterVars.clueData
-local subTypeClue                 = clueData.clueTypes[1] --"clue"
+local subType_Clue                 = clueData.clueTypes[1] --"clue"
 --Treasure
 local treasureData = teleporterVars.treasureData
 local treasureTypes = treasureData.treasureTypes

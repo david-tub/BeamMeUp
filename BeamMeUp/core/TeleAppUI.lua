@@ -2144,7 +2144,7 @@ end
 function BMU.TeleporterSetupUI(addOnName)
 	if appName ~= addOnName then return end
 		addOnName = appName .. " - Teleporter"
-		if BMU_IsNotKeyboard() and CS ~= nil then
+		if IsConsoleUI() and CS ~= nil then
       CS.SetupOptionsMenu(addOnName)
 		else
 		  BMU.SetupOptionsMenu(addOnName)

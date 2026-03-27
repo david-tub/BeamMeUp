@@ -140,7 +140,8 @@ function AutoUnlockNotificationProvider:Decline(data)
 	self.progress = var_AUTOUNLOCK_PROGRESS_NONE
 	addon:AutoUnlockCancel()
 end
-local provider = AutoUnlockNotificationProvider:New(GAMEPAD_NOTIFICATIONS)
+addon.provider = AutoUnlockNotificationProvider:New(GAMEPAD_NOTIFICATIONS)
+local provider = addon.provider
 
 table.insert(GAMEPAD_NOTIFICATIONS.providers, provider)
 GAMEPAD_NOTIFICATIONS:RefreshNotificationList()
@@ -154,7 +155,7 @@ end
 
 function addon:AutoUnlockCancel()
 --	em:UnregisterForUpdate(updateName)
-	self:UnregisterAutoUnlockEvents()
+	BMU:UnregisterAutoUnlockEvents()
 end
 
 -- does all the necessary checks for the given zoneId (if auto unlock is possible)

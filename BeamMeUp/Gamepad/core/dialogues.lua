@@ -390,7 +390,7 @@ ZO_Dialogs_RegisterCustomDialog("BMU_GAMEPAD_AUTO_UNLOCK_DIALOG",
 				setup = zo_SharedGamepadEntry_OnSetup,
 				callback = function(dialog)
 					ReleaseDialog("BMU_GAMEPAD_AUTO_UNLOCK_DIALOG")
-					BMU.startAutoUnlockLoopRandom(nil, 'suffle')
+					BMU.startAutoUnlockLoopRandom(dialog.data.zoneId, 'suffle')
 					--BMU_BMU_GAMEPAD_PLUGIN:StartAutoUnlockLoopRandom(nil, 'suffle', BMU.savedVarsAcc.autoUnlockChatLogging)
 				end,
 			},

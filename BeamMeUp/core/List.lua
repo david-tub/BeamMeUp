@@ -232,6 +232,8 @@ end
 --------------------------------------------------------------------
 
 local addon = BMU_BMU_GAMEPAD_PLUGIN
+local provider = addon.provider
+
 local var_AUTOUNLOCK_PROGRESS_NONE = 0
 local var_AUTOUNLOCK_PROGRESS_ACTIVE = 1
 local var_AUTOUNLOCK_PROGRESS_COMPLETE = 2
@@ -285,12 +287,11 @@ function BMU.reportAutoUnlockFinished(finishZone, finishBody)
     else
         return BMU_pcOnlyDialog("AutoUnlockFinished", finishZone, finishBody)
     end
-    return nil, nil
 end
 
 function BMU.reportAutoUnlockFailed(reason, formattedZoneName)
     if BMU.IsNotKeyboard() then
-        addon.provider.progress = var_AUTOUNLOCK_PROGRESS_FAILED
+      addon.provider.progress = var_AUTOUNLOCK_PROGRESS_FAILED
     else
         if reason == "noPlayers" then
             return BMU_pcOnlyDialog("AutoUnlockNoPlayer", BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE), formattedZoneName .. ": " .. BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_BODY3))
@@ -610,9 +611,8 @@ function BMU.finishedAutoUnlock(reason)
 	CancelCast()
 
 	-- unregister events
-	EM:UnregisterForEvent(appName, EVENT_PLAYER_ACTIVATED)
-	EM:UnregisterForEvent(appName, EVENT_DISCOVERY_EXPERIENCE)
-	-- register again event for furniture count
+  BMU:UnregisterAutoUnlockEvents()
+  -- register again event for furniture count
 	EM:RegisterForEvent(appName, EVENT_PLAYER_ACTIVATED, BMU.updateHouseFurnitureCount)
 
 	-- set flag to "inactivate" the proceed function (if unregister failed or it is called for some other reasons)
@@ -879,7 +879,7 @@ function BMU.showDialogAutoUnlock(zoneId)
 		buttons = {
 			{
 				text = SI_DIALOG_CONFIRM,
-                keybind = "DIALOG_PRIMARY",
+        keybind = "DIALOG_PRIMARY",
 				callback = function()
 					local flagLoop = dialogReference.radioButtonGroup:GetClickedButton().data.loop
 					local isChatLoggingChecked = ZO_CheckButton_IsChecked(BMU.customDialog_checkboxControl)
@@ -888,9 +888,9 @@ function BMU.showDialogAutoUnlock(zoneId)
 					if flagLoop then
 						if selectedEntry.key == "suffle" then
 							-- directly start with random zones
-							BMU.startAutoUnlockLoopRandom(nil, selectedEntry.key)
+							BMU.startAutoUnlockLoopRandom(BMU.uwData.zoneId, selectedEntry.key)
 						else
-							BMU.startAutoUnlockLoopSorted(nil, selectedEntry.key)
+							BMU.startAutoUnlockLoopSorted(BMU.uwData.zoneId, selectedEntry.key)
 						end
 					else
 						-- check and start auto unlocking for given zoneId

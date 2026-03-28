@@ -634,6 +634,13 @@ function categoryList:BuildDungeonsCategoryOptions(groupId, settingsGroupId)
 				self:ToggleBMUSettingByKey('toggleShowAcronymUpdateName', data.checked, "dungeonFinder")
 			end,
 			checked = getTeleporterSettingByKey('toggleShowAcronymUpdateName', "dungeonFinder"),
+		},
+		{
+			filterName = GetString(SI_TELE_UI_TOGGLE_UPDATE_NAME),
+			callback = function(data)
+				self:ToggleBMUSettingByKey('GPtoggleShowAcronymUpdateName', data.checked, "dungeonFinder")
+			end,
+			checked = getTeleporterSettingByKey('GPtoggleShowAcronymUpdateName', "dungeonFinder"),
 		}
 	}
 	

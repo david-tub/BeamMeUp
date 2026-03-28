@@ -162,16 +162,21 @@ local function getTargetTooltipData(targetData)
 	------------------
 
 	-- wayhsrine and skyshard discovery and group dungeon achievement info
-	if targetData.zoneNameClickable == true and (targetData.zoneWayhsrineDiscoveryInfo ~= nil or targetData.zoneSkyshardDiscoveryInfo ~= nil or targetData.publicDungeonAchiementInfo ~= nil or BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName) then
+	if targetData.zoneNameClickable == true and (targetData.zoneWayhsrineDiscoveryInfo ~= nil or targetData.zoneSkyshardDiscoveryInfo ~= nil or targetData.publicDungeonAchiementInfo ~= nil or BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName or BMU.savedVarsChar.dungeonFinder.GPtoggleShowAcronymUpdateName) then
 		if #tooltipData > 0 then
 			-- add separator
 			table.insert(tooltipData, 1, BMU_textures.tooltipSeperator)
 		end
 		
 		local discoveryInfo = {}
-		
     if targetData.acronym ~= nil then
       table.insert(discoveryInfo, targetData.acronym)
+    end
+    if targetData.updateName ~= nil then
+      table.insert(discoveryInfo, targetData.updateName)
+    end
+    if targetData.dungeonTooltip ~= nil and next(targetData.dungeonTooltip) then
+      table.insert(discoveryInfo, targetData.dungeonTooltip[1])
     end
 		-- add discovery info
 		if targetData.zoneWayhsrineDiscoveryInfo ~= nil then
@@ -180,6 +185,7 @@ local function getTargetTooltipData(targetData)
 		if targetData.zoneSkyshardDiscoveryInfo ~= nil then
 			table.insert(discoveryInfo, targetData.zoneSkyshardDiscoveryInfo)
 		end
+    table.insert(discoveryInfo, #discoveryInfo, BMU_textures.tooltipSeperatorStr)
 		if targetData.publicDungeonAchiementInfo ~= nil then
 			table.insert(discoveryInfo, targetData.publicDungeonAchiementInfo)
 		end
@@ -393,26 +399,6 @@ function TeleportClass_Shared:RefreshKeybind()
 	KEYBIND_STRIP:UpdateKeybindButtonGroup(self.keybindStripDescriptor)
 end
 
-local function flattenToString(value)
-    if type(value) == "string" then
-        return value
-    elseif type(value) == "table" then
-        local result = {}
-        for _, v in pairs(value) do
-            if type(v) == "table" then
-                -- recursively flatten nested table into result directly
-                for _, str in pairs(v) do
-                    table.insert(result, flattenToString(str))
-                end
-            elseif v ~= nil then
-                table.insert(result, tostring(v))
-            end
-        end
-        return table.concat(result, "\n")
-    end
-    return tostring(value)
-end
-
 function TeleportClass_Shared:UpdateTooltip(targetData)
 	if not targetData then
 		self:RefreshKeybind()
@@ -497,7 +483,7 @@ function TeleportClass_Shared:UpdateTooltip(targetData)
 	end
 	
 	
-	tooltipControl:LayoutTitleAndMultiSectionDescriptionTooltip(targetData.text, flattenToString(tooltipData))
+	tooltipControl:LayoutTitleAndMultiSectionDescriptionTooltip(targetData.text, unpack(tooltipData))
 	self:RefreshKeybind()
 end
 

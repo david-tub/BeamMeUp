@@ -190,7 +190,11 @@ function Entry_Class:GetLabels()
 	local zoneName = BMU.colorizeText(self.zoneName, self.textColorZoneName)
 	local displayName = BMU.colorizeText(self.displayName, self.textColorDisplayName)
 	
-	if BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName and self.acronym ~= nil then
+	if BMU.savedVarsChar.dungeonFinder.GPtoggleShowAcronymUpdateName and self.updateName and self.dungeonTooltip ~= nil and next(self.dungeonTooltip) then
+    zoneName = zoneName.." · "..BMU.colorizeText(self.updateName, self.textColorZoneName)
+  end
+  
+  if BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName and self.acronym ~= nil then
     zoneName = zoneName.." · "..BMU.colorizeText(self.acronym, self.textColorZoneName)
   end
 

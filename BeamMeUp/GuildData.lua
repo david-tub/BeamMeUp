@@ -105,6 +105,7 @@ BMU_GUILD_DATA = {
             982001,         -- "Chances We're High Too"     |@GYATT [main] @BeardsAndBongs [GM account for this guild]
             986137,         -- "Don't Talk to Me"           |@Cadence_Nightingale discord neurotopia
             978203,         -- "The Daedric Wastelanders"   |@K1LL3R-Cfrags discord shade_k1ller
+            979675,         -- "Coarse Hairs"               |@KaiTheirin discord elyks.
         },
         ["XB1live"] = {},
     }

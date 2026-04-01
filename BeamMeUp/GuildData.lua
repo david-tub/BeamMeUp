@@ -73,7 +73,7 @@ BMU_GUILD_DATA = {
             698893,			-- "The Descendants"			|@ravenzwind
             601183,			-- "Dawn of Cthulhu				|@earthlyreaper
             738065,			-- "Im Going On An Adventure"	|@KhuKhu
-            738317,			-- "KBMU"						|@Celinia
+            --738317,			-- "KBMU"						|@Celinia -> Lead wants to give up on the guild. It is unlisted already and only waiting for the users to switch or get kicked because of inactivity - keeping the entry if Celinia is changing her mind before guild gets deleted
             677323,			-- "Metrobank"					|@APHONlC
             704951,			-- "Mara's Favor"				|@CassieAeri
             785051,			-- ?

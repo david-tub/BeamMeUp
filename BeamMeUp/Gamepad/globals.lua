@@ -1,6 +1,7 @@
 local em = EVENT_MANAGER
 local BMU = BMU
-BMU.IJA = ZO_DeferredInitializingObject:New(GAMEPAD_WORLD_MAP_INFO_FRAGMENT)
+local BMU_Gamepad_Class = ZO_DeferredInitializingObject:Subclass()
+BMU.Gamepad = BMU_Gamepad_Class:New(GAMEPAD_WORLD_MAP_INFO_FRAGMENT)
 
 if not JO_UpdateBuffer_Simple then
 	JO_UpdateBuffer_Simple = function(id, func, ms)

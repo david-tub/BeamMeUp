@@ -1,5 +1,5 @@
 local BMU = BMU
-local addon = BMU.IJA
+local addon = BMU.Gamepad
 
 local EM = EVENT_MANAGER
 

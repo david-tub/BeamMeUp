@@ -1,5 +1,5 @@
 local BMU = BMU
-local addon = BMU.IJA
+local addon = BMU.Gamepad
 local BMU_SI_Get = BMU.SI.get
 local BMU_textures = BMU.textures
 local BMU_var_color = BMU.var.color

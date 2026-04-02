@@ -45,7 +45,7 @@ end
 ---------------------------------------------------------------------------------------------------------------
 
 local BMU = BMU
-local addon = BMU.IJA
+local addon = BMU.Gamepad
 local em = EVENT_MANAGER
 local cm = CALLBACK_MANAGER
 

@@ -1,5 +1,5 @@
 local BMU = BMU
-local addon = BMU.IJA
+local addon = BMU.Gamepad
 local TeleportClass_Shared = addon.subclassTable.list_Shared
 local data_manager = ZO_COLLECTIBLE_DATA_MANAGER
 local zo_Dialogs_ReleaseAllDialogsOfName = ZO_Dialogs_ReleaseAllDialogsOfName

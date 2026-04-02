@@ -1,5 +1,5 @@
 local BMU = BMU
-local addon = BMU.Gamepad
+local addon = BMU.IJA
 
 local EM = EVENT_MANAGER
 
@@ -119,6 +119,6 @@ function AutoUnlockNotificationProvider:Decline(data)
   BMU.finishedAutoUnlock("canceled")
 end
 
-function BMU.Gamepad:AutoUnlockContinue()
+function addon:AutoUnlockContinue()
 	BMU_proceedAutoUnlock()
 end

@@ -44,21 +44,12 @@ end
 --
 ---------------------------------------------------------------------------------------------------------------
 
-BMU_Gamepad = BMU_Gamepad or BMU.Gamepad
-BMU.Gamepad.fragment = ZO_InteractScene:New("BMU_WorldMapScene", SCENE_MANAGER, {
-  type = "WorldMap",
-  interactTypes = { }
-})
-
-local addon = ZO_DeferredInitializingObject:Subclass(BMU.Gamepad.fragment, BMU_BMU_Category_Gamepad)
-BMU.IJA = addon
-
 local BMU = BMU
+local addon = BMU.IJA
 local em = EVENT_MANAGER
 local cm = CALLBACK_MANAGER
 
-function BMU_Gamepad:Init(self, control)
-    d("calling init")
+function addon:Init(control)
     self.categoryList = self.subclassTable.categoryList:New(self, control)
 		self.teleportList = self.subclassTable.teleportList:New(self, BMU_BMU_TeleportList_Gamepad)
 
@@ -75,31 +66,17 @@ function BMU_Gamepad:Init(self, control)
 		-- self:CreateSettings()
 end
 
-function addon:OnDeferredInitialize(fragment, control)
+function addon:OnDeferredInitialize(fragment)
+  local control = BMU_BMU_Category_Gamepad
 	self.control = control
 	zo_mixin(self, addonData)
 
 	self.portalPlayers = {}
 	self.teleportMap = {}
+	self.subclassTable = {}
 	self.autoUnlockProgress = 0
 
-	local function OnLoaded(_, name)
-		if name ~= self.name then return end
-
--- 		self.control:UnregisterForEvent(EVENT_ADD_ON_LOADED)
-      zo_callLater(function()
-        BMU_Gamepad:Init(self, self.control)
-      end, 2000)
-
-	end
-	control:RegisterForEvent( EVENT_ADD_ON_LOADED, OnLoaded)
-
-	local function onPlayerActivated()
-		self.control:UnregisterForEvent(EVENT_PLAYER_ACTIVATED)
-	--	d( self.displayName
-
-	end
-	control:RegisterForEvent(EVENT_PLAYER_ACTIVATED, onPlayerActivated)
+	self:Init(control)
 end
 
 function addon.getDisplayNameFromAppended(data)

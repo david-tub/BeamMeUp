@@ -1,6 +1,6 @@
 local em = EVENT_MANAGER
 local BMU = BMU
-local addon = BMU.Gamepad
+local addon = BMU.IJA
 
 --[[
 	Updated how mapInfo is updated

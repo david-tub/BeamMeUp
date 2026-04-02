@@ -1,5 +1,5 @@
 local BMU = BMU
-local addon = BMU.Gamepad
+local addon = BMU.IJA
 local TeleportClass_Shared = addon.subclassTable.list_Shared
 local BMU_SI_Get = BMU.SI.get
 local categoryListVars = BMU.var

@@ -1,6 +1,7 @@
 local addon = BMU_BMU_GAMEPAD_PLUGIN
 local TeleportClass_Shared = addon.subclassTable.list_Shared
 local BMU = BMU
+local BMU_SI_Get = BMU.SI.get
 local categoryListVars = BMU.var
 
 local surveyData = categoryListVars.surveyData
@@ -641,7 +642,28 @@ function categoryList:BuildDungeonsCategoryOptions(groupId, settingsGroupId)
 				self:ToggleBMUSettingByKey('GPtoggleShowAcronymUpdateName', data.checked, "dungeonFinder")
 			end,
 			checked = getTeleporterSettingByKey('GPtoggleShowAcronymUpdateName', "dungeonFinder"),
-		}
+		},
+		{
+			filterName = GetString(SI_TELE_UI_TOGGLE_UPDATE_NUM),
+			callback = function(data)
+				self:ToggleBMUSettingByKey('GPtoggleShowUpdateNum', data.checked, "dungeonFinder")
+			end,
+			checked = getTeleporterSettingByKey('GPtoggleShowUpdateNum', "dungeonFinder"),
+		},
+    {
+			filterName = GetString(SI_TELE_UI_ENABLE_DUNGEON_SORT),
+			callback = function(data)
+				self:ToggleBMUSettingByKey('GPdoSortDungeons', data.checked, "dungeonFinder")
+			end,
+			checked = getTeleporterSettingByKey('GPdoSortDungeons', "dungeonFinder"),
+		},
+		{
+			filterName = GetString(SI_TELE_UI_SORT_DESC),
+			callback = function(data)
+				self:ToggleBMUSettingByKey('GPsortDungeonsDESC', data.checked, "dungeonFinder")
+			end,
+			checked = getTeleporterSettingByKey('GPsortDungeonsDESC', "dungeonFinder"),
+		},
 	}
 	
 	local filterData = {
@@ -689,7 +711,6 @@ function categoryList:BuildDungeonsCategoryOptions(groupId, settingsGroupId)
 	for filterIndex, currentFilter in ipairs(filterData) do
 		self:AddOptionTemplate(groupId, function() return self:BuildCheckbox(SI_GAMEPAD_CRAFTING_OPTIONS_FILTERS, label, currentFilter, icon) end, conditionFunction)
 	end
-
 end
 
 function categoryList:BuildDelvesCategoryOptions(groupId)

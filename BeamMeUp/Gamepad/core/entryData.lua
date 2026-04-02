@@ -191,11 +191,15 @@ function Entry_Class:GetLabels()
 	local displayName = BMU.colorizeText(self.displayName, self.textColorDisplayName)
 	
 	if BMU.savedVarsChar.dungeonFinder.GPtoggleShowAcronymUpdateName and self.updateName and self.dungeonTooltip ~= nil and next(self.dungeonTooltip) then
-    zoneName = zoneName.." · "..BMU.colorizeText(self.updateName, self.textColorZoneName)
+    zoneName = BMU.colorizeText(self.updateName, self.textColorZoneName).." · "..zoneName
   end
   
   if BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName and self.acronym ~= nil then
-    zoneName = zoneName.." · "..BMU.colorizeText(self.acronym, self.textColorZoneName)
+    zoneName = BMU.colorizeText(self.acronym, self.textColorZoneName).." · "..zoneName
+  end
+  
+  if BMU.savedVarsChar.dungeonFinder.GPtoggleShowUpdateNum and self.updateNum ~= nil then
+    zoneName = BMU.colorizeText(self.updateNum, self.textColorZoneName).." · "..zoneName
   end
 
 	if (CURRENT_CATEGORY_TYPE == CATEGORY_TYPE_DISPLAYED and self.zoneIndex == GetCurrentMapZoneIndex()) and not self.isDungeon then

@@ -1,5 +1,6 @@
 local addon = BMU_BMU_GAMEPAD_PLUGIN
 local BMU = BMU
+local BMU_SI_Get = BMU.SI.get
 local BMU_textures = BMU.textures
 local BMU_var_color = BMU.var.color
 
@@ -399,6 +400,26 @@ function TeleportClass_Shared:RefreshKeybind()
 	KEYBIND_STRIP:UpdateKeybindButtonGroup(self.keybindStripDescriptor)
 end
 
+local function flattenToString(value)
+    if type(value) == "string" then
+        return value
+    elseif type(value) == "table" then
+        local result = {}
+        for _, v in pairs(value) do
+            if type(v) == "table" then
+                -- recursively flatten nested table into result directly
+                for _, str in pairs(v) do
+                    table.insert(result, flattenToString(str))
+                end
+            elseif v ~= nil then
+                table.insert(result, tostring(v))
+            end
+        end
+        return table.concat(result, "\n")
+    end
+    return tostring(value)
+end
+
 function TeleportClass_Shared:UpdateTooltip(targetData)
 	if not targetData then
 		self:RefreshKeybind()
@@ -481,9 +502,20 @@ function TeleportClass_Shared:UpdateTooltip(targetData)
 			end
 		end
 	end
+
+	if BMU.savedVarsChar.dungeonFinder.GPdoSortDungeons and targetData.text and targetData.text == BMU_SI_Get(SI_TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER) then
+	   if BMU.savedVarsChar.dungeonFinder.GPsortDungeonsDESC then
+       table.sort(tooltipData, function(a, b)
+          return zo_strlower(a) > zo_strlower(b)
+       end)
+     else
+       table.sort(tooltipData, function(a, b)
+        return zo_strlower(a) < zo_strlower(b)
+       end)
+     end
+	end
 	
-	
-	tooltipControl:LayoutTitleAndMultiSectionDescriptionTooltip(targetData.text, unpack(tooltipData))
+	tooltipControl:LayoutTitleAndMultiSectionDescriptionTooltip(targetData.text, flattenToString(tooltipData))
 	self:RefreshKeybind()
 end
 
@@ -530,7 +562,8 @@ function TeleportClass_Shared:BuildCheckbox(header, label, currentFilter, finish
 	end
 
 	local header = self.currentGroupHeader
-	local label = currentFilter.filterName
+	label = label or currentFilter.filterName
+	icon = icon or currentFilter.icon
 
 	local function onFilterToggled()
 		if currentFilter.control ~= nil then

@@ -914,8 +914,11 @@ local function OnAddOnLoaded(eventCode, addOnName)
 			["sortByReleaseASC"] = true,
 			["sortByReleaseDESC"] = false,
 			["sortByAcronym"] = false,
+			["GPdoSortDungeons"] = false,
+			["GPsortDungeonsDESC"] = false,
 			["toggleShowAcronymUpdateName"] = false,
 			["GPtoggleShowAcronymUpdateName"] = false,
+			["GPtoggleShowUpdateNum"] = false,
 			["toggleShowZoneNameDungeonName"] = false,
 		},
 		["displayAntiquityLeads"] = { -- "displayLeads" was already used in the past (boolean)

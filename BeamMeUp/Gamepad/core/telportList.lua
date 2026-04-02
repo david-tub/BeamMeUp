@@ -306,7 +306,7 @@ function teleportList:InitializeCustomTabs()
 		tabBarEntries = {
 			{
 				text = getTabHeader,
-				callback = function() self.owner:SwitchToFragment(self.owner.fragment) end,
+				callback = function() self.owner:SwitchToFragment(self.fragment) end,
 			}
 		}
 	}

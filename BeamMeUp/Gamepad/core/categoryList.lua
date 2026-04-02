@@ -133,7 +133,7 @@ function categoryList:Initialize(owner, control)
 	self:InitializeCustomTabs()
 	self:Refresh()
 
-	owner.fragment:RegisterCallback("StateChange",  function(oldState, newState)
+	self.fragment:RegisterCallback("StateChange",  function(oldState, newState)
 		if newState == SCENE_SHOWING then
 			self:Activate()
 			KEYBIND_STRIP:AddKeybindButtonGroup(self.keybindStripDescriptor)

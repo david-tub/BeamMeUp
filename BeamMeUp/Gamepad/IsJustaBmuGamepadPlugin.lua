@@ -43,7 +43,7 @@ end
 ---------------------------------------------------------------------------------------------------------------
 --
 ---------------------------------------------------------------------------------------------------------------
-local addon = ZO_DeferredInitializingObject:Subclass()
+local addon = ZO_DeferredInitializingObject:New()
 BMU.IJA = addon
 
 local BMU = BMU
@@ -62,7 +62,7 @@ function addon:Init(self, control)
 		-- self:CreateSettings()
 end
 
-function addon:Initialize(control)
+function addon:OnDeferredInitialize(control)
 
 	self.control = control
 	zo_mixin(self, addonData)

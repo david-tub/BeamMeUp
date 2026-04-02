@@ -1,4 +1,5 @@
-local addon = BMU_BMU_GAMEPAD_PLUGIN
+local BMU = BMU
+local addon = BMU.Gamepad
 local TeleportClass_Shared = addon.subclassTable.list_Shared
 local data_manager = ZO_COLLECTIBLE_DATA_MANAGER
 local zo_Dialogs_ReleaseAllDialogsOfName = ZO_Dialogs_ReleaseAllDialogsOfName
@@ -305,7 +306,7 @@ function teleportList:InitializeCustomTabs()
 		tabBarEntries = {
 			{
 				text = getTabHeader,
-				callback = function() self.owner:SwitchToFragment(self.fragment) end,
+				callback = function() self.owner:SwitchToFragment(self.owner.fragment) end,
 			}
 		}
 	}

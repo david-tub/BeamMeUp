@@ -1,6 +1,6 @@
-local addon = BMU_BMU_GAMEPAD_PLUGIN
-local TeleportClass_Shared = addon.subclassTable.list_Shared
 local BMU = BMU
+local addon = BMU.Gamepad
+local TeleportClass_Shared = addon.subclassTable.list_Shared
 local BMU_SI_Get = BMU.SI.get
 local categoryListVars = BMU.var
 
@@ -124,7 +124,6 @@ end
 local categoryList = TeleportClass_Shared:Subclass()
 
 function categoryList:Initialize(owner, control)
---	local control = CreateControlFromVirtual(owner.name .. name, parentControl:GetNamedChild('Main'), "IsJustaSANDBOX_List_Template")
 	TeleportClass_Shared.Initialize(self, control)
 
 	self.container = control
@@ -134,7 +133,7 @@ function categoryList:Initialize(owner, control)
 	self:InitializeCustomTabs()
 	self:Refresh()
 
-	self.fragment:RegisterCallback("StateChange",  function(oldState, newState)
+	owner.fragment:RegisterCallback("StateChange",  function(oldState, newState)
 		if newState == SCENE_SHOWING then
 			self:Activate()
 			KEYBIND_STRIP:AddKeybindButtonGroup(self.keybindStripDescriptor)
@@ -848,4 +847,4 @@ end
 ---------------------------------------------------------------------------------------------------------------
 -- 
 ---------------------------------------------------------------------------------------------------------------
-addon.subclassTable.categoryList = categoryList
+BMU.Gamepad.subclassTable.categoryList = categoryList

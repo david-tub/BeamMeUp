@@ -43,33 +43,44 @@ end
 ---------------------------------------------------------------------------------------------------------------
 --
 ---------------------------------------------------------------------------------------------------------------
-local addon = ZO_DeferredInitializingObject:New()
+
+BMU_Gamepad = BMU_Gamepad or BMU.Gamepad
+BMU.Gamepad.fragment = ZO_InteractScene:New("BMU_WorldMapScene", SCENE_MANAGER, {
+  type = "WorldMap",
+  interactTypes = { }
+})
+
+local addon = ZO_DeferredInitializingObject:Subclass(BMU.Gamepad.fragment, BMU_BMU_Category_Gamepad)
 BMU.IJA = addon
 
 local BMU = BMU
 local em = EVENT_MANAGER
 local cm = CALLBACK_MANAGER
 
-function addon:Init(self, control)
+function BMU_Gamepad:Init(self, control)
+    d("calling init")
     self.categoryList = self.subclassTable.categoryList:New(self, control)
 		self.teleportList = self.subclassTable.teleportList:New(self, BMU_BMU_TeleportList_Gamepad)
 
 		self.currentFragment = self.categoryList.fragment
 
 		init_NOTIFICATIONTYPES()
+		addon.provider = AutoUnlockNotificationProvider:New(GAMEPAD_NOTIFICATIONS)
+    local provider = addon.provider
+    
+    table.insert(GAMEPAD_NOTIFICATIONS.providers, provider)
+    GAMEPAD_NOTIFICATIONS:RefreshNotificationList()
 
-		self:RegisterEvents()
+		addon:RegisterEvents()
 		-- self:CreateSettings()
 end
 
-function addon:OnDeferredInitialize(control)
-
+function addon:OnDeferredInitialize(fragment, control)
 	self.control = control
 	zo_mixin(self, addonData)
 
 	self.portalPlayers = {}
 	self.teleportMap = {}
-	self.subclassTable = {}
 	self.autoUnlockProgress = 0
 
 	local function OnLoaded(_, name)
@@ -77,7 +88,7 @@ function addon:OnDeferredInitialize(control)
 
 -- 		self.control:UnregisterForEvent(EVENT_ADD_ON_LOADED)
       zo_callLater(function()
-        addon:Init(self, self.control)
+        BMU_Gamepad:Init(self, self.control)
       end, 2000)
 
 	end
@@ -101,75 +112,6 @@ function addon.getDisplayNameFromAppended(data)
 	end
 	return displayName
 end
-
---[[
-function addon:InitializeCustomTabs()
-	local mapInfo = GAMEPAD_WORLD_MAP_INFO
-	local tabBarEntries = mapInfo.tabBarEntries
-	self.orginalHeaderData = GAMEPAD_WORLD_MAP_INFO.baseHeaderData
-
-	local newtab = {
-		text = BMU.colorizeText(BMU.var.appName, "gold") .. BMU.colorizeText(" - Teleporter", "white"),
-		callback = function() mapInfo:SwitchToFragment(self.categoryList.fragment, USES_RIGHT_SIDE_CONTENT) end,
-	}
-	self.newTab = newtab
-	table.insert(tabBarEntries, 1, newtab)
-
-	mapInfo.tabBarEntries = tabBarEntries
-
-	mapInfo.baseHeaderData = {
-		tabBarEntries = mapInfo.tabBarEntries,
-	}
-
-	ZO_GamepadGenericHeader_Refresh(mapInfo.header, mapInfo.baseHeaderData)
-	ZO_GamepadGenericHeader_SetActiveTabIndex(mapInfo.header, 1)
-
-	local getTabHeader = function()
-		local categoryData = self.categoryList:GetTargetData()
-
-		if categoryData then
-			return categoryData.name
-		end
-
-		return "Locations"
-	end
-
-	local function switchToFragment(fragment)
-		self:SwitchToFragment(fragment)
-	end
-	
-	self.baseHeaderData = {
-		tabBarEntries = {
-			{
-				text = getTabHeader,
-				callback = function() switchToFragment(self.teleportList.fragment) end,
-			}
-		}
-	}
-	self.OnShowTeleportList = function(selectedIndex)
-		mapInfo.baseHeaderData = self.baseHeaderData
-	--	ZO_GamepadGenericHeader_SetActiveTabIndex(mapInfo.header, 1)
-		self:RefreshHeader()
-	end
-
-	self.OnHideTeleportList = function(selectedIndex)
-		mapInfo.baseHeaderData = self.orginalHeaderData
-		GAMEPAD_WORLD_MAP_INFO:OnShowing()
-	--	mapInfo:SwitchToFragment(self.categoryList.fragment, USES_RIGHT_SIDE_CONTENT)
-		
-		-- if was selected by dialogue then go back to last list
-		if selectedIndex then
-			self.categoryList:SetSelectedIndex(selectedIndex, true)
-			CALLBACK_MANAGER:FireCallbacks('BMU_GAMEPAD_CATEGORY_CHANGED', self.categoryList:GetTargetData())
-		elseif SCENE_MANAGER:IsShowing("gamepad_worldMap") then
-			switchToFragment(self.categoryList.fragment)
-		end
-		
-		self:RefreshHeader()
-	--	ZO_GamepadGenericHeader_Refresh(mapInfo.header, mapInfo.baseHeaderData)
-	end
-end
-]]
 
 function addon:SwitchToFragment(fragment)
 	local mapInfo = GAMEPAD_WORLD_MAP_INFO
@@ -280,7 +222,6 @@ do
 	local lastTime = 0
 	local REFRESH_ON_EVENT_TIME_DELAY = 50 -- 5000
 	function addon:RefreshOnEvent(frameTimeInMilliseconds, ...)
-	--	if not self:IsShowing() then return end
 		if self.currentFragment:IsHidden() then return end
 		local args = {...}
 

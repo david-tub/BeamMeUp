@@ -1,5 +1,5 @@
-local addon = BMU_BMU_GAMEPAD_PLUGIN
 local BMU = BMU
+local addon = BMU.Gamepad
 local BMU_SI_Get = BMU.SI.get
 local BMU_textures = BMU.textures
 local BMU_var_color = BMU.var.color
@@ -346,7 +346,6 @@ function TeleportClass_Shared:Initialize(control)
 		end
 	end)
 	
---	self.fragment = ZO_SimpleSceneFragment:New(control)
 	self.fragment = ZO_Object.MultiSubclass(ZO_SimpleSceneFragment:New(control), self)
 	
     local function equalityFunction(left, right)

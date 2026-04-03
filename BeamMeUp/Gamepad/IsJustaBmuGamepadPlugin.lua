@@ -53,6 +53,18 @@ local addonGlobal = BMU.GamepadGlobal
 local em = EVENT_MANAGER
 local cm = CALLBACK_MANAGER
 
+function addonClass:OnShowing()
+    -- Beam Me Up "Beam Me Up when Map opens"
+    if BMU.savedVarsAcc.ShowOnMapOpen then
+      GAMEPAD_WORLD_MAP_INFO:Show()
+    end
+    
+    -- Beam Me Up "Keep Beam Me Up Open"
+    if BMU.savedVarsAcc.windowStay then
+      ZO_GamepadGenericHeader_SetActiveTabIndex(GAMEPAD_WORLD_MAP_INFO.header, 1)
+    end
+end
+
 function addonClass:Init()
     self.categoryList = addonGlobal.subclassTable.categoryList:New(self, BMU_BMU_Category_Gamepad)
 		self.teleportList = addonGlobal.subclassTable.teleportList:New(self, BMU_BMU_TeleportList_Gamepad)
@@ -67,8 +79,6 @@ function addonClass:Init()
     
     table.insert(GAMEPAD_NOTIFICATIONS.providers, provider)
     GAMEPAD_NOTIFICATIONS:RefreshNotificationList()
-    ZO_GamepadGenericHeader_SetActiveTabIndex(GAMEPAD_WORLD_MAP_INFO.header, 2)
-    ZO_GamepadGenericHeader_SetActiveTabIndex(GAMEPAD_WORLD_MAP_INFO.header, 1)
 end
 
 function addonClass:OnDeferredInitialize()
@@ -311,20 +321,7 @@ function addonClass:RegisterEvents()
 		return self:RefreshLocationList()
 	end
 	GAMEPAD_WORLD_MAP_LOCATIONS.data.GetLocationList = getLocationList
-	
--- 	WORLD_MAP_MANAGER:RegisterCallback("Showing", function()
--- 		if GAMEPAD_WORLD_MAP_INFO and SCENE_MANAGER:IsShowing("gamepad_worldMap") then
--- 			-- Beam Me Up "Beam Me Up when Map opens"
--- 			if BMU.savedVarsAcc.ShowOnMapOpen then
--- 				GAMEPAD_WORLD_MAP_INFO:Show()
--- 			end
--- 			
--- 			-- Beam Me Up "Keep Beam Me Up Open"
--- 			if BMU.savedVarsAcc.windowStay then
--- 				ZO_GamepadGenericHeader_SetActiveTabIndex(GAMEPAD_WORLD_MAP_INFO.header, 1)
--- 			end
--- 		end
--- 	end)
+
 end
 
 function addonClass:RefreshLocationList()
@@ -354,6 +351,6 @@ function addonClass:RefreshLocationList()
 end
 
 function BMU_BMU_Initialize( ... )
-	BMU.Gamepad = addonClass:New(GAMEPAD_WORLD_MAP_INFO_FRAGMENT, ... )
+	BMU.Gamepad = addonClass:New(GAMEPAD_WORLD_MAP_SCENE, ... )
 end
 

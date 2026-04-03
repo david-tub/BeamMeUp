@@ -46,12 +46,34 @@ end
 
 local BMU = BMU
 local addonClass = ZO_DeferredInitializingObject:Subclass()
+BMU.GamepadGlobal.class = addonClass
 local addon = BMU.Gamepad
 local addonGlobal = BMU.GamepadGlobal
+
 local em = EVENT_MANAGER
 local cm = CALLBACK_MANAGER
 
+function addonClass:Init()
+    self.categoryList = addonGlobal.subclassTable.categoryList:New(self, BMU_BMU_Category_Gamepad)
+		self.teleportList = addonGlobal.subclassTable.teleportList:New(self, BMU_BMU_TeleportList_Gamepad)
+
+		self.currentFragment = self.categoryList.fragment
+
+    init_NOTIFICATIONTYPES()
+    
+    self:RegisterEvents()
+    self.provider = self.AutoUnlockNotificationProvider:New(GAMEPAD_NOTIFICATIONS)
+    local provider = self.provider
+    
+    table.insert(GAMEPAD_NOTIFICATIONS.providers, provider)
+    GAMEPAD_NOTIFICATIONS:RefreshNotificationList()
+    ZO_GamepadGenericHeader_SetActiveTabIndex(GAMEPAD_WORLD_MAP_INFO.header, 2)
+    ZO_GamepadGenericHeader_SetActiveTabIndex(GAMEPAD_WORLD_MAP_INFO.header, 1)
+end
+
 function addonClass:OnDeferredInitialize()
+  if self.initMarker then return end
+  self.initMarker = true
   local control = BMU_BMU_Category_Gamepad
   self.control = control
   zo_mixin(self, addonData)
@@ -59,19 +81,8 @@ function addonClass:OnDeferredInitialize()
   self.portalPlayers = {}
   self.teleportMap = {}
   self.autoUnlockProgress = 0
-
-  init_NOTIFICATIONTYPES()
-  self.categoryList = addonGlobal.subclassTable.categoryList:New(self, control)
-  self.teleportList = addonGlobal.subclassTable.teleportList:New(self, BMU_BMU_TeleportList_Gamepad)
-
-  self.currentFragment = self.categoryList.fragment
-  self:RegisterEvents()
-  self.provider = self.AutoUnlockNotificationProvider:New(GAMEPAD_NOTIFICATIONS)
-  local provider = self.provider
-  
-  table.insert(GAMEPAD_NOTIFICATIONS.providers, provider)
-  GAMEPAD_NOTIFICATIONS:RefreshNotificationList()
-
+      
+  self:Init()
 end
 
 function addonClass.getDisplayNameFromAppended(data)
@@ -301,19 +312,19 @@ function addonClass:RegisterEvents()
 	end
 	GAMEPAD_WORLD_MAP_LOCATIONS.data.GetLocationList = getLocationList
 	
-	WORLD_MAP_MANAGER:RegisterCallback("Showing", function()
-		if GAMEPAD_WORLD_MAP_INFO and SCENE_MANAGER:IsShowing("gamepad_worldMap") then
-			-- Beam Me Up "Beam Me Up when Map opens"
-			if BMU.savedVarsAcc.ShowOnMapOpen then
-				GAMEPAD_WORLD_MAP_INFO:Show()
-			end
-			
-			-- Beam Me Up "Keep Beam Me Up Open"
-			if BMU.savedVarsAcc.windowStay then
-				ZO_GamepadGenericHeader_SetActiveTabIndex(GAMEPAD_WORLD_MAP_INFO.header, 1)
-			end
-		end
-	end)
+-- 	WORLD_MAP_MANAGER:RegisterCallback("Showing", function()
+-- 		if GAMEPAD_WORLD_MAP_INFO and SCENE_MANAGER:IsShowing("gamepad_worldMap") then
+-- 			-- Beam Me Up "Beam Me Up when Map opens"
+-- 			if BMU.savedVarsAcc.ShowOnMapOpen then
+-- 				GAMEPAD_WORLD_MAP_INFO:Show()
+-- 			end
+-- 			
+-- 			-- Beam Me Up "Keep Beam Me Up Open"
+-- 			if BMU.savedVarsAcc.windowStay then
+-- 				ZO_GamepadGenericHeader_SetActiveTabIndex(GAMEPAD_WORLD_MAP_INFO.header, 1)
+-- 			end
+-- 		end
+-- 	end)
 end
 
 function addonClass:RefreshLocationList()

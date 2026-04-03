@@ -374,7 +374,7 @@ function TeleportClass_Shared:Initialize(control)
 end
 
 function TeleportClass_Shared:PerformFullRefresh()
-	if self.fragment:IsHidden() then return end
+	if not self.fragment or (self.fragment and self.fragment:IsHidden()) then return end
 
 	self:Clear()
 	self:Refresh()

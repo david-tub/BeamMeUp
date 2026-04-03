@@ -1,8 +1,8 @@
-local addon = BMU_BMU_GAMEPAD_PLUGIN
+local BMU = BMU
+local addon = BMU.Gamepad
 
 local EM = EVENT_MANAGER
 
-local addon = BMU_BMU_GAMEPAD_PLUGIN
 local var_AUTOUNLOCK_PROGRESS_NONE = 0
 local var_AUTOUNLOCK_PROGRESS_ACTIVE = 1
 local var_AUTOUNLOCK_PROGRESS_COMPLETE = 2
@@ -68,6 +68,7 @@ local function getSetupFunction(progress)
 end
 
 local AutoUnlockNotificationProvider = ZO_NotificationProvider:Subclass()
+addon.AutoUnlockNotificationProvider = AutoUnlockNotificationProvider
 
 function AutoUnlockNotificationProvider:New(notificationManager)
     local provider = ZO_NotificationProvider.New(self, notificationManager)
@@ -118,11 +119,6 @@ function AutoUnlockNotificationProvider:Decline(data)
 	BMU:UnregisterAutoUnlockEvents()
   BMU.finishedAutoUnlock("canceled")
 end
-addon.provider = AutoUnlockNotificationProvider:New(GAMEPAD_NOTIFICATIONS)
-local provider = addon.provider
-
-table.insert(GAMEPAD_NOTIFICATIONS.providers, provider)
-GAMEPAD_NOTIFICATIONS:RefreshNotificationList()
 
 function addon:AutoUnlockContinue()
 	BMU_proceedAutoUnlock()

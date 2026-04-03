@@ -1,6 +1,6 @@
-local addon = BMU_BMU_GAMEPAD_PLUGIN
-local TeleportClass_Shared = addon.subclassTable.list_Shared
 local BMU = BMU
+local addon = BMU.Gamepad
+local TeleportClass_Shared = BMU.GamepadGlobal.subclassTable.list_Shared
 local BMU_SI_Get = BMU.SI.get
 local categoryListVars = BMU.var
 
@@ -124,7 +124,6 @@ end
 local categoryList = TeleportClass_Shared:Subclass()
 
 function categoryList:Initialize(owner, control)
---	local control = CreateControlFromVirtual(owner.name .. name, parentControl:GetNamedChild('Main'), "IsJustaSANDBOX_List_Template")
 	TeleportClass_Shared.Initialize(self, control)
 
 	self.container = control
@@ -848,4 +847,4 @@ end
 ---------------------------------------------------------------------------------------------------------------
 -- 
 ---------------------------------------------------------------------------------------------------------------
-addon.subclassTable.categoryList = categoryList
+BMU.GamepadGlobal.subclassTable.categoryList = categoryList

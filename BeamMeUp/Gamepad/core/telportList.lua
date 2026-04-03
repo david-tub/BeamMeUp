@@ -1,5 +1,6 @@
-local addon = BMU_BMU_GAMEPAD_PLUGIN
-local TeleportClass_Shared = addon.subclassTable.list_Shared
+local BMU = BMU
+local addon = BMU.Gamepad
+local TeleportClass_Shared = BMU.GamepadGlobal.subclassTable.list_Shared
 local data_manager = ZO_COLLECTIBLE_DATA_MANAGER
 local zo_Dialogs_ReleaseAllDialogsOfName = ZO_Dialogs_ReleaseAllDialogsOfName
 local zo_Dialogs_ShowGamepadDialog = ZO_Dialogs_ShowGamepadDialog
@@ -691,25 +692,4 @@ end
 --
 ---------------------------------------------------------------------------------------------------------------
 
-addon.subclassTable.teleportList = teleportList
-
-
---[[
-	local skipped_POIs = {
-		[] = ture,
-	}
-	'/esoui/art/icons/poi/poi_cave_complete.dds'
-	'/esoui/art/icons/icon_missing.dds'
-
-/script d(GetNumFastTravelNodes())
-534
-					if icon == '/esoui/art/icons/icon_missing.dds' then
-						d( poiType, nodeIndex .. ': ' .. name,icon)
-					end
-				if icon == '/esoui/art/icons/icon_missing.dds' then
-
-					if poiType == POI_TYPE_WAYSHRINE then
-					end
-
-				end
-]]
+BMU.GamepadGlobal.subclassTable.teleportList = teleportList

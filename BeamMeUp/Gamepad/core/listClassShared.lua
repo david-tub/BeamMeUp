@@ -1,4 +1,3 @@
-local addon = BMU_BMU_GAMEPAD_PLUGIN
 local BMU = BMU
 local BMU_SI_Get = BMU.SI.get
 local BMU_textures = BMU.textures
@@ -346,7 +345,6 @@ function TeleportClass_Shared:Initialize(control)
 		end
 	end)
 	
---	self.fragment = ZO_SimpleSceneFragment:New(control)
 	self.fragment = ZO_Object.MultiSubclass(ZO_SimpleSceneFragment:New(control), self)
 	
     local function equalityFunction(left, right)
@@ -376,7 +374,7 @@ function TeleportClass_Shared:Initialize(control)
 end
 
 function TeleportClass_Shared:PerformFullRefresh()
-	if self.fragment:IsHidden() then return end
+	if not self.fragment or (self.fragment and self.fragment:IsHidden()) then return end
 
 	self:Clear()
 	self:Refresh()
@@ -1261,4 +1259,4 @@ end
 ---------------------------------------------------------------------------------------------------------------
 --
 ---------------------------------------------------------------------------------------------------------------
-addon.subclassTable.list_Shared = TeleportClass_Shared
+BMU.GamepadGlobal.subclassTable.list_Shared = TeleportClass_Shared

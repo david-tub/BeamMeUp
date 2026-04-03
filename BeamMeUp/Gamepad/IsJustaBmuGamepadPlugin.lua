@@ -43,59 +43,58 @@ end
 ---------------------------------------------------------------------------------------------------------------
 --
 ---------------------------------------------------------------------------------------------------------------
-local addon = ZO_DeferredInitializingObject:Subclass()
-BMU.IJA = addon
-
 local BMU = BMU
+local addonClass = ZO_DeferredInitializingObject:Subclass()
+BMU.GamepadGlobal.class = addonClass
+local addon = BMU.Gamepad
+local addonGlobal = BMU.GamepadGlobal
+
 local em = EVENT_MANAGER
 local cm = CALLBACK_MANAGER
 
-function addon:Init(self, control)
-    self.categoryList = self.subclassTable.categoryList:New(self, control)
-		self.teleportList = self.subclassTable.teleportList:New(self, BMU_BMU_TeleportList_Gamepad)
+function addonClass:OnShowing()
+    -- Beam Me Up "Beam Me Up when Map opens"
+    if BMU.savedVarsAcc.ShowOnMapOpen then
+      GAMEPAD_WORLD_MAP_INFO:Show()
+    end
+    
+    -- Beam Me Up "Keep Beam Me Up Open"
+    if BMU.savedVarsAcc.windowStay then
+      ZO_GamepadGenericHeader_SetActiveTabIndex(GAMEPAD_WORLD_MAP_INFO.header, 1)
+    end
+end
+
+function addonClass:Init()
+    self.categoryList = addonGlobal.subclassTable.categoryList:New(self, BMU_BMU_Category_Gamepad)
+		self.teleportList = addonGlobal.subclassTable.teleportList:New(self, BMU_BMU_TeleportList_Gamepad)
 
 		self.currentFragment = self.categoryList.fragment
 
-		init_NOTIFICATIONTYPES()
-
-		self:RegisterEvents()
-		-- self:CreateSettings()
+    init_NOTIFICATIONTYPES()
+    
+    self:RegisterEvents()
+    self.provider = self.AutoUnlockNotificationProvider:New(GAMEPAD_NOTIFICATIONS)
+    local provider = self.provider
+    
+    table.insert(GAMEPAD_NOTIFICATIONS.providers, provider)
+    GAMEPAD_NOTIFICATIONS:RefreshNotificationList()
 end
 
-function addon:OnDeferredInitialize()
+function addonClass:OnDeferredInitialize()
+  if self.initMarker then return end
+  self.initMarker = true
+  local control = BMU_BMU_Category_Gamepad
+  self.control = control
+  zo_mixin(self, addonData)
 
+  self.portalPlayers = {}
+  self.teleportMap = {}
+  self.autoUnlockProgress = 0
+      
+  self:Init()
 end
 
-function addon:Initialize(control)
-
-	self.control = control
-	zo_mixin(self, addonData)
-
-	self.portalPlayers = {}
-	self.teleportMap = {}
-	self.subclassTable = {}
-	self.autoUnlockProgress = 0
-
-	local function OnLoaded(_, name)
-		if name ~= self.name then return end
-
--- 		self.control:UnregisterForEvent(EVENT_ADD_ON_LOADED)
-      zo_callLater(function()
-        addon:Init(self, self.control)
-      end, 2000)
-
-	end
-	control:RegisterForEvent( EVENT_ADD_ON_LOADED, OnLoaded)
-
-	local function onPlayerActivated()
-		self.control:UnregisterForEvent(EVENT_PLAYER_ACTIVATED)
-	--	d( self.displayName
-
-	end
-	control:RegisterForEvent(EVENT_PLAYER_ACTIVATED, onPlayerActivated)
-end
-
-function addon.getDisplayNameFromAppended(data)
+function addonClass.getDisplayNameFromAppended(data)
 	local displayName = ''
 	local first, last = data.displayName:find('@.*')
 	if first and last then
@@ -106,83 +105,14 @@ function addon.getDisplayNameFromAppended(data)
 	return displayName
 end
 
---[[
-function addon:InitializeCustomTabs()
-	local mapInfo = GAMEPAD_WORLD_MAP_INFO
-	local tabBarEntries = mapInfo.tabBarEntries
-	self.orginalHeaderData = GAMEPAD_WORLD_MAP_INFO.baseHeaderData
-
-	local newtab = {
-		text = BMU.colorizeText(BMU.var.appName, "gold") .. BMU.colorizeText(" - Teleporter", "white"),
-		callback = function() mapInfo:SwitchToFragment(self.categoryList.fragment, USES_RIGHT_SIDE_CONTENT) end,
-	}
-	self.newTab = newtab
-	table.insert(tabBarEntries, 1, newtab)
-
-	mapInfo.tabBarEntries = tabBarEntries
-
-	mapInfo.baseHeaderData = {
-		tabBarEntries = mapInfo.tabBarEntries,
-	}
-
-	ZO_GamepadGenericHeader_Refresh(mapInfo.header, mapInfo.baseHeaderData)
-	ZO_GamepadGenericHeader_SetActiveTabIndex(mapInfo.header, 1)
-
-	local getTabHeader = function()
-		local categoryData = self.categoryList:GetTargetData()
-
-		if categoryData then
-			return categoryData.name
-		end
-
-		return "Locations"
-	end
-
-	local function switchToFragment(fragment)
-		self:SwitchToFragment(fragment)
-	end
-	
-	self.baseHeaderData = {
-		tabBarEntries = {
-			{
-				text = getTabHeader,
-				callback = function() switchToFragment(self.teleportList.fragment) end,
-			}
-		}
-	}
-	self.OnShowTeleportList = function(selectedIndex)
-		mapInfo.baseHeaderData = self.baseHeaderData
-	--	ZO_GamepadGenericHeader_SetActiveTabIndex(mapInfo.header, 1)
-		self:RefreshHeader()
-	end
-
-	self.OnHideTeleportList = function(selectedIndex)
-		mapInfo.baseHeaderData = self.orginalHeaderData
-		GAMEPAD_WORLD_MAP_INFO:OnShowing()
-	--	mapInfo:SwitchToFragment(self.categoryList.fragment, USES_RIGHT_SIDE_CONTENT)
-		
-		-- if was selected by dialogue then go back to last list
-		if selectedIndex then
-			self.categoryList:SetSelectedIndex(selectedIndex, true)
-			CALLBACK_MANAGER:FireCallbacks('BMU_GAMEPAD_CATEGORY_CHANGED', self.categoryList:GetTargetData())
-		elseif SCENE_MANAGER:IsShowing("gamepad_worldMap") then
-			switchToFragment(self.categoryList.fragment)
-		end
-		
-		self:RefreshHeader()
-	--	ZO_GamepadGenericHeader_Refresh(mapInfo.header, mapInfo.baseHeaderData)
-	end
-end
-]]
-
-function addon:SwitchToFragment(fragment)
+function addonClass:SwitchToFragment(fragment)
 	local mapInfo = GAMEPAD_WORLD_MAP_INFO
 	
 	self.currentFragment = fragment
 	mapInfo:SwitchToFragment(fragment, USES_RIGHT_SIDE_CONTENT)
 end
 
-function addon:RefreshHeader()
+function addonClass:RefreshHeader()
 	local mapInfo = GAMEPAD_WORLD_MAP_INFO
 	local fragments = {
 		self.categoryList.fragment,
@@ -193,7 +123,7 @@ function addon:RefreshHeader()
 	end
 end
 
-function addon:CreateSettings()
+function addonClass:CreateSettings()
 	if not BMU.var.optionsTable then return end
 	local controls = {
 		{ -- "Can Research"
@@ -236,7 +166,7 @@ function addon:CreateSettings()
 end
 
 -- IJA_BMU_GAMEPAD_PLUGIN.portalPlayers
-function addon:UpdatePortalPlayers()
+function addonClass:UpdatePortalPlayers()
 	if not self.teleportList then return end
 	local portalPlayers = {}
 	playersPerZone = {}
@@ -273,7 +203,7 @@ function addon:UpdatePortalPlayers()
 	-- BMU.changeState(index)
 end
 
-function addon:IsShowing()
+function addonClass:IsShowing()
 	local categoryListShowing = not self.categoryList.fragment:IsHidden()
 	local teleportListShowing = not self.teleportList.fragment:IsHidden()
 	
@@ -283,14 +213,13 @@ end
 do
 	local lastTime = 0
 	local REFRESH_ON_EVENT_TIME_DELAY = 50 -- 5000
-	function addon:RefreshOnEvent(frameTimeInMilliseconds, ...)
-	--	if not self:IsShowing() then return end
-		if self.currentFragment:IsHidden() then return end
+	function addonClass:RefreshOnEvent(frameTimeInMilliseconds, ...)
+		if not self.currentFragment or (self.currentFragment and self.currentFragment:IsHidden()) then return end
 		local args = {...}
 
 		local function onUpdate()
 			-- stops selection jump on refresh while moving
-			if self.teleportList:IsMoving() then return end
+			if not self.teleportList or (self.teleportList and self.teleportList:IsMoving()) then return end
 			
 			em:UnregisterForUpdate(self.name)
 			cm:FireCallbacks('BMU_GAMEPAD_CATEGORY_CHANGED', self.categoryList:GetTargetData())
@@ -301,7 +230,7 @@ do
 	end
 end
 
-function addon:RegisterEvents()
+function addonClass:RegisterEvents()
 	local function onCategoryChanged(categoryData, selectedIndex)
 		if not categoryData then return end
 		
@@ -324,7 +253,7 @@ function addon:RegisterEvents()
 	cm:RegisterCallback('BMU_GAMEPAD_CATEGORY_CHANGED', onCategoryChanged)
 
 	local function onBmuListUpdated()
-		if not self.currentFragment:IsHidden() then
+		if self.currentFragment and not self.currentFragment:IsHidden() then
 			self:UpdatePortalPlayers()
 			self:RefreshHeader()
 			
@@ -391,23 +320,10 @@ function addon:RegisterEvents()
 		return self:RefreshLocationList()
 	end
 	GAMEPAD_WORLD_MAP_LOCATIONS.data.GetLocationList = getLocationList
-	
-	WORLD_MAP_MANAGER:RegisterCallback("Showing", function()
-		if GAMEPAD_WORLD_MAP_INFO and SCENE_MANAGER:IsShowing("gamepad_worldMap") then
-			-- Beam Me Up "Beam Me Up when Map opens"
-			if BMU.savedVarsAcc.ShowOnMapOpen then
-				GAMEPAD_WORLD_MAP_INFO:Show()
-			end
-			
-			-- Beam Me Up "Keep Beam Me Up Open"
-			if BMU.savedVarsAcc.windowStay then
-				ZO_GamepadGenericHeader_SetActiveTabIndex(GAMEPAD_WORLD_MAP_INFO.header, 1)
-			end
-		end
-	end)
+
 end
 
-function addon:RefreshLocationList()
+function addonClass:RefreshLocationList()
 	-- Used to update the gamepad's locations tab to add player counts to zone names.
 	-- The counts are based on category selected.
     local mapData = {}
@@ -433,33 +349,7 @@ function addon:RefreshLocationList()
     return mapData
 end
 
----------------------------------------------------------------------------------------------------------------
---
----------------------------------------------------------------------------------------------------------------
-
-
----------------------------------------------------------------------------------------------------------------
---
----------------------------------------------------------------------------------------------------------------
 function BMU_BMU_Initialize( ... )
-	BMU_BMU_GAMEPAD_PLUGIN = addon:New( ... )
+	BMU.Gamepad = addonClass:New(GAMEPAD_WORLD_MAP_SCENE, ... )
 end
 
-function locTest()
-    local locations = WORLD_MAP_LOCATIONS
-    locations.data.mapData = nil
-	
-	ZO_ScrollList_Clear(locations.list)
-    local scrollData = ZO_ScrollList_GetDataList(locations.list)
-	
-    local mapData = locations.data:GetLocationList()
-	
-    for i,entry in ipairs(mapData) do
-        scrollData[#scrollData + 1] = ZO_ScrollList_CreateDataEntry(1, entry)
-    end
-
-    ZO_ScrollList_Commit(locations.list)
-	
-end
-
---	/script locTest()

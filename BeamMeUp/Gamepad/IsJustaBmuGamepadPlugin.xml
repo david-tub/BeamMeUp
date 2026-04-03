@@ -37,7 +37,7 @@
 		
 		<TopLevelControl name="BMU_BMU_Category_Gamepad" inherits="BMU_BMU_List_Template" hidden="true">
 			<AnchorFill/>
-<!--			<OnInitialized> BMU_BMU_Initialize(self) </OnInitialized>-->
+			<OnInitialized> BMU_BMU_Initialize(self) </OnInitialized>
 		</TopLevelControl>
 	</Controls>
 </GuiXml>

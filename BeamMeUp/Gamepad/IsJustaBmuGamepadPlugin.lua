@@ -45,41 +45,36 @@ end
 ---------------------------------------------------------------------------------------------------------------
 
 local BMU = BMU
+local addonClass = ZO_DeferredInitializingObject:Subclass()
 local addon = BMU.Gamepad
+local addonGlobal = BMU.GamepadGlobal
 local em = EVENT_MANAGER
 local cm = CALLBACK_MANAGER
 
-function addon:Init(control)
-    self.categoryList = self.subclassTable.categoryList:New(self, control)
-		self.teleportList = self.subclassTable.teleportList:New(self, BMU_BMU_TeleportList_Gamepad)
-
-		self.currentFragment = self.categoryList.fragment
-
-		init_NOTIFICATIONTYPES()
-		addon.provider = AutoUnlockNotificationProvider:New(GAMEPAD_NOTIFICATIONS)
-    local provider = addon.provider
-    
-    table.insert(GAMEPAD_NOTIFICATIONS.providers, provider)
-    GAMEPAD_NOTIFICATIONS:RefreshNotificationList()
-
-		addon:RegisterEvents()
-		-- self:CreateSettings()
-end
-
-function addon:OnDeferredInitialize(fragment)
+function addonClass:OnDeferredInitialize()
   local control = BMU_BMU_Category_Gamepad
-	self.control = control
-	zo_mixin(self, addonData)
+  self.control = control
+  zo_mixin(self, addonData)
 
-	self.portalPlayers = {}
-	self.teleportMap = {}
-	self.subclassTable = {}
-	self.autoUnlockProgress = 0
+  self.portalPlayers = {}
+  self.teleportMap = {}
+  self.autoUnlockProgress = 0
 
-	self:Init(control)
+  init_NOTIFICATIONTYPES()
+  self.categoryList = addonGlobal.subclassTable.categoryList:New(self, control)
+  self.teleportList = addonGlobal.subclassTable.teleportList:New(self, BMU_BMU_TeleportList_Gamepad)
+
+  self.currentFragment = self.categoryList.fragment
+  self:RegisterEvents()
+  self.provider = self.AutoUnlockNotificationProvider:New(GAMEPAD_NOTIFICATIONS)
+  local provider = self.provider
+  
+  table.insert(GAMEPAD_NOTIFICATIONS.providers, provider)
+  GAMEPAD_NOTIFICATIONS:RefreshNotificationList()
+
 end
 
-function addon.getDisplayNameFromAppended(data)
+function addonClass.getDisplayNameFromAppended(data)
 	local displayName = ''
 	local first, last = data.displayName:find('@.*')
 	if first and last then
@@ -90,14 +85,14 @@ function addon.getDisplayNameFromAppended(data)
 	return displayName
 end
 
-function addon:SwitchToFragment(fragment)
+function addonClass:SwitchToFragment(fragment)
 	local mapInfo = GAMEPAD_WORLD_MAP_INFO
 	
 	self.currentFragment = fragment
 	mapInfo:SwitchToFragment(fragment, USES_RIGHT_SIDE_CONTENT)
 end
 
-function addon:RefreshHeader()
+function addonClass:RefreshHeader()
 	local mapInfo = GAMEPAD_WORLD_MAP_INFO
 	local fragments = {
 		self.categoryList.fragment,
@@ -108,7 +103,7 @@ function addon:RefreshHeader()
 	end
 end
 
-function addon:CreateSettings()
+function addonClass:CreateSettings()
 	if not BMU.var.optionsTable then return end
 	local controls = {
 		{ -- "Can Research"
@@ -151,7 +146,7 @@ function addon:CreateSettings()
 end
 
 -- IJA_BMU_GAMEPAD_PLUGIN.portalPlayers
-function addon:UpdatePortalPlayers()
+function addonClass:UpdatePortalPlayers()
 	if not self.teleportList then return end
 	local portalPlayers = {}
 	playersPerZone = {}
@@ -188,7 +183,7 @@ function addon:UpdatePortalPlayers()
 	-- BMU.changeState(index)
 end
 
-function addon:IsShowing()
+function addonClass:IsShowing()
 	local categoryListShowing = not self.categoryList.fragment:IsHidden()
 	local teleportListShowing = not self.teleportList.fragment:IsHidden()
 	
@@ -198,13 +193,13 @@ end
 do
 	local lastTime = 0
 	local REFRESH_ON_EVENT_TIME_DELAY = 50 -- 5000
-	function addon:RefreshOnEvent(frameTimeInMilliseconds, ...)
-		if self.currentFragment:IsHidden() then return end
+	function addonClass:RefreshOnEvent(frameTimeInMilliseconds, ...)
+		if not self.currentFragment or (self.currentFragment and self.currentFragment:IsHidden()) then return end
 		local args = {...}
 
 		local function onUpdate()
 			-- stops selection jump on refresh while moving
-			if self.teleportList:IsMoving() then return end
+			if not self.teleportList or (self.teleportList and self.teleportList:IsMoving()) then return end
 			
 			em:UnregisterForUpdate(self.name)
 			cm:FireCallbacks('BMU_GAMEPAD_CATEGORY_CHANGED', self.categoryList:GetTargetData())
@@ -215,7 +210,7 @@ do
 	end
 end
 
-function addon:RegisterEvents()
+function addonClass:RegisterEvents()
 	local function onCategoryChanged(categoryData, selectedIndex)
 		if not categoryData then return end
 		
@@ -238,7 +233,7 @@ function addon:RegisterEvents()
 	cm:RegisterCallback('BMU_GAMEPAD_CATEGORY_CHANGED', onCategoryChanged)
 
 	local function onBmuListUpdated()
-		if not self.currentFragment:IsHidden() then
+		if self.currentFragment and not self.currentFragment:IsHidden() then
 			self:UpdatePortalPlayers()
 			self:RefreshHeader()
 			
@@ -321,7 +316,7 @@ function addon:RegisterEvents()
 	end)
 end
 
-function addon:RefreshLocationList()
+function addonClass:RefreshLocationList()
 	-- Used to update the gamepad's locations tab to add player counts to zone names.
 	-- The counts are based on category selected.
     local mapData = {}
@@ -347,33 +342,7 @@ function addon:RefreshLocationList()
     return mapData
 end
 
----------------------------------------------------------------------------------------------------------------
---
----------------------------------------------------------------------------------------------------------------
-
-
----------------------------------------------------------------------------------------------------------------
---
----------------------------------------------------------------------------------------------------------------
 function BMU_BMU_Initialize( ... )
-	BMU_BMU_GAMEPAD_PLUGIN = addon:New( ... )
+	BMU.Gamepad = addonClass:New(GAMEPAD_WORLD_MAP_INFO_FRAGMENT, ... )
 end
 
-function locTest()
-    local locations = WORLD_MAP_LOCATIONS
-    locations.data.mapData = nil
-	
-	ZO_ScrollList_Clear(locations.list)
-    local scrollData = ZO_ScrollList_GetDataList(locations.list)
-	
-    local mapData = locations.data:GetLocationList()
-	
-    for i,entry in ipairs(mapData) do
-        scrollData[#scrollData + 1] = ZO_ScrollList_CreateDataEntry(1, entry)
-    end
-
-    ZO_ScrollList_Commit(locations.list)
-	
-end
-
---	/script locTest()

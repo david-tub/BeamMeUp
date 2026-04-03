@@ -68,6 +68,7 @@ local function getSetupFunction(progress)
 end
 
 local AutoUnlockNotificationProvider = ZO_NotificationProvider:Subclass()
+addon.AutoUnlockNotificationProvider = AutoUnlockNotificationProvider
 
 function AutoUnlockNotificationProvider:New(notificationManager)
     local provider = ZO_NotificationProvider.New(self, notificationManager)

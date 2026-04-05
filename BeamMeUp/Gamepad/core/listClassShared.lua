@@ -554,7 +554,7 @@ function TeleportClass_Shared:BuildCheckboxEntry(header, label, setupFunction, c
 	return entry
 end
 
-function TeleportClass_Shared:BuildCheckbox(header, label, currentFilter, finishedCallback, icon)
+function TeleportClass_Shared:BuildCheckbox(header, label, currentFilter, finishedCallback, icon, filterData)
 	if type(currentFilter) == 'function' then
 		currentFilter = currentFilter()
 	end
@@ -570,7 +570,7 @@ function TeleportClass_Shared:BuildCheckbox(header, label, currentFilter, finish
 			currentFilter.checked = ZO_CheckButton_IsChecked(targetControl.checkBox)
 
 			if currentFilter.callback then
-				currentFilter:callback()
+				currentFilter:callback(filterData)
 			end
 		end
 	end

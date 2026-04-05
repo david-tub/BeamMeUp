@@ -628,6 +628,20 @@ function categoryList:BuildDungeonsCategoryOptions(groupId, settingsGroupId, sor
 		if not categoryData then return false end
 		return categoryData.categoryType == CATEGORY_TYPE_DUNGEON
 	end
+	
+	local function radioGroupThem(owner, data, filterData)
+	  if data.checked then
+      for iDex, ctl in pairs(filterData) do
+        if ctl.filterKey ~= data.filterKey then
+          owner:ToggleBMUSettingByKeyNoRefresh(ctl.filterKey, false, "dungeonFinder")
+          ctl.checked = false
+          ZO_CheckButton_SetUnchecked(ctl.control.checkBox)
+        end
+      end
+    end
+    owner:Refresh()
+	end
+	
 	local settingsData = {
     {
 			filterName = GetString(SI_TELE_UI_TOGGLE_ACRONYM),
@@ -653,15 +667,10 @@ function categoryList:BuildDungeonsCategoryOptions(groupId, settingsGroupId, sor
   }
 	local sortingData = {
 		{	filterName = GetString(SI_TELE_UI_TOGGLE_SORT_ACRONYM),
-			callback = function(data)
+		  filterKey = "sortByAcronym",
+			callback = function(data, filterData)
 				self:ToggleBMUSettingByKeyNoRefresh('sortByAcronym', data.checked, "dungeonFinder")
-				if data.checked then
-				  ZO_CheckButton_SetUnchecked(ZO_GamepadDialogParaEntryListListScrollZO_CheckBoxTemplate_WithPadding_Gamepad3.checkBox)
-          ZO_CheckButton_SetUnchecked(ZO_GamepadDialogParaEntryListListScrollZO_CheckBoxTemplate_WithPadding_Gamepad4.checkBox)
-          for key, ctl in pairs(data.radioSettings) do
-            self:ToggleBMUSettingByKeyNoRefresh(ctl, false, "dungeonFinder")
-          end
-				end
+				radioGroupThem(self, data, filterData)
 			end,
 			radioSettings = { "sortByReleaseASC", "sortByReleaseDESC" },
 			checked = function()
@@ -670,16 +679,10 @@ function categoryList:BuildDungeonsCategoryOptions(groupId, settingsGroupId, sor
 		},
 		{
 			filterName = "|t32:32:"..ZO_ICON_SORT_ARROW_UP.."|t  "..GetString(SI_TELE_UI_TOGGLE_SORT_RELEASE),
-			callback = function(data)
+			filterKey = "sortByReleaseASC",
+			callback = function(data, filterData)
 				self:ToggleBMUSettingByKey('sortByReleaseASC', data.checked, "dungeonFinder")
-        if data.checked then
-          ZO_CheckButton_SetUnchecked(ZO_GamepadDialogParaEntryListListScrollZO_CheckBoxTemplate_WithPadding_GamepadWithHeader2.checkBox)
-          ZO_CheckButton_SetUnchecked(ZO_GamepadDialogParaEntryListListScrollZO_CheckBoxTemplate_WithPadding_Gamepad4.checkBox)
-          for key, ctl in pairs(data.radioSettings) do
-            self:ToggleBMUSettingByKeyNoRefresh(ctl, false, "dungeonFinder")
-          end
-				end
-				self:Refresh()
+        radioGroupThem(self, data, filterData)
 			end,
 			radioSettings = { "sortByAcronym", "sortByReleaseDESC" },
 			checked = function()
@@ -689,15 +692,10 @@ function categoryList:BuildDungeonsCategoryOptions(groupId, settingsGroupId, sor
 		},
 		{
 			filterName = "|t32:32:"..ZO_ICON_SORT_ARROW_DOWN.."|t  "..GetString(SI_TELE_UI_TOGGLE_SORT_RELEASE),
-			callback = function(data)
+			filterKey = "sortByReleaseDESC",
+			callback = function(data, filterData)
 				self:ToggleBMUSettingByKeyNoRefresh('sortByReleaseDESC', data.checked, "dungeonFinder")
-				if data.checked then
-				  ZO_CheckButton_SetUnchecked(ZO_GamepadDialogParaEntryListListScrollZO_CheckBoxTemplate_WithPadding_GamepadWithHeader2.checkBox)
-          ZO_CheckButton_SetUnchecked(ZO_GamepadDialogParaEntryListListScrollZO_CheckBoxTemplate_WithPadding_Gamepad3.checkBox)
-          for key, ctl in pairs(data.radioSettings) do
-            self:ToggleBMUSettingByKeyNoRefresh(ctl, false, "dungeonFinder")
-          end
-				end
+				radioGroupThem(self, data, filterData)
 			end,
 			radioSettings = { "sortByAcronym", "sortByReleaseASC" },
 			checked = function()
@@ -751,8 +749,8 @@ function categoryList:BuildDungeonsCategoryOptions(groupId, settingsGroupId, sor
 	end
 	if sortingGroupId then
     for sortingIndex, currentSorting in ipairs(sortingData) do
-      self:AddOptionTemplate(sortingGroupId, function() 
-        return self:BuildCheckbox(SI_TELE_SETTINGS_SORTING, label, currentSorting, icon) 
+      self:AddOptionTemplate(sortingGroupId, function(self) 
+        return self:BuildCheckbox(SI_TELE_SETTINGS_SORTING, label, currentSorting, nil, currentSorting.icon, sortingData) 
       end, conditionFunction)
     end
 	end

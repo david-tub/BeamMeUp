@@ -65,7 +65,7 @@ function teleportList:Initialize(owner, control)
 	TeleportClass_Shared.Initialize(self, control)
 	self.categoryList = owner.categoryList
 	self.container = control
-	self.owner = owner
+	self.owner = BMU.Gamepad
 	self.owner.savedVars = self.owner.savedVars or {}
 
 	self.noItemsLabel:SetText(GetString(SI_TELE_UI_NO_MATCHES))
@@ -655,7 +655,6 @@ function teleportList:OnSelectedDataChangedCallback(selectedData)
 		end
 		self:SetMapToTarget(selectedData)
 	end, 10)
-
 	self:UpdateTooltip(selectedData)
 	self:RefreshKeybind()
 end

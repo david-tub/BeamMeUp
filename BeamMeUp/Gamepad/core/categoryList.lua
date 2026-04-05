@@ -459,11 +459,12 @@ function categoryList:BuildOptionsList()
 
 	self:BuildPortToFriendOption()
 	local settingsGroupId = self:AddOptionTemplateGroup(function() return GetString(SI_GAME_MENU_SETTINGS) end)
+	local sortingGroupId = self:AddOptionTemplateGroup(function() return GetString(SI_TELE_SETTINGS_SORTING) end)
 	local filtersGroupId = self:AddOptionTemplateGroup(function() return GetString(SI_GAMEPAD_CRAFTING_OPTIONS_FILTERS) end)
 --	self:BuildAutoUnlockOptions(filtersGroupId)
 	self:BuildMainCategroyOptions(filtersGroupId)
 	self:BuildItemsCategoryOptions(filtersGroupId)
-	self:BuildDungeonsCategoryOptions(filtersGroupId, settingsGroupId)
+	self:BuildDungeonsCategoryOptions(filtersGroupId, settingsGroupId, sortingGroupId)
 	self:BuildDelvesCategoryOptions(filtersGroupId)
 end
 
@@ -621,12 +622,26 @@ function categoryList:BuildItemsCategoryOptions(groupId)
 	self:AddOptionTemplate(filtersGroupId, function() return self:BuildMultiSelectDropdown(SI_SPECIALIZEDITEMTYPE101, nil, filterData, icon, areSurveysActive) end, conditionFunction)
 end
 
-function categoryList:BuildDungeonsCategoryOptions(groupId, settingsGroupId)
+function categoryList:BuildDungeonsCategoryOptions(groupId, settingsGroupId, sortingGroupId)
 	local function conditionFunction()
 		local categoryData = self:GetTargetData()
 		if not categoryData then return false end
 		return categoryData.categoryType == CATEGORY_TYPE_DUNGEON
 	end
+	
+	local function radioGroupThem(owner, data, filterData)
+	  if data.checked then
+      for iDex, ctl in pairs(filterData) do
+        if ctl.filterKey ~= data.filterKey then
+          owner:ToggleBMUSettingByKeyNoRefresh(ctl.filterKey, false, "dungeonFinder")
+          ctl.checked = false
+          ZO_CheckButton_SetUnchecked(ctl.control.checkBox)
+        end
+      end
+    end
+    owner:Refresh()
+	end
+	
 	local settingsData = {
     {
 			filterName = GetString(SI_TELE_UI_TOGGLE_ACRONYM),
@@ -649,19 +664,44 @@ function categoryList:BuildDungeonsCategoryOptions(groupId, settingsGroupId)
 			end,
 			checked = getTeleporterSettingByKey('GPtoggleShowUpdateNum', "dungeonFinder"),
 		},
-    {
-			filterName = GetString(SI_TELE_UI_ENABLE_DUNGEON_SORT),
-			callback = function(data)
-				self:ToggleBMUSettingByKey('GPdoSortDungeons', data.checked, "dungeonFinder")
+  }
+	local sortingData = {
+		{	filterName = GetString(SI_TELE_UI_TOGGLE_SORT_ACRONYM),
+		  filterKey = "sortByAcronym",
+			callback = function(data, filterData)
+				self:ToggleBMUSettingByKeyNoRefresh('sortByAcronym', data.checked, "dungeonFinder")
+				radioGroupThem(self, data, filterData)
 			end,
-			checked = getTeleporterSettingByKey('GPdoSortDungeons', "dungeonFinder"),
+			radioSettings = { "sortByReleaseASC", "sortByReleaseDESC" },
+			checked = function()
+			  return getTeleporterSettingByKey('sortByAcronym', "dungeonFinder")
+      end,
 		},
 		{
-			filterName = GetString(SI_TELE_UI_SORT_DESC),
-			callback = function(data)
-				self:ToggleBMUSettingByKey('GPsortDungeonsDESC', data.checked, "dungeonFinder")
+			filterName = "|t32:32:"..ZO_ICON_SORT_ARROW_UP.."|t  "..GetString(SI_TELE_UI_TOGGLE_SORT_RELEASE),
+			filterKey = "sortByReleaseASC",
+			callback = function(data, filterData)
+				self:ToggleBMUSettingByKey('sortByReleaseASC', data.checked, "dungeonFinder")
+        radioGroupThem(self, data, filterData)
 			end,
-			checked = getTeleporterSettingByKey('GPsortDungeonsDESC', "dungeonFinder"),
+			radioSettings = { "sortByAcronym", "sortByReleaseDESC" },
+			checked = function()
+			  return getTeleporterSettingByKey('sortByReleaseASC', "dungeonFinder")
+      end,
+      icon = ZO_ICON_SORT_ARROW_UP,
+		},
+		{
+			filterName = "|t32:32:"..ZO_ICON_SORT_ARROW_DOWN.."|t  "..GetString(SI_TELE_UI_TOGGLE_SORT_RELEASE),
+			filterKey = "sortByReleaseDESC",
+			callback = function(data, filterData)
+				self:ToggleBMUSettingByKeyNoRefresh('sortByReleaseDESC', data.checked, "dungeonFinder")
+				radioGroupThem(self, data, filterData)
+			end,
+			radioSettings = { "sortByAcronym", "sortByReleaseASC" },
+			checked = function()
+			  return getTeleporterSettingByKey('sortByReleaseDESC', "dungeonFinder")
+      end,
+      icon = ZO_ICON_SORT_ARROW_DOWN,
 		},
 	}
 	
@@ -705,6 +745,13 @@ function categoryList:BuildDungeonsCategoryOptions(groupId, settingsGroupId)
 	if settingsGroupId then
     for settingsIndex, currentSetting in ipairs(settingsData) do
       self:AddOptionTemplate(settingsGroupId, function() return self:BuildCheckbox(SI_GAME_MENU_SETTINGS, label, currentSetting, icon) end, conditionFunction)
+    end
+	end
+	if sortingGroupId then
+    for sortingIndex, currentSorting in ipairs(sortingData) do
+      self:AddOptionTemplate(sortingGroupId, function(self) 
+        return self:BuildCheckbox(SI_TELE_SETTINGS_SORTING, label, currentSorting, nil, currentSorting.icon, sortingData) 
+      end, conditionFunction)
     end
 	end
 	for filterIndex, currentFilter in ipairs(filterData) do
@@ -768,13 +815,17 @@ function categoryList:ToggleBMUSetting(index, checked)
 	self:Refresh()
 end
 
-function categoryList:ToggleBMUSettingByKey(index, checked, key)
+function categoryList:ToggleBMUSettingByKeyNoRefresh(index, checked, key)
   if key == nil then
     self:ToggleBMUSetting(index, checked)
     return
   end
 	BMU.savedVarsChar[key][index] = checked
 	self.owner:UpdatePortalPlayers()
+end
+
+function categoryList:ToggleBMUSettingByKey(index, checked, key)
+  self:ToggleBMUSettingByKeyNoRefresh(index, checked, key)
 	self:Refresh()
 end
 

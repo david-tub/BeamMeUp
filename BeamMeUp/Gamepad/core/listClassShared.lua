@@ -576,22 +576,27 @@ function TeleportClass_Shared:BuildCheckbox(header, label, currentFilter, finish
 	end
 
 	local function onFilterSelected()
-		if not self.dialogData.ignoreTooltips then
-			GAMEPAD_TOOLTIPS:LayoutTitleAndDescriptionTooltip(GAMEPAD_LEFT_TOOLTIP, GetStringFromData(currentFilter.filterName), GetStringFromData(currentFilter.filterTooltip))
-		end
+-- 		if not self.dialogData.ignoreTooltips then
+-- 			GAMEPAD_TOOLTIPS:LayoutTitleAndDescriptionTooltip(GAMEPAD_LEFT_TOOLTIP, GetStringFromData(currentFilter.filterName), GetStringFromData(currentFilter.filterTooltip))
+-- 		end
 	end
 
 	local function filterCheckboxEntrySetup(control, data, selected, reselectingDuringRebuild, enabled, active)
 		data.callback = onFilterToggled
 		data.onSelected = onFilterSelected
-		ZO_GamepadCheckBoxTemplate_Setup(control, data, selected, reselectingDuringRebuild, enabled, active)
-
+		local text = data.text
+    if type(text) == "function" then
+        text = text(data)
+    end
+    control.label:SetText(text)
+		--ZO_GamepadCheckBoxTemplate_Setup(control, data, selected, reselectingDuringRebuild, enabled, active)
+    control.checkBox.toggleFunction = data.setChecked
 		local checked = currentFilter.checked
 		if type(checked) == 'function' then
 			checked = checked()
 		end
-		
-		if checked then
+
+		if checked == true then
 			ZO_CheckButton_SetChecked(control.checkBox)
 		else
 			ZO_CheckButton_SetUnchecked(control.checkBox)
@@ -600,7 +605,7 @@ function TeleportClass_Shared:BuildCheckbox(header, label, currentFilter, finish
 
 	end
 
-	return self:BuildCheckboxEntry(header, label, filterCheckboxEntrySetup, Callback, setChecked)
+	return self:BuildCheckboxEntry(header, label, filterCheckboxEntrySetup, currentFilter.callback, nil, finishedCallback, icon)
 end
 
 function TeleportClass_Shared:BuildDropdownEntry(header, label, setupFunction, callback, finishedCallback, icon)

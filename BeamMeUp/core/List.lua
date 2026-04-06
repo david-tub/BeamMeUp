@@ -232,6 +232,7 @@ end
 --------------------------------------------------------------------
 
 local addon = BMU.Gamepad
+
 local provider = addon.provider
 
 local var_AUTOUNLOCK_PROGRESS_NONE = 0
@@ -327,20 +328,22 @@ end
 
 function BMU:RegisterAutoUnlockEvents()
   local eventHandlers = self:GetEventHandlers()
+  local prefix = addon.prefix or "BMU_BMU"
 	for evenId, handler in pairs(eventHandlers) do
-		EM:RegisterForEvent(addon.prefix .. "_AutoWayshrineUnlock", evenId, handler)
+		EM:RegisterForEvent(prefix  .. "_AutoWayshrineUnlock", evenId, handler)
 	end
 	if not BMU_IsNotKeyboard() then
-	  EM:RegisterForEvent(addon.prefix .. "_AutoWayshrineUnlockFurniture", EVENT_PLAYER_ACTIVATED, BMU.updateHouseFurnitureCount)
+	  EM:RegisterForEvent(prefix .. "_AutoWayshrineUnlockFurniture", EVENT_PLAYER_ACTIVATED, BMU.updateHouseFurnitureCount)
 	end
 end
 function BMU:UnregisterAutoUnlockEvents()
   local eventHandlers = self:GetEventHandlers()
+  local prefix = addon.prefix or "BMU_BMU"
 	for evenId, handler in pairs(eventHandlers) do
-		EM:UnregisterForEvent(addon.prefix .. "_AutoWayshrineUnlock", evenId)
+		EM:UnregisterForEvent(prefix .. "_AutoWayshrineUnlock", evenId)
 	end
 	if not BMU_IsNotKeyboard() then
-	  EM:UnregisterForEvent(addon.prefix .. "_AutoWayshrineUnlockFurniture", EVENT_PLAYER_ACTIVATED, BMU.updateHouseFurnitureCount)
+	  EM:UnregisterForEvent(prefix .. "_AutoWayshrineUnlockFurniture", EVENT_PLAYER_ACTIVATED, BMU.updateHouseFurnitureCount)
 	end
 end
 
@@ -888,9 +891,9 @@ function BMU.showDialogAutoUnlock(zoneId)
 					if flagLoop then
 						if selectedEntry.key == "suffle" then
 							-- directly start with random zones
-							BMU.startAutoUnlockLoopRandom(BMU.uwData.zoneId, selectedEntry.key)
+							BMU.startAutoUnlockLoopRandom(BMU.uwData and BMU.uwData.zoneId, selectedEntry.key)
 						else
-							BMU.startAutoUnlockLoopSorted(BMU.uwData.zoneId, selectedEntry.key)
+							BMU.startAutoUnlockLoopSorted(BMU.uwData and BMU.uwData.zoneId, selectedEntry.key)
 						end
 					else
 						-- check and start auto unlocking for given zoneId

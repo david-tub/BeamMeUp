@@ -23,6 +23,10 @@ jobs:
           sparse-checkout: |
             LibZone
           sparse-checkout-cone-mode: false
+
+      - name: Remove .git
+        run: |
+          rm -rf BeamMeUp/Console/lib/.git
           
       - name: Get branch name as version
         id: semver
@@ -69,10 +73,16 @@ jobs:
           # create zip
           (cd /tmp && zip -r "$REPO_FOLDER/${{ env.ZIP_FULL_NAME }}" "${{ env.ADDON_NAME }}")
 
+      - name: Extract latest changelog entry
+        run: |
+          echo "Console Release Only" > latest_changes.md
+          awk '/^## / { if (!found) { found=1; print; next } else { exit } } found' CHANGELOG.md >> latest_changes.md
+          cat latest_changes.md
+
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          name: "${{ env.ADDON_VERSION }}"
+          name: "Console Version Only - ${{ env.ADDON_VERSION }}"
           commit: ${{ github.ref }}
           tag: "${{ env.ADDON_VERSION }}"
           artifacts: "${{ github.workspace }}/${{ env.ADDON_NAME }}/${{ env.ZIP_FULL_NAME }}"
@@ -80,11 +90,6 @@ jobs:
           bodyFile: latest_changes.md
           allowUpdates: true
           makeLatest: true
-
-      - name: Extract latest changelog entry
-        run: |
-          awk '/^## / { if (!found) { found=1; print; next } else { exit } } found' CHANGELOG.md > latest_changes.md
-          cat latest_changes.md
 
       - name: Upload to BNET
         uses: m00nyONE/bnet-upload@main

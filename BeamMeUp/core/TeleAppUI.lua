@@ -94,7 +94,7 @@ local BMU_SOURCE_INDEX_ALL = BMU.SOURCE_INDEX_ALL
 
 --Subtypes
 local clueData = teleporterVars.clueData
-local subTypeClue                 = clueData.clueTypes[1] --"clue"
+local subType_Clue                 = clueData.clueTypes[1] --"clue"
 --Treasure
 local treasureData = teleporterVars.treasureData
 local treasureTypes = treasureData.treasureTypes
@@ -501,28 +501,30 @@ local function SetupUI()
 		else
 			-- do it the old way
 			-- Texture
-			BMU_chatButtonTex = wm:CreateControl("Teleporter_CHAT_MENU_BUTTON", zo_ChatWindow, CT_TEXTURE) --CHG251229 Baertram Performance improvedment for multiple used variable
-            BMU.chatButtonTex = BMU_chatButtonTex --INS251229 Baertram
-			BMU_chatButtonTex:SetDimensions(33, 33)  --CHG251229 Baertram
-			BMU_chatButtonTex:SetAnchor(TOPRIGHT, zo_ChatWindow, TOPRIGHT, -40 - BMU_svAcc.chatButtonHorizontalOffset, 6) --CHG251229 Baertram
-			BMU_chatButtonTex:SetTexture(BMU_textures_wayshrineBtn) --CHG251229 Baertram
-			BMU_chatButtonTex:SetMouseEnabled(true) --CHG251229 Baertram
-			BMU_chatButtonTex:SetDrawLayer(2) --CHG251229 Baertram
-			--Handlers
-			BMU_chatButtonTex:SetHandler("OnMouseUp", function(self, button) --CHG251229 Baertram
-				if button ~= MOUSE_BUTTON_INDEX_LEFT then return end  --INS BAERTRAM20260124
-				BMU_OpenTeleporter(true)
-			end)
+			if not IsConsoleUI() then
+				BMU_chatButtonTex = wm:CreateControl("Teleporter_CHAT_MENU_BUTTON", zo_ChatWindow, CT_TEXTURE) --CHG251229 Baertram Performance improvedment for multiple used variable
+	            BMU.chatButtonTex = BMU_chatButtonTex --INS251229 Baertram
+				BMU_chatButtonTex:SetDimensions(33, 33)  --CHG251229 Baertram
+				BMU_chatButtonTex:SetAnchor(TOPRIGHT, zo_ChatWindow, TOPRIGHT, -40 - BMU_svAcc.chatButtonHorizontalOffset, 6) --CHG251229 Baertram
+				BMU_chatButtonTex:SetTexture(BMU_textures_wayshrineBtn) --CHG251229 Baertram
+				BMU_chatButtonTex:SetMouseEnabled(true) --CHG251229 Baertram
+				BMU_chatButtonTex:SetDrawLayer(2) --CHG251229 Baertram
+				--Handlers
+				BMU_chatButtonTex:SetHandler("OnMouseUp", function(self, button) --CHG251229 Baertram
+					if button ~= MOUSE_BUTTON_INDEX_LEFT then return end  --INS BAERTRAM20260124
+					BMU_OpenTeleporter(true)
+				end)
+				
+				BMU_chatButtonTex:SetHandler("OnMouseEnter", function(chatButtonTexCtrl) --CHG251229 Baertram
+					chatButtonTexCtrl:SetTexture(BMU_textures_wayshrineBtnOver) --CHG251229 Baertram
+					BMU_tooltipTextEnter(BMU, chatButtonTexCtrl, appName) --CHG251229 Baertram Performance improvement for multiple called same function, respecting : notation (1st passed in param must be the BMU table then)
+				end)
 			
-			BMU_chatButtonTex:SetHandler("OnMouseEnter", function(chatButtonTexCtrl) --CHG251229 Baertram
-				chatButtonTexCtrl:SetTexture(BMU_textures_wayshrineBtnOver) --CHG251229 Baertram
-				BMU_tooltipTextEnter(BMU, chatButtonTexCtrl, appName) --CHG251229 Baertram Performance improvement for multiple called same function, respecting : notation (1st passed in param must be the BMU table then)
-			end)
-		
-			BMU_chatButtonTex:SetHandler("OnMouseExit", function(chatButtonTexCtrl) --CHG251229 Baertram
-				chatButtonTexCtrl:SetTexture(BMU_textures_wayshrineBtn) --CHG251229 Baertram
-				BMU_tooltipTextEnter(BMU, chatButtonTexCtrl) --CHG251229 Baertram Performance improvement for multiple called same function, respecting : notation (1st passed in param must be the BMU table then)
-			end)
+				BMU_chatButtonTex:SetHandler("OnMouseExit", function(chatButtonTexCtrl) --CHG251229 Baertram
+					chatButtonTexCtrl:SetTexture(BMU_textures_wayshrineBtn) --CHG251229 Baertram
+					BMU_tooltipTextEnter(BMU, chatButtonTexCtrl) --CHG251229 Baertram Performance improvement for multiple called same function, respecting : notation (1st passed in param must be the BMU table then)
+				end)
+			end
 		end
 	end
 	
@@ -2142,7 +2144,7 @@ end
 function BMU.TeleporterSetupUI(addOnName)
 	if appName ~= addOnName then return end
 		addOnName = appName .. " - Teleporter"
-		if BMU_IsNotKeyboard() and CS ~= nil then
+		if IsConsoleUI() and CS ~= nil then
       CS.SetupOptionsMenu(addOnName)
 		else
 		  BMU.SetupOptionsMenu(addOnName)

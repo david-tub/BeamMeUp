@@ -1,10 +1,10 @@
 ## Title: |cd5b526BeamMeUp|r - Teleporter
 ## Description: Free fast travel to available players from your friend list, guilds and group. Authors who contributed to the development of the addon in its current form: Baertram, Treuce, IsJustaGhost (Gamepad UI), Saranicole1980 (Console/Gamepad integration)
 ## Author: DeadSoon, Gamer1986PAN and others (see description)
-## APIVersion: 101049
+## APIVersion: 101050 101049
 ## SavedVariables: BeamMeUp_SV
-## Version: 4.0.3
-## AddOnVersion: 403
+## Version: 4.0.4
+## AddOnVersion: 404
 ## IsLibrary: false
 ## DependsOn: LibAddonMenu-2.0>=41 LibHarvensAddonSettings>=20102
 ## PCDependsOn: LibZone>=0896 LibScrollableMenu>=020401

@@ -231,9 +231,9 @@ end
 -- Helper functions for reusing PC functionality for Gamepad/Console
 --------------------------------------------------------------------
 
-local addon = BMU.Gamepad
+local addon = {}
 
-local provider = addon.provider
+local provider = BMU.Gamepad.provider
 
 local var_AUTOUNLOCK_PROGRESS_NONE = 0
 local var_AUTOUNLOCK_PROGRESS_ACTIVE = 1

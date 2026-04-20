@@ -37,7 +37,7 @@ BMU_GUILD_DATA = {
             631764,			-- "Die magische Miezmuschel"	|@MiezeMelli
             661070,			-- "BMU Crossroad Alliance"		|@square252
             389326,			-- "Ork Mania"					|@OrkManiac4u
-            -- 677494,		-- "BMU Unofficial"			    |@Kassec - unlisted aber Leader hat Discord - 16.11.2024 auskommentiert, da Gilde aufgegeben
+         -- 677494,		    -- "BMU Unofficial"			    |@Kassec - unlisted aber Leader hat Discord - 16.11.2024 auskommentiert, da Gilde aufgegeben
             418220,			-- "Frozen Lean Gang"			|@Vinc - über Discord angeschrieben
             649984,			-- "Way to warm sands"			|@Ma'pyca (ru)
             701658,			-- "Armoored Rose"				|Discord-name Лютобор Ingame?
@@ -68,12 +68,13 @@ BMU_GUILD_DATA = {
             783860,         -- "Zenithar's Artisans"        |@CassieAeri - discord cassieaeri
             829144,         -- "La Taverne du Poulpe"       |@SecundaHyadum - discord nebuleuse_du_sablier
             852144,         -- "Standing Ovation Society"   |@EliTheDramaQueen - discord pankromka
+            302704,         -- "IV Imperial Legion BM"      |@Yorvialex - discord yorvialex
         },
         ["NA Megaserver"] = {
             698893,			-- "The Descendants"			|@ravenzwind
             601183,			-- "Dawn of Cthulhu				|@earthlyreaper
             738065,			-- "Im Going On An Adventure"	|@KhuKhu
-            --738317,			-- "KBMU"						|@Celinia -> Lead wants to give up on the guild. It is unlisted already and only waiting for the users to switch or get kicked because of inactivity - keeping the entry if Celinia is changing her mind before guild gets deleted
+          --738317,			-- "KBMU"						|@Celinia -> Lead wants to give up on the guild. It is unlisted already and only waiting for the users to switch or get kicked because of inactivity - keeping the entry if Celinia is changing her mind before guild gets deleted
             677323,			-- "Metrobank"					|@APHONlC
             704951,			-- "Mara's Favor"				|@CassieAeri
             785051,			-- ?

@@ -1,3 +1,4 @@
+local BMU = BMU
 local SI = BMU.SI
 local SI_get = SI.get
 
@@ -377,9 +378,8 @@ ZO_Dialogs_RegisterCustomDialog("BMU_GAMEPAD_AUTO_UNLOCK_DIALOG",
 				setup = zo_SharedGamepadEntry_OnSetup,
 				callback = function(dialog)
 					ReleaseDialog("BMU_GAMEPAD_AUTO_UNLOCK_DIALOG")
-					BMU_BMU_GAMEPAD_PLUGIN:CheckAndStartAutoUnlockOfZone(dialog.data.zoneId, BMU.savedVarsAcc.autoUnlockChatLogging)
+					BMU.checkAndStartAutoUnlockOfZone(dialog.data.zoneId)
 				end,
-		--		visible = function(dialog) return dialog.data:HasUndiscoveredWayshrines()  end
 			},
 		},
 		{
@@ -389,7 +389,7 @@ ZO_Dialogs_RegisterCustomDialog("BMU_GAMEPAD_AUTO_UNLOCK_DIALOG",
 				setup = zo_SharedGamepadEntry_OnSetup,
 				callback = function(dialog)
 					ReleaseDialog("BMU_GAMEPAD_AUTO_UNLOCK_DIALOG")
-					BMU_BMU_GAMEPAD_PLUGIN:StartAutoUnlockLoopRandom(nil, 'suffle', BMU.savedVarsAcc.autoUnlockChatLogging)
+					BMU.startAutoUnlockLoopRandom(dialog.data.zoneId, 'suffle')
 				end,
 			},
 		},
@@ -400,7 +400,7 @@ ZO_Dialogs_RegisterCustomDialog("BMU_GAMEPAD_AUTO_UNLOCK_DIALOG",
 				setup = zo_SharedGamepadEntry_OnSetup,
 				callback = function(dialog)
 					ReleaseDialog("BMU_GAMEPAD_AUTO_UNLOCK_DIALOG")
-					BMU_BMU_GAMEPAD_PLUGIN:StartAutoUnlockLoopSorted(nil, 'wayshrines', BMU.savedVarsAcc.autoUnlockChatLogging)
+					BMU.startAutoUnlockLoopSorted(nil, 'wayshrines')
 				end,
 			},
 		},
@@ -411,7 +411,7 @@ ZO_Dialogs_RegisterCustomDialog("BMU_GAMEPAD_AUTO_UNLOCK_DIALOG",
 				setup = zo_SharedGamepadEntry_OnSetup,
 				callback = function(dialog)
 					ReleaseDialog("BMU_GAMEPAD_AUTO_UNLOCK_DIALOG")
-					BMU_BMU_GAMEPAD_PLUGIN:StartAutoUnlockLoopSorted(nil, 'players', BMU.savedVarsAcc.autoUnlockChatLogging)
+					BMU.startAutoUnlockLoopSorted(nil, 'players')
 				end,
 			},
 		},

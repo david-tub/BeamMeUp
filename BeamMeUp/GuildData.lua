@@ -95,7 +95,7 @@ BMU_GUILD_DATA = {
             276637,         -- "B Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
             902797,         -- "C Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
             229811,         -- "T Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
-            927751,         -- "nUber"                      |@Furyous discord: alberthoffpauir
+            --927751,         -- "nUber"                      |@Furyous discord: alberthoffpauir  Paused with 4.0.4 due to overflowing guild
             927611,         -- "O Co-The Ascended Order"    |@Jeauxkr discord: j.oquain
             930593,         -- "TSC Holdings"               |@bluberrygamingyt (main account)/@b3rryV2 (guild leader account), discord: bluberrygaming
             932947,         -- "Chances Are We're High"     |@GYATT discord: atomic.gyatt

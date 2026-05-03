@@ -259,6 +259,24 @@ function CS.SetupOptionsMenu(index) --index == Addon name
 					setFunction = function(value) BMU_savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName = value end,
 					default = false,
 				},
+				{
+         type = LHAS.ST_CHECKBOX,
+					label = BMU_SI_get(SI_TELE_UI_TOGGLE_UPDATE_NAME),
+					getFunction = function()
+						return BMU_savedVarsChar.dungeonFinder.GPtoggleShowAcronymUpdateName
+					end,
+					setFunction = function(value) BMU_savedVarsChar.dungeonFinder.GPtoggleShowAcronymUpdateName = value end,
+					default = false,
+				},
+				{
+         type = LHAS.ST_CHECKBOX,
+					label = BMU_SI_get(SI_TELE_UI_TOGGLE_UPDATE_NUM),
+					getFunction = function()
+						return BMU_savedVarsChar.dungeonFinder.GPtoggleShowUpdateNum
+					end,
+					setFunction = function(value) BMU_savedVarsChar.dungeonFinder.GPtoggleShowUpdateNum = value end,
+					default = false,
+				},
 		 {
               type = LHAS.ST_CHECKBOX,
               label = BMU_SI_get(SI_TELE_SETTINGS_ONLY_MAPS),

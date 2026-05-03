@@ -167,6 +167,7 @@ local BMU_colorizeText 						= BMU.colorizeText
 local BMU_printToChat 						= BMU.printToChat
 local BMU_getItemTypeIcon 					= BMU.getItemTypeIcon
 local BMU_ThrottledUpdate 					= BMU.ThrottledUpdate
+local BMU_IsNotKeyboard             = BMU.IsNotKeyboard
 
 local refreshBMU_ListEventStr = "BMU_Refresh_UI_List"
 
@@ -226,18 +227,134 @@ local function tableItemNameSortFunc(entry1, entry2)
 	return entry1.itemName < entry2.itemName
 end
 
+--------------------------------------------------------------------
+-- Helper functions for reusing PC functionality for Gamepad/Console
+--------------------------------------------------------------------
+
+local addon = {}
+
+local provider = BMU.Gamepad.provider
+
+local var_AUTOUNLOCK_PROGRESS_NONE = 0
+local var_AUTOUNLOCK_PROGRESS_ACTIVE = 1
+local var_AUTOUNLOCK_PROGRESS_COMPLETE = 2
+local var_AUTOUNLOCK_PROGRESS_FAILED = 3
+
+function BMU.hideUIForAutoUnlock()
+  	BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter
+    if BMU_IsNotKeyboard() then
+        SM:ShowBaseScene()
+    else
+        SM:Hide("worldMap")
+        BMU_HideTeleporter()
+    end
+end
+
+function BMU.setAutoUnlockTexture(active)
+    if BMU_IsNotKeyboard() then return end
+    if active then
+        activeTextureForAuto()
+    else
+        normalTextureForAuto()
+    end
+end
+
+function BMU.getAutoUnlockCooldown(pc_default)
+    pc_default = pc_default or 150
+    if IsConsoleUI() then return 5000 end
+    return pc_default
+end
+local BMU_getAutoUnlockCooldown = BMU.getAutoUnlockCooldown
+
+function BMU.pcOnlyDialog(dialogName, title, body)
+    if BMU.IsNotKeyboard() then return end
+    BMU_showDialogSimple = BMU_showDialogSimple or BMU.showDialogSimple
+    return BMU_showDialogSimple(dialogName, title, body, nil, nil)
+end
+local BMU_pcOnlyDialog = BMU.pcOnlyDialog
+
+function BMU.reportAutoUnlockProgress(nextPlayerRecord)
+    if BMU.IsNotKeyboard() then
+        addon.provider.progress = var_AUTOUNLOCK_PROGRESS_ACTIVE
+    else
+        BMU_showAutoUnlockProceedDialog = BMU_showAutoUnlockProceedDialog or BMU.showAutoUnlockProceedDialog
+        BMU_showAutoUnlockProceedDialog(nextPlayerRecord)
+    end
+end
+
+function BMU.reportAutoUnlockFinished(finishZone, finishBody)
+    if BMU.IsNotKeyboard() then
+        addon.provider.progress = var_AUTOUNLOCK_PROGRESS_COMPLETE
+    else
+        return BMU_pcOnlyDialog("AutoUnlockFinished", finishZone, finishBody)
+    end
+end
+
+function BMU.reportAutoUnlockFailed(reason, formattedZoneName)
+    if BMU.IsNotKeyboard() then
+      addon.provider.progress = var_AUTOUNLOCK_PROGRESS_FAILED
+    else
+        if reason == "noPlayers" then
+            return BMU_pcOnlyDialog("AutoUnlockNoPlayer", BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE), formattedZoneName .. ": " .. BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_BODY3))
+        elseif reason == "timeout" then
+            return BMU_pcOnlyDialog("AutoUnlockTimeout", BMU_SI_Get(SI_TELE_DIALOG_TIMEOUT_AUTO_UNLOCK_TITLE), BMU_SI_Get(SI_TELE_DIALOG_TIMEOUT_AUTO_UNLOCK_BODY))
+        end
+    end
+end
+
+function BMU:GetEventHandlers()
+  local ignoredResults = {
+    [JUMP_RESULT_JUMP_FAILED_ZONE_COLLECTIBLE] = true,
+    [JUMP_RESULT_JUMP_FAILED_SOCIAL_TARGET_ZONE_COLLECTIBLE_LOCKED] = true,
+  }
+  return {
+      [EVENT_PLAYER_ACTIVATED] = function() zo_callLater(function() BMU_proceedAutoUnlock() end, BMU_getAutoUnlockCooldown(1500)) end,
+      [EVENT_DISCOVERY_EXPERIENCE] = function(eventCode, reason, level, previousExperience, currentExperience, championPoints)
+          if BMU.uwData.isStarted then
+            BMU.uwData.gainedXP = BMU.uwData.gainedXP + (currentExperience-previousExperience)
+          end
+        end,
+      [EVENT_JUMP_FAILED] = function(eventId, result)
+        -- make sure it's not a result handled by EVENT_ZONE_COLLECTIBLE_REQUIREMENT_FAILED, which will prompt a dialog
+        if not ignoredResults[result] then
+        --	return ALERT, GetString("SI_JUMPRESULT", result)
+          zo_callLater(function()
+            BMU_proceedAutoUnlock()
+          end, BMU_getAutoUnlockCooldown(100))
+        end
+      end
+    }
+end
+
+function BMU:RegisterAutoUnlockEvents()
+  local eventHandlers = self:GetEventHandlers()
+  local prefix = addon.prefix or "BMU_BMU"
+	for evenId, handler in pairs(eventHandlers) do
+		EM:RegisterForEvent(prefix  .. "_AutoWayshrineUnlock", evenId, handler)
+	end
+	if not BMU_IsNotKeyboard() then
+	  EM:RegisterForEvent(prefix .. "_AutoWayshrineUnlockFurniture", EVENT_PLAYER_ACTIVATED, BMU.updateHouseFurnitureCount)
+	end
+end
+function BMU:UnregisterAutoUnlockEvents()
+  local eventHandlers = self:GetEventHandlers()
+  local prefix = addon.prefix or "BMU_BMU"
+	for evenId, handler in pairs(eventHandlers) do
+		EM:UnregisterForEvent(prefix .. "_AutoWayshrineUnlock", evenId)
+	end
+	if not BMU_IsNotKeyboard() then
+	  EM:UnregisterForEvent(prefix .. "_AutoWayshrineUnlockFurniture", EVENT_PLAYER_ACTIVATED, BMU.updateHouseFurnitureCount)
+	end
+end
+
 ------------------------------------------------------------
 
 -- closing interface and starting auto unlock core process
 function BMU.prepareAutoUnlock(zoneId, loopType, loopZoneList)
 	BMU_startAutoUnlock = BMU_startAutoUnlock or BMU.startAutoUnlock
-	BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter
-	-- hide world map if open
-	SM:Hide("worldMap")
-	-- hide UI if open
-	BMU_HideTeleporter()
+	BMU.hideUIForAutoUnlock()
 	-- delay function call, otherwise the auto-unlock-dialog fails (for whatever reason)
-	zo_callLater(function() BMU_startAutoUnlock(zoneId, loopType, loopZoneList) end, 150)
+	zo_callLater(function() BMU_startAutoUnlock(zoneId, loopType, loopZoneList) end, BMU_getAutoUnlockCooldown())
 end
 BMU_prepareAutoUnlock = BMU.prepareAutoUnlock
 
@@ -247,12 +364,11 @@ function BMU.checkAndStartAutoUnlockOfZone(zoneId)
 	BMU_isZoneOverlandZone = BMU_isZoneOverlandZone or BMU.isZoneOverlandZone
 	BMU_getZoneWayshrineCompletion = BMU_getZoneWayshrineCompletion or BMU.getZoneWayshrineCompletion
 	BMU_formatName = BMU_formatName or BMU.formatName
-	BMU_showDialogSimple = BMU_showDialogSimple or BMU.showDialogSimple
 	BMU_prepareAutoUnlock = BMU_prepareAutoUnlock or BMU.prepareAutoUnlock
 
 	if not BMU_isZoneOverlandZone(zoneId) or not CanJumpToPlayerInZone(zoneId) then
 		-- zone is no OverlandZone OR user has no access to zone (DLC) -> show dialog, that unlocking is not possible
-		BMU_showDialogSimple("RefuseAutoUnlock2", BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE), BMU_formatName(GetZoneNameById(zoneId), false) .. ": " .. BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_BODY2), nil, nil)
+		BMU_pcOnlyDialog("RefuseAutoUnlock2", BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE), BMU_formatName(GetZoneNameById(zoneId), false) .. ": " .. BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_BODY2))
 		return
 	end
 
@@ -260,7 +376,7 @@ function BMU.checkAndStartAutoUnlockOfZone(zoneId)
 	local numWayshrines, numWayshrinesDiscovered = BMU_getZoneWayshrineCompletion(zoneId)
 	if numWayshrinesDiscovered >= numWayshrines then
 		-- show dialog, that unlocking is not longer possible
-		BMU_showDialogSimple("RefuseAutoUnlock", BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE), BMU_formatName(GetZoneNameById(zoneId), false) .. ": " .. BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_BODY) .. BMU_colorizeText(" (" .. numWayshrinesDiscovered .. "/" .. numWayshrines .. ")", colorGreen), nil, nil)
+    BMU_pcOnlyDialog("RefuseAutoUnlock", BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE), BMU_formatName(GetZoneNameById(zoneId), false) .. ": " .. BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_BODY) .. BMU_colorizeText(" (" .. numWayshrinesDiscovered .. "/" .. numWayshrines .. ")", colorGreen))
 		return
 	end
 	BMU_prepareAutoUnlock(zoneId, nil, nil)
@@ -271,7 +387,6 @@ end
 function BMU.startAutoUnlock(zoneId, loopType, loopZoneList)
 	BMU_proceedAutoUnlock = BMU_proceedAutoUnlock or BMU.proceedAutoUnlock
 	BMU_formatName = BMU_formatName or BMU.formatName
-	BMU_showDialogSimple = BMU_showDialogSimple or BMU.showDialogSimple
 	BMU_getZoneWayshrineCompletion = BMU_getZoneWayshrineCompletion or BMU.getZoneWayshrineCompletion
 	BMU_createTable = BMU_createTable or BMU.createTable
 
@@ -282,12 +397,12 @@ function BMU.startAutoUnlock(zoneId, loopType, loopZoneList)
 		-- check if list is empty
 		local firstRecord = list[1]
 		if #list == 0 or not firstRecord or firstRecord.displayName == "" then
-			BMU_showDialogSimple("AutoUnlockNoPlayer", BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_TITLE), formattedZoneName .. ": " .. BMU_SI_Get(SI_TELE_DIALOG_REFUSE_AUTO_UNLOCK_BODY3), nil, nil)
+		  BMU.reportAutoUnlockFailed("noPlayers", formattedZoneName)
 			return
 		end
 
 		-- change texture of the button
-		activeTextureForAuto()
+		BMU.setAutoUnlockTexture(true)
 
 		-- get wayshrine discovery info for that current map
 		local numWayshrines, numWayshrinesDiscovered = BMU_getZoneWayshrineCompletion(zoneId)
@@ -311,7 +426,7 @@ function BMU.startAutoUnlock(zoneId, loopType, loopZoneList)
 		-- unregiter existing event for furniture count
 		EM:UnregisterForEvent(appName, EVENT_PLAYER_ACTIVATED)
 		-- register for event when coming out from loading screen
-		EM:RegisterForEvent(appName, EVENT_PLAYER_ACTIVATED, function() zo_callLater(function() BMU_proceedAutoUnlock() end, 1500) end)
+		EM:RegisterForEvent(appName, EVENT_PLAYER_ACTIVATED, function() zo_callLater(function() BMU_proceedAutoUnlock() end, BMU_getAutoUnlockCooldown(1500)) end)
 		-- register for event when gaining XP from wayshrine discovery
 		EM:RegisterForEvent(appName, EVENT_EXPERIENCE_GAIN, function(eventCode, reason, level, previousExperience, currentExperience, championPoints)
 			if BMU.uwData.isStarted then
@@ -381,7 +496,7 @@ function BMU.proceedAutoUnlock()
 				table_insert(BMU.uwData.displayNameList, nextPlayer.displayName)
 				-- NOTE: handling of fast travel error in function BMU.finishedAutoUnlock() in case of timeout
 				-- show dialog with all infos
-				BMU_showAutoUnlockProceedDialog(nextPlayer)
+        BMU.reportAutoUnlockProgress(nextPlayer)
 				return
 			end
 		end
@@ -484,7 +599,6 @@ BMU_showAutoUnlockProceedDialog = BMU.showAutoUnlockProceedDialog
 function BMU.finishedAutoUnlock(reason)
 	BMU_proceedAutoUnlock = BMU_proceedAutoUnlock or BMU.proceedAutoUnlock
 	BMU_formatGold = BMU_formatGold or BMU.formatGold
-	BMU_showDialogSimple = BMU_showDialogSimple or BMU.showDialogSimple
 	BMU_startAutoUnlockLoopRandom = BMU_startAutoUnlockLoopRandom or BMU.startAutoUnlockLoopRandom
 	BMU_startAutoUnlockLoopSorted = BMU_startAutoUnlockLoopSorted or BMU.startAutoUnlockLoopSorted
 
@@ -500,15 +614,14 @@ function BMU.finishedAutoUnlock(reason)
 	CancelCast()
 
 	-- unregister events
-	EM:UnregisterForEvent(appName, EVENT_PLAYER_ACTIVATED)
-	EM:UnregisterForEvent(appName, EVENT_DISCOVERY_EXPERIENCE)
-	-- register again event for furniture count
+  BMU:UnregisterAutoUnlockEvents()
+  -- register again event for furniture count
 	EM:RegisterForEvent(appName, EVENT_PLAYER_ACTIVATED, BMU.updateHouseFurnitureCount)
 
 	-- set flag to "inactivate" the proceed function (if unregister failed or it is called for some other reasons)
 	BMU.uwData.isStarted = false
 	-- restore button texture
-	normalTextureForAuto()
+	BMU.setAutoUnlockTexture(false)
 	-- show all infos in dialog
 	local unlockedWayshrinesString = BMU.uwData.unlockedWayshrines
 	-- colorize if one or more wayshrines were unlocked
@@ -527,9 +640,7 @@ function BMU.finishedAutoUnlock(reason)
 		gainedXPString = BMU_colorizeText(gainedXPString, "yellow")
 	end
 
-	if reason == "timeout" then
-		BMU_showDialogSimple("AutoUnlockTimeout", BMU_SI_Get(SI_TELE_DIALOG_TIMEOUT_AUTO_UNLOCK_TITLE), BMU_SI_Get(SI_TELE_DIALOG_TIMEOUT_AUTO_UNLOCK_BODY), nil, nil)
-	end
+  BMU.reportAutoUnlockFailed(reason)
 
 	local finishDialogTitle = BMU.uwData.fZoneName
 	local finishDialogBody =
@@ -537,8 +648,7 @@ function BMU.finishedAutoUnlock(reason)
 		BMU_SI_Get(SI_TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_DISCOVERY) .. " " .. tos(unlockedWayshrinesString) .. " (" .. tos(totalWayshrinesString) .. ")" .. "\n" ..
 		BMU_SI_Get(SI_TELE_DIALOG_PROCESS_AUTO_UNLOCK_BODY_PART_XP) .. " " .. tos(gainedXPString)
 
-	local globalDialogName, dialogReference = BMU_showDialogSimple("AutoUnlockFinished", finishDialogTitle, finishDialogBody, nil, nil)
-
+  local globalDialogName, dialogReference = BMU.reportAutoUnlockFinished(finishDialogTitle, finishDialogBody)
 	-- print summary into chat
 	BMU_printToChat(
 		BMU.uwData.fZoneName .. ": " ..
@@ -548,16 +658,18 @@ function BMU.finishedAutoUnlock(reason)
 	-- if continuing with next zones and process finished successfully
 	local loopType = BMU.uwData.loopType
 	if loopType and (reason == "finished" or reason == "wayshrinesComplete") then
-		zo_callLater(function()
-			ZO_Dialogs_ReleaseDialog(globalDialogName)
-		end, 1700)
+	  if globalDialogName and dialogReference then
+      zo_callLater(function()
+        ZO_Dialogs_ReleaseDialog(globalDialogName)
+      end, 1700)
+		end
 		zo_callLater(function()
 			if loopType == "suffle" then
 				BMU_startAutoUnlockLoopRandom(BMU.uwData.zoneId, loopType)
 			else
 				BMU_startAutoUnlockLoopSorted(BMU.uwData.loopZoneList, loopType)
 			end
-		end, 1750)
+		end, BMU_getAutoUnlockCooldown(1750))
 	end
 end
 
@@ -589,7 +701,7 @@ function BMU.startAutoUnlockLoopRandom(prevZoneId, loopType)
 				if numWayshrinesDiscovered < numWayshrines then
 					zo_callLater(function()
 						BMU_prepareAutoUnlock(zoneId, loopType, nil)
-					end, 400)
+					end, BMU_getAutoUnlockCooldown(400))
 					return
 				end
 			end
@@ -605,7 +717,6 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType)
 	BMU_createTable = BMU_createTable or BMU.createTable
 	BMU_getZoneWayshrineCompletion = BMU_getZoneWayshrineCompletion or BMU.getZoneWayshrineCompletion
 	BMU_startAutoUnlockLoopSorted = BMU_startAutoUnlockLoopSorted or BMU.startAutoUnlockLoopSorted
-	BMU_showDialogSimple = BMU_showDialogSimple or BMU.showDialogSimple
 	BMU_prepareAutoUnlock = BMU_prepareAutoUnlock or BMU.prepareAutoUnlock
 
 	if not zoneRecordList or #zoneRecordList == 0 then
@@ -661,7 +772,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType)
 			table_remove(zoneRecordList, index)
 			zo_callLater(function()
 				BMU_prepareAutoUnlock(zoneRecord.zoneId, loopType, zoneRecordList)
-			end, 400)
+			end, BMU_getAutoUnlockCooldown(400))
 			return
 		end
 	end
@@ -676,7 +787,7 @@ function BMU.startAutoUnlockLoopSorted(zoneRecordList, loopType)
 	end
 
 	-- finished here: found no zone to unlock
-	BMU_showDialogSimple("AutoUnlockLoopFinish", BMU_SI_Get(SI_TELE_DIALOG_LOOP_FINISH_AUTO_UNLOCK_TITLE), BMU_SI_Get(SI_TELE_DIALOG_LOOP_FINISH_AUTO_UNLOCK_BODY), nil, nil)
+	BMU.reportAutoUnlockFinished(BMU_SI_Get(SI_TELE_DIALOG_LOOP_FINISH_AUTO_UNLOCK_TITLE), BMU_SI_Get(SI_TELE_DIALOG_LOOP_FINISH_AUTO_UNLOCK_BODY))
 end
 
 
@@ -771,7 +882,7 @@ function BMU.showDialogAutoUnlock(zoneId)
 		buttons = {
 			{
 				text = SI_DIALOG_CONFIRM,
-                keybind = "DIALOG_PRIMARY",
+        keybind = "DIALOG_PRIMARY",
 				callback = function()
 					local flagLoop = dialogReference.radioButtonGroup:GetClickedButton().data.loop
 					local isChatLoggingChecked = ZO_CheckButton_IsChecked(BMU.customDialog_checkboxControl)
@@ -780,9 +891,9 @@ function BMU.showDialogAutoUnlock(zoneId)
 					if flagLoop then
 						if selectedEntry.key == "suffle" then
 							-- directly start with random zones
-							BMU.startAutoUnlockLoopRandom(nil, selectedEntry.key)
+							BMU.startAutoUnlockLoopRandom(BMU.uwData and BMU.uwData.zoneId, selectedEntry.key)
 						else
-							BMU.startAutoUnlockLoopSorted(nil, selectedEntry.key)
+							BMU.startAutoUnlockLoopSorted(BMU.uwData and BMU.uwData.zoneId, selectedEntry.key)
 						end
 					else
 						-- check and start auto unlocking for given zoneId
@@ -921,7 +1032,7 @@ function BMU.PortalToPlayer(displayName, sourceIndex, zoneName, zoneId, zoneCate
 		if IsMounted() then
 			-- dont try again, it could interfere with the new delayed try
 			tryAgainOnError = false
-			zo_callLater(function() BMU.PortalToPlayer(displayName, sourceIndex, zoneName, zoneId, zoneCategory, false, true, false) end, 1500)
+			zo_callLater(function() BMU.PortalToPlayer(displayName, sourceIndex, zoneName, zoneId, zoneCategory, false, true, false) end, BMU_getAutoUnlockCooldown(1500))
 		end
 
 		-- prophylactic cancel cast
@@ -962,7 +1073,7 @@ function BMU.PortalToPlayer(displayName, sourceIndex, zoneName, zoneId, zoneCate
 					BMU_updateStatistic(zoneCategory, zoneId)
 				end
 			end
-		end, 1800)
+		end, BMU_getAutoUnlockCooldown(1800))
 		-- if necessary show center screen message that the player is still offline
 		BMU_showOfflineNote()
 	else
@@ -1927,7 +2038,7 @@ function BMU.clickOnTeleportToPlayerButton(textureControl, button, message)
 
 	-- click effect
 	textureControl:SetAlpha(0.65)
-	zo_callLater(function() textureControl:SetAlpha(1) end, 200)
+	zo_callLater(function() textureControl:SetAlpha(1) end, BMU_getAutoUnlockCooldown(200))
 
 	-- catch the case if the it is a zone without player (fast travel for gold)
 	if message.zoneWithoutPlayer then
@@ -2010,7 +2121,7 @@ BMU_clickOnTeleportToOwnHouseButton_2 = BMU.clickOnTeleportToOwnHouseButton_2
 function BMU.clickOnTeleportToOwnHouseButton(textureControl, button, message)
 	-- click effect
 	textureControl:SetAlpha(0.65)
-	zo_callLater(function() textureControl:SetAlpha(1) end, 200)
+	zo_callLater(function() textureControl:SetAlpha(1) end, BMU_getAutoUnlockCooldown(200))
 
 	if message.forceOutside then
 		BMU_clickOnTeleportToOwnHouseButton_2(button, message, true)
@@ -2031,7 +2142,7 @@ function BMU.clickOnTeleportToPTFHouseButton(textureControl, button, message)
 
 	-- click effect
 	textureControl:SetAlpha(0.65)
-	zo_callLater(function() textureControl:SetAlpha(1) end, 200)
+	zo_callLater(function() textureControl:SetAlpha(1) end, BMU_getAutoUnlockCooldown(200))
 
 	if message.displayName ~= nil and message.displayName ~= "" and message.houseId ~= nil and message.houseId > 0 then
 		-- cut PTF favorite number which is maybe before displayName

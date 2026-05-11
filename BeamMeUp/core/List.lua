@@ -893,7 +893,7 @@ function BMU.showDialogAutoUnlock(zoneId)
 							-- directly start with random zones
 							BMU.startAutoUnlockLoopRandom(BMU.uwData and BMU.uwData.zoneId, selectedEntry.key)
 						else
-							BMU.startAutoUnlockLoopSorted(BMU.uwData and BMU.uwData.zoneId, selectedEntry.key)
+							BMU.startAutoUnlockLoopSorted(BMU.uwData and BMU.uwData.loopZoneList, selectedEntry.key)
 						end
 					else
 						-- check and start auto unlocking for given zoneId

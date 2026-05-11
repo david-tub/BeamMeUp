@@ -233,7 +233,9 @@ end
 
 local addon = {}
 
-local provider = BMU.Gamepad.provider
+local provider = BMU.Gamepad.provider or { progress = 0 }
+
+addon.provider = provider
 
 local var_AUTOUNLOCK_PROGRESS_NONE = 0
 local var_AUTOUNLOCK_PROGRESS_ACTIVE = 1

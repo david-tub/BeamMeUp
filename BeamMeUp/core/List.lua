@@ -231,7 +231,7 @@ end
 -- Helper functions for reusing PC functionality for Gamepad/Console
 --------------------------------------------------------------------
 
-local addon = {}
+local addon = BMU.Gamepad or {}
 
 local provider = BMU.Gamepad.provider or { progress = 0 }
 

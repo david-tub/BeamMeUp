@@ -121,5 +121,5 @@ function AutoUnlockNotificationProvider:Decline(data)
 end
 
 function addon:AutoUnlockContinue()
-	BMU_proceedAutoUnlock()
+	BMU.proceedAutoUnlock()
 end

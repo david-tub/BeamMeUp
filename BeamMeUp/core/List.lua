@@ -234,6 +234,8 @@ end
 local addon = BMU.Gamepad or {}
 
 addon.provider = addon.provider or { progress = 0 }
+local timingDelta = 25000
+addon.expireDiscovery = addon.expireDiscovery or { countdown = timingDelta }
 
 local var_AUTOUNLOCK_PROGRESS_NONE = 0
 local var_AUTOUNLOCK_PROGRESS_ACTIVE = 1
@@ -273,6 +275,24 @@ function BMU.pcOnlyDialog(dialogName, title, body)
 end
 local BMU_pcOnlyDialog = BMU.pcOnlyDialog
 
+local function expireDiscovery()
+  local function theloop()
+    zo_callLater(function()
+      addon.expireDiscovery.countdown = addon.expireDiscovery.countdown - 1000
+      if addon.expireDiscovery.countdown > 0 then
+        theloop()
+      else
+        BMU_finishedAutoUnlock("timeout")
+        addon.expireDiscovery.lock = nil
+      end
+    end, 1000)
+  end
+
+  if addon.expireDiscovery.lock == nil then
+    theloop()
+  end
+end
+
 function BMU.reportAutoUnlockProgress(nextPlayerRecord)
     if BMU.IsNotKeyboard() then
         addon.provider.progress = var_AUTOUNLOCK_PROGRESS_ACTIVE
@@ -308,7 +328,11 @@ function BMU:GetEventHandlers()
     [JUMP_RESULT_JUMP_FAILED_SOCIAL_TARGET_ZONE_COLLECTIBLE_LOCKED] = true,
   }
   return {
-      [EVENT_PLAYER_ACTIVATED] = function() zo_callLater(function() BMU_proceedAutoUnlock() end, BMU_getAutoUnlockCooldown(1500)) end,
+      [EVENT_PLAYER_ACTIVATED] = function() 
+        zo_callLater(function() 
+          BMU_proceedAutoUnlock() end, 
+        BMU_getAutoUnlockCooldown(1500)) 
+      end,
       [EVENT_DISCOVERY_EXPERIENCE] = function(eventCode, reason, level, previousExperience, currentExperience, championPoints)
           if BMU.uwData.isStarted then
             BMU.uwData.gainedXP = BMU.uwData.gainedXP + (currentExperience-previousExperience)
@@ -440,7 +464,7 @@ function BMU.startAutoUnlock(zoneId, loopType, loopZoneList)
 end
 BMU_startAutoUnlock = BMU.startAutoUnlock
 
-
+	
 -- loop of the automatic teleportation
 function BMU.proceedAutoUnlock()
 	BMU_getZoneWayshrineCompletion = BMU_getZoneWayshrineCompletion or BMU.getZoneWayshrineCompletion
@@ -450,9 +474,16 @@ function BMU.proceedAutoUnlock()
 	BMU_has_value = BMU_has_value or BMU.has_value
 	BMU_PortalToPlayer = BMU_PortalToPlayer or BMU.PortalToPlayer
 	BMU_showAutoUnlockProceedDialog = BMU_showAutoUnlockProceedDialog or BMU.showAutoUnlockProceedDialog
-
+	BMU_IsNotKeyboard = BMU_IsNotKeyboard or BMU.IsNotKeyboard
+  
 	-- only proceed if feature is active
 	if BMU.uwData.isStarted then
+	  
+	  if BMU_IsNotKeyboard() then
+	    addon.expireDiscovery.countdown = timingDelta
+      expireDiscovery()
+      addon.expireDiscovery.lock = true
+    end
 		local _, allUnlockedWayshrines = BMU_getZoneWayshrineCompletion(BMU.uwData.zoneId)
 
 		-- Note: multiple wayshrine can be discovered at once

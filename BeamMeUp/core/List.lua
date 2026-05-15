@@ -234,8 +234,6 @@ end
 local addon = BMU.Gamepad or {}
 
 addon.provider = addon.provider or { progress = 0 }
-local timingDelta = 25000
-addon.expireDiscovery = addon.expireDiscovery or { countdown = timingDelta }
 
 local var_AUTOUNLOCK_PROGRESS_NONE = 0
 local var_AUTOUNLOCK_PROGRESS_ACTIVE = 1
@@ -275,22 +273,30 @@ function BMU.pcOnlyDialog(dialogName, title, body)
 end
 local BMU_pcOnlyDialog = BMU.pcOnlyDialog
 
-local function expireDiscovery()
-  local function theloop()
-    zo_callLater(function()
-      addon.expireDiscovery.countdown = addon.expireDiscovery.countdown - 1000
-      if addon.expireDiscovery.countdown > 0 then
-        theloop()
-      else
-        BMU_finishedAutoUnlock("timeout")
-        addon.expireDiscovery.lock = nil
-      end
-    end, 1000)
-  end
+function addon:beginTracking()
+    SetMapToPlayerLocation()
 
-  if addon.expireDiscovery.lock == nil then
-    theloop()
-  end
+    self.startX, self.startY = GetMapPlayerPosition("player")
+    self.startZoneId = GetZoneId(GetUnitZoneIndex("player"))
+end
+
+function addon:hasMoved()
+    local currentZoneId = GetZoneId(GetUnitZoneIndex("player"))
+
+    -- Ignore movement if the player changed zones
+    if currentZoneId ~= self.startZoneId then
+        return false
+    end
+
+    SetMapToPlayerLocation()
+
+    local currentX, currentY = GetMapPlayerPosition("player")
+
+    -- Small threshold to avoid floating point jitter
+    local threshold = 0.0001
+
+    return math.abs(currentX - self.startX) > threshold
+        or math.abs(currentY - self.startY) > threshold
 end
 
 function BMU.reportAutoUnlockProgress(nextPlayerRecord)
@@ -476,9 +482,16 @@ function BMU.proceedAutoUnlock()
 	if BMU.uwData.isStarted then
 	  
 	  if BMU_IsNotKeyboard() then
-	    addon.expireDiscovery.countdown = timingDelta
-      expireDiscovery()
-      addon.expireDiscovery.lock = true
+	    addon:beginTracking()
+	    if addon.wayshrineLock == nil then
+        zo_callLater(function()
+            if addon:hasMoved() then
+              BMU_finishedAutoUnlock("timeout")
+            end
+            addon.wayshrineLock = nil
+        end, 10000)
+        addon.wayshrineLock = true
+      end
     end
 		local _, allUnlockedWayshrines = BMU_getZoneWayshrineCompletion(BMU.uwData.zoneId)
 

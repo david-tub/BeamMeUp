@@ -328,11 +328,7 @@ function BMU:GetEventHandlers()
     [JUMP_RESULT_JUMP_FAILED_SOCIAL_TARGET_ZONE_COLLECTIBLE_LOCKED] = true,
   }
   return {
-      [EVENT_PLAYER_ACTIVATED] = function() 
-        zo_callLater(function() 
-          BMU_proceedAutoUnlock() end, 
-        BMU_getAutoUnlockCooldown(1500)) 
-      end,
+      [EVENT_PLAYER_ACTIVATED] = function() zo_callLater(function() BMU_proceedAutoUnlock() end, BMU_getAutoUnlockCooldown(1500)) end,
       [EVENT_DISCOVERY_EXPERIENCE] = function(eventCode, reason, level, previousExperience, currentExperience, championPoints)
           if BMU.uwData.isStarted then
             BMU.uwData.gainedXP = BMU.uwData.gainedXP + (currentExperience-previousExperience)
@@ -464,7 +460,7 @@ function BMU.startAutoUnlock(zoneId, loopType, loopZoneList)
 end
 BMU_startAutoUnlock = BMU.startAutoUnlock
 
-	
+
 -- loop of the automatic teleportation
 function BMU.proceedAutoUnlock()
 	BMU_getZoneWayshrineCompletion = BMU_getZoneWayshrineCompletion or BMU.getZoneWayshrineCompletion

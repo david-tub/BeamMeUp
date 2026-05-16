@@ -231,9 +231,9 @@ end
 -- Helper functions for reusing PC functionality for Gamepad/Console
 --------------------------------------------------------------------
 
-local addon = {}
+local addon = BMU.Gamepad or {}
 
-local provider = BMU.Gamepad.provider
+addon.provider = addon.provider or { progress = 0 }
 
 local var_AUTOUNLOCK_PROGRESS_NONE = 0
 local var_AUTOUNLOCK_PROGRESS_ACTIVE = 1
@@ -272,6 +272,32 @@ function BMU.pcOnlyDialog(dialogName, title, body)
     return BMU_showDialogSimple(dialogName, title, body, nil, nil)
 end
 local BMU_pcOnlyDialog = BMU.pcOnlyDialog
+
+function addon:beginTracking()
+    SetMapToPlayerLocation()
+
+    self.startX, self.startY = GetMapPlayerPosition("player")
+    self.startZoneId = GetZoneId(GetUnitZoneIndex("player"))
+end
+
+function addon:hasMoved()
+    local currentZoneId = GetZoneId(GetUnitZoneIndex("player"))
+
+    -- Ignore movement if the player changed zones
+    if currentZoneId ~= self.startZoneId then
+        return false
+    end
+
+    SetMapToPlayerLocation()
+
+    local currentX, currentY = GetMapPlayerPosition("player")
+
+    -- Small threshold to avoid floating point jitter
+    local threshold = 0.0001
+
+    return math.abs(currentX - self.startX) > threshold
+        or math.abs(currentY - self.startY) > threshold
+end
 
 function BMU.reportAutoUnlockProgress(nextPlayerRecord)
     if BMU.IsNotKeyboard() then
@@ -450,9 +476,23 @@ function BMU.proceedAutoUnlock()
 	BMU_has_value = BMU_has_value or BMU.has_value
 	BMU_PortalToPlayer = BMU_PortalToPlayer or BMU.PortalToPlayer
 	BMU_showAutoUnlockProceedDialog = BMU_showAutoUnlockProceedDialog or BMU.showAutoUnlockProceedDialog
-
+	BMU_IsNotKeyboard = BMU_IsNotKeyboard or BMU.IsNotKeyboard
+  
 	-- only proceed if feature is active
 	if BMU.uwData.isStarted then
+	  
+	  if BMU_IsNotKeyboard() then
+	    addon:beginTracking()
+	    if addon.wayshrineLock == nil then
+        zo_callLater(function()
+            if addon:hasMoved() then
+              BMU_finishedAutoUnlock("timeout")
+            end
+            addon.wayshrineLock = nil
+        end, 10000)
+        addon.wayshrineLock = true
+      end
+    end
 		local _, allUnlockedWayshrines = BMU_getZoneWayshrineCompletion(BMU.uwData.zoneId)
 
 		-- Note: multiple wayshrine can be discovered at once
@@ -893,7 +933,7 @@ function BMU.showDialogAutoUnlock(zoneId)
 							-- directly start with random zones
 							BMU.startAutoUnlockLoopRandom(BMU.uwData and BMU.uwData.zoneId, selectedEntry.key)
 						else
-							BMU.startAutoUnlockLoopSorted(BMU.uwData and BMU.uwData.zoneId, selectedEntry.key)
+							BMU.startAutoUnlockLoopSorted(BMU.uwData and BMU.uwData.loopZoneList, selectedEntry.key)
 						end
 					else
 						-- check and start auto unlocking for given zoneId

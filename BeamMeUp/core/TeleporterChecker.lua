@@ -379,7 +379,6 @@ function BMU.createTable(args)
 		end
 	end
 
-  local printBool = true
 	-- 3. go over all Guild members
 	if not BMU_savedVarsAcc.preferPerformance then
     for i = 1, TeleTotalGuilds do

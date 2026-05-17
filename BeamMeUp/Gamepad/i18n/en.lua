@@ -10,6 +10,9 @@ local strings = {
 	SI_TELE_UI_TOGGLE_GROUP_ARENAS      = "Show group arenas",
 	SI_TELE_UI_TOGGLE_TRIALS            = "Show trials",
 	SI_TELE_UI_TOGGLE_ENDLESS_DUNGEONS  = "Show Endless Archive",
+	SI_TELE_UI_ENABLE_DUNGEON_SORT      = "Enable dungeon sort",
+	SI_TELE_UI_SORT_DESC                = "Sort descending",
+	SI_TELE_UI_TOGGLE_UPDATE_NUM        = "Show update number",
 	
 	
 	SI_BMU_GAMEPAD_PAN						= "Focus in on map pin",

@@ -1,5 +1,5 @@
-local addon = BMU_BMU_GAMEPAD_PLUGIN
 local BMU = BMU
+local BMU_SI_Get = BMU.SI.get
 local BMU_textures = BMU.textures
 local BMU_var_color = BMU.var.color
 
@@ -162,16 +162,21 @@ local function getTargetTooltipData(targetData)
 	------------------
 
 	-- wayhsrine and skyshard discovery and group dungeon achievement info
-	if targetData.zoneNameClickable == true and (targetData.zoneWayhsrineDiscoveryInfo ~= nil or targetData.zoneSkyshardDiscoveryInfo ~= nil or targetData.publicDungeonAchiementInfo ~= nil or BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName) then
+	if targetData.zoneNameClickable == true and (targetData.zoneWayhsrineDiscoveryInfo ~= nil or targetData.zoneSkyshardDiscoveryInfo ~= nil or targetData.publicDungeonAchiementInfo ~= nil or BMU.savedVarsChar.dungeonFinder.toggleShowAcronymUpdateName or BMU.savedVarsChar.dungeonFinder.GPtoggleShowAcronymUpdateName) then
 		if #tooltipData > 0 then
 			-- add separator
 			table.insert(tooltipData, 1, BMU_textures.tooltipSeperator)
 		end
 		
 		local discoveryInfo = {}
-		
     if targetData.acronym ~= nil then
       table.insert(discoveryInfo, targetData.acronym)
+    end
+    if targetData.updateName ~= nil then
+      table.insert(discoveryInfo, targetData.updateName)
+    end
+    if targetData.dungeonTooltip ~= nil and next(targetData.dungeonTooltip) then
+      table.insert(discoveryInfo, targetData.dungeonTooltip[1])
     end
 		-- add discovery info
 		if targetData.zoneWayhsrineDiscoveryInfo ~= nil then
@@ -180,6 +185,7 @@ local function getTargetTooltipData(targetData)
 		if targetData.zoneSkyshardDiscoveryInfo ~= nil then
 			table.insert(discoveryInfo, targetData.zoneSkyshardDiscoveryInfo)
 		end
+    table.insert(discoveryInfo, #discoveryInfo, BMU_textures.tooltipSeperatorStr)
 		if targetData.publicDungeonAchiementInfo ~= nil then
 			table.insert(discoveryInfo, targetData.publicDungeonAchiementInfo)
 		end
@@ -339,7 +345,6 @@ function TeleportClass_Shared:Initialize(control)
 		end
 	end)
 	
---	self.fragment = ZO_SimpleSceneFragment:New(control)
 	self.fragment = ZO_Object.MultiSubclass(ZO_SimpleSceneFragment:New(control), self)
 	
     local function equalityFunction(left, right)
@@ -369,7 +374,7 @@ function TeleportClass_Shared:Initialize(control)
 end
 
 function TeleportClass_Shared:PerformFullRefresh()
-	if self.fragment:IsHidden() then return end
+	if not self.fragment or (self.fragment and self.fragment:IsHidden()) then return end
 
 	self:Clear()
 	self:Refresh()
@@ -495,7 +500,18 @@ function TeleportClass_Shared:UpdateTooltip(targetData)
 			end
 		end
 	end
-	
+
+	if BMU.savedVarsChar.dungeonFinder.GPdoSortDungeons and targetData.text and targetData.text == BMU_SI_Get(SI_TELE_KEYBINDING_TOGGLE_MAIN_DUNGEON_FINDER) then
+	   if BMU.savedVarsChar.dungeonFinder.GPsortDungeonsDESC then
+       table.sort(tooltipData, function(a, b)
+          return zo_strlower(a) > zo_strlower(b)
+       end)
+     else
+       table.sort(tooltipData, function(a, b)
+        return zo_strlower(a) < zo_strlower(b)
+       end)
+     end
+	end
 	
 	tooltipControl:LayoutTitleAndMultiSectionDescriptionTooltip(targetData.text, flattenToString(tooltipData))
 	self:RefreshKeybind()
@@ -538,13 +554,14 @@ function TeleportClass_Shared:BuildCheckboxEntry(header, label, setupFunction, c
 	return entry
 end
 
-function TeleportClass_Shared:BuildCheckbox(header, label, currentFilter, finishedCallback, icon)
+function TeleportClass_Shared:BuildCheckbox(header, label, currentFilter, finishedCallback, icon, filterData)
 	if type(currentFilter) == 'function' then
 		currentFilter = currentFilter()
 	end
 
 	local header = self.currentGroupHeader
-	local label = currentFilter.filterName
+	label = label or currentFilter.filterName
+	icon = icon or currentFilter.icon
 
 	local function onFilterToggled()
 		if currentFilter.control ~= nil then
@@ -553,28 +570,26 @@ function TeleportClass_Shared:BuildCheckbox(header, label, currentFilter, finish
 			currentFilter.checked = ZO_CheckButton_IsChecked(targetControl.checkBox)
 
 			if currentFilter.callback then
-				currentFilter:callback()
+				currentFilter:callback(filterData)
 			end
-		end
-	end
-
-	local function onFilterSelected()
-		if not self.dialogData.ignoreTooltips then
-			GAMEPAD_TOOLTIPS:LayoutTitleAndDescriptionTooltip(GAMEPAD_LEFT_TOOLTIP, GetStringFromData(currentFilter.filterName), GetStringFromData(currentFilter.filterTooltip))
 		end
 	end
 
 	local function filterCheckboxEntrySetup(control, data, selected, reselectingDuringRebuild, enabled, active)
 		data.callback = onFilterToggled
 		data.onSelected = onFilterSelected
-		ZO_GamepadCheckBoxTemplate_Setup(control, data, selected, reselectingDuringRebuild, enabled, active)
-
+		local text = data.text
+    if type(text) == "function" then
+        text = text(data)
+    end
+    control.label:SetText(text)
+    control.checkBox.toggleFunction = data.setChecked
 		local checked = currentFilter.checked
 		if type(checked) == 'function' then
 			checked = checked()
 		end
-		
-		if checked then
+
+		if checked == true then
 			ZO_CheckButton_SetChecked(control.checkBox)
 		else
 			ZO_CheckButton_SetUnchecked(control.checkBox)
@@ -583,7 +598,7 @@ function TeleportClass_Shared:BuildCheckbox(header, label, currentFilter, finish
 
 	end
 
-	return self:BuildCheckboxEntry(header, label, filterCheckboxEntrySetup, Callback, setChecked)
+	return self:BuildCheckboxEntry(header, label, filterCheckboxEntrySetup, currentFilter.callback, nil, finishedCallback, icon)
 end
 
 function TeleportClass_Shared:BuildDropdownEntry(header, label, setupFunction, callback, finishedCallback, icon)
@@ -1242,4 +1257,4 @@ end
 ---------------------------------------------------------------------------------------------------------------
 --
 ---------------------------------------------------------------------------------------------------------------
-addon.subclassTable.list_Shared = TeleportClass_Shared
+BMU.GamepadGlobal.subclassTable.list_Shared = TeleportClass_Shared

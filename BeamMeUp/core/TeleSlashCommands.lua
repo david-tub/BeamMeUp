@@ -317,6 +317,7 @@ end
 
 local function BMU_sc_setCurrentHouse(option)
 	BMU_formatName = BMU_formatName or BMU.formatName 												--INS251229 Baertram
+	BMU_getParentZoneId = BMU_getParentZoneId or BMU.getParentZoneId
 	BMU_setZoneSpecificHouse = BMU_setZoneSpecificHouse or BMU.setZoneSpecificHouse					--INS251229 Baertram
 	local currentHouseId = GetCurrentZoneHouseId()
 	if not currentHouseId or currentHouseId == 0 then

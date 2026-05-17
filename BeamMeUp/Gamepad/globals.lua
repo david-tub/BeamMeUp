@@ -1,4 +1,6 @@
 local em = EVENT_MANAGER
+local BMU = BMU
+BMU.GamepadGlobal = { subclassTable = {} }
 
 if not JO_UpdateBuffer_Simple then
 	JO_UpdateBuffer_Simple = function(id, func, ms)

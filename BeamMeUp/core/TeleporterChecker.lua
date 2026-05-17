@@ -58,6 +58,8 @@ local textureDeclineRed = BMU_textures.declineRedStr
 local textureTooltipSeparator = BMU_textures.tooltipSeperatorStr
 local leadTypeCompletedTextureStr = BMU_textures.leadTypeCompletedStr20
 local timerTextureStr             = BMU_textures.timerStr20
+local guildIndex = nil
+local memberIndex = nil
 
 local surveyData = teleporterVars.surveyData
 local surveyTypeContainers = surveyData.surveyTypeContainers
@@ -412,12 +414,11 @@ function BMU.createTable(args)
       end
     end
   else
-    local guildIndex = 1
-    local memberIndex = 1
+
     local batchSize = 10
-    local processedPlayers = {}
-    
-    local function processGuildMembers()
+    local function processGuildMembers(guildIndex, memberIndex)
+      local guildIndex = guildIndex or 1
+      local memberIndex = memberIndex or 1
       local processed = 0
 
       while guildIndex <= TeleTotalGuilds and processed < batchSize do
@@ -463,8 +464,9 @@ function BMU.createTable(args)
           guildIndex = 1
           memberIndex = 1
       end
+      return guildIndex, memberIndex
     end
-    processGuildMembers()
+    guildIndex, memberIndex = processGuildMembers(guildIndex, memberIndex)
   end
 
 	--4. Own houses

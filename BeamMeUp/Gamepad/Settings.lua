@@ -45,6 +45,7 @@ function CS.SetupOptionsMenu(index) --index == Addon name
     local BMU_savedVarsAcc = BMU.savedVarsAcc
     local BMU_savedVarsServ = BMU.savedVarsServ
     local BMU_DefaultsAccount = BMU.DefaultsAccount
+    local BMU_DefaultsServer   = BMU.DefaultsServer
     local BMU_getIndexFromValue = BMU.getIndexFromValue
 
     CS.SettingsPanel = LHAS:AddAddon(BMU.var.appName .. "Options", {
@@ -519,6 +520,14 @@ function CS.SetupOptionsMenu(index) --index == Addon name
 			  setFunction = function(control, itemName, itemData) BMU_savedVarsAcc.secondLanguage = itemData.data end,
 			  default = BMU.dropdownSecLangChoices[BMU_DefaultsAccount["secondLanguage"]],
 			          },
+     {
+              type = LHAS.ST_CHECKBOX,
+              label = BMU_SI_get(SI_TELE_SETTINGS_PREFER_PERFORMANCE),
+              tooltip = BMU_SI_get(SI_TELE_SETTINGS_PREFER_PERFORMANCE_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU_DefaultsServer.preferPerformance) .. "]",
+              getFunction = function() return BMU_savedVarsAcc.preferPerformance end,
+              setFunction = function(value) BMU_savedVarsAcc.preferPerformance = value end,
+			        default = BMU_DefaultsServer["preferPerformance"],
+			           },
 		 {
               type = LHAS.ST_SECTION,
               label = ""

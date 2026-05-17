@@ -381,33 +381,90 @@ function BMU.createTable(args)
 
 
 	-- 3. go over all Guild members
-    for i = 1, TeleTotalGuilds do
-        local totalGuildMembers = GetNumGuildMembers(GetGuildId(i))
+	if not BMU_IsNotKeyboard() then
+      for i = 1, TeleTotalGuilds do
+          local totalGuildMembers = GetNumGuildMembers(GetGuildId(i))
+  
+          for j = 1, totalGuildMembers do
+        -- gathering information
+              local e = {}
+              e.displayName, e.Note, e.GuildMemberRankIndex, e.status, e.secsSinceLogoff = GetGuildMemberInfo(GetGuildId(i), j)
+              e.hasCharacter, e.characterName, e.zoneName, e.classType, e.alliance, e.level, e.championRank, e.zoneId = GetGuildMemberCharacterInfo(GetGuildId(i), j)
+        e.guildIndex = i
+  
+        -- first big layer of filtering, second layer is placed in seperate function
+              -- consider only: other players ; online users (state 1,2,3) ; valid zone names ; valid player names
+        if e.displayName ~= GetDisplayName() and e.status ~= 4 and e.zoneName ~= nil and e.zoneName ~= "" and e.zoneId ~= nil and e.zoneId ~= 0 and e.displayName ~= "" and not consideredPlayers[e.displayName] then
+          -- save displayName
+          consideredPlayers[e.displayName] = true
+          -- do some formating stuff
+          e = BMU_addInfo_1(e, currentZoneId, playersZoneId, BMU_SOURCE_INDEX_GUILD[i])
+  
+          -- second big filter level
+          if BMU_filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filterSourceIndex) then
+            -- add bunch of information to the record
+            e = BMU_addInfo_2(e)
+            -- insert into table
+            table_insert(TeleportAllPlayersTable, e)
+          end
+        end
+      end
+    elseif BMU_savedVarsAcc.preferPerformance then
+      local guildIndex = 1
+      local memberIndex = 1
+      local batchSize = 25
+      
+      local function processGuildMembers()
+        local processed = 0
 
-        for j = 1, totalGuildMembers do
-			-- gathering information
-            local e = {}
-            e.displayName, e.Note, e.GuildMemberRankIndex, e.status, e.secsSinceLogoff = GetGuildMemberInfo(GetGuildId(i), j)
-            e.hasCharacter, e.characterName, e.zoneName, e.classType, e.alliance, e.level, e.championRank, e.zoneId = GetGuildMemberCharacterInfo(GetGuildId(i), j)
-			e.guildIndex = i
-
-			-- first big layer of filtering, second layer is placed in seperate function
-            -- consider only: other players ; online users (state 1,2,3) ; valid zone names ; valid player names
-			if e.displayName ~= GetDisplayName() and e.status ~= 4 and e.zoneName ~= nil and e.zoneName ~= "" and e.zoneId ~= nil and e.zoneId ~= 0 and e.displayName ~= "" and not consideredPlayers[e.displayName] then
-				-- save displayName
-				consideredPlayers[e.displayName] = true
-				-- do some formating stuff
-				e = BMU_addInfo_1(e, currentZoneId, playersZoneId, BMU_SOURCE_INDEX_GUILD[i])
-
-				-- second big filter level
-				if BMU_filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filterSourceIndex) then
-					-- add bunch of information to the record
-					e = BMU_addInfo_2(e)
-					-- insert into table
-					table_insert(TeleportAllPlayersTable, e)
-				end
-			end
-		end
+        while guildIndex <= TeleTotalGuilds and processed < batchSize do
+            local guildId = GetGuildId(guildIndex)
+            local totalGuildMembers = GetNumGuildMembers(guildId)
+    
+            while memberIndex <= totalGuildMembers and processed < batchSize do
+                local e = {}
+    
+                e.displayName,
+                e.Note,
+                e.GuildMemberRankIndex,
+                e.status,
+                e.secsSinceLogoff =
+                    GetGuildMemberInfo(guildId, memberIndex)
+    
+                e.hasCharacter,
+                e.characterName,
+                e.zoneName,
+                e.classType,
+                e.alliance,
+                e.level,
+                e.championRank,
+                e.zoneId =
+                    GetGuildMemberCharacterInfo(guildId, memberIndex)
+    
+                e.guildIndex = guildIndex
+    
+                table.insert(TeleportAllPlayersTable, e)
+    
+                memberIndex = memberIndex + 1
+                processed = processed + 1
+            end
+    
+            -- move to next guild
+            if memberIndex > totalGuildMembers then
+                guildIndex = guildIndex + 1
+                memberIndex = 1
+            end
+        end
+    
+        -- finished
+        if guildIndex > TeleTotalGuilds then
+            EVENT_MANAGER:UnregisterForUpdate("BMU_ConsoleGuildScan")
+        end
+      end
+      EVENT_MANAGER:RegisterForUpdate("BMU_ConsoleGuildScan", 0, processGuildMembers)
+    end
+	end
+	
 	end
 
 	--4. Own houses

@@ -826,6 +826,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
     
     local anchorOnMap = not BMU_IsNotKeyboard()
     local showOpenButtonOnMap = not BMU_IsNotKeyboard()
+    local preferPerformance = IsConsoleUI()
 
     BMU.DefaultsAccount = {
 		["pos_MapScene_x"] = -15,
@@ -898,6 +899,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["houseFurnitureCount_LII"] = {}, -- maps houseId with furniture count
 		["favoriteListWayshrines"] = {},
 		["zoneSpecificHouses"] = {}, -- maps zoneId to preferred houseId for that zone
+		["preferPerformance"] = preferPerformance,
 	}
 	
 	BMU.DefaultsCharacter = {

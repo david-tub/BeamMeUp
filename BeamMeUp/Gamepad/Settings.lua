@@ -104,10 +104,6 @@ function CS.SetupOptionsMenu(index) --index == Addon name
 			  default = BMU_DefaultsAccount["AutoPortFreq"],
          },
 		 {
-              type = LHAS.ST_SECTION,
-              label = ""
-         },
-		 {
               type = LHAS.ST_SLIDER,
               label = BMU_SI_get(SI_TELE_SETTINGS_SCALE),
 			  tooltip = BMU_SI_get(SI_TELE_SETTINGS_SCALE_TOOLTIP) .. " [DEFAULT: " .. BMU_DefaultsAccount["Scale"] .. "]",
@@ -487,10 +483,6 @@ function CS.SetupOptionsMenu(index) --index == Addon name
 			  default = BMU_DefaultsAccount["showTeleportAnimation"],
 			           },
 		 {
-              type = LHAS.ST_SECTION,
-              label = ""
-			           },
-		 {
               type = LHAS.ST_CHECKBOX,
               label = BMU_SI_get(SI_TELE_SETTINGS_USE_PAN_AND_ZOOM),
               tooltip = BMU_SI_get(SI_TELE_SETTINGS_USE_PAN_AND_ZOOM_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU_DefaultsAccount["usePanAndZoom"]) .. "]",
@@ -507,9 +499,6 @@ function CS.SetupOptionsMenu(index) --index == Addon name
 			  disabled = function() return not BMU.LibMapPing end,
 			  default = BMU_DefaultsAccount["useMapPing"],
 			           },
-		 {
-              type = LHAS.ST_SECTION,
-			           },
          {
               type = LHAS.ST_DROPDOWN,
               label = BMU_SI_get(SI_TELE_SETTINGS_SECOND_SEARCH_LANGUAGE),
@@ -520,10 +509,6 @@ function CS.SetupOptionsMenu(index) --index == Addon name
 			  default = BMU.dropdownSecLangChoices[BMU_DefaultsAccount["secondLanguage"]],
 			          },
 		 {
-              type = LHAS.ST_SECTION,
-              label = ""
-			           },
-		 {
               type = LHAS.ST_CHECKBOX,
               label = BMU_SI_get(SI_TELE_SETTINGS_NOTIFICATION_PLAYER_FAVORITE_ONLINE),
               tooltip = BMU_SI_get(SI_TELE_SETTINGS_NOTIFICATION_PLAYER_FAVORITE_ONLINE_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU_DefaultsAccount["FavoritePlayerStatusNotification"]) .. "]",
@@ -533,10 +518,6 @@ function CS.SetupOptionsMenu(index) --index == Addon name
                 ReloadUI()
               end,
 			  default = BMU_DefaultsAccount["FavoritePlayerStatusNotification"],
-			           },
-		 {
-              type = LHAS.ST_SECTION,
-              label = ""
 			           },
 		 {
               type = LHAS.ST_CHECKBOX,
@@ -560,10 +541,6 @@ function CS.SetupOptionsMenu(index) --index == Addon name
 			  disabled = function() return not BMU_savedVarsAcc.surveyMapsNotification end,
 			           },
 		 {
-              type = LHAS.ST_SECTION,
-              label = ""
-			           },
-		 {
               type = LHAS.ST_CHECKBOX,
               label = BMU_SI_get(SI_TELE_SETTINGS_AUTO_CONFIRM_WAYSHRINE_TRAVEL),
               tooltip = BMU_SI_get(SI_TELE_SETTINGS_AUTO_CONFIRM_WAYSHRINE_TRAVEL_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU_DefaultsAccount["wayshrineTravelAutoConfirm"]) .. "]",
@@ -575,10 +552,6 @@ function CS.SetupOptionsMenu(index) --index == Addon name
 			  default = BMU_DefaultsAccount["wayshrineTravelAutoConfirm"],
 			           },
 		 {
-              type = LHAS.ST_SECTION,
-              label = ""
-			           },
-		 {
               type = LHAS.ST_CHECKBOX,
               label = BMU_SI_get(SI_TELE_SETTINGS_OFFLINE_NOTE),
               tooltip = BMU_SI_get(SI_TELE_SETTINGS_OFFLINE_NOTE_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU_DefaultsAccount["showOfflineReminder"]) .. "]",
@@ -588,10 +561,6 @@ function CS.SetupOptionsMenu(index) --index == Addon name
                 ReloadUI()
               end,
 			  default = BMU_DefaultsAccount["showOfflineReminder"],
-			           },
-		 {
-              type = LHAS.ST_SECTION,
-              label = ""
 			           },
 		 {
 			  type = LHAS.ST_CHECKBOX,

@@ -2205,3 +2205,54 @@ function BMU.GetConstByInputModeBase(constName, inputMode, placeholder)
   end
   return _G[name]
 end
+
+-- Caching functionality
+
+local BMU_GUILD_CACHE_TTL    = BMU.GUILD_CACHE_TTL or 5
+local BMU_GuildCache = {}
+
+local function IsGuildCacheValid(guildId)
+    local cache = BMU_GuildCache[guildId]
+    if not cache then return false end
+    return (GetFrameTimeSeconds() - cache.timestamp) < BMU_GUILD_CACHE_TTL
+end
+
+
+local function GetGuildMemberStatusTable(guildId, guildIndex)
+    if IsGuildCacheValid(guildId) then
+        return BMU_GuildCache[guildId].members
+    end
+
+    local members    = {}
+    local e = {}
+
+    local numMembers = GetNumGuildMembers(guildId)
+
+    for j = 1, numMembers do
+        e.displayName, e.Note, e.GuildMemberRankIndex, e.status, e.secsSinceLogoff = GetGuildMemberInfo(guildId, j)
+        e.hasCharacter, e.characterName, e.zoneName, e.classType, e.alliance, e.level, e.championRank, e.zoneId = GetGuildMemberCharacterInfo(guildId, j)
+        e.guildIndex = guildIndex
+        e.category = 1
+
+        if e.status ~= PLAYER_STATUS_OFFLINE then
+          table.insert(members, e)
+        end
+        e = {}
+    end
+
+    BMU_GuildCache[guildId] =
+    {
+        timestamp = GetFrameTimeSeconds(),
+        members   = members,
+    }
+    return members
+end
+
+function BMU.getGuildMembersCached(guildId, guildIndex)
+    local cache = BMU_GuildCache[guildId]
+    local now = GetGameTimeMilliseconds() / 1000
+    if cache and (now - cache.timestamp <= BMU_GUILD_CACHE_TTL) then
+        return cache.members
+    end
+    return GetGuildMemberStatusTable(guildId, guildIndex)
+end

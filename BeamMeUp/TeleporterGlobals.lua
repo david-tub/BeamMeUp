@@ -2230,11 +2230,11 @@ local function GetGuildMemberStatusTable(guildId, guildIndex)
 
     for j = 1, numMembers do
         e.displayName, e.Note, e.GuildMemberRankIndex, e.status, e.secsSinceLogoff = GetGuildMemberInfo(guildId, j)
-        e.hasCharacter, e.characterName, e.zoneName, e.classType, e.alliance, e.level, e.championRank, e.zoneId = GetGuildMemberCharacterInfo(guildId, j)
-        e.guildIndex = guildIndex
-        e.category = 1
 
         if e.status ~= PLAYER_STATUS_OFFLINE then
+          e.hasCharacter, e.characterName, e.zoneName, e.classType, e.alliance, e.level, e.championRank, e.zoneId = GetGuildMemberCharacterInfo(guildId, j)
+          e.guildIndex = guildIndex
+          e.category = 1
           table.insert(members, e)
         end
         e = {}

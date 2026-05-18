@@ -2208,13 +2208,13 @@ end
 
 -- Caching functionality
 
-local BMU_GUILD_CACHE_TTL    = BMU.GUILD_CACHE_TTL or 5
+local BMU_GUILD_CACHE_TTL    = BMU.GUILD_CACHE_TTL or 5000
 local BMU_GuildCache = {}
 
 local function IsGuildCacheValid(guildId)
     local cache = BMU_GuildCache[guildId]
     if not cache then return false end
-    return (GetFrameTimeSeconds() - cache.timestamp) < BMU_GUILD_CACHE_TTL
+    return (GetGameTimeMilliseconds() - cache.timestamp) < BMU_GUILD_CACHE_TTL
 end
 
 
@@ -2242,7 +2242,7 @@ local function GetGuildMemberStatusTable(guildId, guildIndex)
 
     BMU_GuildCache[guildId] =
     {
-        timestamp = GetFrameTimeSeconds(),
+        timestamp = GetGameTimeMilliseconds(),
         members   = members,
     }
     return members
@@ -2250,7 +2250,7 @@ end
 
 function BMU.getGuildMembersCached(guildId, guildIndex)
     local cache = BMU_GuildCache[guildId]
-    local now = GetGameTimeMilliseconds() / 1000
+    local now = GetGameTimeMilliseconds()
     if cache and (now - cache.timestamp <= BMU_GUILD_CACHE_TTL) then
         return cache.members
     end

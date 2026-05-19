@@ -33,11 +33,13 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
     -- -v- INS251229 Baertram performance improvement for multiple used variable reference
     local BMU_DefaultsPerCharacter = BMU.DefaultsCharacter
     local BMU_DefaultsPerAccount   = BMU.DefaultsAccount
+    local BMU_DefaultsServer   = BMU.DefaultsServer
     BMU_getIndexFromValue = BMU_getIndexFromValue or BMU.getIndexFromValue
     BMU_formatName = BMU_formatName or BMU.formatName
     BMU_getStringIsInstalledLibrary = BMU_getStringIsInstalledLibrary or BMU.getStringIsInstalledLibrary
 
     local BMU_SVAcc = BMU.savedVarsAcc
+    local BMU_SVServ = BMU.savedVarsServ
     -- -^- INS251229 Baertram
 
     local teleporterWin     = BMU.win
@@ -773,6 +775,16 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
               end,
 			  default = BMU_DefaultsPerAccount["secondLanguage"],
 			  submenu = "adv",
+        },
+        {
+              type = "checkbox",
+              name = BMU_SI_Get(SI_TELE_SETTINGS_PREFER_PERFORMANCE),
+              tooltip = BMU_SI_Get(SI_TELE_SETTINGS_PREFER_PERFORMANCE_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU_DefaultsServer.preferPerformance) .. "]",
+              getFunc = function() return BMU_SVServ.preferPerformance end,
+			        setFunc = function(value) BMU_SVServ.preferPerformance = value
+              end,
+              default = BMU_DefaultsServer["preferPerformance"],
+              submenu = "adv",
         },
 		 {
               type = "divider",

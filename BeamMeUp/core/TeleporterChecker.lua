@@ -111,6 +111,7 @@ local BMU_isFavoriteZone 					= BMU.isFavoriteZone
 local BMU_isFavoritePlayer 					= BMU.isFavoritePlayer
 local BMU_updateRelatedItemsCounterPanel 	= BMU.updateRelatedItemsCounterPanel
 local BMU_IsNotKeyboard = BMU.IsNotKeyboard
+local BMU_getGuildMembersCached = BMU.getGuildMembersCached
 
 ----variables (defined inline in code below, upon first usage, as they are still nil at this line)
 local BMU_LibZoneGivenZoneData
@@ -358,39 +359,51 @@ function BMU.createTable(args)
 		-- gathering information
         local e = {}
         e.displayName, e.Note, e.status, e.secsSinceLogoff = GetFriendInfo(j)
-        e.hasCharacter, e.characterName, e.zoneName, e.classType, e.alliance, e.level, e.championRank, e.zoneId = GetFriendCharacterInfo(j)
 
 		-- first big layer of filtering, second layer is placed in seperate function
         -- consider only: other players ; online users (state 1,2,3) ; valid zone names ; valid player names
-		if e.displayName ~= GetDisplayName() and e.status ~= PLAYER_STATUS_OFFLINE and e.zoneName ~= nil and e.zoneName ~= "" and e.zoneId ~= nil and e.zoneId ~= 0 and e.displayName ~= "" and not consideredPlayers[e.displayName] then
-
+		if e.displayName ~= GetDisplayName() and e.status ~= PLAYER_STATUS_OFFLINE and e.zoneName ~= nil and e.zoneName ~= "" and e.displayName ~= "" and not consideredPlayers[e.displayName] then
+      e.hasCharacter, e.characterName, e.zoneName, e.classType, e.alliance, e.level, e.championRank, e.zoneId = GetFriendCharacterInfo(j)
 			-- save displayName
-			consideredPlayers[e.displayName] = true
-			-- do some formating stuff
-			e = BMU_addInfo_1(e, currentZoneId, playersZoneId, BMU_SOURCE_INDEX_FRIEND)
-
-			-- second big filter level
-			if BMU_filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filterSourceIndex) then
-				-- add bunch of information to the record
-				e = BMU_addInfo_2(e)
-				-- insert into table
-				table_insert(TeleportAllPlayersTable, e)
-			end
+			if e.zoneId ~= nil and e.zoneId ~= 0 then
+			
+        consideredPlayers[e.displayName] = true
+        -- do some formating stuff
+        e = BMU_addInfo_1(e, currentZoneId, playersZoneId, BMU_SOURCE_INDEX_FRIEND)
+  
+        -- second big filter level
+        if BMU_filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filterSourceIndex) then
+          -- add bunch of information to the record
+          e = BMU_addInfo_2(e)
+          -- insert into table
+          table_insert(TeleportAllPlayersTable, e)
+        end
+      end
 		end
 	end
 
 
 	-- 3. go over all Guild members
     for i = 1, TeleTotalGuilds do
-        local totalGuildMembers = GetNumGuildMembers(GetGuildId(i))
+        local guildId = GetGuildId(i)
+        local totalGuildMembers = GetNumGuildMembers(guildId)
+        local members
+        
+        if BMU_savedVarsAcc.preferPerformance then
+          members = BMU_getGuildMembersCached(guildId, i)
+          totalGuildMembers = #members
+        end
 
         for j = 1, totalGuildMembers do
 			-- gathering information
             local e = {}
-            e.displayName, e.Note, e.GuildMemberRankIndex, e.status, e.secsSinceLogoff = GetGuildMemberInfo(GetGuildId(i), j)
-            e.hasCharacter, e.characterName, e.zoneName, e.classType, e.alliance, e.level, e.championRank, e.zoneId = GetGuildMemberCharacterInfo(GetGuildId(i), j)
-			e.guildIndex = i
-
+            if BMU_savedVarsAcc.preferPerformance and members and next(members) then
+              e = members[j]
+            else
+              e.displayName, e.Note, e.GuildMemberRankIndex, e.status, e.secsSinceLogoff = GetGuildMemberInfo(guildId, j)
+              e.hasCharacter, e.characterName, e.zoneName, e.classType, e.alliance, e.level, e.championRank, e.zoneId = GetGuildMemberCharacterInfo(guildId, j)
+              e.guildIndex = i
+            end
 			-- first big layer of filtering, second layer is placed in seperate function
             -- consider only: other players ; online users (state 1,2,3) ; valid zone names ; valid player names
 			if e.displayName ~= GetDisplayName() and e.status ~= 4 and e.zoneName ~= nil and e.zoneName ~= "" and e.zoneId ~= nil and e.zoneId ~= 0 and e.displayName ~= "" and not consideredPlayers[e.displayName] then

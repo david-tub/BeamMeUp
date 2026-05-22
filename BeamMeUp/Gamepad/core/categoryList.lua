@@ -169,7 +169,7 @@ function categoryList:InitializeCustomTabs()
 	mapInfo.tabBarEntries = tabBarEntries
 
 	ZO_GamepadGenericHeader_Refresh(mapInfo.header, self:GetHeaderData())
-	ZO_GamepadGenericHeader_SetActiveTabIndex(mapInfo.header, 1)
+-- 	ZO_GamepadGenericHeader_SetActiveTabIndex(mapInfo.header, 1)
 end
 
 function categoryList:GetHeaderData()

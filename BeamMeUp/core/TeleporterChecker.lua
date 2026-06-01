@@ -226,6 +226,27 @@ function BMU.getCurrentZoneId()
 end
 BMU_getCurrentZoneId = BMU.getCurrentZoneId
 
+local tableTTL = 5000
+local portalPlayers_Cache = {}
+--Caching for main teleport table 
+local function IsCacheValid()
+  if portalPlayers_Cache.timestamp == nil then return false end
+  local delta = GetGameTimeMilliseconds() - portalPlayers_Cache.timestamp
+  return delta < tableTTL
+end
+
+function BMU.resetCache()
+  portalPlayers_Cache = {}
+end
+
+function BMU.retrieveCachedTable(args)
+    if IsCacheValid() and portalPlayers_Cache.players and #portalPlayers_Cache.players > 1 then
+      return portalPlayers_Cache.players
+    end
+    portalPlayers_Cache = { players = BMU.createTable(args), timestamp = GetGameTimeMilliseconds() }
+    return portalPlayers_Cache.players
+end
+
 
 -- index: choose scenario / filter action -> see globals
 -- inputString: search string

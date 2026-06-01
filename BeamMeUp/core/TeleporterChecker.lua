@@ -2160,7 +2160,9 @@ BMU_createNoResultsInfo = BMU.createNoResultsInfo  --INS251229 Baertram
 
 -- removes an existing entry (already added zoneId) from table (TeleportAllPlayersTable) if it is not a player favorite or group member
 function BMU.removeExistingEntry(zoneId)
-  zoneEntryMap[zoneId] = nil
+  if zoneEntryMap and zoneEntryMap[zoneId] then
+    zoneEntryMap[zoneId] = nil
+  end
 	for index, record in pairs(TeleportAllPlayersTable) do
 		if record.zoneId == zoneId and not BMU_isFavoritePlayer(record.displayName) and record.sourceIndexLeading ~= BMU_SOURCE_INDEX_GROUP then
 			table_remove(TeleportAllPlayersTable, index)

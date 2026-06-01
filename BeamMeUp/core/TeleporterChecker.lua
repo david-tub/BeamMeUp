@@ -1357,7 +1357,6 @@ function BMU.getLowestNumber(tab)
 	return low
 end
 
-
 -- checks if "only one entry per zone" is enabled
 -- increments counter according to case
 -- returns if the record can be used
@@ -2161,6 +2160,7 @@ BMU_createNoResultsInfo = BMU.createNoResultsInfo  --INS251229 Baertram
 
 -- removes an existing entry (already added zoneId) from table (TeleportAllPlayersTable) if it is not a player favorite or group member
 function BMU.removeExistingEntry(zoneId)
+  zoneEntryMap[zoneId] = nil
 	for index, record in pairs(TeleportAllPlayersTable) do
 		if record.zoneId == zoneId and not BMU_isFavoritePlayer(record.displayName) and record.sourceIndexLeading ~= BMU_SOURCE_INDEX_GROUP then
 			table_remove(TeleportAllPlayersTable, index)
@@ -2170,15 +2170,19 @@ end
 BMU_removeExistingEntry = BMU.removeExistingEntry  					--INS251229 Baertram
 
 
-
+local zoneEntryMap = {}
 -- returns the record from table (TeleportAllPlayersTable) located at given zoneId
 function BMU.getExistingEntry(zoneId)
-	for index, record in pairs(TeleportAllPlayersTable) do
-		if record.zoneId == zoneId then
-			return record
-		end
-	end
-	d("[BMU]NOT FOUND, zoneId: " .. tos(zoneId))
+  if BMU.savedVarsAcc.preferPerformance and zoneEntryMap[zoneId] ~= nil then
+    return zoneEntryMap[zoneId]
+  end
+  for index, record in pairs(TeleportAllPlayersTable) do
+    if record.zoneId == zoneId then
+      zoneEntryMap[record.zoneId] = record
+      return record
+    end
+  end
+  d("[BMU]NOT FOUND, zoneId: " .. tos(zoneId))
 end
 BMU_getExistingEntry = BMU.getExistingEntry							--INS251229 Baertram
 

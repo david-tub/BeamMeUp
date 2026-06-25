@@ -78,6 +78,10 @@ local BMU_ZONE_CATEGORY_OVERLAND = BMU.ZONE_CATEGORY_OVERLAND
 local colorLegendary = ZO_ColorDef:New(teleporterVars.color.colLegendary)
 local guildHousesAtServer = teleporterVars.guildHouse[worldName]
 local BMUGuildsAtServer = teleporterVars.BMUGuilds[worldName]
+BMU.wayshrineCompletionCache = {}
+local BMU_wayshrineCompletionCache = BMU.wayshrineCompletionCache
+BMU.zoneWayshrineActivities = {}
+local BMU_zoneWayshrineActivities = BMU.zoneWayshrineActivities
 
 local BMU_indexListMain 					= BMU.indexListMain
 --local BMU_indexListCurrentZone 				= BMU.indexListCurrentZone
@@ -186,7 +190,7 @@ local BMU_isZoneOverlandZone, BMU_categorizeZone, BMU_showDialogSimple, BMU_prep
 	  BMU_findExactQuestLocation, BMU_sc_porting, BMU_getParentZoneId, BMU_clickOnTeleportToOwnHouseButton, BMU_clickOnTeleportToOwnHouseButton_2,
       BMU_tooltipTextEnter, BMU_clickOnTeleportToPTFHouseButton, BMU_clickOnOpenGuild, BMU_clickOnTeleportToDungeonButton, BMU_clickOnTeleportToPlayerButton,
 	  BMU_checkIfContextMenuIconShouldShow, BMU_clickOnPlayerName, BMU_clickOnHouseName, BMU_clickOnEmptyZoneName, BMU_throttle, BMU_calculateListHeight,
-      BMU_getHouseNameByHouseId, BMU_decideTryAgainPorting, BMU_updateStatistic, BMU_clickOnZoneName, BMU_retrieveCachedTable
+      BMU_getHouseNameByHouseId, BMU_decideTryAgainPorting, BMU_updateStatistic, BMU_clickOnZoneName, BMU_retrieveCachedTable, BMU_buildWayshrineCache
 -- -^- INS251229 Baertram END 0
 
 
@@ -300,9 +304,9 @@ function addon:hasMoved()
 end
 
 function BMU.reportAutoUnlockProgress(nextPlayerRecord)
-    if BMU.IsNotKeyboard() then
-        addon.provider.progress = var_AUTOUNLOCK_PROGRESS_ACTIVE
-    else
+    if not BMU.IsNotKeyboard() then
+--         addon.provider.progress = var_AUTOUNLOCK_PROGRESS_ACTIVE
+--     else
         BMU_showAutoUnlockProceedDialog = BMU_showAutoUnlockProceedDialog or BMU.showAutoUnlockProceedDialog
         BMU_showAutoUnlockProceedDialog(nextPlayerRecord)
     end
@@ -338,6 +342,7 @@ function BMU:GetEventHandlers()
       [EVENT_DISCOVERY_EXPERIENCE] = function(eventCode, reason, level, previousExperience, currentExperience, championPoints)
           if BMU.uwData.isStarted then
             BMU.uwData.gainedXP = BMU.uwData.gainedXP + (currentExperience-previousExperience)
+            BMU.wayshrineCompletionCache = {}
           end
         end,
       [EVENT_JUMP_FAILED] = function(eventId, result)
@@ -454,6 +459,10 @@ function BMU.startAutoUnlock(zoneId, loopType, loopZoneList)
 			loopZoneList = loopZoneList, -- can be nil
 			gainedXP = 0
 		}
+		
+		if BMU_IsNotKeyboard() then
+		  addon.provider.progress = var_AUTOUNLOCK_PROGRESS_ACTIVE
+		end
 
 		-- unregiter existing event for furniture count
 		EM:UnregisterForEvent(appName, EVENT_PLAYER_ACTIVATED)
@@ -996,6 +1005,48 @@ end
 BMU_showDialogAutoUnlock = BMU.showDialogAutoUnlock
 
 
+------------------------------------------------------------
+-- Builds the cache to optimize wayshrine completion
+function BMU.buildWayshrineCache(zoneId)
+    BMU_getMapIndex = BMU_getMapIndex or BMU.getMapIndex
+    if BMU_zoneWayshrineActivities[zoneId] and next(BMU_zoneWayshrineActivities[zoneId]) then
+        return
+    end
+
+    BMU_zoneWayshrineActivities[zoneId] = {}
+
+    local mapIndex = BMU_getMapIndex(zoneId)
+    if mapIndex then
+        worldMapManager:SetMapByIndex(1)
+        worldMapManager:SetMapByIndex(mapIndex)
+    end
+
+    local countTotal = GetNumZoneActivitiesForZoneCompletionType(
+        zoneId,
+        ZONE_COMPLETION_TYPE_WAYSHRINES
+    )
+
+    for activityIndex = 1, countTotal do
+        local activityId = GetZoneActivityIdForZoneCompletionType(
+            zoneId,
+            ZONE_COMPLETION_TYPE_WAYSHRINES,
+            activityIndex
+        )
+
+        local _, _, _, isInCurrentMap =
+            GetNormalizedPositionForZoneStoryActivityId(
+                zoneId,
+                ZONE_COMPLETION_TYPE_WAYSHRINES,
+                activityId
+            )
+
+        BMU_zoneWayshrineActivities[zoneId][activityIndex] = {
+            activityId = activityId,
+            isInCurrentMap = isInCurrentMap,
+        }
+    end
+end
+BMU_buildWayshrineCache = BMU.buildWayshrineCache
 
 ------------------------------------------------------------
 
@@ -1023,12 +1074,22 @@ function BMU.getZoneWayshrineCompletion(zoneId)
 
 	local numWayshrines = 0
 	local numWayshrinesDiscovered = 0
+	
+	if BMU.savedVarsAcc.preferPerformance then
+	  BMU_buildWayshrineCache(zoneId)
+	end
 	-- get total number of wayshrines
 	local countTotal = GetNumZoneActivitiesForZoneCompletionType(zoneId, ZONE_COMPLETION_TYPE_WAYSHRINES)
 	for activityIndex = 1, countTotal do
+	  local activityId
+	  local isInCurrentMap
+	  if BMU_zoneWayshrineActivities[zoneId] and BMU_zoneWayshrineActivities[zoneId][activityIndex] then
+	    isInCurrentMap = BMU_zoneWayshrineActivities[zoneId][activityIndex].isInCurrentMap
+	  else  
+	    activityId = GetZoneActivityIdForZoneCompletionType(zoneId, ZONE_COMPLETION_TYPE_WAYSHRINES, activityIndex)
+		  _, _, _, isInCurrentMap = GetNormalizedPositionForZoneStoryActivityId(zoneId, ZONE_COMPLETION_TYPE_WAYSHRINES, activityId)
+	  end
 		local isActivityComplete = IsZoneStoryActivityComplete(zoneId, ZONE_COMPLETION_TYPE_WAYSHRINES, activityIndex)
-		local activityId = GetZoneActivityIdForZoneCompletionType(zoneId, ZONE_COMPLETION_TYPE_WAYSHRINES, activityIndex)
-		local _, _, _, isInCurrentMap = GetNormalizedPositionForZoneStoryActivityId(zoneId, ZONE_COMPLETION_TYPE_WAYSHRINES, activityId)
 		if isInCurrentMap then
 			-- wayshrine of the current map
 			numWayshrines = numWayshrines + 1
@@ -1041,7 +1102,6 @@ function BMU.getZoneWayshrineCompletion(zoneId)
 	return numWayshrines, numWayshrinesDiscovered
 end
 BMU_getZoneWayshrineCompletion = BMU.getZoneWayshrineCompletion
-
 
 -- return true if the zone is a Overland zone / region
 function BMU.isZoneOverlandZone(zoneId)

@@ -304,9 +304,15 @@ function addon:hasMoved()
 end
 
 function BMU.reportAutoUnlockProgress(nextPlayerRecord)
-    if not BMU.IsNotKeyboard() then
---         addon.provider.progress = var_AUTOUNLOCK_PROGRESS_ACTIVE
---     else
+    if BMU.IsNotKeyboard() then
+      if not addon.wayshrineLock then
+        if BMU.savedVarsAcc.preferPerformance then
+          BMU_proceedAutoUnlock()
+        else
+          addon.provider.progress = var_AUTOUNLOCK_PROGRESS_ACTIVE
+        end
+      end
+    else
         BMU_showAutoUnlockProceedDialog = BMU_showAutoUnlockProceedDialog or BMU.showAutoUnlockProceedDialog
         BMU_showAutoUnlockProceedDialog(nextPlayerRecord)
     end

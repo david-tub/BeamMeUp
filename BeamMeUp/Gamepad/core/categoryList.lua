@@ -40,11 +40,11 @@ local USES_RIGHT_SIDE_CONTENT = true
 local FILTER_DEFAULTS =  {
 	{ -- Show Group
 		name = GetString(SI_MAIN_MENU_GROUP),
-		index = 0,
+		index = 100,
 	},
 	{ -- Show all
 		name = GetString(SI_GUILD_HISTORY_SUBCATEGORY_ALL),
-		index = 0,
+		index = 100,
 	},
 	{ -- current map zone only
 		name = GetString(SI_ANTIQUITY_SCRYABLE_CURRENT_ZONE_SUBCATEGORY),
@@ -52,7 +52,7 @@ local FILTER_DEFAULTS =  {
 	},
 	{ -- personal homes
 		name = GetString(SI_TELE_UI_BTN_PORT_TO_OWN_HOUSE),
-		index = 0,
+		index = 100,
 	},
 	{ -- show quests
 		name = GetString(SI_JOURNAL_MENU_QUESTS),
@@ -64,7 +64,7 @@ local FILTER_DEFAULTS =  {
 	},
 	{ -- dungeon finder
 		name = GetString(SI_TELE_UI_BTN_DUNGEON_FINDER),
-		index = 0,
+		index = 100,
 	},
 	{ -- Delves and open Dungeons
 		name = GetString(SI_BMU_GAMEPAD_CATEGORY_DELVES), -- only Delves and open Dungeons (in your own Zone or globally)
@@ -72,7 +72,7 @@ local FILTER_DEFAULTS =  {
 	},
 	{ -- show BMU guilds
 		name = GetString(SI_TELE_UI_BTN_GUILD_BMU),
-		index = 0,
+		index = 100,
 	},
 }
 
@@ -107,14 +107,14 @@ local function isVisible(visible)
 end
 
 local HEADER_STRINGS = {
-	CATEGORY0 = '',
+	CATEGORY100 = '',
 	CATEGORY1 = GetString(SI_CUSTOMERSERVICEASKFORHELPCHARACTERISSUECATEGORY2), -- Group Activities
 	CATEGORY2 = GetString(SI_GUILD_RECRUITMENT_ADDITIONAL_ACTIVITIES_HEADER):gsub(':$',''), -- Additional Activities
 	CATEGORY3 = GetString(SI_CHATCHANNELCATEGORIES60), -- Other
 }
 
 local function getHeaderString(headerType, headerIndex)
-	headerIndex = headerIndex or 0
+	headerIndex = headerIndex or 100
 	return HEADER_STRINGS[headerType .. headerIndex]
 end
 
@@ -218,7 +218,7 @@ function categoryList:BuildCategories()
 			categoryFilter = categoryFilter_Group,
 
 			filter = {
-				index = 0,
+				index = 100,
 			},
 			callback = function(currentFilter)
 				local orig_zoneOnceOnly = BMU.savedVarsAcc.zoneOnceOnly
@@ -241,7 +241,7 @@ function categoryList:BuildCategories()
 			visible = true,
 
 			filter = {
-				index = 0,
+				index = 100,
 			},
 			callback = function(currentFilter)
 				BMU.createTable(currentFilter)
@@ -274,7 +274,7 @@ function categoryList:BuildCategories()
 			visible = true,
 
 			filter = {
-				index = 0,
+				index = 100,
 			},
 			callback = function(currentFilter)
 				BMU.createTableHouses(currentFilter)
@@ -322,7 +322,7 @@ function categoryList:BuildCategories()
 			visible = true,
 
 			filter = {
-				index = 0,
+				index = 100,
 			},
 			callback = function()
 				BMU.createTableDungeons()
@@ -354,7 +354,7 @@ function categoryList:BuildCategories()
 			visible = PortToFriend ~= nil,
 
 			filter = {
-				index = 0,
+				index = 100,
 			},
 			callback = function()
 			--	d( 'Please let me know how Port To Friends is working in this addon. I\'ll remove this message later.')
@@ -484,7 +484,7 @@ function categoryList:BuildMainCategroyOptions(groupId)
 		local dropdownData = {callback = callback}
 		table.insert(dropdownData, { -- All
 			filterName = GetString(SI_GUILD_HISTORY_SUBCATEGORY_ALL),
-			filterIndex = 0,
+			filterindex = 100,
 		})
 
 		table.insert(dropdownData, { -- Group

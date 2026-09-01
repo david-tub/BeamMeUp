@@ -36,6 +36,7 @@ BMU.SOURCE_INDEX_GUILD = {
 	[5] = 7,
 }
 BMU.SOURCE_INDEX_OWNHOUSES = 8 --INS Baertram 260206
+BMU.SOURCE_INDEX_HOUSE_TOUR = 9  -- source "Home Tours"
 
 -- constant values for zone categorization
 BMU.ZONE_CATEGORY_UNKNOWN = 0
@@ -135,6 +136,11 @@ BMU.var = {
 }
 
 local teleporterVars = BMU.var
+-- House Tours caches
+BMU.houseTourListings = nil              -- liste brute [{ houseId, ownerName, houseName, collectibleId, houseZoneId, parentZoneId }, ...]
+BMU.houseTourSearchPending = false       -- true pendant qu'une recherche Home Tours est en cours
+BMU.houseTourFallbackByParentZoneId = {} -- cache: [parentZoneId] = listingData OU false (si aucun résultat)
+	
 --local allowedLanguages = teleporterVars.allowedLanguages
 local allowedLanguagesIndex = teleporterVars.allowedLanguagesIndex
 

@@ -911,7 +911,7 @@ function TeleportClass_Shared:BuildMainCategroyOptions(groupId)
 		local dropdownData = {callback = callback}
 		table.insert(dropdownData, { -- All
 			filterName = GetString(SI_GUILD_HISTORY_SUBCATEGORY_ALL),
-			filterIndex = 0,
+			filterIndex = 100,
 		})
 
 		table.insert(dropdownData, { -- Group

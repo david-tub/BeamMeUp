@@ -478,7 +478,8 @@ function BMU.createTable(args)
 	end
 	
 	-- 5b. House Tours shared houses (inséré avant les zones sans joueurs)
-	if not noOwnHouses then
+	-- Skip entirely when the user disabled House Tour houses display in the settings menu
+	if not noOwnHouses and BMU_savedVarsAcc.showHouseTours then
 		if not BMU.houseTourListings then
 			-- Les listings ne sont pas encore chargés : lancer la recherche asynchrone
 			if not BMU.houseTourSearchPending then

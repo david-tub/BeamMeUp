@@ -124,6 +124,12 @@ local BMU_getParentZoneId, BMU_getMapIndex, BMU_categorizeZone, BMU_getCurrentZo
 	  BMU_createBlankRecord, BMU_createDungeonRecord, BMU_createTableGuilds, BMU_getIndexFromValue, BMU_leadIsRelated, BMU_dropdownSecLangChoicesShort
 ----functions (defined inline in code below, upon first usage, as they are still nil at this line)
 
+local JumpToSpecificHouse = JumpToSpecificHouse
+local GetHouseZoneId = GetHouseZoneId
+local GetCollectibleIdForHouse = GetCollectibleIdForHouse
+local GetCollectibleDefaultNickname = GetCollectibleDefaultNickname
+local HOUSE_TOURS_LISTING_TYPE_BROWSE = HOUSE_TOURS_LISTING_TYPE_BROWSE
+
 --String text variables
 --Lowercase constants for string comparisons
 local surveyMapStrLower   = 		string_lower(BMU_SI_Get(SI_CONSTANT_SURVEY_MAP))
@@ -143,7 +149,16 @@ local guildTraderOnwershipHeaderStr = GetString(SI_GUILD_TRADER_OWNERSHIP_HEADER
 local bankIconStr20                 = BMU_textures["bankStr20"]
 -- -^- INS251229 Baertram END 0
 
+-- function BMU.ResetHouseTourSearchParameters()
+    -- if not HOUSE_TOURS_SEARCH_MANAGER then
+        -- return
+    -- end
 
+	-- local filters = HOUSE_TOURS_SEARCH_MANAGER:GetSearchFilters(HOUSE_TOURS_LISTING_TYPE_BROWSE)
+	-- if filters then
+		-- filters:ResetFilters()
+	-- end
+-- end
 
 -- format zone name and removes articles (if enabled)
 function BMU.formatName(unformatted, flag)
@@ -458,6 +473,54 @@ function BMU.createTable(args)
 				-- add manually
 				--allZoneIds[e.zoneId] = allZoneIds[e.zoneId] + 1
 				table_insert(TeleportAllPlayersTable, e)
+			end
+		end
+	end
+	
+	-- 5b. House Tours shared houses (inséré avant les zones sans joueurs)
+	-- Skip entirely when the user disabled House Tour houses display in the settings menu
+	if not noOwnHouses and BMU_savedVarsAcc.showHouseTours then
+		if not BMU.houseTourListings then
+			-- Les listings ne sont pas encore chargés : lancer la recherche asynchrone
+			if not BMU.houseTourSearchPending then
+				BMU.RequestHouseTourSearch()
+			end
+		else
+			-- Les listings sont déjà dédupliqués par houseId et pré-enrichis avec
+			-- tous les champs dérivés statiques au moment de la recherche.
+			-- Cette boucle ne fait donc que recopier des valeurs en cache :
+			-- aucun appel d'API ESO, aucune table temporaire par rafraîchissement.
+			local houseTourListings = BMU.houseTourListings
+			for _, listing in ipairs(houseTourListings) do
+				if listing.parentZoneId and listing.parentZoneId ~= 0 then
+					local e = {}
+					e.houseId              = listing.houseId
+					e.displayName          = listing.ownerName
+					e.characterName        = listing.houseName  -- requis par addInfo_1 (gsub sur characterName)
+					e.parentZoneId         = listing.parentZoneId
+					e.parentZoneName       = listing.parentZoneName
+					e.zoneId               = listing.parentZoneId
+					e.zoneName             = listing.zoneName
+					e.isHouseTour          = true
+					e.forceOutside         = true
+					e.houseNameUnformatted = listing.houseNameUnformatted
+					e.collectibleId        = listing.collectibleId
+					e.houseNameFormatted   = listing.houseNameFormatted
+					e.nickName             = listing.nickName
+					e.houseTooltip         = listing.houseTooltip
+
+					-- addInfo_1 ajoute: currentZone, playersZone, zoneNameSecondLanguage, sources, sourcesText, sourceIndexLeading
+					-- attention: addInfo_1 utilise characterName:gsub, donc characterName doit être défini
+					e = BMU_addInfo_1(e, currentZoneId, playersZoneId, BMU.SOURCE_INDEX_HOUSE_TOUR)
+
+					if BMU_filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filterSourceIndex) then
+						e = BMU_addInfo_2(e)
+						-- overwrite mapIndex et parentZoneId
+						e.mapIndex = listing.mapIndex
+						e.parentZoneId = listing.parentZoneId
+						table_insert(TeleportAllPlayersTable, e)
+					end
+				end
 			end
 		end
 	end
@@ -1188,7 +1251,7 @@ function BMU.filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filt
 		-- add only player with given sourceIndex
 		---or add houses to general list, if filter was set to own houses only
 		if filterSourceIndex == BMU_SOURCE_INDEX_OWNHOUSES then
-			if e.houseId ~= nil then return true end
+			if e.houseId ~= nil and not e.isHouseTour then return true end
 		end
 
 		if BMU_has_value(e.sources, filterSourceIndex) then
@@ -1639,7 +1702,14 @@ function BMU.itemIsRelated(p_portalPlayers, bagId, slotIndex, itemZoneId)							
 			-- try to match with zone
 			if record.zoneId == itemZoneId then
 				return true, BMU_addItemInformation(record, bagId, slotIndex), index
+			elseif record.isHouseTour then
+				-- Les maisons Home Tours sont associées au parentZoneId
+				-- mais les items peuvent être dans une sous-zone
+				if record.zoneId == BMU_getParentZoneId(itemZoneId) then
+					return true, BMU_addItemInformation(record, bagId, slotIndex), index
+				end
 			end
+
 		end
 	end
 	return false, nil, nil
@@ -2089,7 +2159,14 @@ function BMU.questIsRelated(p_portalPlayers, slotIndex)												--CHG251229 B
 
 	-- go over all records in portalPlayers
 	for index, record in ipairs(p_portalPlayers) do
-		if record.zoneId == questZoneId then
+		local recordMatchesQuest = record.zoneId == questZoneId
+		if not recordMatchesQuest and record.isHouseTour then
+			-- Les maisons Home Tours sont associées au parentZoneId
+			-- mais les quêtes peuvent être dans une sous-zone (delve, dungeon)
+			recordMatchesQuest = record.zoneId == BMU_getParentZoneId(questZoneId)
+		end
+		if recordMatchesQuest then
+
 			-- add quest name to record
 			table_insert(record.relatedQuests, questName)
 			-- add questIndex for quest map ping
@@ -2152,6 +2229,13 @@ BMU_getExistingEntry = BMU.getExistingEntry							--INS251229 Baertram
 -- returns true if the first record is preferred
 -- return false if the second record is preferred
 function BMU.decidePrioDisplay(record1, record2)
+	-- House Tours > zoneWithoutPlayer (fallback gratuit préférable à un oratoire payant)
+	if record1.isHouseTour and record2.zoneWithoutPlayer then
+		return true
+	elseif record2.isHouseTour and record1.zoneWithoutPlayer then
+		return false
+	end
+
 	if record1.isLeader and not record2.isLeader then
 		return true
 	elseif record2.isLeader and not record1.isLeader then
@@ -2244,6 +2328,126 @@ function BMU.getParentZoneId(zoneId)
 end
 BMU_getParentZoneId = BMU.getParentZoneId
 
+-- Retourne le parentZoneId d'une maison à partir de son houseId
+function BMU.getHouseParentZoneId(houseId)
+    if not houseId or houseId == 0 then
+        return nil
+    end
+    local houseZoneId = GetHouseZoneId(houseId)
+    if not houseZoneId or houseZoneId == 0 then
+        return nil
+    end
+    return BMU.getParentZoneId(houseZoneId)
+end
+
+-- Lance une recherche Home Tours asynchrone (type BROWSE)
+function BMU.RequestHouseTourSearch()
+    if not HOUSE_TOURS_SEARCH_MANAGER then
+        return
+    end
+
+    if BMU.houseTourSearchPending then
+        return
+    end
+
+    -- Réinitialiser les paramètres de recherche avant chaque nouvelle recherche.
+    local filters = HOUSE_TOURS_SEARCH_MANAGER:GetSearchFilters(HOUSE_TOURS_LISTING_TYPE_BROWSE)
+	if filters then
+		filters:ResetFilters()
+	end
+
+    BMU.houseTourSearchPending = true
+
+    HOUSE_TOURS_SEARCH_MANAGER:ExecuteSearch(HOUSE_TOURS_LISTING_TYPE_BROWSE)
+end
+
+-- Callback appelé quand la recherche Home Tours est terminée
+function BMU.onHouseTourSearchComplete(searchState, listingType)
+    if listingType ~= HOUSE_TOURS_LISTING_TYPE_BROWSE then
+        return
+    end
+    if searchState ~= ZO_HOUSE_TOURS_SEARCH_STATES.COMPLETE then
+        return
+    end
+
+    BMU.houseTourSearchPending = false
+
+    if not HOUSE_TOURS_SEARCH_MANAGER then
+        return
+    end
+
+    local results = HOUSE_TOURS_SEARCH_MANAGER:GetSearchResults(HOUSE_TOURS_LISTING_TYPE_BROWSE)
+    if not results then
+        BMU.houseTourListings = {}
+        return
+    end
+
+    -- Cache le nom d'affichage du joueur une seule fois pour toute la boucle
+    local myDisplayName = GetDisplayName()
+
+    -- Construit une table de listings DÉDUPLIQUÉE par houseId et PRÉ-ENRICHIE :
+    -- tous les champs dérivés statiques (noms de zone, surnoms, index de carte,
+    -- tooltip) sont calculés une seule fois ici. Ainsi, la boucle de construction
+    -- de liste ne rappelle plus aucune fonction d'API ESO à chaque rafraîchissement
+    -- → réduction importante de l'usage CPU et du bruit mémoire (GC).
+    local listings = {}
+    local seenHouseIds = {}
+
+    for _, listingData in ipairs(results) do
+        if listingData then
+            local houseId = listingData:GetHouseId()
+            local ownerName = listingData:GetOwnerDisplayName()
+
+            if houseId and houseId > 0 and ownerName and ownerName ~= "" and ownerName ~= myDisplayName then
+                -- Déduplication par houseId : on garde la première annonce de chaque maison
+                if not seenHouseIds[houseId] then
+                    seenHouseIds[houseId] = true
+
+                    local collectibleId = listingData:GetCollectibleId() or GetCollectibleIdForHouse(houseId)
+                    local houseZoneId = GetHouseZoneId(houseId)
+                    if not houseZoneId or houseZoneId == 0 then
+                        houseZoneId = 0
+                    end
+
+                    local parentZoneId = 0
+                    if houseZoneId ~= 0 then
+                        parentZoneId = BMU.getParentZoneId(houseZoneId) or 0
+                    end
+
+                    local houseName = listingData:GetHouseName() or ""
+                    local nickName = BMU_formatName(GetCollectibleNickname(collectibleId))
+                    local houseNameFormatted = (houseName ~= "" and houseName) or BMU_formatName(GetCollectibleDefaultNickname(collectibleId))
+
+                    table.insert(listings, {
+                        houseId              = houseId,
+                        ownerName            = ownerName,
+                        houseName            = houseName,
+                        collectibleId        = collectibleId,
+                        houseZoneId          = houseZoneId,
+                        parentZoneId         = parentZoneId,
+                        -- Champs dérivés précalculés (statiques pour la session)
+                        houseNameUnformatted = GetZoneNameById(houseZoneId),
+                        zoneName             = GetZoneNameById(parentZoneId),
+                        parentZoneName       = BMU_formatName(GetZoneNameById(parentZoneId)),
+                        houseNameFormatted   = houseNameFormatted,
+                        nickName             = nickName,
+                        mapIndex             = BMU_getMapIndex(houseZoneId),
+                        houseTooltip         = { houseNameFormatted, "\"" .. nickName .. "\"", BMU_colorizeText(ownerName, colorOrange) },
+                    })
+                end
+            end
+        end
+    end
+
+    -- N'assigne le cache qu'une fois la construction terminée (données partielles jamais visibles)
+    BMU.houseTourListings = listings
+
+    -- Vider le cache des fallbacks par zone pour forcer le recalcul
+    BMU.houseTourFallbackByParentZoneId = {}
+
+    -- Rafraîchir la liste active
+    BMU.refreshListAuto(false)
+end
 
 function BMU.createTableHouses()
 	-- change global state, to have the correct tab active

@@ -486,48 +486,40 @@ function BMU.createTable(args)
 				BMU.RequestHouseTourSearch()
 			end
 		else
-			-- Parcourir les listings Home Tours et dédupliquer par houseId
-			local seenHouseIds = {}
-			local uniqueListings = {}
-
-			for _, listing in ipairs(BMU.houseTourListings) do
+			-- Les listings sont déjà dédupliqués par houseId et pré-enrichis avec
+			-- tous les champs dérivés statiques au moment de la recherche.
+			-- Cette boucle ne fait donc que recopier des valeurs en cache :
+			-- aucun appel d'API ESO, aucune table temporaire par rafraîchissement.
+			local houseTourListings = BMU.houseTourListings
+			for _, listing in ipairs(houseTourListings) do
 				if listing.parentZoneId and listing.parentZoneId ~= 0 then
-					-- Déduplication par houseId
-					if not seenHouseIds[listing.houseId] then
-						seenHouseIds[listing.houseId] = true
-						table.insert(uniqueListings, listing)
+					local e = {}
+					e.houseId              = listing.houseId
+					e.displayName          = listing.ownerName
+					e.characterName        = listing.houseName  -- requis par addInfo_1 (gsub sur characterName)
+					e.parentZoneId         = listing.parentZoneId
+					e.parentZoneName       = listing.parentZoneName
+					e.zoneId               = listing.parentZoneId
+					e.zoneName             = listing.zoneName
+					e.isHouseTour          = true
+					e.forceOutside         = true
+					e.houseNameUnformatted = listing.houseNameUnformatted
+					e.collectibleId        = listing.collectibleId
+					e.houseNameFormatted   = listing.houseNameFormatted
+					e.nickName             = listing.nickName
+					e.houseTooltip         = listing.houseTooltip
+
+					-- addInfo_1 ajoute: currentZone, playersZone, zoneNameSecondLanguage, sources, sourcesText, sourceIndexLeading
+					-- attention: addInfo_1 utilise characterName:gsub, donc characterName doit être défini
+					e = BMU_addInfo_1(e, currentZoneId, playersZoneId, BMU.SOURCE_INDEX_HOUSE_TOUR)
+
+					if BMU_filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filterSourceIndex) then
+						e = BMU_addInfo_2(e)
+						-- overwrite mapIndex et parentZoneId
+						e.mapIndex = listing.mapIndex
+						e.parentZoneId = listing.parentZoneId
+						table_insert(TeleportAllPlayersTable, e)
 					end
-				end
-			end
-
-			-- Ajouter une seule entrée par maison (houseId unique)
-			for _, listing in ipairs(uniqueListings) do
-				local e = {}
-				e.houseId = listing.houseId
-				e.displayName = listing.ownerName
-				e.characterName = listing.houseName or ""  -- requis par addInfo_1 (gsub sur characterName)
-				e.parentZoneId = listing.parentZoneId
-				e.parentZoneName = BMU_formatName(GetZoneNameById(e.parentZoneId))
-				e.zoneId = e.parentZoneId
-				e.zoneName = GetZoneNameById(e.zoneId)
-				e.isHouseTour = true
-				e.forceOutside = true
-				e.houseNameUnformatted = GetZoneNameById(listing.houseZoneId)
-				e.collectibleId = listing.collectibleId
-				e.houseNameFormatted = listing.houseName ~= "" and listing.houseName or BMU_formatName(GetCollectibleDefaultNickname(e.collectibleId))
-				e.nickName = BMU_formatName(GetCollectibleNickname(e.collectibleId))
-				e.houseTooltip = {e.houseNameFormatted, "\"" .. e.nickName .. "\"", BMU_colorizeText(listing.ownerName, colorOrange)}
-
-				-- addInfo_1 ajoute: currentZone, playersZone, zoneNameSecondLanguage, sources, sourcesText, sourceIndexLeading
-				-- attention: addInfo_1 utilise characterName:gsub, donc characterName doit être défini
-				e = BMU_addInfo_1(e, currentZoneId, playersZoneId, BMU.SOURCE_INDEX_HOUSE_TOUR)
-
-				if BMU_filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filterSourceIndex) then
-					e = BMU_addInfo_2(e)
-					-- overwrite mapIndex et parentZoneId
-					e.mapIndex = BMU_getMapIndex(listing.houseZoneId)
-					e.parentZoneId = listing.parentZoneId
-					table_insert(TeleportAllPlayersTable, e)
 				end
 			end
 		end
@@ -2365,8 +2357,6 @@ function BMU.RequestHouseTourSearch()
 	end
 
     BMU.houseTourSearchPending = true
-    BMU.cachedHouseTourListings = nil
-    BMU.houseTourFallbackCache = nil
 
     HOUSE_TOURS_SEARCH_MANAGER:ExecuteSearch(HOUSE_TOURS_LISTING_TYPE_BROWSE)
 end
@@ -2381,7 +2371,6 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
     end
 
     BMU.houseTourSearchPending = false
-    BMU.houseTourListings = {}
 
     if not HOUSE_TOURS_SEARCH_MANAGER then
         return
@@ -2389,37 +2378,69 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
 
     local results = HOUSE_TOURS_SEARCH_MANAGER:GetSearchResults(HOUSE_TOURS_LISTING_TYPE_BROWSE)
     if not results then
+        BMU.houseTourListings = {}
         return
     end
+
+    -- Cache le nom d'affichage du joueur une seule fois pour toute la boucle
+    local myDisplayName = GetDisplayName()
+
+    -- Construit une table de listings DÉDUPLIQUÉE par houseId et PRÉ-ENRICHIE :
+    -- tous les champs dérivés statiques (noms de zone, surnoms, index de carte,
+    -- tooltip) sont calculés une seule fois ici. Ainsi, la boucle de construction
+    -- de liste ne rappelle plus aucune fonction d'API ESO à chaque rafraîchissement
+    -- → réduction importante de l'usage CPU et du bruit mémoire (GC).
+    local listings = {}
+    local seenHouseIds = {}
 
     for _, listingData in ipairs(results) do
         if listingData then
             local houseId = listingData:GetHouseId()
             local ownerName = listingData:GetOwnerDisplayName()
-            local collectibleId = listingData:GetCollectibleId()
-            local houseName = listingData:GetHouseName()
 
-            if houseId and houseId > 0 and ownerName and ownerName ~= "" then
-                -- Ne pas inclure sa propre maison
-                if ownerName ~= GetDisplayName() then
+            if houseId and houseId > 0 and ownerName and ownerName ~= "" and ownerName ~= myDisplayName then
+                -- Déduplication par houseId : on garde la première annonce de chaque maison
+                if not seenHouseIds[houseId] then
+                    seenHouseIds[houseId] = true
+
+                    local collectibleId = listingData:GetCollectibleId() or GetCollectibleIdForHouse(houseId)
                     local houseZoneId = GetHouseZoneId(houseId)
-                    local parentZoneId = nil
-                    if houseZoneId and houseZoneId ~= 0 then
-                        parentZoneId = BMU.getParentZoneId(houseZoneId)
+                    if not houseZoneId or houseZoneId == 0 then
+                        houseZoneId = 0
                     end
 
-                    table.insert(BMU.houseTourListings, {
-                        houseId       = houseId,
-                        ownerName     = ownerName,
-                        houseName     = houseName or "",
-                        collectibleId = collectibleId or GetCollectibleIdForHouse(houseId),
-                        houseZoneId   = houseZoneId or 0,
-                        parentZoneId  = parentZoneId or 0,
+                    local parentZoneId = 0
+                    if houseZoneId ~= 0 then
+                        parentZoneId = BMU.getParentZoneId(houseZoneId) or 0
+                    end
+
+                    local houseName = listingData:GetHouseName() or ""
+                    local nickName = BMU_formatName(GetCollectibleNickname(collectibleId))
+                    local houseNameFormatted = (houseName ~= "" and houseName) or BMU_formatName(GetCollectibleDefaultNickname(collectibleId))
+
+                    table.insert(listings, {
+                        houseId              = houseId,
+                        ownerName            = ownerName,
+                        houseName            = houseName,
+                        collectibleId        = collectibleId,
+                        houseZoneId          = houseZoneId,
+                        parentZoneId         = parentZoneId,
+                        -- Champs dérivés précalculés (statiques pour la session)
+                        houseNameUnformatted = GetZoneNameById(houseZoneId),
+                        zoneName             = GetZoneNameById(parentZoneId),
+                        parentZoneName       = BMU_formatName(GetZoneNameById(parentZoneId)),
+                        houseNameFormatted   = houseNameFormatted,
+                        nickName             = nickName,
+                        mapIndex             = BMU_getMapIndex(houseZoneId),
+                        houseTooltip         = { houseNameFormatted, "\"" .. nickName .. "\"", BMU_colorizeText(ownerName, colorOrange) },
                     })
                 end
             end
         end
     end
+
+    -- N'assigne le cache qu'une fois la construction terminée (données partielles jamais visibles)
+    BMU.houseTourListings = listings
 
     -- Vider le cache des fallbacks par zone pour forcer le recalcul
     BMU.houseTourFallbackByParentZoneId = {}

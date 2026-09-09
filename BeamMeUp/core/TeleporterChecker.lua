@@ -2328,7 +2328,7 @@ function BMU.getParentZoneId(zoneId)
 end
 BMU_getParentZoneId = BMU.getParentZoneId
 
--- Retourne le parentZoneId d'une maison à partir de son houseId
+-- Returns the parentZoneId of a house from its houseId.
 function BMU.getHouseParentZoneId(houseId)
     if not houseId or houseId == 0 then
         return nil
@@ -2338,6 +2338,36 @@ function BMU.getHouseParentZoneId(houseId)
         return nil
     end
     return BMU.getParentZoneId(houseZoneId)
+end
+
+-- creates a blacklist for all owned houses to make sure "house tours-houses" only produce entrys, if you do not own a home yourself
+function BMU.getOwnedHouseIdsForHouseTours()
+    local ownedHouseIds = {}
+
+    local ownedHouses = {}
+    if BMU_IsNotKeyboard() then
+        ownedHouses = ZO_COLLECTIBLE_DATA_MANAGER:GetAllCollectibleDataObjects(
+            { ZO_CollectibleCategoryData.IsHousingCategory },
+            { ZO_CollectibleData.IsUnlocked }
+        )
+    elseif COLLECTIONS_BOOK_SINGLETON then
+        ownedHouses = COLLECTIONS_BOOK_SINGLETON:GetOwnedHouses()
+    end
+
+    for _, house in pairs(ownedHouses) do
+        local houseId
+        if BMU_IsNotKeyboard() then
+            houseId = house:GetReferenceId()
+        else
+            houseId = house.houseId
+        end
+
+        if houseId and houseId > 0 then
+            ownedHouseIds[houseId] = true
+        end
+    end
+
+    return ownedHouseIds
 end
 
 -- Lance une recherche Home Tours asynchrone (type BROWSE)
@@ -2382,14 +2412,17 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
         return
     end
 
-    -- Cache le nom d'affichage du joueur une seule fois pour toute la boucle
+    -- Cache the player's display name once for the entire loop
     local myDisplayName = GetDisplayName()
 
-    -- Construit une table de listings DÉDUPLIQUÉE par houseId et PRÉ-ENRICHIE :
-    -- tous les champs dérivés statiques (noms de zone, surnoms, index de carte,
-    -- tooltip) sont calculés une seule fois ici. Ainsi, la boucle de construction
-    -- de liste ne rappelle plus aucune fonction d'API ESO à chaque rafraîchissement
-    -- → réduction importante de l'usage CPU et du bruit mémoire (GC).
+	-- owned houses are a blacklist for the "house tour"- houses, because you have more options with your own houses (travel to and travel inside the house instead of only inside)
+	local ownedHouseIds = BMU.getOwnedHouseIdsForHouseTours()
+-- Build a DEDUPLICATED listings table by houseId and PRE-ENRICH it:
+-- all static derived fields (zone names, nicknames, map index,
+-- tooltip) are calculated only once here. This way, the list-building loop
+-- no longer calls any ESO API functions on every refresh
+-- → significant reduction in CPU usage and memory churn (GC).
+
     local listings = {}
     local seenHouseIds = {}
 
@@ -2399,8 +2432,8 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
             local ownerName = listingData:GetOwnerDisplayName()
 
             if houseId and houseId > 0 and ownerName and ownerName ~= "" and ownerName ~= myDisplayName then
-                -- Déduplication par houseId : on garde la première annonce de chaque maison
-                if not seenHouseIds[houseId] then
+				if not ownedHouseIds[houseId] then -- remove all owned houses from the "house tours"-feature
+                if not seenHouseIds[houseId] then  -- Deduplicate by houseId: keep the first listing for each house.
                     seenHouseIds[houseId] = true
 
                     local collectibleId = listingData:GetCollectibleId() or GetCollectibleIdForHouse(houseId)
@@ -2434,6 +2467,7 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
                         mapIndex             = BMU_getMapIndex(houseZoneId),
                         houseTooltip         = { houseNameFormatted, "\"" .. nickName .. "\"", BMU_colorizeText(ownerName, colorOrange) },
                     })
+					end
                 end
             end
         end

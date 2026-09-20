@@ -240,8 +240,8 @@ function Entry_Class:UpdateEntryData(mostUsedModifier)
 
 	self.isFavorite				= getIsFavorite(self)
 
-	local timesUsed = BMU.savedVarsAcc.portCounterPerZone[self.zoneId] or 0
-	self.mostUsed = timesUsed > mostUsedModifier
+-- 	local timesUsed = BMU.savedVarsAcc.portCounterPerZone[self.zoneId] or 0
+-- 	self.mostUsed = timesUsed > mostUsedModifier
 	
 	self:UpdatePayerCount()
 	self:UpdateZoneInfo()
@@ -371,7 +371,6 @@ local preferedParentZoneIds = {
 function Entry_Class:UpdateZoneInfo()
 	local preferedParentZoneId = preferedParentZoneIds[self.zoneId] or self.parentZoneId
 	local parentZoneId, parentZoneIndex, poiIndex, isValidPin = LibZone:GetZoneMapPinInfo(self.zoneId, preferedParentZoneId)
-	
 	local icon = "/esoui/art/icons/poi/poi_wayshrine_complete.dds"
 	if parentZoneId then
 		self.parentZoneId = parentZoneId

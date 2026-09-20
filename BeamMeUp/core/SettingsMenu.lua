@@ -583,6 +583,15 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
 			  default = BMU_DefaultsPerAccount["hideOwnHouses"],
 			  submenu = "bl",
          },
+			 {
+              type = "checkbox",
+              name = BMU_SI_Get(SI_TELE_SETTINGS_SHOW_HOUSE_TOURS),
+              tooltip = BMU_SI_Get(SI_TELE_SETTINGS_SHOW_HOUSE_TOURS_TOOLTIP) .. " [DEFAULT: " .. tos(BMU_DefaultsPerAccount["showHouseTours"]) .. "]",
+              getFunc = function() return BMU_SVAcc.showHouseTours end,
+              setFunc = function(value) BMU_SVAcc.showHouseTours = value end,
+			  default = BMU_DefaultsPerAccount["showHouseTours"],
+			  submenu = "bl",
+         },
 		 {
               type = "description",
               text = BMU_SI_Get(SI_TELE_SETTINGS_PRIORITIZATION_DESCRIPTION),
@@ -733,6 +742,20 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
               setFunc = function(value) BMU_SVAcc.showTeleportAnimation = value end,
 			  default = BMU_DefaultsPerAccount["showTeleportAnimation"],
 			  submenu = "adv",
+         },
+		 {
+              type = "divider",
+			  submenu = "adv",
+         },
+         {
+              type = "checkbox",
+              name = BMU_SI_Get(SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS),
+              tooltip = BMU_SI_Get(SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS_TOOLTIP) .. " [DEFAULT: " .. tos(BMU_DefaultsPerAccount["diagnosticChatCommands"]) .. "]",
+              getFunc = function() return BMU_SVAcc.diagnosticChatCommands end,
+              setFunc = function(value) BMU_SVAcc.diagnosticChatCommands = value end,
+              default = BMU_DefaultsPerAccount["diagnosticChatCommands"],
+              requiresReload = true,
+              submenu = "adv",
          },
 		 {
               type = "divider",

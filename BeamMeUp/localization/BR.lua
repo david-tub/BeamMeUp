@@ -57,8 +57,9 @@ local strings = {
 ["SI_TELE_UI_TOGGLE_ACRONYM"] = "Mostrar Abreviaturas",
 ["SI_TELE_UI_TOOGLE_DUNGEON_NAME"] = "Mostrar nome da instância",
 ["SI_TELE_UI_TRAVEL_PARENT_ZONE"] = "Port to parent zone",
-["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Set as preferred house",
-["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Unset preferred house",
+["SI_TELE_UI_HOUSE_TOURS_FILTER"] = "Visitas a casas",
+["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Definir como casa preferida",
+["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Remover como casa preferida",
 
 
 
@@ -116,6 +117,8 @@ local strings = {
 ["SI_TELE_SETTINGS_NUMBER_LINES"] = "Número de linhas/listagens",
 ["SI_TELE_SETTINGS_NUMBER_LINES_TOOLTIP"] = "Ao definir o número de linhas/listagens visíveis, você pode controlar a altura total do addon.",
 ["SI_TELE_SETTINGS_HEADER_ADVANCED"] = "Recursos extras",
+    ["SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS"] = "Ativar comandos de diagnóstico no chat",
+    ["SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS_TOOLTIP"] = "Ativa os comandos de diagnóstico em /bmu/diag e os disponibiliza no preenchimento automático do LibSlashCommander. As alterações exigem recarregar a interface.",
 ["SI_TELE_SETTINGS_HEADER_UI"] = "Geral",
 ["SI_TELE_SETTINGS_HEADER_RECORDS"] = "Listagens",
 ["SI_TELE_SETTINGS_CLOSE_ON_PORTING"] = "Auto Fechar Mapa e BeamMeUp",
@@ -161,6 +164,8 @@ local strings = {
 ["SI_TELE_SETTINGS_CURRENT_ZONE_ALWAYS_TOP_TOOLTIP"] = "Mostrar a zona atual sempre em cima da lista.",
 ["SI_TELE_SETTINGS_HIDE_OWN_HOUSES"] = "Esconder casas próprias",
 ["SI_TELE_SETTINGS_HIDE_OWN_HOUSES_TOOLTIP"] = "Esconda suas próprias casas (Viajar para fora) na lista principal.",
+    ["SI_TELE_SETTINGS_SHOW_HOUSE_TOURS"] = "Show House Tour houses",
+    ["SI_TELE_SETTINGS_SHOW_HOUSE_TOURS_TOOLTIP"] = "Show houses found via the House Tours browser in the list.",
 ["SI_TELE_SETTINGS_HEADER_STATS"] = "Estatisticas",
 ["SI_TELE_SETTINGS_MOST_PORTED_ZONES"] = "Zonas mais visitadas:",
 ["SI_TELE_SETTINGS_INSTALLED_SCINCE"] = "Instalado em:",

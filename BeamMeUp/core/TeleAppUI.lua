@@ -979,6 +979,12 @@ local function SetupUI()
 
   teleporterWin_Main_Control_RefreshTexture:SetHandler("OnMouseUp", function(self, button)
  	    if button ~= MOUSE_BUTTON_INDEX_LEFT then return end  --INS BAERTRAM20260124
+		-- Refresh House Tours as well. The asynchronous callback refreshes the list
+		-- again when the new search results are available.
+		if BMU.RefreshHouseTours then
+			BMU.RefreshHouseTours()
+		end
+
 		if BMU.state == BMU.indexListMain then
 			-- dont reset slider if user stays already on main list
 			BMU_createTable({index=BMU.indexListMain, dontResetSlider=true})

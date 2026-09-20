@@ -647,7 +647,7 @@ function BMU.sc_findQuestLocation(questIndex)
 	return peter
 	-- Achtung mit Timing, mglw. Delay einbauen für aufwendiges map wechseln
 	-- Weitere Idee / Optimierung: Teil Code von der Funktion "ZO_WorldMap_ShowQuestOnMap(questIndex)" kopieren
-	-- und nur SetMapTo Funktionen nutzen, die weder die Map öffnen und somit deutlich effizienter sind
+	-- and use only SetMapTo functions that do not open the map and are therefore much more efficient.
 end
 
 
@@ -667,9 +667,222 @@ end
 
 
 --------------------------------------------------------------------------------------------------------------------
+-- House Tour map diagnostics.
+-- The diagnostic version is read dynamically from teleporterVars.version,
+-- which is populated from the add-on manifest (##AddOnVersion).
+--------------------------------------------------------------------------------------------------------------------
+local function BMU_getDiagnosticVersion()
+    return tostring(teleporterVars.version or "?")
+end
+
+local function BMU_sc_mapDiagZone(label, zoneId)
+    local mapId = GetMapIdByZoneId and GetMapIdByZoneId(zoneId) or nil
+    local mapIndex = GetMapIndexByZoneId and GetMapIndexByZoneId(zoneId) or nil
+    local parentZoneId = GetParentZoneId and GetParentZoneId(zoneId) or nil
+    local parentIndex = parentZoneId and GetMapIndexByZoneId and GetMapIndexByZoneId(parentZoneId) or nil
+    local bmuIndex = BMU.getMapIndex and BMU.getMapIndex(zoneId) or nil
+    local zoneIndex = GetMapZoneIndexByMapId and mapId and GetMapZoneIndexByMapId(mapId) or nil
+    local mapName = ""
+    if mapId and GetMapInfoById then
+        mapName = select(1, GetMapInfoById(mapId)) or ""
+    end
+
+    d(string.format(
+        "[BMU %s MapDiag] %s: zoneId=%s mapId=%s mapIndex=%s parentZoneId=%s parentIndex=%s BMUindex=%s zoneIndex=%s mapName=%s",
+        BMU_getDiagnosticVersion(), label, tos(zoneId), tos(mapId), tos(mapIndex), tos(parentZoneId), tos(parentIndex),
+        tos(bmuIndex), tos(zoneIndex), tos(mapName)
+    ))
+end
+
+local function BMU_sc_mapDiag(option)
+    local currentMapId = GetCurrentMapId and GetCurrentMapId() or nil
+    local currentMapIndex = GetCurrentMapIndex and GetCurrentMapIndex() or nil
+    local currentZoneIndex = GetCurrentMapZoneIndex and GetCurrentMapZoneIndex() or nil
+    local currentZoneId = currentZoneIndex and GetZoneId(currentZoneIndex) or nil
+    local currentMapName = ""
+    if currentMapId and GetMapInfoById then
+        currentMapName = select(1, GetMapInfoById(currentMapId)) or ""
+    end
+
+    d(string.format("========== BMU %s MAP DIAGNOSTIC ==========", BMU_getDiagnosticVersion()))
+    d(string.format(
+        "[BMU %s MapDiag] CURRENT: mapId=%s mapIndex=%s zoneIndex=%s zoneId=%s mapName=%s",
+        BMU_getDiagnosticVersion(), tos(currentMapId), tos(currentMapIndex), tos(currentZoneIndex), tos(currentZoneId), tos(currentMapName)
+    ))
+
+    -- Fargrave: 1282 is the known House Tour pin zone. 1283 is included
+    -- because the client may expose a separate map context for the city.
+    BMU_sc_mapDiagZone("Ferngrab Gesamt / Ziel", 1282)
+    BMU_sc_mapDiagZone("Ferngrab Vergleich", 1283)
+
+    -- Clockwork City / Brass Fortress: 981 is the known Brass Fortress
+    -- zone. 980 is included as the comparison/parent-side context.
+    BMU_sc_mapDiagZone("Messingfeste Gesamt / Ziel", 981)
+    BMU_sc_mapDiagZone("Messingfeste Vergleich", 980)
+
+    if WORLD_MAP_MANAGER then
+        local currentMapData = WORLD_MAP_MANAGER.GetCurrentMapData and WORLD_MAP_MANAGER:GetCurrentMapData() or nil
+        if currentMapData then
+            d(string.format(
+                "[BMU %s MapDiag] WMM current data: index=%s mapId=%s zoneId=%s parentIndex=%s",
+                BMU_getDiagnosticVersion(), tos(currentMapData.index), tos(currentMapData.mapId), tos(currentMapData.zoneId), tos(currentMapData.parentIndex)
+            ))
+        else
+            d(string.format("[BMU %s MapDiag] WMM current data: nil", BMU_getDiagnosticVersion()))
+        end
+    end
+
+    d(string.format("[BMU %s MapDiag] ========================================", BMU_getDiagnosticVersion()))
+end
+
+local function BMU_sc_registerDiagnosticCommands()
+    -- Diagnostic commands are intentionally registered only when enabled in the settings.
+    -- This keeps them out of LibSlashCommander autocomplete for normal users.
+    BMU_registerChatCommand("/bmu/diag/maptest", BMU_sc_mapDiag, "Print House Tour map diagnostics")
+end
+
+
+-- House Tours result diagnostic.
+-- BROWSE only. Owned house IDs are grouped into compact lines and are not
+-- printed as individual BROWSE listings because BMU ignores them anyway.
+local function BMU_sc_houseTourDiag()
+    local manager = HOUSE_TOURS_SEARCH_MANAGER
+    local diagnosticVersion = BMU_getDiagnosticVersion()
+    if not manager then
+        d(string.format("[BMU %s HouseTourDiag] HOUSE_TOURS_SEARCH_MANAGER is nil", diagnosticVersion))
+        return
+    end
+
+    local wanted = {
+        [92] = "Ossa Accentium",
+        [115] = "Zersplitterte Spiegelinsel",
+        [124] = "Das Nachtlager",
+        [102] = "Labyrinth der Schattenkönigin",
+    }
+
+    local ownedHouseIds = BMU.getOwnedHouseIdsForHouseTours and BMU.getOwnedHouseIdsForHouseTours() or {}
+    local ownedIds = {}
+    for houseId in pairs(ownedHouseIds) do
+        table.insert(ownedIds, houseId)
+    end
+    table.sort(ownedIds)
+
+    d(string.format("========== BMU %s HOUSE TOUR DIAGNOSTIC =========", diagnosticVersion))
+    d(string.format("[BMU %s HouseTourDiag] BROWSE only; owned houses excluded", diagnosticVersion))
+
+    local ownedLine = {}
+    local ownedCount = 0
+    for _, houseId in ipairs(ownedIds) do
+        table.insert(ownedLine, tostring(houseId))
+        ownedCount = ownedCount + 1
+        if #ownedLine >= 10 then
+            d(string.format("[BMU %s HouseTourDiag] OWNED: %s", diagnosticVersion, table.concat(ownedLine, ",")))
+            ownedLine = {}
+        end
+    end
+    if #ownedLine > 0 then
+        d(string.format("[BMU %s HouseTourDiag] OWNED: %s", diagnosticVersion, table.concat(ownedLine, ",")))
+    end
+    d(string.format("[BMU %s HouseTourDiag] OWNED count=%d", diagnosticVersion, ownedCount))
+
+    d(string.format(
+        "[BMU %s HouseTourDiag] FILTER active=%s method=%s total=%s batch=%s/%s batchSize=%s error=%s",
+        diagnosticVersion,
+        tostring(BMU.houseTourBrowseFilterActive),
+        tostring(BMU.houseTourBrowseFilterMethod),
+        tostring(BMU.houseTourBrowseFilterTotal),
+        tostring(BMU.houseTourBrowseFilterBatchIndex),
+        tostring(BMU.houseTourBrowseFilterBatchCount),
+        tostring(BMU.houseTourBrowseFilterBatchSize),
+        tostring(BMU.houseTourBrowseFilterError)
+    ))
+
+    local results = manager:GetSearchResults(HOUSE_TOURS_LISTING_TYPE_BROWSE)
+    if not results then
+        d(string.format("[BMU %s HouseTourDiag] BROWSE: GetSearchResults=nil", diagnosticVersion))
+    else
+        local found = {}
+        local shown = 0
+        local skippedOwned = 0
+        for _, listingData in ipairs(results) do
+            if listingData then
+                local houseId = listingData.GetHouseId and listingData:GetHouseId() or nil
+                if houseId and houseId > 0 then
+                    found[houseId] = true
+                    if ownedHouseIds[houseId] then
+                        skippedOwned = skippedOwned + 1
+                    else
+                        shown = shown + 1
+                        local houseName = listingData.GetHouseName and listingData:GetHouseName() or ""
+                        local ownerName = listingData.GetOwnerDisplayName and listingData:GetOwnerDisplayName() or ""
+                        d(string.format(
+                            "[BMU %s HouseTourDiag] BROWSE #%d: houseId=%s houseName=%s owner=%s",
+                            diagnosticVersion, shown, tostring(houseId), tostring(houseName), tostring(ownerName)
+                        ))
+                    end
+                end
+            end
+        end
+
+        d(string.format(
+            "[BMU %s HouseTourDiag] BROWSE returned=%d shown=%d ownedSkipped=%d",
+            diagnosticVersion, #results, shown, skippedOwned
+        ))
+
+        for houseId, name in pairs(wanted) do
+            d(string.format(
+                "[BMU %s HouseTourDiag] BROWSE TARGET houseId=%d (%s): %s%s",
+                diagnosticVersion,
+                houseId,
+                name,
+                found[houseId] and "FOUND" or "MISSING",
+                ownedHouseIds[houseId] and " [OWNED]" or ""
+            ))
+        end
+    end
+
+    local cached = BMU.houseTourListings or {}
+    local cachedFound = {}
+    for _, entry in ipairs(cached) do
+        if entry and entry.houseId then
+            cachedFound[entry.houseId] = true
+        end
+    end
+    d(string.format("[BMU %s HouseTourDiag] CACHE entries=%d", diagnosticVersion, #cached))
+    for houseId, name in pairs(wanted) do
+        d(string.format(
+            "[BMU %s HouseTourDiag] CACHE TARGET houseId=%d (%s): %s",
+            diagnosticVersion, houseId, name, cachedFound[houseId] and "FOUND" or "MISSING"
+        ))
+    end
+
+    d(string.format("[BMU %s HouseTourDiag] =============================================", diagnosticVersion))
+end
+
+local function BMU_sc_houseTourRefresh()
+    if BMU.RefreshHouseTours and BMU.RefreshHouseTours() then
+        BMU_printToChat("House Tours refresh started. The list will update when the search finishes.")
+    else
+        BMU_printToChat("House Tours search manager is not available.")
+    end
+end
+
+
+local function BMU_sc_registerHouseTourDiag()
+    BMU_registerChatCommand("/bmu/diag/housetourdiag", BMU_sc_houseTourDiag, "Show House Tours search results")
+    BMU_registerChatCommand("/bmu/misc/housetourrefresh", function(option) BMU_sc_houseTourRefresh() end, "Refresh House Tours listings")
+end
+
+--------------------------------------------------------------------------------------------------------------------
 -- register/activate all chat commands
 --------------------------------------------------------------------------------------------------------------------
 function BMU.activateSlashCommands()
+
+	-- Diagnostic chat commands (opt-in, default off)
+	if BMU.savedVarsAcc and BMU.savedVarsAcc.diagnosticChatCommands then
+		BMU_sc_registerDiagnosticCommands()
+		BMU_sc_registerHouseTourDiag()
+	end
 
 	-- Debug Mode (new slash commands will be activated)
 	BMU_registerChatCommand("/bmu/misc/debug", function(option) BMU_sc_toggleDebugMode() end, "Enable debug mode")

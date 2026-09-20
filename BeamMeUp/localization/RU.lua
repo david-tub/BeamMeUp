@@ -53,8 +53,9 @@ local strings = {
     ["SI_TELE_UI_TOGGLE_ACRONYM"] = "Показать аббревиатуру",
     ["SI_TELE_UI_TOOGLE_DUNGEON_NAME"] = "Показать название инстанса",
     ["SI_TELE_UI_TRAVEL_PARENT_ZONE"] = "Port to parent zone",
-    ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Set as preferred house",
-    ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Unset preferred house",
+    ["SI_TELE_UI_HOUSE_TOURS_FILTER"] = "Обзор домов",
+    ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Установить как предпочитаемый дом",
+    ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Убрать из предпочитаемых домов",
     
     
     
@@ -112,6 +113,8 @@ local strings = {
     ["SI_TELE_SETTINGS_NUMBER_LINES"] = "Количество строк/записей",
     ["SI_TELE_SETTINGS_NUMBER_LINES_TOOLTIP"] = "Установив количество видимых строк/записей, вы можете контролировать общую высоту аддона.",
     ["SI_TELE_SETTINGS_HEADER_ADVANCED"] = "Дополнительные функции",
+    ["SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS"] = "Включить диагностические команды чата",
+    ["SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS_TOOLTIP"] = "Включает диагностические команды в разделе /bmu/diag и добавляет их в автодополнение LibSlashCommander. Для применения изменений требуется перезагрузка интерфейса.",
     ["SI_TELE_SETTINGS_HEADER_UI"] = "Общие настройки",
     ["SI_TELE_SETTINGS_HEADER_RECORDS"] = "Записи",
     ["SI_TELE_SETTINGS_CLOSE_ON_PORTING"] = "Автоматически закрывать карту и BeamMeUp",
@@ -157,6 +160,8 @@ local strings = {
     ["SI_TELE_SETTINGS_CURRENT_ZONE_ALWAYS_TOP_TOOLTIP"] = "Показывать текущую зону всегда в начале списка.",
     ["SI_TELE_SETTINGS_HIDE_OWN_HOUSES"] = "Скрывать свои дома",
     ["SI_TELE_SETTINGS_HIDE_OWN_HOUSES_TOOLTIP"] = "Скрывать сво дома (телепорт ко входу) в общем списке.",
+    ["SI_TELE_SETTINGS_SHOW_HOUSE_TOURS"] = "Show House Tour houses",
+    ["SI_TELE_SETTINGS_SHOW_HOUSE_TOURS_TOOLTIP"] = "Show houses found via the House Tours browser in the list.",
     ["SI_TELE_SETTINGS_HEADER_STATS"] = "Статистика",
     ["SI_TELE_SETTINGS_MOST_PORTED_ZONES"] = "Часто посещаемые зоны:",
     ["SI_TELE_SETTINGS_INSTALLED_SCINCE"] = "Установлен по крайней мере с:",

@@ -53,8 +53,9 @@ local strings = {
     ["SI_TELE_UI_TOGGLE_ACRONYM"] = "Pokaż akronim",
     ["SI_TELE_UI_TOOGLE_DUNGEON_NAME"] = "Pokaż pełną nazwę",
     ["SI_TELE_UI_TRAVEL_PARENT_ZONE"] = "Port to parent zone",
-    ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Set as preferred house",
-    ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Unset preferred house",
+    ["SI_TELE_UI_HOUSE_TOURS_FILTER"] = "Zwiedzanie domów",
+    ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Ustaw jako preferowany dom",
+    ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Usuń jako preferowany dom",
 
 
 
@@ -112,6 +113,8 @@ local strings = {
     ["SI_TELE_SETTINGS_NUMBER_LINES"] = "Ilość wersów/wyszukań",
     ["SI_TELE_SETTINGS_NUMBER_LINES_TOOLTIP"] = "Przez ustawienie ilości widocznych wersów/wyszukań możesz kontrolować całkowitą wysokość dodatku.",
     ["SI_TELE_SETTINGS_HEADER_ADVANCED"] = "Opcje zaawansowane",
+    ["SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS"] = "Włącz polecenia diagnostyczne czatu",
+    ["SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS_TOOLTIP"] = "Włącza polecenia diagnostyczne w /bmu/diag i udostępnia je w autouzupełnianiu LibSlashCommander. Zmiany wymagają przeładowania interfejsu.",
     ["SI_TELE_SETTINGS_HEADER_UI"] = "Ogólne",
     ["SI_TELE_SETTINGS_HEADER_RECORDS"] = "Wyszukiwanie",
     ["SI_TELE_SETTINGS_CLOSE_ON_PORTING"] = "Automatycznie zamknij mapę i BeamMeUp",
@@ -157,6 +160,8 @@ local strings = {
     ["SI_TELE_SETTINGS_CURRENT_ZONE_ALWAYS_TOP_TOOLTIP"] = "Pokazuj aktualną strefę zawsze na górze listy.",
     ["SI_TELE_SETTINGS_HIDE_OWN_HOUSES"] = "Ukryj posiadane domy",
     ["SI_TELE_SETTINGS_HIDE_OWN_HOUSES_TOOLTIP"] = "Ukryj swoje posiadane domy (teleportacja na zewnątrz) w głównej liście.",
+    ["SI_TELE_SETTINGS_SHOW_HOUSE_TOURS"] = "Show House Tour houses",
+    ["SI_TELE_SETTINGS_SHOW_HOUSE_TOURS_TOOLTIP"] = "Show houses found via the House Tours browser in the list.",
     ["SI_TELE_SETTINGS_HEADER_STATS"] = "Statystyki",
     ["SI_TELE_SETTINGS_MOST_PORTED_ZONES"] = "Najczęściej odwiedzane strefy:",
     ["SI_TELE_SETTINGS_INSTALLED_SCINCE"] = "Zainstalowane co najmniej od:",

@@ -53,8 +53,9 @@ local strings = {
     ["SI_TELE_UI_TOGGLE_ACRONYM          "] = "Afficher les acronymes",
     ["SI_TELE_UI_TOOGLE_DUNGEON_NAME     "] = "Afficher le nom de l'instance",
     ["SI_TELE_UI_TRAVEL_PARENT_ZONE      "] = "Port to parent zone",
-    ["SI_TELE_UI_SET_PREFERRED_HOUSE     "] = "Set as preferred house",
-    ["SI_TELE_UI_UNSET_PREFERRED_HOUSE   "] = "Unset preferred house",
+    ["SI_TELE_UI_HOUSE_TOURS_FILTER"] = "Visites de maisons",
+    ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Définir comme maison préférée",
+    ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Ne plus utiliser comme maison préférée",
 
 
 
@@ -112,6 +113,8 @@ local strings = {
     ["SI_TELE_SETTINGS_NUMBER_LINES"] = "Nombre de lignes à afficher",
     ["SI_TELE_SETTINGS_NUMBER_LINES_TOOLTIP"] = "Changer le nombre de lignes à afficher pour ajuster la hauteur de l'extension.",
     ["SI_TELE_SETTINGS_HEADER_ADVANCED"] = "Fonctionnalités supplémentaires",
+    ["SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS"] = "Activer les commandes de diagnostic",
+    ["SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS_TOOLTIP"] = "Active les commandes de diagnostic sous /bmu/diag et les rend disponibles dans l’autocomplétion de LibSlashCommander. Les modifications nécessitent un rechargement de l’interface.",
     ["SI_TELE_SETTINGS_HEADER_UI"] = "Général",
     ["SI_TELE_SETTINGS_HEADER_RECORDS"] = "Affichages",
     ["SI_TELE_SETTINGS_CLOSE_ON_PORTING"] = "Fermeture automatique de la carte & BeamMeUp",
@@ -157,6 +160,8 @@ local strings = {
     ["SI_TELE_SETTINGS_CURRENT_ZONE_ALWAYS_TOP_TOOLTIP"] = "Toujours afficher la zone courante en début de liste.",
     ["SI_TELE_SETTINGS_HIDE_OWN_HOUSES"] = "Cacher MES maisons",
     ["SI_TELE_SETTINGS_HIDE_OWN_HOUSES_TOOLTIP"] = "Cache vos propres maisons (téléportation à l'extérieur) dans la liste principale.",
+    ["SI_TELE_SETTINGS_SHOW_HOUSE_TOURS"] = "Afficher les maisons des Visites",
+    ["SI_TELE_SETTINGS_SHOW_HOUSE_TOURS_TOOLTIP"] = "Affiche dans la liste les maisons trouvées via le navigateur de Visites de maisons (House Tours).",
     ["SI_TELE_SETTINGS_HEADER_STATS"] = "Statistiques",
     ["SI_TELE_SETTINGS_MOST_PORTED_ZONES"] = "Zones les plus fréquentes :",
     ["SI_TELE_SETTINGS_INSTALLED_SCINCE"] = "Installé au moins depuis :",

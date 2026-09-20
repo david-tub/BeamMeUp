@@ -844,6 +844,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["hidePVP"] = true,
 		["hideClosedDungeons"] = true,
 		["hideHouses"] = false,
+		["showHouseTours"] = true,
 		["hideDelves"] = false,
 		["hidePublicDungeons"] = false,
 		["savedGold"] = 0,
@@ -886,6 +887,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["chatOutputAdditional"] = true,
 		["chatOutputUnlock"] = true,
 		["showContextMenuIcons"] = true, --INS 260203 Baertram
+		["diagnosticChatCommands"] = false,
     }
     
 	BMU.DefaultsServer = {
@@ -1045,6 +1047,13 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		-- write welcome message to chat when you accept application (automatically welcome)
 		EM:RegisterForEvent(appName, EVENT_GUILD_FINDER_PROCESS_APPLICATION_RESPONSE, BMU.AdminAutoWelcome)
 	end
+	
+	-- House Tours search callback
+    if HOUSE_TOURS_SEARCH_MANAGER then
+        HOUSE_TOURS_SEARCH_MANAGER:RegisterCallback("OnSearchStateChanged", function(searchState, listingType)
+            BMU.onHouseTourSearchComplete(searchState, listingType)
+        end)
+    end
 end
 
 

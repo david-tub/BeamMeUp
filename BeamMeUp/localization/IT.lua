@@ -53,8 +53,9 @@ local strings = {
     ["SI_TELE_UI_TOGGLE_ACRONYM"] = "Show acronym",
     ["SI_TELE_UI_TOOGLE_DUNGEON_NAME"] = "Show instance name",
     ["SI_TELE_UI_TRAVEL_PARENT_ZONE"] = "Port to parent zone",
-    ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Set as preferred house",
-    ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Unset preferred house",
+    ["SI_TELE_UI_HOUSE_TOURS_FILTER"] = "Visite delle case",
+    ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Imposta come casa preferita",
+    ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Rimuovi come casa preferita",
 
 
 
@@ -112,6 +113,8 @@ local strings = {
     ["SI_TELE_SETTINGS_NUMBER_LINES"] = "Numero di linee / elenchi",
     ["SI_TELE_SETTINGS_NUMBER_LINES_TOOLTIP"] = "Impostando il numero di linee visibili / elenchi è possibile controllare l'altezza totale del Addon.",
     ["SI_TELE_SETTINGS_HEADER_ADVANCED"] = "Funzionalità Extra",
+    ["SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS"] = "Attiva i comandi di diagnostica",
+    ["SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS_TOOLTIP"] = "Attiva i comandi di diagnostica sotto /bmu/diag e li rende disponibili nell’autocompletamento di LibSlashCommander. Le modifiche richiedono un ricaricamento dell’interfaccia.",
     ["SI_TELE_SETTINGS_HEADER_UI"] = "Generale",
     ["SI_TELE_SETTINGS_HEADER_RECORDS"] = "Elenchi",
     ["SI_TELE_SETTINGS_CLOSE_ON_PORTING"] = "Auto chiudi mappa e Beammeup",
@@ -157,6 +160,8 @@ local strings = {
     ["SI_TELE_SETTINGS_CURRENT_ZONE_ALWAYS_TOP_TOOLTIP"] = "Mostra la zona corrente sempre in cima all'elenco.",
     ["SI_TELE_SETTINGS_HIDE_OWN_HOUSES"] = "Nascondi case proprie",
     ["SI_TELE_SETTINGS_HIDE_OWN_HOUSES_TOOLTIP"] = "Nascondi le tue case (teletrasporto esterno) nell'elenco principale.",
+    ["SI_TELE_SETTINGS_SHOW_HOUSE_TOURS"] = "Show House Tour houses",
+    ["SI_TELE_SETTINGS_SHOW_HOUSE_TOURS_TOOLTIP"] = "Show houses found via the House Tours browser in the list.",
     ["SI_TELE_SETTINGS_HEADER_STATS"] = "Statistics",
     ["SI_TELE_SETTINGS_MOST_PORTED_ZONES"] = "Most traveled zones:",
     ["SI_TELE_SETTINGS_INSTALLED_SCINCE"] = "Installed at least since:",

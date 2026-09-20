@@ -53,8 +53,9 @@ local strings = {
     ["SI_TELE_UI_TOGGLE_ACRONYM"] = "Show acronym",
     ["SI_TELE_UI_TOOGLE_DUNGEON_NAME"] = "Show instance name",
     ["SI_TELE_UI_TRAVEL_PARENT_ZONE"] = "Port to parent zone",
-    ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Set as preferred house",
-    ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Unset preferred house",
+    ["SI_TELE_UI_HOUSE_TOURS_FILTER"] = "房屋游览",
+    ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "设为首选住宅",
+    ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "取消首选住宅",
 
 
 
@@ -112,6 +113,8 @@ local strings = {
     ["SI_TELE_SETTINGS_NUMBER_LINES"] = "行/列表数量",
     ["SI_TELE_SETTINGS_NUMBER_LINES_TOOLTIP"] = "通过设置可见的行/列表数量，您可以控制插件的总体高度。",
     ["SI_TELE_SETTINGS_HEADER_ADVANCED"] = "额外功能",
+    ["SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS"] = "启用诊断聊天命令",
+    ["SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS_TOOLTIP"] = "启用 /bmu/diag 下的诊断聊天命令，并在 LibSlashCommander 自动补全中显示这些命令。更改后需要重新加载界面。",
     ["SI_TELE_SETTINGS_HEADER_UI"] = "通用",
     ["SI_TELE_SETTINGS_HEADER_RECORDS"] = "列表",
     ["SI_TELE_SETTINGS_CLOSE_ON_PORTING"] = "自动关闭地图和BeamMeUp",
@@ -157,6 +160,8 @@ local strings = {
     ["SI_TELE_SETTINGS_CURRENT_ZONE_ALWAYS_TOP_TOOLTIP"] = "将当前地区置于列表顶端。",
     ["SI_TELE_SETTINGS_HIDE_OWN_HOUSES"] = "隐藏自己的房子",
     ["SI_TELE_SETTINGS_HIDE_OWN_HOUSES_TOOLTIP"] = "在主列表中隐藏你自己的房子(传送外部)。",
+    ["SI_TELE_SETTINGS_SHOW_HOUSE_TOURS"] = "Show House Tour houses",
+    ["SI_TELE_SETTINGS_SHOW_HOUSE_TOURS_TOOLTIP"] = "Show houses found via the House Tours browser in the list.",
     ["SI_TELE_SETTINGS_HEADER_STATS"] = "统计",
     ["SI_TELE_SETTINGS_MOST_PORTED_ZONES"] = "最常去区域:",
     ["SI_TELE_SETTINGS_INSTALLED_SCINCE"] = "至少从此时已安装:",

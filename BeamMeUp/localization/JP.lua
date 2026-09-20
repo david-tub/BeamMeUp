@@ -53,8 +53,9 @@ local strings = {
     ["SI_TELE_UI_TOGGLE_ACRONYM"] = "略称を表示",
     ["SI_TELE_UI_TOOGLE_DUNGEON_NAME"] = "インスタンス名を表示",
     ["SI_TELE_UI_TRAVEL_PARENT_ZONE"] = "Port to parent zone",
-    ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Set as preferred house",
-    ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Unset preferred house",
+    ["SI_TELE_UI_HOUSE_TOURS_FILTER"] = "ハウスツアー",
+    ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "お気に入りの家に設定",
+    ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "お気に入りの家から解除",
 
 
 
@@ -112,6 +113,8 @@ local strings = {
     ["SI_TELE_SETTINGS_NUMBER_LINES"] = "行数/登録数",
     ["SI_TELE_SETTINGS_NUMBER_LINES_TOOLTIP"] = "表示される行数を調整することで、BeamMeUp全体の高さをコントロールできます。",
     ["SI_TELE_SETTINGS_HEADER_ADVANCED"] = "その他の設定",
+    ["SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS"] = "診断チャットコマンドを有効化",
+    ["SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS_TOOLTIP"] = "/bmu/diag の診断チャットコマンドを有効にし、LibSlashCommander の自動補完に表示します。変更を適用するにはUIの再読み込みが必要です。",
     ["SI_TELE_SETTINGS_HEADER_UI"] = "全般",
     ["SI_TELE_SETTINGS_HEADER_RECORDS"] = "リスト表示設定",
     ["SI_TELE_SETTINGS_CLOSE_ON_PORTING"] = "テレポートを開始したら閉じる",
@@ -157,6 +160,8 @@ local strings = {
     ["SI_TELE_SETTINGS_CURRENT_ZONE_ALWAYS_TOP_TOOLTIP"] = "現在のゾーンを常にリストの一番上に表示します。",
     ["SI_TELE_SETTINGS_HIDE_OWN_HOUSES"] = "自宅を隠す",
     ["SI_TELE_SETTINGS_HIDE_OWN_HOUSES_TOOLTIP"] = "メインリストから自宅(外へ移動)を隠します。",
+    ["SI_TELE_SETTINGS_SHOW_HOUSE_TOURS"] = "Show House Tour houses",
+    ["SI_TELE_SETTINGS_SHOW_HOUSE_TOURS_TOOLTIP"] = "Show houses found via the House Tours browser in the list.",
     ["SI_TELE_SETTINGS_HEADER_STATS"] = "統計情報",
     ["SI_TELE_SETTINGS_MOST_PORTED_ZONES"] = "最も移動したゾーン：",
     ["SI_TELE_SETTINGS_INSTALLED_SCINCE"] = "インストール日：",

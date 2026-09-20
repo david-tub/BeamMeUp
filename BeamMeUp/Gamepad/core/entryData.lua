@@ -240,8 +240,8 @@ function Entry_Class:UpdateEntryData(mostUsedModifier)
 
 	self.isFavorite				= getIsFavorite(self)
 
--- 	local timesUsed = BMU.savedVarsAcc.portCounterPerZone[self.zoneId] or 0
--- 	self.mostUsed = timesUsed > mostUsedModifier
+	local timesUsed = BMU.savedVarsAcc.portCounterPerZone[self.zoneId] or 0
+	self.mostUsed = timesUsed > mostUsedModifier
 	
 	self:UpdatePayerCount()
 	self:UpdateZoneInfo()
@@ -371,6 +371,7 @@ local preferedParentZoneIds = {
 function Entry_Class:UpdateZoneInfo()
 	local preferedParentZoneId = preferedParentZoneIds[self.zoneId] or self.parentZoneId
 	local parentZoneId, parentZoneIndex, poiIndex, isValidPin = LibZone:GetZoneMapPinInfo(self.zoneId, preferedParentZoneId)
+	
 	local icon = "/esoui/art/icons/poi/poi_wayshrine_complete.dds"
 	if parentZoneId then
 		self.parentZoneId = parentZoneId
@@ -502,10 +503,24 @@ function Entry_Class_House:GetLabels()
 	  name = self.nickName
 	end
 
-	return BMU.colorizeText(name, self.textColorZoneName), (self.parentZoneName or nil)
+	-- House Tours should be grouped by their actual House Tours zone in Gamepad.
+	-- The parentZoneName is still kept for map/teleport context, especially for
+	-- houses whose map is displayed on the parent world map.
+	local houseTourZoneName = self.isHouseTour and self.zoneName or self.parentZoneName
+	return BMU.colorizeText(name, self.textColorZoneName), (houseTourZoneName or nil)
 end
 
 function Entry_Class_House:TryToPort()
+	-- House Tour destinations belong to another player's house. Use the same
+	-- owner + houseId travel path as the keyboard/mouse mode instead of
+	-- RequestJumpToHouse(), which is intended for owned houses.
+	if self.isHouseTour then
+		if self.displayName ~= nil and self.displayName ~= "" and self.houseId ~= nil and self.houseId > 0 then
+			JumpToSpecificHouse(self.displayName, self.houseId, true)
+		end
+		return true
+	end
+
 	local collectibleData = getCollectibleData(self.collectibleId)
 	if self.forceOutside then
 		local TRAVEL_OUTSIDE = true
@@ -746,6 +761,14 @@ BMU_Gamepad_EntryData = {}
 
 function BMU_Gamepad_EntryData:CreateNewEntry(data, sameZone)
 	CURRENT_CATEGORY_TYPE = data.categoryType
+
+	-- House entries need the dedicated house entry class so Gamepad uses
+	-- RequestJumpToHouse() instead of treating the house as a player/zone entry.
+	-- Port-to-Friend entries keep their dedicated category and behavior.
+	if data.houseId and not data.isPTFHouse and CURRENT_CATEGORY_TYPE ~= CATEGORY_TYPE_PTF then
+		return Entry_Class_House:New(data)
+	end
+
 	local setupFunction = CATEGORY_TYPE_MAP[CURRENT_CATEGORY_TYPE]
 	
 	if setupFunction and validateDisplayName(data.displayName) then

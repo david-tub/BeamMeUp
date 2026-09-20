@@ -14,19 +14,19 @@ jobs:
         uses: actions/checkout@v5
         with:
           ref: ${{ github.ref }}
-      - name: Checkout LibZone
-        uses: actions/checkout@v5
-        with:
-          repository: Baertram/LibZone
-          ref: master
-          path: BeamMeUp/Console/lib
-          sparse-checkout: |
-            LibZone
-          sparse-checkout-cone-mode: false
-
-      - name: Remove .git
-        run: |
-          rm -rf BeamMeUp/Console/lib/.git
+#      - name: Checkout LibZone
+#        uses: actions/checkout@v5
+#        with:
+#          repository: Baertram/LibZone
+#          ref: master
+#          path: BeamMeUp/Console/lib
+#          sparse-checkout: |
+#            LibZone
+#          sparse-checkout-cone-mode: false
+#
+#      - name: Remove .git
+#        run: |
+#          rm -rf BeamMeUp/Console/lib/.git
           
       - name: Get branch name as version
         id: semver

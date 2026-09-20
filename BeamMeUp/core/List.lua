@@ -160,6 +160,7 @@ local IsZoneStoryActivityComplete = IsZoneStoryActivityComplete
 local GetNumZoneActivitiesForZoneCompletionType = GetNumZoneActivitiesForZoneCompletionType
 local zo_callLater = zo_callLater
 local CanJumpToPlayerInZone = CanJumpToPlayerInZone
+local JumpToSpecificHouse = JumpToSpecificHouse
 
 --BMU functions
 local BMU_SI_Get 							= SI.get
@@ -186,7 +187,8 @@ local BMU_isZoneOverlandZone, BMU_categorizeZone, BMU_showDialogSimple, BMU_prep
 	  BMU_findExactQuestLocation, BMU_sc_porting, BMU_getParentZoneId, BMU_clickOnTeleportToOwnHouseButton, BMU_clickOnTeleportToOwnHouseButton_2,
       BMU_tooltipTextEnter, BMU_clickOnTeleportToPTFHouseButton, BMU_clickOnOpenGuild, BMU_clickOnTeleportToDungeonButton, BMU_clickOnTeleportToPlayerButton,
 	  BMU_checkIfContextMenuIconShouldShow, BMU_clickOnPlayerName, BMU_clickOnHouseName, BMU_clickOnEmptyZoneName, BMU_throttle, BMU_calculateListHeight,
-      BMU_getHouseNameByHouseId, BMU_decideTryAgainPorting, BMU_updateStatistic, BMU_clickOnZoneName
+      BMU_getHouseNameByHouseId, BMU_decideTryAgainPorting, BMU_updateStatistic, BMU_clickOnZoneName,
+	  BMU_clickOnTeleportToHouseTourButton
 -- -^- INS251229 Baertram END 0
 
 
@@ -1561,6 +1563,7 @@ function ListView:update()
 	BMU_formatName = BMU_formatName or BMU.formatName
 	BMU_clickOnZoneName = BMU_clickOnZoneName or BMU.clickOnZoneName
 	BMU_isFavoriteZone = BMU_isFavoriteZone or BMU.isFavoriteZone
+	BMU_clickOnTeleportToHouseTourButton = BMU_clickOnTeleportToHouseTourButton or BMU.clickOnTeleportToHouseTourButton
 
 	-- suggestion by otac0n (Discord, 2022_10)
 	-- To make it robust, you may want to create a unique ID per ListView.  This assumes a singleton.
@@ -1679,13 +1682,21 @@ function ListView:update()
 				ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnPlayerName(button, message) end)
 
 
-			--House right click menu
+			                --House right click menu
 			elseif message.houseId ~= nil then
-				isHouseEntry = true
-				--Clear the tooltip
-				disableTooltipAndResetOnMouseUp(rowControlOfList)
-				ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnHouseName(button, message) end)
-				ColumnPlayerNameTex:SetHidden(false)
+                    if message.isHouseTour then
+                        -- House Tours: pas de menu contextuel sur le nom
+                        disableTooltipAndResetOnMouseUp(rowControlOfList)
+                        ColumnPlayerNameTex:SetHandler("OnMouseUp", nil)
+                        ColumnPlayerNameTex:SetHidden(false)
+                    else
+                        isHouseEntry = true
+                        disableTooltipAndResetOnMouseUp(rowControlOfList)
+                        ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnHouseName(button, message) end)
+                        ColumnPlayerNameTex:SetHidden(false)
+                    end
+
+
 			--Empty zone right click menu (no player in the zone)
 			elseif message.zoneId ~= nil then
 				--Clear the tooltip
@@ -1907,11 +1918,20 @@ function ListView:update()
 				--respect nicknames of houses
 				local houseName = BMU_getHouseNameByHouseId(message.houseId)
 				local houseNickName = (showHouseNickNames == true and BMU_formatName(GetCollectibleNickname(GetCollectibleIdForHouse((message.houseId))))) or ""
-				if message.isPTFHouse then
-				  rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText(message.displayName, "lime"))
-				else
-				  rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText((houseNickName ~= "" and houseNickName) or zo_strformat(formatStringFirstUppercase, houseName), "lime"))
-			  end
+                if message.isPTFHouse then
+                    rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText(message.displayName, "lime"))
+                elseif message.isHouseTour then
+                    rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText(message.houseNameFormatted .. " (" .. message.displayName .. ")", "lime"))
+                else
+                    rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText((houseNickName ~= "" and houseNickName) or zo_strformat(formatStringFirstUppercase, houseName), "lime"))
+                end
+
+
+				-- if message.isPTFHouse then
+					-- rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText(message.displayName, "lime"))
+				-- else
+				  -- rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText((houseNickName ~= "" and houseNickName) or zo_strformat(formatStringFirstUppercase, houseName), "lime"))
+			  -- end
 			else
 				rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText(displayNameOfMessage, message.textColorDisplayName))
 			end
@@ -1992,8 +2012,18 @@ function ListView:update()
 				texture_normal = BMU_textures.groupLeaderBtn
 				texture_over = BMU_textures.groupLeaderBtnOver
 			end
+			
+			if message.isHouseTour and CanJumpToHouseFromCurrentLocation() and CanLeaveCurrentLocationViaTeleport() then
+                    -- House Tours shared house
+                    rowControlOfList.portalToPlayerTex:SetHidden(false)
+                    rowControlOfList.portalToPlayerTex:SetTexture(BMU_textures.houseBtn)
+                    rowControlOfList.portalToPlayerTex:SetHandler("OnMouseEnter", function(self) rowControlOfList.portalToPlayerTex:SetTexture(BMU_textures.houseBtnOver) BMU.pauseAutoRefresh = true end)
+                    rowControlOfList.portalToPlayerTex:SetHandler("OnMouseExit", function(self) rowControlOfList.portalToPlayerTex:SetTexture(BMU_textures.houseBtn) BMU.pauseAutoRefresh = false end)
+                    rowControlOfList.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) if button ~= MOUSE_BUTTON_INDEX_LEFT then return end BMU_clickOnTeleportToHouseTourButton(rowControlOfList.portalToPlayerTex, button, message) end)
 
-			if message.isOwnHouse and CanJumpToHouseFromCurrentLocation() and CanLeaveCurrentLocationViaTeleport() then
+			elseif message.isOwnHouse and CanJumpToHouseFromCurrentLocation() and CanLeaveCurrentLocationViaTeleport() then
+
+			
 				-- own house
 				rowControlOfList.portalToPlayerTex:SetHidden(false)
 				rowControlOfList.portalToPlayerTex:SetTexture(BMU_textures.houseBtn)
@@ -2232,7 +2262,33 @@ function BMU.clickOnTeleportToPTFHouseButton(textureControl, button, message)
 	end
 end
 
+function BMU.clickOnTeleportToHouseTourButton(textureControl, button, message)
+    BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter
+    BMU_showTeleportAnimation = BMU_showTeleportAnimation or BMU.showTeleportAnimation
+    BMU_formatName = BMU_formatName or BMU.formatName
 
+    -- click effect
+    textureControl:SetAlpha(0.65)
+    zo_callLater(function() textureControl:SetAlpha(1) end, BMU_getAutoUnlockCooldown(200))
+
+    if message.displayName ~= nil and message.displayName ~= "" and message.houseId ~= nil and message.houseId > 0 then
+        -- show additional animation
+        if BMU.savedVarsAcc.showTeleportAnimation then
+            BMU_showTeleportAnimation()
+        end
+
+        CancelCast()
+
+        BMU_printToChat("Port to House Tour: " .. message.displayName .. " - " .. BMU_formatName(GetZoneNameById(message.zoneId), false), BMU.MSG_FT)
+        JumpToSpecificHouse(message.displayName, message.houseId, true)
+
+        if BMU.savedVarsAcc.closeOnPorting then
+            SM:Hide("worldMap")
+            BMU_HideTeleporter()
+        end
+    end
+end
+BMU_clickOnTeleportToHouseTourButton = BMU.clickOnTeleportToHouseTourButton
 
 function BMU.clickOnOpenGuild(textureControl, button, message)
 	-- click effect

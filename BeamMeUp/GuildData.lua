@@ -37,8 +37,8 @@ BMU_GUILD_DATA = {
             631764,			-- "Die magische Miezmuschel"	|@MiezeMelli
             661070,			-- "BMU Crossroad Alliance"		|@square252
             389326,			-- "Ork Mania"					|@OrkManiac4u
-         -- 677494,		    -- "BMU Unofficial"			    |@Kassec - unlisted aber Leader hat Discord - 16.11.2024 auskommentiert, da Gilde aufgegeben
-            418220,			-- "Frozen Lean Gang"			|@Vinc - über Discord angeschrieben
+         -- 677494,		    -- "BMU Unofficial"			    |@Kassec - unlisted but the leader has Discord - commented out on 2024-11-16 because the guild was abandoned
+            418220,			-- "Frozen Lean Gang"			|@Vinc - contacted via Discord
             649984,			-- "Way to warm sands"			|@Ma'pyca (ru)
             701658,			-- "Armoored Rose"				|Discord-name Лютобор Ingame?
             704816,			-- "Reaper's Assasins"			|Original Leader @Hekate's_Realm -> Substitute Leader @BeamMeUp-Addon
@@ -54,7 +54,7 @@ BMU_GUILD_DATA = {
             439872,			-- "Arkays Handelshof"			|?
             738288,			-- "Dragon's Imperium"			|?
             756036,			-- "Die Ritter der Ananas"		|@XCrusaderX36
-            742682,			-- "Grim Bastion"				|Ursprünglich SheldoRU, ✓Okc✓ Discord-Name Ingame noch rausfinden + nachfragen ob eintrag bestehen bleiben soll.
+            742682,			-- "Grim Bastion"				|Originally SheldoRU, ✓Okc✓ Discord name; still need to find the in-game name and ask whether the entry should remain.
             611168,			-- "Hermaeus Mora Army"			|triquetra Discord-Name Ingame?
             527788,			-- "Akatosh Knights"			|likezed Discord-Name Ingame?
             782574,			-- "Die reisenden Schatten"		|LaicosVK Discord-Name Ingame?
@@ -79,14 +79,14 @@ BMU_GUILD_DATA = {
             704951,			-- "Mara's Favor"				|@CassieAeri
             785051,			-- ?
             789007,			-- "Reaper's Assasins			|Original Leader @Hekate's_Realm -> Substitute Leader @Knifekill1984
-            264915,			-- "Ebonheart Merchant"			|@ - Discord User wurde gelöscht kein Hinweis auf Ingame-Name Gilde wird nicht angezeigt vermutlich inaktiv -
+            264915,			-- "Ebonheart Merchant"			|@ - Discord user deleted; no in-game name found; guild is not listed and is probably inactive -
             434691,			-- "Complete Souls"				|@Candalynn
             809511,			-- "Zenithar’s Grace"			|@shortieFuse
             591467,			-- "The Brotherhood of Askir"	|@Tianlein
             774767,			-- "Circus Sideshow"			|@AnnaPython
-            630613,			-- "Seas of Oblivion"			|@Ocean Discord-Name Benutzer gelöscht Gilde nicht gelistet
+            630613,			-- "Seas of Oblivion"			|@Ocean Discord name; user deleted; guild not listed
             401657,			-- "Zions of Chaos"				|@Shinigami Discord-Name Ingame @WrathofShinigami
-            197803,			-- "Celestial Rift"				|@Shiseida Discord-Name Ingame noch rausfinden gilde aktuell nicht gelistet
+            197803,			-- "Celestial Rift"				|@Shiseida Discord name; in-game name still needs to be found; guild currently not listed
             869871,			-- "Allegiance of Asgard"		|@joyousdeath Discord-Name Joy<3
             465947,         -- "The Way Of The Sword"       |@Izahym discord: aze_the_killer
             820013,         -- "Hodor's Trading Post"       |@Orabel33 discord: Orabel33

@@ -7,6 +7,8 @@ local zo_Dialogs_ShowGamepadDialog = ZO_Dialogs_ShowGamepadDialog
 
 local GPS = LibGPS3
 
+local BMU_SI_Get = BMU.SI.get
+
 local CATEGORY_TYPE_ALL			= 1
 local CATEGORY_TYPE_PTF			= 9
 
@@ -350,6 +352,55 @@ function teleportList:BuildOptionsList()
 	end
 
 	self:AddOptionTemplate(groupIdFavorites, function() return self:BuildCheckbox(nil, label, toggleFavoritZone, icon) end, function() return self.socialData.zoneId ~= nil end)
+
+	-- House Tours and owned houses share the same zone-specific preferred-house
+	-- mapping. This allows a House Tour house to become the single main-list
+	-- destination for a zone just like an owned house.
+	local function isHouseDestination()
+		local data = self:GetTargetData()
+		return data ~= nil and data.houseId ~= nil and (data.isOwnHouse or data.isHouseTour)
+	end
+
+	local function getPreferredHouseZoneId(data)
+		local zoneId = data.parentZoneId or data.zoneId
+		local preferredHouseId = BMU.getZoneSpecificHouse(zoneId)
+		if not preferredHouseId and data.isHouseTour then
+			local geographicalParentZoneId = BMU.getParentZoneId(data.zoneId)
+			if geographicalParentZoneId ~= zoneId then
+				zoneId = geographicalParentZoneId
+				preferredHouseId = BMU.getZoneSpecificHouse(zoneId)
+			end
+		end
+		return zoneId, preferredHouseId
+	end
+
+	local function togglePreferredHouse(data, checked)
+		local zoneId = data.parentZoneId or data.zoneId
+		if data.isHouseTour then
+			zoneId = BMU.getParentZoneId(data.zoneId)
+		end
+		if checked then
+			BMU.setZoneSpecificHouse(zoneId, data.houseId)
+		else
+			local preferredZoneId, preferredHouseId = getPreferredHouseZoneId(data)
+			if preferredHouseId == data.houseId then
+				BMU.clearZoneSpecificHouse(preferredZoneId)
+			end
+		end
+		self:PerformFullRefresh()
+	end
+
+	self:AddOptionTemplate(groupIdFavorites, function()
+		local data = self:GetTargetData()
+		local _, preferredHouseId = getPreferredHouseZoneId(data)
+		local checked = preferredHouseId == data.houseId
+		local filterData = {
+			filterName = BMU_SI_Get(checked and SI_TELE_UI_UNSET_PREFERRED_HOUSE or SI_TELE_UI_SET_PREFERRED_HOUSE),
+			callback = function(optionData) togglePreferredHouse(data, optionData.checked) end,
+			checked = function() return checked end,
+		}
+		return self:BuildCheckbox(nil, nil, filterData)
+	end, isHouseDestination)
 
 	-- TODO: create string 'Manage Favorites'
 	local function manageFavoritesSetup()

@@ -99,6 +99,7 @@ local BMU_SOURCE_INDEX_FRIEND 				= BMU.SOURCE_INDEX_FRIEND
 local BMU_SOURCE_INDEX_GROUP 				= BMU.SOURCE_INDEX_GROUP
 --local BMU_SOURCE_INDEX_GUILD				= BMU.SOURCE_INDEX_GUILD
 local BMU_SOURCE_INDEX_OWNHOUSES			= BMU.SOURCE_INDEX_OWNHOUSES
+local BMU_SOURCE_INDEX_HOUSE_TOUR			= BMU.SOURCE_INDEX_HOUSE_TOUR
 
 local formatStringFirstUppercase = teleporterVars.formatStringFirstUppercase
 
@@ -160,6 +161,7 @@ local IsZoneStoryActivityComplete = IsZoneStoryActivityComplete
 local GetNumZoneActivitiesForZoneCompletionType = GetNumZoneActivitiesForZoneCompletionType
 local zo_callLater = zo_callLater
 local CanJumpToPlayerInZone = CanJumpToPlayerInZone
+local JumpToSpecificHouse = JumpToSpecificHouse
 
 --BMU functions
 local BMU_SI_Get 							= SI.get
@@ -186,7 +188,8 @@ local BMU_isZoneOverlandZone, BMU_categorizeZone, BMU_showDialogSimple, BMU_prep
 	  BMU_findExactQuestLocation, BMU_sc_porting, BMU_getParentZoneId, BMU_clickOnTeleportToOwnHouseButton, BMU_clickOnTeleportToOwnHouseButton_2,
       BMU_tooltipTextEnter, BMU_clickOnTeleportToPTFHouseButton, BMU_clickOnOpenGuild, BMU_clickOnTeleportToDungeonButton, BMU_clickOnTeleportToPlayerButton,
 	  BMU_checkIfContextMenuIconShouldShow, BMU_clickOnPlayerName, BMU_clickOnHouseName, BMU_clickOnEmptyZoneName, BMU_throttle, BMU_calculateListHeight,
-      BMU_getHouseNameByHouseId, BMU_decideTryAgainPorting, BMU_updateStatistic, BMU_clickOnZoneName
+      BMU_getHouseNameByHouseId, BMU_decideTryAgainPorting, BMU_updateStatistic, BMU_clickOnZoneName,
+	  BMU_clickOnTeleportToHouseTourButton
 -- -^- INS251229 Baertram END 0
 
 
@@ -1561,6 +1564,7 @@ function ListView:update()
 	BMU_formatName = BMU_formatName or BMU.formatName
 	BMU_clickOnZoneName = BMU_clickOnZoneName or BMU.clickOnZoneName
 	BMU_isFavoriteZone = BMU_isFavoriteZone or BMU.isFavoriteZone
+	BMU_clickOnTeleportToHouseTourButton = BMU_clickOnTeleportToHouseTourButton or BMU.clickOnTeleportToHouseTourButton
 
 	-- suggestion by otac0n (Discord, 2022_10)
 	-- To make it robust, you may want to create a unique ID per ListView.  This assumes a singleton.
@@ -1679,13 +1683,17 @@ function ListView:update()
 				ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnPlayerName(button, message) end)
 
 
-			--House right click menu
+			                --House right click menu
 			elseif message.houseId ~= nil then
-				isHouseEntry = true
-				--Clear the tooltip
-				disableTooltipAndResetOnMouseUp(rowControlOfList)
-				ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnHouseName(button, message) end)
-				ColumnPlayerNameTex:SetHidden(false)
+                    -- Owned houses and House Tours use the same context menu on the
+                    -- displayed house/owner name. This also exposes the shared
+                    -- source filters (Own houses / House Tours) for House Tour owners.
+                    isHouseEntry = true
+                    disableTooltipAndResetOnMouseUp(rowControlOfList)
+                    ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnHouseName(button, message) end)
+                    ColumnPlayerNameTex:SetHidden(false)
+
+
 			--Empty zone right click menu (no player in the zone)
 			elseif message.zoneId ~= nil then
 				--Clear the tooltip
@@ -1780,14 +1788,15 @@ function ListView:update()
 			end
 			------------------
 
-			-- if search for related items and info not already added
+			-- Build the related-item suffix once per message, but append it on every
+			-- row update. List rows are recycled while scrolling, so display text
+			-- must not depend on a persistent "already added" flag.
 			if message.relatedItems ~= nil and #message.relatedItems > 0 then
-				-- ensure to add the total number only once
-				if not message.addedTotalItems then
-					-- add info about total number of related items
+				if message.relatedItemsDisplaySuffix == nil then
+					local relatedItemsSuffix = ""
 					local totalItemsCountInv = 0
 					local totalItemsCountBank = 0
-					for index, item in pairs(message.relatedItems) do
+					for _, item in pairs(message.relatedItems) do
 						if item.isInInventory then
 							totalItemsCountInv = totalItemsCountInv + item.itemCount
 						else
@@ -1795,23 +1804,20 @@ function ListView:update()
 						end
 					end
 					if totalItemsCountInv > 0 then
-						messageZoneName = messageZoneName .. " (" .. totalItemsCountInv .. ")"
+						relatedItemsSuffix = relatedItemsSuffix .. " (" .. totalItemsCountInv .. ")"
 					end
 					if totalItemsCountBank > 0 then
-						messageZoneName = messageZoneName .. BMU_colorizeText(" (" .. totalItemsCountBank .. ")", colorGray)
+						relatedItemsSuffix = relatedItemsSuffix .. BMU_colorizeText(" (" .. totalItemsCountBank .. ")", colorGray)
 					end
-
-					-- add item type icons
-					messageZoneName = messageZoneName .. " "
+					relatedItemsSuffix = relatedItemsSuffix .. " "
 					for _, itemType in ipairs(message.relatedItemsTypes) do
 						if itemType ~= nil then
-							-- add dimensionized icon (same size as BMU.font1)
-							--> add the survey, antiquity, treasure map icons at the rows
-							messageZoneName = messageZoneName .. BMU_getItemTypeIcon(itemType, BMU_round(16*scale, 0))
+							relatedItemsSuffix = relatedItemsSuffix .. BMU_getItemTypeIcon(itemType, BMU_round(16*scale, 0))
 						end
 					end
-					message.addedTotalItems = true
+					message.relatedItemsDisplaySuffix = relatedItemsSuffix
 				end
+				messageZoneName = messageZoneName .. message.relatedItemsDisplaySuffix
 
 				-- copy item names to tooltipTextZone
 				if #tooltipTextZone > 0 then
@@ -1907,11 +1913,20 @@ function ListView:update()
 				--respect nicknames of houses
 				local houseName = BMU_getHouseNameByHouseId(message.houseId)
 				local houseNickName = (showHouseNickNames == true and BMU_formatName(GetCollectibleNickname(GetCollectibleIdForHouse((message.houseId))))) or ""
-				if message.isPTFHouse then
-				  rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText(message.displayName, "lime"))
-				else
-				  rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText((houseNickName ~= "" and houseNickName) or zo_strformat(formatStringFirstUppercase, houseName), "lime"))
-			  end
+                if message.isPTFHouse then
+                    rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText(message.displayName, "lime"))
+                elseif message.isHouseTour then
+                    rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText(message.houseNameFormatted .. " (" .. message.displayName .. ")", "lime"))
+                else
+                    rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText((houseNickName ~= "" and houseNickName) or zo_strformat(formatStringFirstUppercase, houseName), "lime"))
+                end
+
+
+				-- if message.isPTFHouse then
+					-- rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText(message.displayName, "lime"))
+				-- else
+				  -- rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText((houseNickName ~= "" and houseNickName) or zo_strformat(formatStringFirstUppercase, houseName), "lime"))
+			  -- end
 			else
 				rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText(displayNameOfMessage, message.textColorDisplayName))
 			end
@@ -1992,8 +2007,18 @@ function ListView:update()
 				texture_normal = BMU_textures.groupLeaderBtn
 				texture_over = BMU_textures.groupLeaderBtnOver
 			end
+			
+			if message.isHouseTour and CanJumpToHouseFromCurrentLocation() and CanLeaveCurrentLocationViaTeleport() then
+                    -- House Tours shared house
+                    rowControlOfList.portalToPlayerTex:SetHidden(false)
+                    rowControlOfList.portalToPlayerTex:SetTexture(BMU_textures.houseBtn)
+                    rowControlOfList.portalToPlayerTex:SetHandler("OnMouseEnter", function(self) rowControlOfList.portalToPlayerTex:SetTexture(BMU_textures.houseBtnOver) BMU.pauseAutoRefresh = true end)
+                    rowControlOfList.portalToPlayerTex:SetHandler("OnMouseExit", function(self) rowControlOfList.portalToPlayerTex:SetTexture(BMU_textures.houseBtn) BMU.pauseAutoRefresh = false end)
+                    rowControlOfList.portalToPlayerTex:SetHandler("OnMouseUp", function(self, button) if button ~= MOUSE_BUTTON_INDEX_LEFT then return end BMU_clickOnTeleportToHouseTourButton(rowControlOfList.portalToPlayerTex, button, message) end)
 
-			if message.isOwnHouse and CanJumpToHouseFromCurrentLocation() and CanLeaveCurrentLocationViaTeleport() then
+			elseif message.isOwnHouse and CanJumpToHouseFromCurrentLocation() and CanLeaveCurrentLocationViaTeleport() then
+
+			
 				-- own house
 				rowControlOfList.portalToPlayerTex:SetHidden(false)
 				rowControlOfList.portalToPlayerTex:SetTexture(BMU_textures.houseBtn)
@@ -2232,7 +2257,33 @@ function BMU.clickOnTeleportToPTFHouseButton(textureControl, button, message)
 	end
 end
 
+function BMU.clickOnTeleportToHouseTourButton(textureControl, button, message)
+    BMU_HideTeleporter = BMU_HideTeleporter or BMU.HideTeleporter
+    BMU_showTeleportAnimation = BMU_showTeleportAnimation or BMU.showTeleportAnimation
+    BMU_formatName = BMU_formatName or BMU.formatName
 
+    -- click effect
+    textureControl:SetAlpha(0.65)
+    zo_callLater(function() textureControl:SetAlpha(1) end, BMU_getAutoUnlockCooldown(200))
+
+    if message.displayName ~= nil and message.displayName ~= "" and message.houseId ~= nil and message.houseId > 0 then
+        -- show additional animation
+        if BMU.savedVarsAcc.showTeleportAnimation then
+            BMU_showTeleportAnimation()
+        end
+
+        CancelCast()
+
+        BMU_printToChat("Port to House Tour: " .. message.displayName .. " - " .. BMU_formatName(GetZoneNameById(message.zoneId), false), BMU.MSG_FT)
+        JumpToSpecificHouse(message.displayName, message.houseId, true)
+
+        if BMU.savedVarsAcc.closeOnPorting then
+            SM:Hide("worldMap")
+            BMU_HideTeleporter()
+        end
+    end
+end
+BMU_clickOnTeleportToHouseTourButton = BMU.clickOnTeleportToHouseTourButton
 
 function BMU.clickOnOpenGuild(textureControl, button, message)
 	-- click effect
@@ -2409,12 +2460,49 @@ function BMU.clickOnZoneName(button, record)
 		end
 
 		------ display map ------
-		-- switch to Tamriel and back to players map in order to reset any subzone or zoom
-		if record.mapIndex ~= nil then
+		-- Keep the current map when a House Tour entry targets the exact sub-map
+		-- that is already displayed. This is important for Shadow Queen's Labyrinth:
+		-- the Brass Fortress and Clockwork City share a world-map index.
+		--
+		-- Fargrave houses (Ossa Accentium / Shattered Mirror Isle) have two useful
+		-- coordinate sets: one for the Fargrave overview map (2119) and one for the
+		-- Fargrave City Center map (2035). If the overview is already open, keep it
+		-- open and use its coordinates; otherwise switch to City Center. Night's Den
+		-- is handled separately because it exists only on the Fargrave overview.
+		local houseTourMapAlreadyOpen = false
+		local displayedZoneId = GetZoneId(GetCurrentMapZoneIndex())
+		local displayedMapId = GetCurrentMapId and GetCurrentMapId() or nil
+		local useHouseTourOverallMap = record.houseTourOverallMapId and displayedMapId == record.houseTourOverallMapId
+		if useHouseTourOverallMap then
+			houseTourMapAlreadyOpen = true
+		end
+		if record.houseTourMapId and record.houseTourMapZoneId then
+			-- The Brass Fortress is a sub-map of Clockwork City. When that sub-map
+			-- is already displayed, never force the view back to the world map.
+			if record.houseTourMapZoneId == 981 and displayedZoneId == 981 then
+				houseTourMapAlreadyOpen = true
+			elseif record.houseTourMapId and displayedMapId == record.houseTourMapId then
+				houseTourMapAlreadyOpen = true
+			end
+		elseif record.houseTourMapId then
+			houseTourMapAlreadyOpen = (displayedMapId == record.houseTourMapId)
+		end
+
+		if record.houseTourMapId and not houseTourMapAlreadyOpen then
+			SM:Show("worldMap")
+			if record.houseTourMapZoneId == 981 and WORLD_MAP_MANAGER and WORLD_MAP_MANAGER.SetMapById then
+				WORLD_MAP_MANAGER:SetMapById(record.houseTourMapId)
+			else
+				SetMapToMapId(record.houseTourMapId)
+			end
+			CM:FireCallbacks("OnWorldMapChanged")
+		elseif record.mapIndex ~= nil and not houseTourMapAlreadyOpen then
 			SM:Show("worldMap")
 			worldMapManager:SetMapByIndex(1)
 			worldMapManager:SetMapByIndex(record.mapIndex)
 			CM:FireCallbacks("OnWorldMapChanged")
+		elseif record.isHouseTour then
+			SM:Show("worldMap")
 		end
 
 		------ display poi on map (in case of delve, dungeon etc.) ------
@@ -2422,9 +2510,25 @@ function BMU.clickOnZoneName(button, record)
 			local normalizedX
 			local normalizedZ
 			local _
-			-- primary: use LibZone function
-			local parentZoneId, parentZoneIndex, poiIndex = BMU_LibZone:GetZoneMapPinInfo(record.zoneId, record.parentZoneId)
-			if poiIndex ~= nil and poiIndex ~= 0 then
+			-- Primary: use LibZone. House Tours may need the exact map-specific
+			-- zone rather than the broader geographical parent.
+			local pinParentZoneId = record.parentZoneId
+			if record.houseTourMapZoneId then
+				pinParentZoneId = record.houseTourMapZoneId
+			end
+
+			-- Use explicit fixed house coordinates first, regardless of whether
+			-- this is an owned-house or House Tour entry.
+			if useHouseTourOverallMap and record.houseTourOverallPingX and record.houseTourOverallPingZ then
+				normalizedX = record.houseTourOverallPingX
+				normalizedZ = record.houseTourOverallPingZ
+			elseif record.houseTourPingX and record.houseTourPingZ then
+				normalizedX = record.houseTourPingX
+				normalizedZ = record.houseTourPingZ
+			end
+
+			local parentZoneId, parentZoneIndex, poiIndex = BMU_LibZone:GetZoneMapPinInfo(record.zoneId, pinParentZoneId)
+			if not normalizedX and poiIndex ~= nil and poiIndex ~= 0 then
 				normalizedX, normalizedZ, _, _, _, _ = GetPOIMapInfo(parentZoneIndex, poiIndex)
 			end
 
@@ -2439,7 +2543,7 @@ function BMU.clickOnZoneName(button, record)
 				-- find out coordinates in order to Ping on Map (e.g. Delves, Public Dungeons)
 				--local coordinate_x = 0
 				--local coordinate_z = 0
-				local zoneIndex = GetZoneIndex(record.parentZoneId)
+				local zoneIndex = GetZoneIndex(pinParentZoneId)
 				for i = 0, GetNumPOIs(zoneIndex) do
 					local e = {}
 					e.normalizedX, e.normalizedZ, e.poiPinType, e.icon, e.isShownInCurrentMap, e.linkedCollectibleIsLocked = GetPOIMapInfo(zoneIndex, i)
@@ -2467,7 +2571,9 @@ function BMU.clickOnZoneName(button, record)
 			end
 			------------------
 
-			if normalizedX and normalizedZ then
+			-- ESO can return 0,0 when no valid POI coordinates exist. Do not ping
+			-- the center of the map in that case.
+			if normalizedX and normalizedZ and (normalizedX ~= 0 or normalizedZ ~= 0) then
 				-- Map Ping
 				if BMU_savedVarsAcc.useMapPing and BMU.LibMapPing then
 					PingMap(MAP_PIN_TYPE_RALLY_POINT, MAP_TYPE_LOCATION_CENTERED, normalizedX, normalizedZ)
@@ -2498,6 +2604,38 @@ function BMU.clickOnZoneName(button, record)
 
 		-- start generating context menus
 		ClearCustomScrollableMenu()
+
+		-------Preferred-house contextMenu-------
+		-- Owned houses and House Tours share the same zone-specific preference.
+		-- This makes /bmu/house/set/current_zone a combined preference system
+		-- for both kinds of house destinations.
+		if (record.isHouseTour or record.isOwnHouse) and record.houseId then
+			AddCustomScrollableMenuDivider()
+			local preferredHouseId = BMU_getZoneSpecificHouse(record.parentZoneId)
+			if not preferredHouseId then
+				local geographicalParentZoneId = BMU_getParentZoneId(record.zoneId)
+				if geographicalParentZoneId ~= record.parentZoneId then
+					preferredHouseId = BMU_getZoneSpecificHouse(geographicalParentZoneId)
+				end
+			end
+
+			if preferredHouseId == record.houseId then
+				AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_UNSET_PREFERRED_HOUSE), function()
+					local zoneId = record.parentZoneId
+					if not BMU_getZoneSpecificHouse(zoneId) then
+						zoneId = BMU_getParentZoneId(record.zoneId)
+					end
+					BMU_clearZoneSpecificHouse(zoneId)
+					BMU_refreshListAuto(false)
+				end)
+			else
+				AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_SET_PREFERRED_HOUSE), function()
+					local zoneId = BMU_getParentZoneId(record.zoneId)
+					BMU_setZoneSpecificHouse(zoneId, record.houseId)
+					BMU_refreshListAuto(false)
+				end)
+			end
+		end
 
 		-------Own house contextMenu-------
 		if inOwnHouseTab then
@@ -2550,19 +2688,7 @@ function BMU.clickOnZoneName(button, record)
 				AddCustomScrollableMenuDivider()
 			end
 
-			-- 2. manage preferred houses
-			local preferredHouseId = BMU_getZoneSpecificHouse(record.parentZoneId)
-			if preferredHouseId and preferredHouseId == record.houseId then
-				-- current house is set as preferred
-				-- clear zone to unset the house
-				AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_UNSET_PREFERRED_HOUSE), function() BMU_clearZoneSpecificHouse(record.parentZoneId) end)
-			else
-				-- current house is not preferred
-				-- set house as preferred
-				AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_SET_PREFERRED_HOUSE), function() BMU_setZoneSpecificHouse(record.parentZoneId, record.houseId) end)
-			end
-
-			-- 3. make primary residence
+			-- 2. make primary residence
 			if record.prio ~= 1 then
 				-- prio = 1 -> is primary house
 				-- make primary and refresh with delay
@@ -2574,10 +2700,10 @@ function BMU.clickOnZoneName(button, record)
 				 end)
 			end
 
-			-- 4. rename own houses
+			-- 3. rename own houses
 			AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_RENAME_HOUSE_NICKNAME), function() ZO_CollectionsBook.ShowRenameDialog(record.collectibleId) end)
 
-			-- 5. paste link to chat
+			-- 4. paste link to chat
 			AddCustomScrollableMenuEntry(GetString(SI_HOUSING_LINK_IN_CHAT), function() ZO_HousingBook_LinkHouseInChat(record.houseId, myDisplayName) end)
 		end
 
@@ -2845,28 +2971,48 @@ local function addCommonContextMenuEntries(button, record)
 			icon = function() return BMU_checkIfContextMenuIconShouldShow("friends") end,
 		},
 	}
-	--Player owns any houses?
-	if numOwnHouses > 0 then
+	-- Houses / House Tours
+	local numHouseTourHouses = BMU.houseTourListings and #BMU.houseTourListings or 0
+	local showHouseTourFilter = BMU.savedVarsAcc.showHouseTours and numHouseTourHouses > 0
+	if numOwnHouses > 0 or showHouseTourFilter then
 		entries_filter[#entries_filter+1] = {
-			label = GetString(SI_MAPFILTER18) .. ((numOwnHouses > 0 and " (#" .. tos(numOwnHouses) .. ")") or ""), --"Houses",
+			label = GetString(SI_MAPFILTER18), --"Houses",
 			entryType = LSM_ENTRY_TYPE_HEADER,
 		}
-		entries_filter[#entries_filter+1] = {
-			label = BMU_colorizeText(BMU_SI_Get(SI_TELE_UI_BTN_PORT_TO_OWN_HOUSE), colorTeal), --Own houses
-			callback = function()
-				BMU_createTable({index=BMU_indexListSource, filterSourceIndex=BMU_SOURCE_INDEX_OWNHOUSES}) --INS Baertram 260206
-				BMU.var.choosenListPlayerFilter = BMU_SOURCE_INDEX_OWNHOUSES
-				--BMU_createTableHouses() BMU.var.choosenListPlayerFilter = -1 --> This would switch the active listButton to "Own houses"!
-			end,
-			entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
-			buttonGroup = 7,
-			checked = function() return BMU.var.choosenListPlayerFilter == BMU_SOURCE_INDEX_OWNHOUSES end,
-			icon = function() return BMU_checkIfContextMenuIconShouldShow("houseBtn") end,
-			enabled = function()
-				if BMU.savedVarsAcc.hideOwnHouses then return false end
-				return numOwnHouses > 0
-			end,
-		}
+		if numOwnHouses > 0 then
+			entries_filter[#entries_filter+1] = {
+				label = BMU_colorizeText(BMU_SI_Get(SI_TELE_UI_BTN_PORT_TO_OWN_HOUSE) .. " (#" .. tos(numOwnHouses) .. ")", colorTeal), --Own houses
+				callback = function()
+					BMU_createTable({index=BMU_indexListSource, filterSourceIndex=BMU_SOURCE_INDEX_OWNHOUSES}) --INS Baertram 260206
+					BMU.var.choosenListPlayerFilter = BMU_SOURCE_INDEX_OWNHOUSES
+					--BMU_createTableHouses() BMU.var.choosenListPlayerFilter = -1 --> This would switch the active listButton to "Own houses"!
+				end,
+				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
+				buttonGroup = 7,
+				checked = function() return BMU.var.choosenListPlayerFilter == BMU_SOURCE_INDEX_OWNHOUSES end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("houseBtn") end,
+				enabled = function()
+					if BMU.savedVarsAcc.hideOwnHouses then return false end
+					return numOwnHouses > 0
+				end,
+			}
+		end
+		if showHouseTourFilter then
+			entries_filter[#entries_filter+1] = {
+				label = BMU_colorizeText(BMU_SI_Get(SI_TELE_UI_HOUSE_TOURS_FILTER) .. " (#" .. tos(numHouseTourHouses) .. ")", colorTeal), --House Tours
+				callback = function()
+					BMU_createTable({index=BMU_indexListSource, filterSourceIndex=BMU_SOURCE_INDEX_HOUSE_TOUR})
+					BMU.var.choosenListPlayerFilter = BMU_SOURCE_INDEX_HOUSE_TOUR
+				end,
+				entryType = LSM_ENTRY_TYPE_RADIOBUTTON,
+				buttonGroup = 7,
+				checked = function() return BMU.var.choosenListPlayerFilter == BMU_SOURCE_INDEX_HOUSE_TOUR end,
+				icon = function() return BMU_checkIfContextMenuIconShouldShow("houseBtn") end,
+				enabled = function()
+					return BMU.savedVarsAcc.showHouseTours and numHouseTourHouses > 0
+				end,
+			}
+		end
 	end
 
 	-- add all guilds

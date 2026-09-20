@@ -53,8 +53,9 @@ local strings = {
     ["SI_TELE_UI_TOGGLE_ACRONYM"] = "Mostrar acrónimos",
     ["SI_TELE_UI_TOOGLE_DUNGEON_NAME"] = "Mostrar nombre de la instancia",
     ["SI_TELE_UI_TRAVEL_PARENT_ZONE"] = "Port to parent zone",
-    ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Set as preferred house",
-    ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Unset preferred house",
+    ["SI_TELE_UI_HOUSE_TOURS_FILTER"] = "Visitas de casas",
+    ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Establecer como casa preferida",
+    ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Quitar como casa preferida",
 
 
 
@@ -112,6 +113,8 @@ local strings = {
     ["SI_TELE_SETTINGS_NUMBER_LINES"] = "Numero de lineas / listado",
     ["SI_TELE_SETTINGS_NUMBER_LINES_TOOLTIP"] = "Al configurar el numero de lineas visibles / listados podra controlar la total altura del complemento.",
     ["SI_TELE_SETTINGS_HEADER_ADVANCED"] = "Caracteristicas Extras",
+    ["SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS"] = "Activar comandos de diagnóstico",
+    ["SI_TELE_SETTINGS_DIAGNOSTIC_COMMANDS_TOOLTIP"] = "Activa los comandos de diagnóstico bajo /bmu/diag y los hace disponibles en el autocompletado de LibSlashCommander. Los cambios requieren recargar la interfaz.",
     ["SI_TELE_SETTINGS_HEADER_UI"] = "General",
     ["SI_TELE_SETTINGS_HEADER_RECORDS"] = "Listado",
     ["SI_TELE_SETTINGS_CLOSE_ON_PORTING"] = "Cierre automatico de mapa y BeamMeUp",
@@ -157,6 +160,8 @@ local strings = {
     ["SI_TELE_SETTINGS_CURRENT_ZONE_ALWAYS_TOP_TOOLTIP"] = "Mostrar zona actual siempre en la parte superior de la lista.",
     ["SI_TELE_SETTINGS_HIDE_OWN_HOUSES"] = "Ocultar casas propias",
     ["SI_TELE_SETTINGS_HIDE_OWN_HOUSES_TOOLTIP"] = "Ocultar casas propias  (transportar afuera) en la lista principal.",
+    ["SI_TELE_SETTINGS_SHOW_HOUSE_TOURS"] = "Show House Tour houses",
+    ["SI_TELE_SETTINGS_SHOW_HOUSE_TOURS_TOOLTIP"] = "Show houses found via the House Tours browser in the list.",
     ["SI_TELE_SETTINGS_HEADER_STATS"] = "Estadisticas",
     ["SI_TELE_SETTINGS_MOST_PORTED_ZONES"] = "Zonas mas transportadas:",
     ["SI_TELE_SETTINGS_INSTALLED_SCINCE"] = "Instalado desde:",

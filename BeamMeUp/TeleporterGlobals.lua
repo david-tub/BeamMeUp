@@ -36,6 +36,7 @@ BMU.SOURCE_INDEX_GUILD = {
 	[5] = 7,
 }
 BMU.SOURCE_INDEX_OWNHOUSES = 8 --INS Baertram 260206
+BMU.SOURCE_INDEX_HOUSE_TOUR = 9  -- source "Home Tours"
 
 -- constant values for zone categorization
 BMU.ZONE_CATEGORY_UNKNOWN = 0
@@ -135,6 +136,19 @@ BMU.var = {
 }
 
 local teleporterVars = BMU.var
+-- House Tours caches
+BMU.houseTourListings = nil              -- raw listings [{ houseId, ownerName, houseName, collectibleId, houseZoneId, parentZoneId }, ...]
+BMU.houseTourSearchPending = false       -- true while a House Tours search is in progress
+BMU.houseTourFallbackByParentZoneId = {} -- cache: [parentZoneId] = listingData OR false (if there is no result)
+
+-- House Tour homes whose ESO zone association is incorrect.
+-- Values are the correct geographical parent zone IDs.
+BMU.houseTourParentZoneOverrides = {
+    [102] = 981,  -- Shadow Queen's Labyrinth -> Brass Fortress
+    [54]  = 684,  -- Pariah's Pinnacle -> Wrothgar
+    [115] = 1282, -- Shattered Mirror Isle -> Fargrave
+}
+	
 --local allowedLanguages = teleporterVars.allowedLanguages
 local allowedLanguagesIndex = teleporterVars.allowedLanguagesIndex
 
@@ -675,7 +689,6 @@ BMU.blacklistEndlessDungeons = {1436}
 --------
 
 -- Houses
-BMU.blacklistHouses = {940, 942, 941, 939, 938, 937, 859, 858, 878, 868, 869, 873, 860, 861, 877, 852, 853, 881, 867, 866, 874, 863, 862, 876, 871, 870, 872, 864, 865, 875, 855, 854, 880, 856, 857, 879, 944, 943, 945, 882, 883, 994, 995, 997, 996, 1005, 1008, 1007, 1006, 1042, 1043, 1044, 1045, 1059, 1060, 1061, 1063, 1108, 1109, 1064, 1125, 1126, 1128, 1129, 1130, 1154, 1155, 1192, 1193, 1199, 1200, 1218, 1219, 1220, 1233, 1234, 1264, 1265, 1270, 1271, 1275, 1276, 1277, 1307, 1342, 1343, 1306, 1345, 1363, 1364, 1432, 1433, 1434, 1435, 1437, 1468, 1472, 1473, 1438, 1479, 1487, 1491, 1492, 1494, 1495, 1500, 1501, 1546, 1547, 1554, 1555, 1556, 1560, 1561, 1566, 1567, 1568, 1569, 1594, 1595, 1597, 1609, 1610}
 
 -----------------------------------------
 

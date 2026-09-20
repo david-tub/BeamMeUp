@@ -6,7 +6,7 @@
 ## Version: ${ADDON_VERSION}
 ## AddOnVersion: ${ADDON_FORMATTED_VERSION}
 ## IsLibrary: false
-## ConsoleDependsOn: LibHarvensAddonSettings LibZone
+## ConsoleDependsOn: LibHarvensAddonSettings
 ## DependsOn: LibAddonMenu-2.0>=41
 ## PCDependsOn: LibScrollableMenu LibZone>=0895
 ## OptionalDependsOn: LibCustomMenu LibSlashCommander LibSets LibMapPing LibChatMenuButton PortToFriendsHouse BanditsUserInterface MorrowindStyleUI
@@ -17,14 +17,14 @@ localization/EN.lua
 localization/$(language).lua
 
 ## LibZone
-#Console/lib/LibZone/LibZone_Constants.lua
+Console/lib/LibZone/LibZone_Constants.lua
 
 ##LibZone API functions
-#Console/lib/LibZone/LibZone.lua
+Console/lib/LibZone/LibZone.lua
 
 ##LibZone preloaded zonedata and names
-#Console/lib/LibZone/LibZone_Data.lua
-#Console/lib/LibZone/LibZone_GeoData.lua
+Console/lib/LibZone/LibZone_Data.lua
+Console/lib/LibZone/LibZone_GeoData.lua
 
 ## Globals / data sets
 GuildData.lua

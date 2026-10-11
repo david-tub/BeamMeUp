@@ -3293,12 +3293,10 @@ end
 -- cancelled and replaced when a new search completes, and the previous cache
 -- stays in use until the enriched entries are merged (see
 -- BMU.finishHouseTourSearch). Without LibAsync it falls back to a synchronous
--- loop with a deferred safety finalizer (zo_callLater) that finalizes the
--- build even when the loop body raises, so the search is never left locked.
--- An error inside a listing aborts the remaining loop and surfaces to ESO's
--- error handler; LibAsync's own error protection runs OnError/Finally on
--- the LibAsync path, which finalize the build and restore the game's House
--- Tours filters with the listings enriched so far.
+-- loop. An error inside a listing aborts the remaining loop: LibAsync's
+-- own error protection runs the OnError/Finally handlers, which finalize the
+-- build and restore the game's House Tours filters with the listings
+-- enriched so far.
 function BMU.buildHouseToursCacheEntries(rawListings, resultCount, onComplete)
     local enrichedListings = {}
 
@@ -3318,19 +3316,16 @@ function BMU.buildHouseToursCacheEntries(rawListings, resultCount, onComplete)
             return
         end
         finished = true
-        -- Release the mandatory state FIRST, before the diagnostics and the
-        -- final callback. If a later step raises, the flags are already reset
-        -- so a later deferred finalizer cannot leave the search locked; the
-        -- guard (`finished`) also prevents any double finalization.
-        BMU.houseTourCacheBuilding = false
-        BMU.houseTourCacheBuildTask = nil
-        BMU.houseTourSearchPending = false
-        BMU.houseTourSearchPendingType = nil
         stats.entries = #enrichedListings
         BMU.houseTourCacheStats = logCacheBuildStats(stats, "HouseToursCache")
-        -- onComplete advances the batch chain (merge, refresh, next batch or
-        -- filter restore). An error inside it is NOT recovered here: it
-        -- propagates to the caller, and the flags above are already reset.
+        BMU.houseTourCacheBuilding = false
+        BMU.houseTourCacheBuildTask = nil
+        -- Release the "search in progress" state only now: while the
+        -- enrichment runs, RequestHouseTourSearch stays blocked so no
+        -- concurrent search can restart the batch chain (batch index, game
+        -- filters) in the middle of a build.
+        BMU.houseTourSearchPending = false
+        BMU.houseTourSearchPendingType = nil
         onComplete(enrichedListings, resultCount)
     end
 
@@ -3366,21 +3361,6 @@ function BMU.buildHouseToursCacheEntries(rawListings, resultCount, onComplete)
         end)
     else
         -- No LibAsync available: enrich synchronously as a fallback.
-        --
-        -- Deferred safety finalizer, scheduled BEFORE the loop so it runs
-        -- even when the loop body raises: without it, finishBuild would never
-        -- run and houseTourSearchPending would stay locked for the whole
-        -- session (no error capture is used; the error still surfaces to
-        -- ESO's error handler). On the success path the loop calls
-        -- finishBuild() synchronously first and the guard (`finished` +
-        -- generation check) makes this deferred callback a no-op.
-        BMU.houseTourCacheBuilding = true
-        zo_callLater(function()
-            if not finished and BMU.houseTourCacheBuildGeneration == generation then
-                finishBuild()
-            end
-        end, 1)
-
         for _, rawListing in ipairs(rawListings) do
             timeCacheBuildStep(stats, function()
                 BMU.enrichHouseTourListing(rawListing, enrichedListings)

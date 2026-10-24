@@ -29,9 +29,6 @@ local appName = teleporterVars.appName
 local searchPatternSC = "^(%S*)%s*(.-)$"
 local gsubPattern1 = "[\n\r]"
 local gsubPattern2 = "%s+$"
-local fallbackLang = teleporterVars.fallbackLang
-local clientLanguage = string_lower(GetCVar("language.2") or fallbackLang)
-local BMU_LibZoneGivenZoneData
 ----functions
 --ZOs functions
 local GetZoneNameById = GetZoneNameById
@@ -60,7 +57,7 @@ local BMU_PortalToPlayer = BMU.PortalToPlayer
 
 
 ----variables (defined inline in code below, upon first usage, as they are still nil at this line)
-local BMU_LibZone, BMU_LibZone_GetZoneGeographicalParentZoneId, BMU_setZoneSpecificHouse, BMU_getZoneSpecificHouse, BMU_clearZoneSpecificHouse,
+local BMU_setZoneSpecificHouse, BMU_getZoneSpecificHouse, BMU_clearZoneSpecificHouse,
 	  BMU_sc_checkPartnerGuilds_2, BMU_createTable, BMU_formatName
 
 --BMU functions
@@ -77,11 +74,9 @@ local function getZoneNameWithFallback(zoneId)
 	end
 	
 	-- Try to get parent zone name if available
-	BMU_LibZone = BMU_LibZone or BMU.LibZone
-	BMU_LibZone_GetZoneGeographicalParentZoneId = BMU_LibZone_GetZoneGeographicalParentZoneId or BMU_LibZone.GetZoneGeographicalParentZoneId
-	BMU_LibZoneGivenZoneData = BMU_LibZoneGivenZoneData or BMU.LibZoneGivenZoneData
+	BMU_getParentZoneId = BMU_getParentZoneId or BMU.getParentZoneId
 
-	local parentZoneId = BMU_LibZone_GetZoneGeographicalParentZoneId(zoneId)
+	local parentZoneId = BMU_getParentZoneId(zoneId)
 	if parentZoneId and parentZoneId ~= zoneId then
 		local parentZoneName = GetZoneNameById(parentZoneId)
 		if parentZoneName and parentZoneName ~= "" then
@@ -89,20 +84,6 @@ local function getZoneNameWithFallback(zoneId)
 		end
 	end
 
-	-- Try to get from LibZone data as fallback
-	if BMU_LibZoneGivenZoneData then
-		local langData = BMU_LibZoneGivenZoneData[clientLanguage] or (clientLanguage ~= fallbackLang and BMU_LibZoneGivenZoneData[fallbackLang]) or nil
-		if langData and langData[zoneId] then
-			return langData[zoneId]
-		end
-		
-		-- Also try parent zone from LibZone data
-		parentZoneId = BMU_LibZone_GetZoneGeographicalParentZoneId(zoneId)
-		if parentZoneId and parentZoneId ~= zoneId and langData[parentZoneId] then
-			return langData[parentZoneId] .. " (Sub-zone ID: " .. tos(zoneId) .. ")"
-		end
-	end
-	
 	return "Unknown Zone ID: " .. tos(zoneId)
 end
 
@@ -479,21 +460,16 @@ local function BMU_sc_initializeSlashPorting()
 	BMU_sc_joinBlacklistForSlashPorting(BMU.blacklistGroupArenas)
 	BMU_sc_joinBlacklistForSlashPorting(BMU.blacklistEndlessDungeons)
 
-	-- initialize chat commands
-	-- check if zone name data is available in client language
-	-- use English zoneData if zoneData in client language is not available
-	local libZoneData = BMU.LibZoneGivenZoneData
-	local zoneData = libZoneData[string_lower(BMU.lang)] or (BMU.lang ~= fallbackLang and libZoneData[fallbackLang]) or nil
-	if zoneData ~= nil then
-		local blacklistForSlashPorting = BMU.blacklistForSlashPorting
-		
-		for zoneId, zoneName in pairs(zoneData) do
-			if type(zoneId) == "number" and type(zoneName) == "string" then
-				local zoneNameFormatted = BMU_formatName(zoneName, BMU.savedVarsAcc.formatZoneName)
-				local comName = "/bmutp/" .. string_gsub(string_lower(zoneNameFormatted), " ", "_")
-				if SLASH_COMMANDS[comName] == nil and CanJumpToPlayerInZone(zoneId) and not blacklistForSlashPorting[zoneId] then -- dont overwrite existing command, check for solo zones by game, check for blacklisting
-					BMU_registerChatCommand(comName, function(option) BMU_sc_porting(zoneId) end, zoneNameFormatted)
-				end
+	-- initialize chat commands for all zones (zone names in client language)
+	local blacklistForSlashPorting = BMU.blacklistForSlashPorting
+	for zoneIndex = 1, GetNumZones() do
+		local zoneId = GetZoneId(zoneIndex)
+		local zoneName = GetZoneNameById(zoneId)
+		if zoneName ~= "" then
+			local zoneNameFormatted = BMU_formatName(ZO_CachedStrFormat("<<C:1>>", zoneName), BMU.savedVarsAcc.formatZoneName)
+			local comName = "/bmutp/" .. string_gsub(string_lower(zoneNameFormatted), " ", "_")
+			if SLASH_COMMANDS[comName] == nil and CanJumpToPlayerInZone(zoneId) and not blacklistForSlashPorting[zoneId] then -- dont overwrite existing command, check for solo zones by game, check for blacklisting
+				BMU_registerChatCommand(comName, function(option) BMU_sc_porting(zoneId) end, zoneNameFormatted)
 			end
 		end
 	end

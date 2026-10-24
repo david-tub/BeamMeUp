@@ -1147,7 +1147,7 @@ function BMU.filterAndDecide(index, e, inputString, currentZoneId, fZoneId, filt
 
 	-- filter by zone name
 	elseif index == BMU_indexListSearchZone then
-		if (string_match(string_lower(e.zoneName), string_lower(inputString)) or (BMU_savedVarsAcc.secondLanguage ~= 1 and string_match(string_lower(e.zoneNameSecondLanguage), string_lower(inputString)))) and not BMU_isBlacklisted(e.zoneId, e.sourceIndexLeading, BMU_savedVarsAcc.onlyMaps) and BMU_checkOnceOnly(BMU_savedVarsAcc.zoneOnceOnly, e) then
+		if (string_match(string_lower(e.zoneName), string_lower(inputString)) or (BMU_savedVarsAcc.secondLanguage ~= 1 and e.zoneNameSecondLanguage ~= nil and string_match(string_lower(e.zoneNameSecondLanguage), string_lower(inputString)))) and not BMU_isBlacklisted(e.zoneId, e.sourceIndexLeading, BMU_savedVarsAcc.onlyMaps) and BMU_checkOnceOnly(BMU_savedVarsAcc.zoneOnceOnly, e) then
 			return true
 		end
 
@@ -2227,8 +2227,19 @@ BMU_getDataMapInfo = BMU.getDataMapInfo
 
 -- return (geographical) parent zone id (if parent zone id can not be found -> parentZoneId = zoneId)
 function BMU.getParentZoneId(zoneId)
-	-- use LibZone function that already handles exceptions and returns true geographical parent zone
-	local parentZoneId = BMU_LibZone:GetZoneGeographicalParentZoneId(zoneId)
+	local parentZoneId
+	if BMU_LibZone then
+		-- use LibZone function that already handles exceptions and returns true geographical parent zone
+		parentZoneId = BMU_LibZone:GetZoneGeographicalParentZoneId(zoneId)
+	else
+		-- use own list of zones where the API returns a wrong geographical parent zone
+		parentZoneId = BMU.parentZoneOverrides[zoneId]
+		if type(parentZoneId) == tableType then
+			-- zone is located in multiple zones: use the player's zone if it is one of them, otherwise the first one
+			local playerZoneId = GetUnitWorldPosition("player")
+			parentZoneId = (ZO_IsElementInNumericallyIndexedTable(parentZoneId, playerZoneId) and playerZoneId) or parentZoneId[1]
+		end
+	end
 
 	-- fallback: use API to get parent zone
 	if not parentZoneId or parentZoneId == 0 then
@@ -2432,7 +2443,7 @@ function BMU.addOverlandZoneMatches(p_portalPlayers, inputString, currentZoneId)
 	for overlandZoneId, _ in pairs(BMU.overlandDelvesPublicDungeons) do
 		local entry = BMU_createClickableZoneRecord(overlandZoneId)
 		-- add only if zone not already in result list + search string match
-		if not allZoneIds[overlandZoneId] and (string_match(string_lower(entry.zoneName), string_lower(inputString)) or (BMU.savedVarsAcc.secondLanguage ~= 1 and string_match(string_lower(entry.zoneNameSecondLanguage), string_lower(inputString)))) then
+		if not allZoneIds[overlandZoneId] and (string_match(string_lower(entry.zoneName), string_lower(inputString)) or (BMU.savedVarsAcc.secondLanguage ~= 1 and entry.zoneNameSecondLanguage ~= nil and string_match(string_lower(entry.zoneNameSecondLanguage), string_lower(inputString)))) then
 			-- change text color if zone is displayed zone
 			if entry.zoneId == currentZoneId then
 				entry.textColorZoneName = colorTeal

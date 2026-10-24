@@ -126,6 +126,7 @@ local strings = {
     ["SI_TELE_SETTINGS_SORTING_TOOLTIP"] = "Choisissez l'une des options de tri possibles dans la liste.",
     ["SI_TELE_SETTINGS_SECOND_SEARCH_LANGUAGE"] = "Deuxième langue de recherche",
     ["SI_TELE_SETTINGS_SECOND_SEARCH_LANGUAGE_TOOLTIP"] = "Vous pouvez effectuer vos recherches par nom de zone dans la langue de votre client et dans cette seconde langue en même temps. L'infobulle du nom de la zone affiche également le nom dans la langue secondaire.",
+    ["SI_TELE_ADDON_EXT_LIBZONE_DESC"] = "Affichez et recherchez les noms de zones dans une seconde langue. Une option dans « Fonctionnalités supplémentaires » permet de choisir la langue.",
     ["SI_TELE_SETTINGS_NOTIFICATION_PLAYER_FAVORITE_ONLINE"] = "Notification de connexion de joueur favoris",
     ["SI_TELE_SETTINGS_NOTIFICATION_PLAYER_FAVORITE_ONLINE_TOOLTIP"] = "Vous recevrez une notification (message au centre de votre écran) lorsqu'un joueur configuré en favoris se connecte au serveur.",
     ["SI_TELE_SETTINGS_HIDE_ON_MAP_CLOSE"] = "Fermer BeamMeUp à la fermeture de la carte",

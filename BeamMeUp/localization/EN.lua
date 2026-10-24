@@ -88,6 +88,7 @@ local stringsEN = {
     ["SI_TELE_ADDON_EXT_LIBSETS_DESC"] = "Check your collection progress of set items in BeamMeUp and sort your fast travel options. The number of the collected set items is displayed in the tooltip of the zone names. Furthermore, you can sort your results according to the number of missing set items.",
     ["SI_TELE_ADDON_EXT_LIBMAPPING_DESC"] = "Use pings on the map (rally points) instead of zooming when you click on specific zone names or group members. An option in the 'Extra Features' allows you to toggle between the map ping and the zoom & pan feature.",
     ["SI_TELE_ADDON_EXT_LIBSLASHCOMMANDER_DESC"] = "Get comprehensive auto-completion, color coding and short description for chat commands.",
+    ["SI_TELE_ADDON_EXT_LIBZONE_DESC"] = "Display and search zone names in a second language. An option in the 'Extra Features' allows you to choose the language.",
     ["SI_TELE_ADDON_EXT_LIBCHATMENUBTN_DESC"] = "Leave the positioning of the BMU chat button to an external library. Support the concept of libraries. But you will lose the option to set an individual offset.",
     ["SI_TELE_ADDON_EXT_IJAGBMUGP_DESC"] = "Use BeamMeUp in the gamepad mode. With this addon, BeamMeUp gets a dedicated gamepad support. |cFF00FFIsJusta|r Beam Me Up Gamepad Plugin integrates the features of BeamMeUp in the gamepad interface and allows you to travel more comfortable than ever before.",
 

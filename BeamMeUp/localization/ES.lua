@@ -126,6 +126,7 @@ local strings = {
     ["SI_TELE_SETTINGS_SORTING_TOOLTIP"] = "Elija uno de los posibles tipos de lista.",
     ["SI_TELE_SETTINGS_SECOND_SEARCH_LANGUAGE"] = "Segunda busqueda de Lenguaje",
     ["SI_TELE_SETTINGS_SECOND_SEARCH_LANGUAGE_TOOLTIP"] = "Puede buscar por nombres de Zonas en el idioma de cliente y este segundo Lenguaje al mismo tiempo. La información sobre herramientas del nombre de la zona también muestra el nombre en el segundo idioma.",
+    ["SI_TELE_ADDON_EXT_LIBZONE_DESC"] = "Muestra y busca nombres de zonas en un segundo idioma. Una opción en 'Caracteristicas Extras' permite elegir el idioma.",
     ["SI_TELE_SETTINGS_NOTIFICATION_PLAYER_FAVORITE_ONLINE"] = "Notificacion de Jugador Favorito en Linea",
     ["SI_TELE_SETTINGS_NOTIFICATION_PLAYER_FAVORITE_ONLINE_TOOLTIP"] = "Recibira una notificacion (mensaje en pantalla central) cuando un jugador favotiro se conecte en Linea.",
     ["SI_TELE_SETTINGS_HIDE_ON_MAP_CLOSE"] = "Cerrar BeamMeUp cuando el mapa este cerrado",

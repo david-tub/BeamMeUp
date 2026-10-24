@@ -344,6 +344,15 @@ function BMU.getStringIsInstalledLibrary(addonName)
 		end
 	end
 
+	-- LibZone
+	if lowerAddonName== "libzone" then
+		if BMU.LibZone then
+			return stringInstalled
+		else
+			return stringNotInstalled
+		end
+	end
+
 	-- LibChatMenuButton
 	if lowerAddonName== "lcmb" then
 		if BMU.LCMB then

@@ -2351,6 +2351,41 @@ end
 BMU_isWholeWordInString = BMU.isWholeWordInString
 
 
+-- searches the map pin (POI) of a zone (e.g. Delves, Public Dungeons) by its name on the map of zoneIndex
+-- returns the poiIndex or nil (results are cached, as the POIs do not change)
+BMU.poiIndexByNameCache = {}
+function BMU.findPoiIndexByName(zoneIndex, toSearch)
+	if toSearch == nil or toSearch == "" then return end
+	local poiIndexByNameCache = BMU.poiIndexByNameCache
+	local cacheKey = zoneIndex .. "_" .. toSearch
+	local cachedPoiIndex = poiIndexByNameCache[cacheKey]
+	if cachedPoiIndex ~= nil then
+		return cachedPoiIndex or nil
+	end
+
+	BMU_formatName = BMU_formatName or BMU.formatName
+	-- because of inconsistency with zone names coming from API and coming from map (POI), we have to test all 4 cases / combinations
+	local zoneNameWithArticle = string_lower(BMU_formatName(toSearch, false))
+	local zoneNameWithoutArcticle = string_lower(BMU_formatName(toSearch, true))
+	-- solve bug with "-"
+	zoneNameWithArticle = string_gsub(zoneNameWithArticle, "-", "--")
+
+	local foundPoiIndex = false
+	for i = 0, GetNumPOIs(zoneIndex) do
+		local icon = select(4, GetPOIMapInfo(zoneIndex, i))
+		local objectiveNameWithArticle = string_lower(BMU_formatName(GetPOIInfo(zoneIndex, i), false))
+		local iconLower = string_lower(icon)
+		-- check (if zoneNameWithArticle is found in objectiveNameWithArticle) or if (zoneNameWithoutArcticle is found in objectiveNameWithArticle) AND objective has no wayshrine or portal icon (to prevent matches with wayshrines and dolmen)
+		if (BMU_isWholeWordInString(objectiveNameWithArticle, zoneNameWithArticle) or BMU_isWholeWordInString(objectiveNameWithArticle, zoneNameWithoutArcticle)) and not string_match(iconLower, "wayshrine") and not string_match(iconLower, "portal") then
+			foundPoiIndex = i
+			break
+		end
+	end
+	poiIndexByNameCache[cacheKey] = foundPoiIndex
+	return foundPoiIndex or nil
+end
+
+
 local function showZoneFavoriteContextMenu(comboBox, control, data)
 	if data == nil and control ~= nil then data = GetCustomScrollableMenuRowData(control) end
 	if data.zoneId ~= nil and data.zoneId ~= 0 then
@@ -2423,13 +2458,15 @@ function BMU.clickOnZoneName(button, record)
 			local normalizedZ
 			local _
 			-- primary: use LibZone function
-			local parentZoneId, parentZoneIndex, poiIndex = BMU_LibZone:GetZoneMapPinInfo(record.zoneId, record.parentZoneId)
-			if poiIndex ~= nil and poiIndex ~= 0 then
-				normalizedX, normalizedZ, _, _, _, _ = GetPOIMapInfo(parentZoneIndex, poiIndex)
+			if BMU_LibZone then
+				local parentZoneId, parentZoneIndex, poiIndex = BMU_LibZone:GetZoneMapPinInfo(record.zoneId, record.parentZoneId)
+				if poiIndex ~= nil and poiIndex ~= 0 then
+					normalizedX, normalizedZ, _, _, _, _ = GetPOIMapInfo(parentZoneIndex, poiIndex)
+				end
 			end
 
 			------------------
-			-- temp. fallback: search corresponding pin by name
+			-- fallback: search corresponding pin by name
 			if not normalizedX or not normalizedZ then
 				local toSearch = record.zoneNameUnformatted
 				if record.forceOutside then
@@ -2437,32 +2474,10 @@ function BMU.clickOnZoneName(button, record)
 				end
 
 				-- find out coordinates in order to Ping on Map (e.g. Delves, Public Dungeons)
-				--local coordinate_x = 0
-				--local coordinate_z = 0
 				local zoneIndex = GetZoneIndex(record.parentZoneId)
-				for i = 0, GetNumPOIs(zoneIndex) do
-					local e = {}
-					e.normalizedX, e.normalizedZ, e.poiPinType, e.icon, e.isShownInCurrentMap, e.linkedCollectibleIsLocked = GetPOIMapInfo(zoneIndex, i)
-					e.objectiveName, e.objectiveLevel, e.startDescription, e.finishedDescription = GetPOIInfo(zoneIndex, i)
-
-					-- because of inconsistency with zone names coming from API and coming from map (POI), we have to test all 4 cases / combinations
-					local objectiveNameWithArticle = string_lower(BMU_formatName(e.objectiveName, false))
-					local zoneNameWithArticle = string_lower(BMU_formatName(toSearch, false))
-					--local objectiveNameWithoutArticle = string_lower(BMU_formatName(e.objectiveName, true))
-					local zoneNameWithoutArcticle = string_lower(BMU_formatName(toSearch, true))
-
-					-- solve bug with "-"
-					if zoneNameWithArticle ~= nil then
-						zoneNameWithArticle = string_gsub(zoneNameWithArticle, "-", "--")
-					end
-
-					local iconLower = string_lower(e.icon)
-					-- check (if zoneNameWithArticle is found in objectiveNameWithArticle) or if (zoneNameWithoutArcticle is found in objectiveNameWithArticle) AND objective has no wayshrine or portal icon (to prevent matches with wayshrines and dolmen)
-					if (BMU_isWholeWordInString(objectiveNameWithArticle, zoneNameWithArticle) or BMU_isWholeWordInString(objectiveNameWithArticle, zoneNameWithoutArcticle)) and not string_match(iconLower, "wayshrine") and not string_match(iconLower, "portal") then
-						normalizedX = e.normalizedX
-						normalizedZ = e.normalizedZ
-						break
-					end
+				local poiIndex = BMU.findPoiIndexByName(zoneIndex, toSearch)
+				if poiIndex then
+					normalizedX, normalizedZ = GetPOIMapInfo(zoneIndex, poiIndex)
 				end
 			end
 			------------------
@@ -3619,10 +3634,11 @@ BMU_tooltipTextEnter = BMU_tooltipTextEnter or BMU.tooltipTextEnter
 
 -- retrieves zone name from zoneId
 function BMU.getZoneIdFromZoneName(searchZoneName)
-	local libZoneData = BMU.LibZoneGivenZoneData
-	local zoneData = libZoneData[string_lower(BMU.lang)] or libZoneData["en"]
-	for zoneId, zoneName in pairs(zoneData) do
-		if string_lower(zoneName) == string_lower(searchZoneName) then
+	searchZoneName = string_lower(searchZoneName)
+	for zoneIndex = 1, GetNumZones() do
+		local zoneId = GetZoneId(zoneIndex)
+		local zoneName = GetZoneNameById(zoneId)
+		if zoneName ~= "" and string_lower(ZO_CachedStrFormat("<<C:1>>", zoneName)) == searchZoneName then
 			return zoneId
 		end
 	end

@@ -671,7 +671,7 @@ function BMU.showNotification(itemTabClicked)
 
 	-- 2022_08_29
 	-- check if the latest LibZone version is installed
-	if not BMU_LibZone.GetZoneMapPinInfo or not BMU_LibZone.GetZoneGeographicalParentZoneId then
+	if BMU_LibZone and (not BMU_LibZone.GetZoneMapPinInfo or not BMU_LibZone.GetZoneGeographicalParentZoneId) then
 		-- show dialog
 		BMU_showDialogSimple("LibZoneOutdated", "Outdated LibZone version", "The installed version of LibZone is outdated. Please update the LibZone library, otherwise BeamMeUp will not work properly.\n\nIf you dont use Minion Addon Manager, you can open the LibZone website by accepting this dialog.", function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info2171-LibZone.html") end, nil)
 	end
@@ -940,8 +940,8 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["ptfHouseZoneNames"] = false,
 	}
 
-	--Add the LibZone datatable to Teleporter -> See event_add_on_loaded as LibZone will be definitely loaded then
-	--due to the ##DependsOn: LibZone entry in this addon's manifest file BeamMeUp.txt
+	--Add the LibZone datatable to Teleporter (only needed for the zone names in the second language)
+	--LibZone is optional (##OptionalDependsOn: LibZone), so it is loaded before this addon if it is installed
 	local BMU_LibZoneGivenZoneData = {} 															--INS251229 Baertram
 	if BMU_LibZone and BMU_LibZone.GetAllZoneData then
 		-- LibZone >= v6
@@ -949,8 +949,6 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		if ZO_IsTableEmpty(BMU_LibZoneGivenZoneData) then
 			d("[" .. appName .. " - ERROR] LibZone zone data is missing. Please update the library!")
 		end
-	else
-		d("[" .. appName .. " - ERROR] Error when accessing LibZone library: Please update & enable the library!")
 	end
 	BMU.LibZoneGivenZoneData = BMU_LibZoneGivenZoneData
 

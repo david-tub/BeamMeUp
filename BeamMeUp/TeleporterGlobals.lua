@@ -253,11 +253,11 @@ local colorStrToColorCodes = {
 --v- INS260127 Baertram
 local function getLibraries()
 	-- necessary libraries - Will be updated at EVENT_ADD_ON_LOADED again
-	BMU.LibZone = LibZone
 	BMU.LAM = LibAddonMenu2
 	BMU.LSM = LibScrollableMenu
 
 	-- optional libraries
+	BMU.LibZone = LibZone
 	BMU.LSC = LibSlashCommander
 	BMU.LibSets = LibSets
 	BMU.LibMapPing = LibMapPing2
@@ -1021,6 +1021,46 @@ BMU.overlandDelvesPublicDungeons = {
 			[1530] = 4471,		--Calindvale Gardens
 		}
 	},
+}
+
+
+-- Geographical parent zones of zones where GetParentZoneId returns a wrong zone (only used if LibZone is not available)
+-- Data taken from LibZone 8.99 (Unlicense) by Baertram
+-- structure: [<zoneId>] = <parentZoneId> or {<parentZoneId>, ...} if the zone is located in multiple zones
+BMU.parentZoneOverrides = {
+	-- Apocrypha
+	[1393] = 1413,		-- The Tranquil Catalog -> Apocrypha
+	[1398] = 1413,		-- Quires Wind -> Apocrypha
+	[1399] = 1413,		-- The Disquiet Study -> Apocrypha
+	[1400] = 1413,		-- Fathoms Drift -> Apocrypha
+	[1401] = 1413,		-- Apogee of the Tormenting Eye -> Apocrypha
+	[1409] = 1413,		-- The Sidereal Cloisters -> Apocrypha
+	[1410] = 1413,		-- Cenotaph of the Remnants -> Apocrypha
+	[1416] = 1413,		-- The Underweave -> Apocrypha
+	-- Blackreach
+	[1169] = 1161,		-- Midnight Barrow -> Blackreach: Greymoor Caverns
+	[1195] = 1195,		-- The Undergrove
+	[1209] = 1208,		-- Gloomreach -> Blackreach: Arkthzand Cavern
+	[1214] = 1208,		-- Bthar-Zel -> Blackreach: Arkthzand Cavern
+	[1222] = 1207,		-- Valthume -> The Reach
+	[1225] = 1208,		-- Nchuand-Zel -> Blackreach: Arkthzand Cavern
+	-- Fargrave
+	[1282] = 1283,		-- Fargrave -> The Shambles
+	[1283] = 1283,		-- The Shambles
+	[1304] = 1283,		-- The Bathhouse -> The Shambles
+	-- others
+	[159] = 159,		-- Emeric's Dream
+	[201] = 347,		-- Castle of the Worm -> Coldharbour
+	[548] = 548,		-- Silatar
+	[599] = 383,		-- Elden Root -> Grahtwood
+	[600] = 57,			-- Mournhold -> Deshaan
+	[725] = 382,		-- Maw of Lorkhaj -> Reaper's March
+	[1000] = 981,		-- Asylum Sanctorium -> The Brass Fortress
+	[1016] = 1027,		-- Traitor's Vault -> Artaeum
+	[1027] = 1027,		-- Artaeum
+	[1463] = 267,		-- The Scholarium -> Eyevea
+	-- located in multiple zones
+	[385] = {58, 101, 104},	-- Ragnthar -> Malabal Tor, Eastmarch, Alik'r Desert
 }
 			
 

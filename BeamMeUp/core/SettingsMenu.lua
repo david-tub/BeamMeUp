@@ -180,6 +180,29 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
          },
 	     {
               type = "description",
+			  title = "LibZone",
+              text = BMU_getStringIsInstalledLibrary("libzone"),
+			  width = "half",
+			  submenu = "deps",
+         },
+		 {
+              type = "button",
+              name = BMU_SI_Get(SI_TELE_ADDON_EXT_OPEN_URL),
+			  func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info2171-LibZone.html") end,
+			  width = "half",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
+              text = BMU_SI_Get(SI_TELE_ADDON_EXT_LIBZONE_DESC),
+			  submenu = "deps",
+         },
+		 {
+              type = "divider",
+			  submenu = "deps",
+         },
+	     {
+              type = "description",
 			  title = "LibChatMenuButton",
               text = BMU_getStringIsInstalledLibrary("lcmb"),
 			  width = "half",
@@ -771,6 +794,7 @@ local function SetupOptionsMenu(addonName) --index == Addon name                
 			  setFunc = function(value) BMU_SVAcc.secondLanguage = value
                   BMU.secondLanguageChanged = true                                                  --INS251229 Baertram
               end,
+			  disabled = function() return not BMU.LibZone end,
 			  default = BMU_DefaultsPerAccount["secondLanguage"],
 			  submenu = "adv",
         },

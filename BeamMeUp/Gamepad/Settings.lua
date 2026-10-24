@@ -506,6 +506,7 @@ function CS.SetupOptionsMenu(index) --index == Addon name
 			  items = dropdownSecLangItems,
               getFunction = function() return BMU.dropdownSecLangChoices[BMU_savedVarsAcc.secondLanguage] end,
 			  setFunction = function(control, itemName, itemData) BMU_savedVarsAcc.secondLanguage = itemData.data end,
+			  disabled = function() return not BMU.LibZone end,
 			  default = BMU.dropdownSecLangChoices[BMU_DefaultsAccount["secondLanguage"]],
 			          },
 		 {

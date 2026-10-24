@@ -370,7 +370,16 @@ local preferedParentZoneIds = {
 
 function Entry_Class:UpdateZoneInfo()
 	local preferedParentZoneId = preferedParentZoneIds[self.zoneId] or self.parentZoneId
-	local parentZoneId, parentZoneIndex, poiIndex, isValidPin = LibZone:GetZoneMapPinInfo(self.zoneId, preferedParentZoneId)
+	local parentZoneId, parentZoneIndex, poiIndex, isValidPin
+	if BMU.LibZone then
+		parentZoneId, parentZoneIndex, poiIndex, isValidPin = BMU.LibZone:GetZoneMapPinInfo(self.zoneId, preferedParentZoneId)
+	elseif preferedParentZoneId and (self.category ~= BMU.ZONE_CATEGORY_OVERLAND or self.forceOutside) then
+		-- fallback: search corresponding pin by name
+		parentZoneId = preferedParentZoneId
+		parentZoneIndex = GetZoneIndex(parentZoneId)
+		poiIndex = BMU.findPoiIndexByName(parentZoneIndex, (self.forceOutside and self.houseNameUnformatted) or self.zoneNameUnformatted)
+		isValidPin = poiIndex ~= nil and poiIndex > 0
+	end
 	local icon = "/esoui/art/icons/poi/poi_wayshrine_complete.dds"
 	if parentZoneId then
 		self.parentZoneId = parentZoneId

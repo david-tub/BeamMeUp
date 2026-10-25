@@ -9,7 +9,7 @@
 ## ConsoleDependsOn: LibHarvensAddonSettings
 ## DependsOn: LibAddonMenu-2.0>=41
 ## PCDependsOn: LibScrollableMenu LibZone>=0895
-## OptionalDependsOn: LibCustomMenu LibSlashCommander LibSets LibMapPing LibChatMenuButton PortToFriendsHouse BanditsUserInterface MorrowindStyleUI
+## OptionalDependsOn: LibCustomMenu LibSlashCommander LibSets LibMapPing LibChatMenuButton PortToFriendsHouse BanditsUserInterface MorrowindStyleUI LibAsync
 
 ## Core translation files
 core/SI.lua

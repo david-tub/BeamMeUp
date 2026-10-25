@@ -73,6 +73,7 @@ local strings = {
     ["SI_TELE_CHAT_SHARING_FOLLOW_LINK"] = "Following the link ...",
     ["SI_TELE_CHAT_AUTO_UNLOCK_CANCELED"] = "ユーザーによって自動検出がキャンセルされました。",
     ["SI_TELE_CHAT_AUTO_UNLOCK_SKIP"] = "ファストトラベルエラー: 現在のプレイヤーをスキップします。",
+    ["SI_TELE_CHAT_LIBASYNC_MISSING"] = "LibAsyncが見つかりません(オプション依存関係、BeamMeUpより前に読み込む必要があります):バックグラウンドキャッシュは同期的に構築され、起動が一時的に遅くなる場合があります。",
 
 
 

@@ -1693,6 +1693,30 @@ function ListView:update()
                     ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnHouseName(button, message) end)
                     ColumnPlayerNameTex:SetHidden(false)
 
+                    -- Tooltip on the displayed house/owner name: house name and
+                    -- nickname (own houses), plus the owner for House Tours. The
+                    -- content is the same message.houseTooltip that is shown on
+                    -- the zone-name column; the (renameable) nickname is read
+                    -- live when the list is built.
+                    local tooltipTextHouse = {}
+                    if message.houseTooltip then
+                        for _, v in pairs(message.houseTooltip) do
+                            table_insert(tooltipTextHouse, v)
+                        end
+                    end
+                    if #tooltipTextHouse > 0 then
+                        ColumnPlayerNameTex:SetHandler("OnMouseEnter", function(self)
+                            BMU_tooltipTextEnter(BMU, ColumnPlayerNameTex, tooltipTextHouse)
+                            BMU.pauseAutoRefresh = true
+                        end)
+                        ColumnPlayerNameTex:SetHandler("OnMouseExit", function(self)
+                            BMU_tooltipTextEnter(BMU, ColumnPlayerNameTex)
+                            BMU.pauseAutoRefresh = false
+                        end)
+                        -- link tooltip text to control (for update on scroll / mouse wheel)
+                        ColumnPlayerNameTex.tooltipText = tooltipTextHouse
+                    end
+
 
 			--Empty zone right click menu (no player in the zone)
 			elseif message.zoneId ~= nil then

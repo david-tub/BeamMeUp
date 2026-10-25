@@ -73,6 +73,7 @@ local strings = {
     ["SI_TELE_CHAT_SHARING_FOLLOW_LINK"] = "跟随链接 ...",
     ["SI_TELE_CHAT_AUTO_UNLOCK_CANCELED"] = "用户取消自动发现",
     ["SI_TELE_CHAT_AUTO_UNLOCK_SKIP"] = "快速旅行失败：跳过当前玩家。",
+    ["SI_TELE_CHAT_LIBASYNC_MISSING"] = "未找到 LibAsync(可选依赖,必须在 BeamMeUp 之前加载):后台缓存将同步构建,可能会短暂拖慢启动速度。",
 
 
 

@@ -9,7 +9,7 @@
 ## DependsOn: LibAddonMenu-2.0>=41 LibHarvensAddonSettings>=20102
 ## ConsoleDependsOn: LibZone
 ## PCDependsOn: LibZone>=0896 LibScrollableMenu>=020401
-## OptionalDependsOn: LibCustomMenu LibSlashCommander LibSets LibMapPing LibChatMenuButton PortToFriendsHouse BanditsUserInterface MorrowindStyleUI
+## OptionalDependsOn: LibCustomMenu LibSlashCommander LibSets LibMapPing LibChatMenuButton PortToFriendsHouse BanditsUserInterface MorrowindStyleUI LibAsync
 
 ## Core translation files
 core/SI.lua
@@ -19,7 +19,6 @@ localization/$(language).lua
 ## Globals / data sets
 GuildData.lua
 TeleporterGlobals.lua
-
 
 ## Gamepad
 Gamepad/i18n/en.lua

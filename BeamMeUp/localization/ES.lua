@@ -73,6 +73,7 @@ local strings = {
     ["SI_TELE_CHAT_SHARING_FOLLOW_LINK"] = "Siguiendo el enlace ...",
     ["SI_TELE_CHAT_AUTO_UNLOCK_CANCELED"] = "Descubrimiento automático cancelado por el usuario.",
     ["SI_TELE_CHAT_AUTO_UNLOCK_SKIP"] = "Error al saltar a otro jugador: Omisión del jugador actual.",
+    ["SI_TELE_CHAT_LIBASYNC_MISSING"] = "No se encontró LibAsync (dependencia opcional, debe cargarse antes que BeamMeUp): las cachés en segundo plano se construyen de forma síncrona y pueden ralentizar brevemente el inicio.",
 
 
 

@@ -73,6 +73,7 @@ local strings = {
     ["SI_TELE_CHAT_SHARING_FOLLOW_LINK"] = "Folge dem Link ...",
     ["SI_TELE_CHAT_AUTO_UNLOCK_CANCELED"] = "Wegschrein-Freischaltung durch Nutzer abgebrochen.",
     ["SI_TELE_CHAT_AUTO_UNLOCK_SKIP"] = "Schnellreise Fehler: Überspringe aktuellen Spieler.",
+    ["SI_TELE_CHAT_LIBASYNC_MISSING"] = "LibAsync nicht gefunden (optionale Abhängigkeit, muss vor BeamMeUp geladen werden): Die Hintergrund-Caches werden synchron aufgebaut und können den Start kurzzeitig verlangsamen.",
 
 
 

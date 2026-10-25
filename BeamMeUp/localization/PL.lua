@@ -73,6 +73,7 @@ local strings = {
     ["SI_TELE_CHAT_SHARING_FOLLOW_LINK"] = "Przekierowanie do linka...",
     ["SI_TELE_CHAT_AUTO_UNLOCK_CANCELED"] = "Automatyczne odblokowywanie przerwane przez użytkownika.",
     ["SI_TELE_CHAT_AUTO_UNLOCK_SKIP"] = "Błąd szybkiej podróży: pominięto tego gracza.",
+    ["SI_TELE_CHAT_LIBASYNC_MISSING"] = "Nie znaleziono LibAsync (opcjonalna zależność, musi być wczytana przed BeamMeUp): pamięci podręczne w tle są budowane synchronicznie i mogą chwilowo spowolnić uruchomienie.",
 
 
 

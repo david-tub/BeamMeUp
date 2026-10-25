@@ -73,6 +73,7 @@ local strings = {
     ["SI_TELE_CHAT_SHARING_FOLLOW_LINK				"] = "Suivre le lien...",
     ["SI_TELE_CHAT_AUTO_UNLOCK_CANCELED 		   	"] = "Découverte automatique annulée par l'utilisateur.",
     ["SI_TELE_CHAT_AUTO_UNLOCK_SKIP				   	"] = "Erreur de voyage rapide : omission du joueur courant",
+    ["SI_TELE_CHAT_LIBASYNC_MISSING"] = "LibAsync introuvable (dépendance optionnelle, doit être chargée avant BeamMeUp) : les caches en tâche de fond sont construits de façon synchrone et peuvent ralentir brièvement le démarrage.",
 
 
 

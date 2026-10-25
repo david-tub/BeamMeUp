@@ -73,6 +73,7 @@ local stringsEN = {
     ["SI_TELE_CHAT_SHARING_FOLLOW_LINK"] = "Following the link ...",
     ["SI_TELE_CHAT_AUTO_UNLOCK_CANCELED"] = "Automatic discovery canceled by user.",
     ["SI_TELE_CHAT_AUTO_UNLOCK_SKIP"] = "Fast Travel error: Skip current player.",
+    ["SI_TELE_CHAT_LIBASYNC_MISSING"] = "LibAsync not found (optional dependency, must be loaded before BeamMeUp): the background caches are built synchronously and may briefly slow down the startup.",
 
 
 

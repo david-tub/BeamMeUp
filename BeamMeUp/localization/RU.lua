@@ -73,6 +73,7 @@ local strings = {
     ["SI_TELE_CHAT_SHARING_FOLLOW_LINK"] = "Следуем по ссылке ...",
     ["SI_TELE_CHAT_AUTO_UNLOCK_CANCELED"] = "Автоматическое обнаружение отменено пользователем.",
     ["SI_TELE_CHAT_AUTO_UNLOCK_SKIP"] = "Ошибка быстрого перемещения: пропустить текущего игрока.",
+    ["SI_TELE_CHAT_LIBASYNC_MISSING"] = "LibAsync не найдена (необязательная зависимость, должна быть загружена до BeamMeUp): фоновые кэши строятся синхронно и могут ненадолго замедлить запуск.",
     
     
     

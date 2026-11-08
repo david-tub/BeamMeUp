@@ -54,6 +54,7 @@ local stringsEN = {
     ["SI_TELE_UI_TOOGLE_DUNGEON_NAME"] = "Show instance name",
     ["SI_TELE_UI_TRAVEL_PARENT_ZONE"] = "Port to parent zone",
     ["SI_TELE_UI_HOUSE_TOURS_FILTER"] = "House Tours",
+    ["SI_TELE_UI_HOUSE_TOURS_RELOAD"] = "Reload House Tours list",
     ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Set as preferred house",
     ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Unset preferred house",
 

@@ -58,6 +58,7 @@ local strings = {
 ["SI_TELE_UI_TOOGLE_DUNGEON_NAME"] = "Mostrar nome da instância",
 ["SI_TELE_UI_TRAVEL_PARENT_ZONE"] = "Port to parent zone",
 ["SI_TELE_UI_HOUSE_TOURS_FILTER"] = "Visitas a casas",
+["SI_TELE_UI_HOUSE_TOURS_RELOAD"] = "Recarregar a lista de visitas às casas",
 ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Definir como casa preferida",
 ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Remover como casa preferida",
 

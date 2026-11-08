@@ -54,6 +54,7 @@ local strings = {
     ["SI_TELE_UI_TOOGLE_DUNGEON_NAME"] = "Показать название инстанса",
     ["SI_TELE_UI_TRAVEL_PARENT_ZONE"] = "Port to parent zone",
     ["SI_TELE_UI_HOUSE_TOURS_FILTER"] = "Обзор домов",
+    ["SI_TELE_UI_HOUSE_TOURS_RELOAD"] = "Перезагрузить список экскурсий по домам",
     ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Установить как предпочитаемый дом",
     ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Убрать из предпочитаемых домов",
     

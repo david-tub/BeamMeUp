@@ -54,6 +54,7 @@ local strings = {
     ["SI_TELE_UI_TOOGLE_DUNGEON_NAME"] = "Show instance name",
     ["SI_TELE_UI_TRAVEL_PARENT_ZONE"] = "Port to parent zone",
     ["SI_TELE_UI_HOUSE_TOURS_FILTER"] = "房屋游览",
+    ["SI_TELE_UI_HOUSE_TOURS_RELOAD"] = "重新加载房屋游览列表",
     ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "设为首选住宅",
     ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "取消首选住宅",
 

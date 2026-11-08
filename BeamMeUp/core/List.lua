@@ -1686,10 +1686,35 @@ function ListView:update()
 			                --House right click menu
 			elseif message.houseId ~= nil then
                     -- Owned houses and House Tours use the same context menu on the
-                    -- displayed house/owner name. This also exposes the shared
-                    -- source filters (Own houses / House Tours) for House Tour owners.
+                    -- displayed house/owner name. House Tours additionally expose a
+                    -- four-line tooltip with the source, house, owner and zone.
                     isHouseEntry = true
                     disableTooltipAndResetOnMouseUp(rowControlOfList)
+                    if message.isHouseTour then
+                        local houseTourHouseName = message.houseNameFormatted or message.houseName or message.characterName
+                        if (not houseTourHouseName or houseTourHouseName == "") and BMU_getHouseNameByHouseId then
+                            houseTourHouseName = BMU_getHouseNameByHouseId(message.houseId)
+                        end
+                        local tooltipTextHouseTour = {
+                            BMU_SI_Get(SI_TELE_UI_HOUSE_TOURS_FILTER),
+                            BMU.cleanHouseTourZoneName(houseTourHouseName or ""),
+                            message.displayName or "",
+                            BMU.cleanHouseTourZoneName(message.zoneName or ""),
+                        }
+                        ColumnPlayerNameTex:SetHandler("OnMouseEnter", function(self)
+                            ColumnPlayerNameTex:SetAlpha(0.3)
+                            BMU_tooltipTextEnter(BMU, ColumnPlayerNameTex, tooltipTextHouseTour)
+                            BMU.pauseAutoRefresh = true
+                        end)
+                        ColumnPlayerNameTex:SetHandler("OnMouseExit", function(self)
+                            ColumnPlayerNameTex:SetAlpha(0)
+                            BMU_tooltipTextEnter(BMU, ColumnPlayerNameTex)
+                            BMU.pauseAutoRefresh = false
+                        end)
+                        -- Keep the tooltip available when the list is refreshed while
+                        -- the mouse remains over this column (e.g. after scrolling).
+                        ColumnPlayerNameTex.tooltipText = tooltipTextHouseTour
+                    end
                     ColumnPlayerNameTex:SetHandler("OnMouseUp", function(self, button) BMU_clickOnHouseName(button, message) end)
                     ColumnPlayerNameTex:SetHidden(false)
 
@@ -1746,7 +1771,8 @@ function ListView:update()
 					table_insert(tooltipTextZone, tooltipDividerStr)
 				end
 				-- add house infos
-				for _, v in pairs(message.houseTooltip) do
+				local houseTooltip = message.isHouseTour and BMU.cleanHouseTourTooltip(message.houseTooltip) or message.houseTooltip
+				for _, v in pairs(houseTooltip) do
 					table_insert(tooltipTextZone, v)
 				end
 			end
@@ -1916,7 +1942,8 @@ function ListView:update()
                 if message.isPTFHouse then
                     rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText(message.displayName, "lime"))
                 elseif message.isHouseTour then
-                    rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText(message.houseNameFormatted .. " (" .. message.displayName .. ")", "lime"))
+                    local houseTourHouseName = BMU.cleanHouseTourZoneName(message.houseNameFormatted or message.houseName or "")
+                    rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText(houseTourHouseName .. " (" .. message.displayName .. ")", "lime"))
                 else
                     rowControlOfList.ColumnPlayerName:SetText(BMU_colorizeText((houseNickName ~= "" and houseNickName) or zo_strformat(formatStringFirstUppercase, houseName), "lime"))
                 end
@@ -2274,7 +2301,8 @@ function BMU.clickOnTeleportToHouseTourButton(textureControl, button, message)
 
         CancelCast()
 
-        BMU_printToChat("Port to House Tour: " .. message.displayName .. " - " .. BMU_formatName(GetZoneNameById(message.zoneId), false), BMU.MSG_FT)
+        BMU_printToChat("Port to House Tour: " .. message.displayName .. " - " .. BMU_formatName(BMU.cleanHouseTourZoneName(GetZoneNameById(message.zoneId)), false), BMU.MSG_FT)
+        BMU.beginHouseTourVisit(message.displayName, message.houseId)
         JumpToSpecificHouse(message.displayName, message.houseId, true)
 
         if BMU.savedVarsAcc.closeOnPorting then
@@ -3040,6 +3068,17 @@ function BMU.clickOnHouseName(button, record)
 		ClearCustomScrollableMenu()
 
 		addCommonContextMenuEntries(button, record)
+
+        -- House Tours listings can become stale when a listing is full or its
+        -- owner no longer allows visitors. Offer an explicit full cache rebuild.
+        if record and record.isHouseTour then
+            AddCustomScrollableMenuDivider()
+            AddCustomScrollableMenuEntry(BMU_SI_Get(SI_TELE_UI_HOUSE_TOURS_RELOAD), function()
+                if BMU.resetHouseTourCacheAndRefresh then
+                    BMU.resetHouseTourCacheAndRefresh()
+                end
+            end)
+        end
 
 		ShowCustomScrollableMenu(nil, { visibleRowsDropdown = 20, visibleRowsSubmenu = 20 })
 	end

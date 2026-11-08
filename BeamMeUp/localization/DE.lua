@@ -54,6 +54,7 @@ local strings = {
     ["SI_TELE_UI_TOOGLE_DUNGEON_NAME"] = "Zeige Instanz Name",
     ["SI_TELE_UI_TRAVEL_PARENT_ZONE"] = "Schnellreise in die Eltern-Zone",
     ["SI_TELE_UI_HOUSE_TOURS_FILTER"] = "Heimschau",
+    ["SI_TELE_UI_HOUSE_TOURS_RELOAD"] = "Heimschau Liste neu laden",
     ["SI_TELE_UI_SET_PREFERRED_HOUSE"] = "Als bevorzugtes Haus festlegen",
     ["SI_TELE_UI_UNSET_PREFERRED_HOUSE"] = "Bevorzugtes Haus freigeben",
 

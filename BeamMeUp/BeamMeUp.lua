@@ -127,6 +127,12 @@ local function alertTeleporterLoaded()
 	-- register events for own houses furniture count update
 	EM:RegisterForEvent(appName, EVENT_PLAYER_ACTIVATED, BMU.updateHouseFurnitureCount)
 	EM:RegisterForEvent(appName, EVENT_HOUSE_FURNITURE_COUNT_UPDATED, BMU.updateHouseFurnitureCount)
+
+    -- The persistent House Tours cache is already available. Only query the
+    -- server when the client has gained house IDs since the last completed scan.
+    if BMU.checkHouseTourCacheForNewHouses then
+        BMU.checkHouseTourCacheForNewHouses()
+    end
 end
 
 
@@ -901,6 +907,10 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["houseFurnitureCount_LII"] = {}, -- maps houseId with furniture count
 		["favoriteListWayshrines"] = {},
 		["zoneSpecificHouses"] = {}, -- maps zoneId to preferred houseId for that zone
+        -- Server-specific House Tours results and the set of house IDs already queried.
+        ["houseTourListings"] = {},
+        ["houseTourKnownHouseIds"] = {},
+        ["houseTourCacheVersion"] = 0,
 	}
 	
 	BMU.DefaultsCharacter = {
@@ -965,6 +975,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	--]]
 	BMU.savedVarsAcc =  ZO_SavedVars:NewAccountWide(SVTabName, 			2, nil, BMU.DefaultsAccount, 	nil)
 	BMU.savedVarsServ = ZO_SavedVars:NewAccountWide(SVTabName, 			3, nil, BMU.DefaultsServer, 	GetWorldName())
+	if BMU.loadHouseTourSavedCache then BMU.loadHouseTourSavedCache() end
 	BMU.savedVarsChar = ZO_SavedVars:NewCharacterIdSettings(SVTabName, 	3, nil, BMU.DefaultsCharacter, 	nil)
 	local BMU_savedVarsAcc = BMU.savedVarsAcc
 
@@ -986,6 +997,14 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	EM:RegisterForEvent(appName, EVENT_GAME_CAMERA_UI_MODE_CHANGED, BMU_cameraModeChanged)
 	
 	EM:RegisterForEvent(appName, EVENT_SOCIAL_ERROR, BMU.socialErrorWhilePorting)
+
+    -- Track only explicit House Tours attempts. A successful zone load clears
+    -- the marker; EVENT_JUMP_FAILED triggers a refresh of the House Tours cache.
+    local houseTourEventNamespace = appName .. "_HouseTours"
+    EM:RegisterForEvent(houseTourEventNamespace, EVENT_PLAYER_ACTIVATED, BMU.clearHouseTourPendingVisit)
+    if EVENT_JUMP_FAILED then
+        EM:RegisterForEvent(houseTourEventNamespace, EVENT_JUMP_FAILED, BMU.houseTourJumpFailed)
+    end
 
 	--- initialize slash commands
 	BMU.activateSlashCommands()

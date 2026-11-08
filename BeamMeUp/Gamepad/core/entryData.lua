@@ -502,11 +502,17 @@ function Entry_Class_House:GetLabels()
 	if BMU.savedVarsChar.houseNickNames and self.nickName then
 	  name = self.nickName
 	end
+	if self.isHouseTour and BMU.cleanHouseTourZoneName then
+		name = BMU.cleanHouseTourZoneName(name)
+	end
 
 	-- House Tours should be grouped by their actual House Tours zone in Gamepad.
 	-- The parentZoneName is still kept for map/teleport context, especially for
 	-- houses whose map is displayed on the parent world map.
 	local houseTourZoneName = self.isHouseTour and self.zoneName or self.parentZoneName
+	if self.isHouseTour and BMU.cleanHouseTourZoneName then
+		houseTourZoneName = BMU.cleanHouseTourZoneName(houseTourZoneName)
+	end
 	return BMU.colorizeText(name, self.textColorZoneName), (houseTourZoneName or nil)
 end
 
@@ -516,6 +522,7 @@ function Entry_Class_House:TryToPort()
 	-- RequestJumpToHouse(), which is intended for owned houses.
 	if self.isHouseTour then
 		if self.displayName ~= nil and self.displayName ~= "" and self.houseId ~= nil and self.houseId > 0 then
+            BMU.beginHouseTourVisit(self.displayName, self.houseId)
 			JumpToSpecificHouse(self.displayName, self.houseId, true)
 		end
 		return true

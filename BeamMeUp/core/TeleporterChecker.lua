@@ -211,6 +211,123 @@ function BMU.formatName(unformatted, flag)
 end
 local BMU_formatName = BMU.formatName                                                      --INS251229 Baertram
 
+-- ESO names may contain grammatical suffixes such as "^pd,in", "^p" or
+-- "^m". These are localization metadata, not part of the name shown in BMU.
+-- Remove the token itself instead of everything after the caret: some callers
+-- wrap names in quotes or append other tooltip punctuation after the token.
+function BMU.cleanHouseTourZoneName(zoneName)
+    if type(zoneName) ~= "string" or zoneName == "" then
+        return zoneName
+    end
+    local cleanName = string_gsub(zoneName, "%^%a[%w_,]*", "")
+    return (string_gsub(cleanName, "%s+$", ""))
+end
+
+-- Tooltip strings can wrap a localized name in quotes, so clean the individual
+-- values with the same token-aware helper while preserving the surrounding text.
+function BMU.cleanHouseTourTooltip(tooltip)
+    if type(tooltip) ~= "table" then
+        return tooltip
+    end
+    local cleanedTooltip = {}
+    for key, value in pairs(tooltip) do
+        if type(value) == "string" then
+            cleanedTooltip[key] = BMU.cleanHouseTourZoneName(value)
+        else
+            cleanedTooltip[key] = value
+        end
+    end
+    return cleanedTooltip
+end
+
+function BMU.formatHouseTourZoneName(zoneName, removeArticles)
+    local cleanName = BMU.cleanHouseTourZoneName(zoneName)
+    if cleanName == nil or cleanName == "" then
+        return ""
+    end
+    return BMU_formatName(cleanName, removeArticles)
+end
+
+-- House Tours are server-specific, so their persistent cache is stored in
+-- BMU.savedVarsServ (not in the account-wide settings shared by both servers).
+function BMU.loadHouseTourSavedCache()
+    local savedVars = BMU.savedVarsServ
+    if not savedVars then
+        return
+    end
+
+    local cachedListings = savedVars.houseTourListings
+    if type(cachedListings) ~= "table" then
+        cachedListings = {}
+        savedVars.houseTourListings = cachedListings
+    end
+
+    -- Normalize entries written by earlier builds as well. In particular,
+    -- remove raw ESO grammatical suffixes before the first list is rendered.
+    for _, listing in ipairs(cachedListings) do
+        if listing then
+            listing.zoneName = BMU.cleanHouseTourZoneName(listing.zoneName)
+            listing.parentZoneName = BMU.cleanHouseTourZoneName(listing.parentZoneName)
+            listing.houseTourDisplayZoneName = BMU.cleanHouseTourZoneName(listing.houseTourDisplayZoneName)
+            listing.houseTourDisplayParentZoneName = BMU.cleanHouseTourZoneName(listing.houseTourDisplayParentZoneName)
+            listing.houseName = BMU.cleanHouseTourZoneName(listing.houseName)
+            listing.houseNameUnformatted = BMU.cleanHouseTourZoneName(listing.houseNameUnformatted)
+            listing.houseNameFormatted = BMU.cleanHouseTourZoneName(listing.houseNameFormatted)
+            listing.nickName = BMU.cleanHouseTourZoneName(listing.nickName)
+            listing.houseTooltip = BMU.cleanHouseTourTooltip(listing.houseTooltip)
+        end
+    end
+
+    BMU.houseTourListings = cachedListings
+    BMU.houseTourKnownHouseIds = type(savedVars.houseTourKnownHouseIds) == "table" and savedVars.houseTourKnownHouseIds or nil
+    BMU.houseTourCacheInitialized = (tonumber(savedVars.houseTourCacheVersion) or 0) >= 1
+end
+
+local function houseTourListingKey(entry)
+    if not entry or not entry.houseId then return nil end
+    local contextZone = entry.houseTourContextZoneId or entry.parentZoneId or 0
+    return tostring(entry.houseId) .. ":" .. tostring(contextZone)
+end
+
+function BMU.mergeHouseTourListings(existingListings, newListings)
+    local merged = {}
+    local seen = {}
+    local function add(entry)
+        local key = houseTourListingKey(entry)
+        if key and not seen[key] then
+            seen[key] = true
+            table_insert(merged, entry)
+        end
+    end
+    for _, entry in ipairs(existingListings or {}) do add(entry) end
+    for _, entry in ipairs(newListings or {}) do add(entry) end
+    return merged
+end
+
+function BMU.saveHouseTourCache(listings, knownHouseIds)
+    local savedVars = BMU.savedVarsServ
+    local cacheCopy = {}
+    for _, entry in ipairs(listings or {}) do
+        table_insert(cacheCopy, entry)
+    end
+
+    BMU.houseTourListings = cacheCopy
+    BMU.houseTourCacheInitialized = true
+
+    if savedVars then
+        savedVars.houseTourListings = cacheCopy
+        if knownHouseIds then
+            local knownCopy = {}
+            for houseId, value in pairs(knownHouseIds) do
+                if value then knownCopy[houseId] = true end
+            end
+            savedVars.houseTourKnownHouseIds = knownCopy
+            BMU.houseTourKnownHouseIds = knownCopy
+        end
+        savedVars.houseTourCacheVersion = 1
+    end
+end
+
 
 -- zone where the player actual is
 function BMU.getPlayersZoneId()
@@ -495,35 +612,30 @@ function BMU.createTable(args)
 	-- 5b. House Tours shared houses (inserted before zones without players)
 	-- Skip entirely when the user disabled House Tour houses display in the settings menu
 	if not noOwnHouses and BMU_savedVarsAcc.showHouseTours then
-		if not BMU.houseTourListings then
-			-- Listings are not loaded yet: start the asynchronous search.
-			if not BMU.houseTourSearchPending then
-				BMU.RequestHouseTourSearch()
-			end
-		else
-			-- Listings are already deduplicated by houseId and pre-enriched with
-			-- all static derived fields at search time.
-			-- This loop therefore only copies cached values:
-			-- no ESO API calls and no temporary table are created on each refresh.
-			local houseTourListings = BMU.houseTourListings
-			for _, listing in ipairs(houseTourListings) do
+        -- The cache is displayed immediately. A lightweight local ID comparison
+        -- starts a query only for houses introduced since the last completed scan.
+        if not BMU.houseTourSearchPending and BMU.checkHouseTourCacheForNewHouses then
+            BMU.checkHouseTourCacheForNewHouses()
+        end
+		local houseTourListings = BMU.houseTourListings or {}
+		for _, listing in ipairs(houseTourListings) do
 				local listingParentZoneId = listing.parentZoneId or listing.houseTourContextZoneId
 				if listingParentZoneId and listingParentZoneId ~= 0 then
 					local e = {}
 					e.houseId              = listing.houseId
 					e.displayName          = listing.ownerName
-					e.characterName        = listing.houseName  -- required by addInfo_1 (gsub on characterName)
+					e.characterName        = BMU.cleanHouseTourZoneName(listing.houseName)  -- required by addInfo_1 (gsub on characterName)
 					e.parentZoneId         = listing.houseTourContextZoneId or listingParentZoneId
-					e.parentZoneName       = listing.houseTourDisplayParentZoneName or listing.parentZoneName
+					e.parentZoneName       = BMU.cleanHouseTourZoneName(listing.houseTourDisplayParentZoneName or listing.parentZoneName)
 					e.zoneId               = listing.houseTourContextZoneId or listingParentZoneId
-					e.zoneName             = listing.houseTourDisplayZoneName or listing.zoneName
+					e.zoneName             = BMU.cleanHouseTourZoneName(listing.houseTourDisplayZoneName or listing.zoneName)
 					e.isHouseTour          = true
 					e.forceOutside         = true
-					e.houseNameUnformatted = listing.houseNameUnformatted
+					e.houseNameUnformatted = BMU.cleanHouseTourZoneName(listing.houseNameUnformatted)
 					e.collectibleId        = listing.collectibleId
-					e.houseNameFormatted   = listing.houseNameFormatted
-					e.nickName             = listing.nickName
-					e.houseTooltip         = listing.houseTooltip
+					e.houseNameFormatted   = BMU.cleanHouseTourZoneName(listing.houseNameFormatted or listing.houseName)
+					e.nickName             = BMU.cleanHouseTourZoneName(listing.nickName)
+					e.houseTooltip         = BMU.cleanHouseTourTooltip(listing.houseTooltip)
 
 					-- addInfo_1 adds: currentZone, playersZone, zoneNameSecondLanguage, sources, sourcesText, sourceIndexLeading
 					-- addInfo_1 uses characterName:gsub, so characterName must be defined.
@@ -561,7 +673,6 @@ function BMU.createTable(args)
 
 					end
 				end
-			end
 		end
 	end
 
@@ -2525,8 +2636,8 @@ function BMU.applyHouseFixedMapData(entry)
     if entry.houseId == 92 or entry.houseId == 115 then
         entry.parentZoneId = fixed.parentZoneId or fixed.zoneId
         entry.zoneId = fixed.zoneId
-        entry.zoneName = GetZoneNameById(fixed.zoneId)
-        entry.parentZoneName = BMU_formatName(GetZoneNameById(entry.parentZoneId))
+        entry.zoneName = BMU.cleanHouseTourZoneName(GetZoneNameById(fixed.zoneId))
+        entry.parentZoneName = BMU.formatHouseTourZoneName(GetZoneNameById(entry.parentZoneId))
     elseif entry.houseId == 124 then
         -- Night's Den is in zone 1283 (Bruchgassen), which is a sub-zone/map
         -- of the overall Fargrave map (zone 1282 / mapId 2119).
@@ -2534,13 +2645,13 @@ function BMU.applyHouseFixedMapData(entry)
         -- house zone and its parent zone for filtering and display.
         entry.parentZoneId = fixed.parentZoneId or 1282
         entry.zoneId = fixed.zoneId
-        entry.zoneName = GetZoneNameById(fixed.zoneId)
-        entry.parentZoneName = BMU_formatName(GetZoneNameById(entry.parentZoneId))
+        entry.zoneName = BMU.cleanHouseTourZoneName(GetZoneNameById(fixed.zoneId))
+        entry.parentZoneName = BMU.formatHouseTourZoneName(GetZoneNameById(entry.parentZoneId))
     elseif entry.houseId == 102 then
         entry.parentZoneId = fixed.zoneId
         entry.zoneId = fixed.zoneId
-        entry.zoneName = GetZoneNameById(fixed.zoneId)
-        entry.parentZoneName = BMU_formatName(GetZoneNameById(fixed.zoneId))
+        entry.zoneName = BMU.cleanHouseTourZoneName(GetZoneNameById(fixed.zoneId))
+        entry.parentZoneName = BMU.formatHouseTourZoneName(GetZoneNameById(fixed.zoneId))
         entry.mapId = entry.houseTourMapId
         -- mapId 1348 is the actual Brass Fortress sub-map; zoneId 981 has no
         -- direct GetMapIdByZoneId/GetMapIndexByZoneId mapping.
@@ -2716,10 +2827,14 @@ function BMU.prepareHouseTourBrowseFilter()
     end
 
     local ownedHouseIds = BMU.getOwnedHouseIdsForHouseTours()
-    local allHouseIds = BMU.getAllHouseTourHouseIds()
+    local selectedHouseIds = BMU.houseTourBrowseSearchHouseIds
+    if type(selectedHouseIds) ~= "table" then
+        selectedHouseIds = BMU.getAllHouseTourHouseIds()
+        BMU.houseTourBrowseSearchHouseIds = selectedHouseIds
+    end
     local browseHouseIds = {}
 
-    for _, houseId in ipairs(allHouseIds) do
+    for _, houseId in ipairs(selectedHouseIds) do
         if not ownedHouseIds[houseId] then
             table.insert(browseHouseIds, houseId)
         end
@@ -2729,8 +2844,9 @@ function BMU.prepareHouseTourBrowseFilter()
     BMU.houseTourBrowseFilterTotal = #browseHouseIds
     BMU.houseTourBrowseFilterBatchSize = tonumber(MAX_HOUSE_TOURS_HOUSE_FILTERS) or #browseHouseIds
     if BMU.houseTourBrowseFilterBatchSize < 1 then
-        BMU.houseTourBrowseFilterBatchSize = #browseHouseIds
+        BMU.houseTourBrowseFilterBatchSize = math.max(1, #browseHouseIds)
     end
+    BMU.houseTourBrowseFilterBatchCount = math.max(1, math.ceil(#browseHouseIds / BMU.houseTourBrowseFilterBatchSize))
     BMU.houseTourBrowseFilterBatchIndex = BMU.houseTourBrowseFilterBatchIndex or 1
 
     local firstIndex = ((BMU.houseTourBrowseFilterBatchIndex - 1) * BMU.houseTourBrowseFilterBatchSize) + 1
@@ -2747,11 +2863,12 @@ function BMU.prepareHouseTourBrowseFilter()
     if ok then
         BMU.houseTourBrowseFilterMethod = method
         BMU.houseTourBrowseFilterActive = true
-        BMU.houseTourBrowseFilterBatchCount = math.max(1, math.ceil(#browseHouseIds / BMU.houseTourBrowseFilterBatchSize))
         return true, method
     end
 
     BMU.houseTourBrowseFilterActive = false
+    BMU.houseTourBrowseFilterBatchCount = 1
+    BMU.houseTourBrowseFilterIndex = 1
     BMU.houseTourBrowseFilterError = method
     if type(filters.ResetFilters) == "function" then
         filters:ResetFilters()
@@ -2770,52 +2887,240 @@ function BMU.restoreHouseTourBrowseFilters()
     BMU.houseTourBrowseFilterActive = false
     BMU.houseTourBrowseFilterBatchIndex = nil
     BMU.houseTourBrowseHouseIds = nil
+    BMU.houseTourBrowseSearchHouseIds = nil
 end
 
 -- Start an asynchronous House Tours BROWSE search.
 -- RECOMMENDED is intentionally not used: the BROWSE result is filtered to all
 -- known houses except the player's owned houses, then merged into the cache.
-function BMU.RefreshHouseTours()
+function BMU.RefreshHouseTours(cacheMode)
     if not HOUSE_TOURS_SEARCH_MANAGER then
         return false
     end
 
+    cacheMode = cacheMode or "replace"
     if BMU.houseTourSearchPending then
+        -- A full refresh must run after an in-progress incremental discovery.
+        if cacheMode == "replace" then
+            BMU.houseTourRefreshAfterCurrent = "replace"
+        end
         BMU.refreshListAuto(false)
         return true
     end
 
-    BMU.RequestHouseTourSearch(HOUSE_TOURS_LISTING_TYPE_BROWSE)
+    BMU.RequestHouseTourSearch(HOUSE_TOURS_LISTING_TYPE_BROWSE, cacheMode)
     BMU.refreshListAuto(false)
     return true
 end
 
-function BMU.RequestHouseTourSearch(listingType)
+-- Delete the persistent House Tours snapshot and rebuild it from the game's
+-- current listings. If another batch chain is already active, RefreshHouseTours
+-- queues a complete replacement scan after that chain has finished.
+function BMU.resetHouseTourCacheAndRefresh()
+    local savedVars = BMU.savedVarsServ
+    if savedVars then
+        savedVars.houseTourListings = nil
+        savedVars.houseTourKnownHouseIds = nil
+        savedVars.houseTourCacheVersion = nil
+    end
+
+    BMU.houseTourListings = {}
+    BMU.houseTourKnownHouseIds = nil
+    BMU.houseTourCacheInitialized = false
+    BMU.houseTourCacheCheckedThisSession = true
+    BMU.houseTourFallbackByParentZoneId = {}
+    BMU.houseTourPendingVisit = nil
+
+    -- Start/queue a full BROWSE scan. The current cache is already cleared, and
+    -- the existing batch implementation commits the new snapshot at completion.
+    local started = BMU.RefreshHouseTours("replace")
+    if not started and BMU.refreshListAuto then
+        BMU.refreshListAuto(false)
+    end
+    return started
+end
+
+function BMU.RequestHouseTourSearch(listingType, cacheMode, searchHouseIds)
     if not HOUSE_TOURS_SEARCH_MANAGER then
-        return
+        return false
     end
 
     listingType = listingType or HOUSE_TOURS_LISTING_TYPE_BROWSE
     if listingType ~= HOUSE_TOURS_LISTING_TYPE_BROWSE then
-        return
+        return false
     end
 
     if BMU.houseTourSearchPending then
-        return
+        return false
     end
 
+    cacheMode = cacheMode or "replace"
+    BMU.houseTourBrowseCacheMode = cacheMode
+    BMU.houseTourBrowseAllKnownHouseIds = BMU.getAllHouseTourHouseIds()
+    BMU.houseTourBrowseSearchHouseIds = searchHouseIds or BMU.houseTourBrowseAllKnownHouseIds
+    BMU.houseTourRefreshListings = {}
     BMU.houseTourBrowseFilterBatchIndex = 1
+
     local filterOk = BMU.prepareHouseTourBrowseFilter()
     if not filterOk then
-        -- Keep a safe fallback for client revisions where the filter object does
-        -- not expose the expected house-ID methods. The result is still filtered
-        -- by owned houseId below, so no owned House Tour can enter BMU's cache.
+        -- Fallback for client revisions where the filter object exposes no
+        -- supported house-ID setter. Owned houses are still excluded below.
         BMU.houseTourBrowseFilterActive = false
+        BMU.houseTourBrowseFilterBatchCount = 1
+    end
+
+    -- There is nothing to query when the only newly-known houses are owned.
+    if #(BMU.houseTourBrowseHouseIds or {}) == 0 then
+        local knownHouseIds = {}
+        for _, houseId in ipairs(BMU.houseTourBrowseAllKnownHouseIds or {}) do
+            knownHouseIds[houseId] = true
+        end
+        if cacheMode == "replace" then
+            BMU.saveHouseTourCache({}, knownHouseIds)
+        elseif cacheMode == "merge" then
+            BMU.saveHouseTourCache(BMU.houseTourListings or {}, knownHouseIds)
+        end
+        BMU.houseTourRefreshListings = nil
+        BMU.houseTourBrowseCacheMode = nil
+        BMU.houseTourBrowseAllKnownHouseIds = nil
+        BMU.restoreHouseTourBrowseFilters()
+        BMU.refreshListAuto(false)
+        return true
     end
 
     BMU.houseTourSearchPending = true
     BMU.houseTourSearchPendingType = HOUSE_TOURS_LISTING_TYPE_BROWSE
     HOUSE_TOURS_SEARCH_MANAGER:ExecuteSearch(HOUSE_TOURS_LISTING_TYPE_BROWSE)
+    return true
+end
+
+-- After startup, only house IDs which did not exist during the previous complete
+-- House Tours scan need an incremental query. The SavedVariables cache remains
+-- usable while that small batch runs in the background.
+function BMU.checkHouseTourCacheForNewHouses()
+    local savedVars = BMU.savedVarsAcc
+    if not savedVars or not savedVars.showHouseTours or not HOUSE_TOURS_SEARCH_MANAGER then
+        return false
+    end
+    if BMU.houseTourSearchPending or BMU.houseTourCacheCheckedThisSession then
+        return false
+    end
+
+    local allHouseIds = BMU.getAllHouseTourHouseIds()
+    if type(allHouseIds) ~= "table" or #allHouseIds == 0 then
+        return false
+    end
+    -- This catalogue is static for the current client session. Avoid repeating
+    -- the same local scan on every automatic list refresh (usually every few seconds).
+    BMU.houseTourCacheCheckedThisSession = true
+
+    local oldKnown = BMU.houseTourKnownHouseIds
+    if not BMU.houseTourCacheInitialized or type(oldKnown) ~= "table" then
+        return BMU.RequestHouseTourSearch(HOUSE_TOURS_LISTING_TYPE_BROWSE, "replace", allHouseIds)
+    end
+
+    local currentKnown = {}
+    local ownedHouseIds = BMU.getOwnedHouseIdsForHouseTours()
+    local newHouseIds = {}
+    for _, houseId in ipairs(allHouseIds) do
+        currentKnown[houseId] = true
+        if not oldKnown[houseId] and not ownedHouseIds[houseId] then
+            table_insert(newHouseIds, houseId)
+        end
+    end
+
+    -- Remove cached houses which have since become owned or are no longer part
+    -- of the client's housing catalogue.
+    local validHouseIds = currentKnown
+    local filteredCache = {}
+    for _, entry in ipairs(BMU.houseTourListings or {}) do
+        if entry and entry.houseId and validHouseIds[entry.houseId] and not ownedHouseIds[entry.houseId] then
+            table_insert(filteredCache, entry)
+        end
+    end
+    if #filteredCache ~= #(BMU.houseTourListings or {}) then
+        BMU.saveHouseTourCache(filteredCache, oldKnown)
+    end
+
+    if #newHouseIds > 0 then
+        return BMU.RequestHouseTourSearch(HOUSE_TOURS_LISTING_TYPE_BROWSE, "merge", newHouseIds)
+    end
+
+    -- Keep the known-ID set synchronized even when no query is needed.
+    BMU.houseTourKnownHouseIds = currentKnown
+    if BMU.savedVarsServ then
+        BMU.savedVarsServ.houseTourKnownHouseIds = currentKnown
+    end
+    return false
+end
+
+-- Remember the exact House Tour destination until the client confirms the jump
+-- or reports EVENT_JUMP_FAILED. The timeout prevents a stale click from being
+-- attributed to an unrelated future jump failure.
+function BMU.beginHouseTourVisit(displayName, houseId)
+    if not displayName or displayName == "" or not houseId or houseId <= 0 then
+        return
+    end
+    BMU.houseTourPendingVisitToken = (BMU.houseTourPendingVisitToken or 0) + 1
+    local token = BMU.houseTourPendingVisitToken
+    BMU.houseTourPendingVisit = {
+        displayName = displayName,
+        houseId = houseId,
+    }
+    zo_callLater(function()
+        if BMU.houseTourPendingVisitToken == token then
+            BMU.houseTourPendingVisit = nil
+        end
+    end, 60000)
+end
+
+function BMU.clearHouseTourPendingVisit()
+    BMU.houseTourPendingVisit = nil
+end
+
+function BMU.houseTourJumpFailed(eventCode, jumpResult)
+    local failedVisit = BMU.houseTourPendingVisit
+    if not failedVisit then
+        return
+    end
+
+    BMU.clearHouseTourPendingVisit()
+    if BMU.debugMode then
+        d(string.format(
+            "[BMU %s HouseTour] visit failed: houseId=%s owner=%s jumpResult=%s; refreshing listings",
+            tostring(teleporterVars.version or "?"),
+            tostring(failedVisit.houseId),
+            tostring(failedVisit.displayName),
+            tostring(jumpResult)
+        ))
+    end
+
+    zo_callLater(function()
+        if BMU.savedVarsAcc and BMU.savedVarsAcc.showHouseTours then
+            BMU.RefreshHouseTours("replace")
+        end
+    end, 500)
+end
+
+-- Run a full refresh which was queued because a House Tour jump failed
+-- while another batch chain was already in progress.
+function BMU.startQueuedHouseTourRefresh()
+    local queuedRefreshMode = BMU.houseTourRefreshAfterCurrent
+    if not queuedRefreshMode then
+        return false
+    end
+
+    BMU.houseTourRefreshAfterCurrent = nil
+    zo_callLater(function()
+        if BMU.savedVarsAcc and BMU.savedVarsAcc.showHouseTours and HOUSE_TOURS_SEARCH_MANAGER then
+            if not BMU.houseTourSearchPending then
+                BMU.RequestHouseTourSearch(HOUSE_TOURS_LISTING_TYPE_BROWSE, queuedRefreshMode)
+            else
+                BMU.houseTourRefreshAfterCurrent = queuedRefreshMode
+            end
+        end
+    end, 500)
+    return true
 end
 
 -- Callback called when a House Tours BROWSE search is complete.
@@ -2832,12 +3137,21 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
     BMU.houseTourSearchPendingType = nil
 
     if not HOUSE_TOURS_SEARCH_MANAGER then
+        BMU.houseTourRefreshListings = nil
+        BMU.houseTourBrowseCacheMode = nil
+        BMU.houseTourBrowseAllKnownHouseIds = nil
+        BMU.restoreHouseTourBrowseFilters()
+        BMU.startQueuedHouseTourRefresh()
         return
     end
 
     local results = HOUSE_TOURS_SEARCH_MANAGER:GetSearchResults(HOUSE_TOURS_LISTING_TYPE_BROWSE)
     if not results then
+        BMU.houseTourRefreshListings = nil
+        BMU.houseTourBrowseCacheMode = nil
+        BMU.houseTourBrowseAllKnownHouseIds = nil
         BMU.restoreHouseTourBrowseFilters()
+        BMU.startQueuedHouseTourRefresh()
         return
     end
 
@@ -2871,9 +3185,18 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
                         parentZoneId = houseTourParentZoneOverride
                     end
 
-                    local houseName = listingData:GetHouseName() or ""
-                    local nickName = BMU_formatName(GetCollectibleNickname(collectibleId))
-                    local houseNameFormatted = (houseName ~= "" and houseName) or BMU_formatName(GetCollectibleDefaultNickname(collectibleId))
+                    -- The House Tours API returns house names with ESO grammatical
+                    -- suffixes (for example "^p" / "^m"). Strip these before storing
+                    -- or formatting the names; these values feed both list columns
+                    -- and the mouse-over tooltip.
+                    local houseName = BMU.cleanHouseTourZoneName(listingData:GetHouseName() or "")
+                    local rawNickName = BMU.cleanHouseTourZoneName(GetCollectibleNickname(collectibleId))
+                    local nickName = BMU.cleanHouseTourZoneName(BMU_formatName(rawNickName))
+                    local rawDefaultHouseName = BMU.cleanHouseTourZoneName(GetCollectibleDefaultNickname(collectibleId))
+                    local houseNameFormatted = houseName
+                    if houseNameFormatted == "" then
+                        houseNameFormatted = BMU.cleanHouseTourZoneName(BMU_formatName(rawDefaultHouseName))
+                    end
 
                     local listing = {
                         houseId              = houseId,
@@ -2882,9 +3205,9 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
                         collectibleId        = collectibleId,
                         houseZoneId          = houseZoneId,
                         parentZoneId         = parentZoneId,
-                        houseNameUnformatted = GetZoneNameById(houseZoneId),
-                        zoneName             = GetZoneNameById(parentZoneId),
-                        parentZoneName       = BMU_formatName(GetZoneNameById(parentZoneId)),
+                        houseNameUnformatted = BMU.cleanHouseTourZoneName(GetZoneNameById(houseZoneId)),
+                        zoneName             = BMU.cleanHouseTourZoneName(GetZoneNameById(parentZoneId)),
+                        parentZoneName       = BMU.formatHouseTourZoneName(GetZoneNameById(parentZoneId)),
                         houseNameFormatted   = houseNameFormatted,
                         nickName             = nickName,
                         mapIndex             = BMU_getMapIndex(houseZoneId),
@@ -2907,17 +3230,17 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
                         listing.parentZoneId = 1282
                         listing.houseTourMapZoneId = 1283
                         listing.houseTourMapId = 2119
-                        listing.zoneName = GetZoneNameById(1283)
-                        listing.parentZoneName = BMU_formatName(GetZoneNameById(1282))
-                        listing.houseTourDisplayZoneName = BMU_formatName(GetZoneNameById(1283))
+                        listing.zoneName = BMU.cleanHouseTourZoneName(GetZoneNameById(1283))
+                        listing.parentZoneName = BMU.formatHouseTourZoneName(GetZoneNameById(1282))
+                        listing.houseTourDisplayZoneName = BMU.cleanHouseTourZoneName(GetZoneNameById(1283))
                         listing.houseTourDisplayParentZoneName = listing.parentZoneName
                     end
                     if houseId == 102 then
                         listing.mapIndex = BMU_getMapIndex(981) or BMU_getMapIndex(980) or listing.mapIndex
                         listing.mapId = listing.houseTourMapId
                         listing.houseTourContextZoneId = 981
-                        listing.houseTourDisplayZoneName = BMU_formatName(GetZoneNameById(981))
-                        listing.houseTourDisplayParentZoneName = listing.houseTourDisplayZoneName
+                        listing.houseTourDisplayZoneName = BMU.cleanHouseTourZoneName(GetZoneNameById(981))
+                        listing.houseTourDisplayParentZoneName = BMU.formatHouseTourZoneName(GetZoneNameById(981))
                     end
 
                     table.insert(listings, listing)
@@ -2932,8 +3255,8 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
                         worldMapListing.houseTourMapId = GetMapIdByZoneId and GetMapIdByZoneId(980) or nil
                         worldMapListing.mapId = worldMapListing.houseTourMapId
                         worldMapListing.mapIndex = BMU_getMapIndex(980) or worldMapListing.mapIndex
-                        worldMapListing.houseTourDisplayZoneName = BMU_formatName(GetZoneNameById(981))
-                        worldMapListing.houseTourDisplayParentZoneName = worldMapListing.houseTourDisplayZoneName
+                        worldMapListing.houseTourDisplayZoneName = BMU.cleanHouseTourZoneName(GetZoneNameById(981))
+                        worldMapListing.houseTourDisplayParentZoneName = BMU.formatHouseTourZoneName(GetZoneNameById(981))
                         worldMapListing.houseTourPingX = 0.4457
                         worldMapListing.houseTourPingZ = 0.4160
                         worldMapListing.housePingX = 0.4457
@@ -2945,28 +3268,21 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
         end
     end
 
-    local mergedListings = {}
-    local mergedKeys = {}
-    local function addMergedListing(entry)
-        if not entry then return end
-        local contextZone = entry.houseTourContextZoneId or entry.parentZoneId or 0
-        local key = tostring(entry.houseId or 0) .. ":" .. tostring(contextZone)
-        if not mergedKeys[key] then
-            mergedKeys[key] = true
-            table.insert(mergedListings, entry)
+    -- Accumulate all batches separately from the last completed cache. This is
+    -- essential for a full refresh: stale listings are removed only after every
+    -- batch has finished, while the old cache remains available to the UI.
+    BMU.houseTourRefreshListings = BMU.mergeHouseTourListings(BMU.houseTourRefreshListings, listings)
+
+    local searchMode = BMU.houseTourBrowseCacheMode or "replace"
+    if searchMode == "merge" then
+        BMU.houseTourListings = BMU.mergeHouseTourListings(BMU.houseTourListings, BMU.houseTourRefreshListings)
+        -- Persist incremental discoveries batch-by-batch. The checked-ID set is
+        -- only advanced after the final batch, so interrupted scans are retried.
+        if BMU.savedVarsServ then
+            BMU.savedVarsServ.houseTourListings = BMU.houseTourListings
         end
     end
 
-    if BMU.houseTourListings then
-        for _, entry in ipairs(BMU.houseTourListings) do
-            addMergedListing(entry)
-        end
-    end
-    for _, entry in ipairs(listings) do
-        addMergedListing(entry)
-    end
-
-    BMU.houseTourListings = mergedListings
     BMU.houseTourFallbackByParentZoneId = {}
 
     -- Each filter batch is completed independently. Refresh the visible list
@@ -2976,7 +3292,7 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
     local currentBatch = BMU.houseTourBrowseFilterBatchIndex or 1
     local batchCount = BMU.houseTourBrowseFilterBatchCount or 1
     local batchResults = #results
-    local cacheEntries = #(BMU.houseTourListings or {})
+    local cacheEntries = (searchMode == "replace") and #(BMU.houseTourRefreshListings or {}) or #(BMU.houseTourListings or {})
     -- Batch output follows the Debug Mode only. It is intentionally independent
     -- of the optional diagnostic chat-command setting.
     local diagnosticsEnabled = BMU.debugMode
@@ -3024,6 +3340,11 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
             if not HOUSE_TOURS_SEARCH_MANAGER then
                 BMU.houseTourSearchPending = false
                 BMU.houseTourSearchPendingType = nil
+                BMU.houseTourRefreshListings = nil
+                BMU.houseTourBrowseCacheMode = nil
+                BMU.houseTourBrowseAllKnownHouseIds = nil
+                BMU.restoreHouseTourBrowseFilters()
+                BMU.startQueuedHouseTourRefresh()
                 return
             end
 
@@ -3031,8 +3352,12 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
             if not filterOk then
                 BMU.houseTourSearchPending = false
                 BMU.houseTourSearchPendingType = nil
+                BMU.houseTourRefreshListings = nil
+                BMU.houseTourBrowseCacheMode = nil
+                BMU.houseTourBrowseAllKnownHouseIds = nil
                 BMU.restoreHouseTourBrowseFilters()
                 BMU.refreshListAuto(false)
+                BMU.startQueuedHouseTourRefresh()
                 return
             end
 
@@ -3051,45 +3376,44 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
         return
     end
 
-    -- Last batch: clear the filter, then perform one final list refresh so the
-    -- user sees the complete merged cache with no House Tour filter active.
+    -- Last batch: commit the finished snapshot. A full refresh replaces the
+    -- previous cache (thereby removing unlisted/inaccessible entries); an
+    -- incremental discovery adds only newly introduced house IDs.
+    local completedListings = BMU.houseTourRefreshListings or {}
+    local completedMode = BMU.houseTourBrowseCacheMode or "replace"
+    local completedKnownIds = {}
+    for _, houseId in ipairs(BMU.houseTourBrowseAllKnownHouseIds or {}) do
+        completedKnownIds[houseId] = true
+    end
+
+    local finalListings
+    if completedMode == "merge" then
+        finalListings = BMU.mergeHouseTourListings(BMU.houseTourListings, completedListings)
+    else
+        finalListings = BMU.mergeHouseTourListings({}, completedListings)
+    end
+    BMU.saveHouseTourCache(finalListings, completedKnownIds)
+    BMU.houseTourRefreshListings = nil
+    BMU.houseTourBrowseCacheMode = nil
+    BMU.houseTourBrowseAllKnownHouseIds = nil
+    BMU.houseTourFallbackByParentZoneId = {}
+
     BMU.restoreHouseTourBrowseFilters()
 
     if diagnosticsEnabled then
         d(string.format(
-            "[BMU %s HouseTourBatch] all %d batches complete; filter reset; final refresh",
+            "[BMU %s HouseTourBatch] all %d batches complete; cache saved (%d listings); filter reset",
             tostring(teleporterVars.version or "?"),
-            batchCount
+            batchCount,
+            #(BMU.houseTourListings or {})
         ))
     end
 
     BMU.refreshListAuto(false)
 
-    -- The completed batch chain is normally sufficient. Only perform one
-    -- guarded fallback retry when the merged cache is still incomplete. The
-    -- previous implementation scheduled three independent retries at once;
-    -- that caused the complete 11-batch sequence to run multiple times in
-    -- parallel after initialization.
-    local expectedCacheEntries = BMU.houseTourBrowseFilterTotal or 0
-    if expectedCacheEntries > 0 and cacheEntries < expectedCacheEntries and not BMU.houseTourInitialRetryDone then
-        BMU.houseTourInitialRetryDone = true
-
-        if diagnosticsEnabled then
-            d(string.format(
-                "[BMU %s HouseTourBatch] cache incomplete (%d/%d); scheduling one fallback retry",
-                tostring(teleporterVars.version or "?"),
-                cacheEntries,
-                expectedCacheEntries
-            ))
-        end
-
-        zo_callLater(function()
-            local savedVars = BMU.savedVarsAcc
-            if savedVars and savedVars.showHouseTours and HOUSE_TOURS_SEARCH_MANAGER and not BMU.houseTourSearchPending then
-                BMU.RequestHouseTourSearch(HOUSE_TOURS_LISTING_TYPE_BROWSE)
-            end
-        end, 3000)
-    end
+    -- If a visit failed while an incremental search was already running, run
+    -- the requested complete refresh now that the current batch chain is done.
+    BMU.startQueuedHouseTourRefresh()
 end
 
 function BMU.createTableHouses()

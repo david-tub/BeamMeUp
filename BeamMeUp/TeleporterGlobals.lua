@@ -2171,6 +2171,28 @@ function BMU.GetCurrentMapDisplayFilter()
 end
 
 
+-- returns all current user filters for clues, survey maps and treasure maps
+-- returns a table with named boolean fields (true: map type is shown)
+-- Keys: clue, alchemist, blacksmith, clothier, enchanter, woodworker, jewelry, treasure
+-- This named API is preferred over GetCurrentMapDisplayFilter() for new integrations.
+function BMU.GetCurrentMapDisplayFilters()
+	local savedVarsChar = BMU.savedVarsChar
+	local displayMaps = savedVarsChar and savedVarsChar.displayMaps
+	if not displayMaps then return nil end
+
+	return {
+		clue = displayMaps.clue == true,
+		alchemist = displayMaps.alchemist == true,
+		blacksmith = displayMaps.blacksmith == true,
+		clothier = displayMaps.clothier == true,
+		enchanter = displayMaps.enchanter == true,
+		woodworker = displayMaps.woodworker == true,
+		jewelry = displayMaps.jewelry == true,
+		treasure = displayMaps.treasure == true,
+	}
+end
+
+
 --Run a function throttled (check if it should run already and overwrite the old call then with a new one to
 --prevent running it multiple times in a short time)
 function BMU.ThrottledUpdate(callbackName, timer, callback, ...)

@@ -36,6 +36,7 @@ BMU.SOURCE_INDEX_GUILD = {
 	[5] = 7,
 }
 BMU.SOURCE_INDEX_OWNHOUSES = 8 --INS Baertram 260206
+BMU.SOURCE_INDEX_HOUSE_TOUR = 9  -- source "Home Tours"
 
 -- constant values for zone categorization
 BMU.ZONE_CATEGORY_UNKNOWN = 0
@@ -135,6 +136,20 @@ BMU.var = {
 }
 
 local teleporterVars = BMU.var
+-- House Tours caches
+BMU.houseTourServerListings = nil        -- full shared server pool, including houses owned by other ESO accounts
+BMU.houseTourListings = nil              -- account-specific visible projection of the shared pool
+BMU.houseTourSearchPending = false       -- true while a House Tours search is in progress
+BMU.houseTourFallbackByParentZoneId = {} -- cache: [parentZoneId] = listingData OR false (if there is no result)
+
+-- House Tour homes whose ESO zone association is incorrect.
+-- Values are the correct geographical parent zone IDs.
+BMU.houseTourParentZoneOverrides = {
+    [102] = 981,  -- Shadow Queen's Labyrinth -> Brass Fortress
+    [54]  = 684,  -- Pariah's Pinnacle -> Wrothgar
+    [115] = 1282, -- Shattered Mirror Isle -> Fargrave
+}
+	
 --local allowedLanguages = teleporterVars.allowedLanguages
 local allowedLanguagesIndex = teleporterVars.allowedLanguagesIndex
 
@@ -2154,6 +2169,28 @@ function BMU.GetCurrentMapDisplayFilter()
 		BMU_SVChar_displayMaps.woodworker, BMU_SVChar_displayMaps.blacksmith,
 		BMU_SVChar_displayMaps.clothier, BMU_SVChar_displayMaps.jewelry,
 		BMU_SVChar_displayMaps.treasure
+end
+
+
+-- returns all current user filters for clues, survey maps and treasure maps
+-- returns a table with named boolean fields (true: map type is shown)
+-- Keys: clue, alchemist, blacksmith, clothier, enchanter, woodworker, jewelry, treasure
+-- This named API is preferred over GetCurrentMapDisplayFilter() for new integrations.
+function BMU.GetCurrentMapDisplayFilters()
+	local savedVarsChar = BMU.savedVarsChar
+	local displayMaps = savedVarsChar and savedVarsChar.displayMaps
+	if not displayMaps then return nil end
+
+	return {
+		clue = displayMaps.clue == true,
+		alchemist = displayMaps.alchemist == true,
+		blacksmith = displayMaps.blacksmith == true,
+		clothier = displayMaps.clothier == true,
+		enchanter = displayMaps.enchanter == true,
+		woodworker = displayMaps.woodworker == true,
+		jewelry = displayMaps.jewelry == true,
+		treasure = displayMaps.treasure == true,
+	}
 end
 
 

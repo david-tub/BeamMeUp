@@ -351,6 +351,14 @@ function CS.SetupOptionsMenu(index) --index == Addon name
               setFunction = function(value) BMU_savedVarsAcc.hideOwnHouses = value end,
 			  default = BMU_DefaultsAccount["hideOwnHouses"],
 			           },
+			           {
+              type = LHAS.ST_CHECKBOX,
+              label = BMU_SI_get(SI_TELE_SETTINGS_SHOW_HOUSE_TOURS),
+              tooltip = BMU_SI_get(SI_TELE_SETTINGS_SHOW_HOUSE_TOURS_TOOLTIP) .. " [DEFAULT: " .. tostring(BMU_DefaultsAccount["showHouseTours"]) .. "]",
+              getFunction = function() return BMU_savedVarsAcc.showHouseTours end,
+              setFunction = function(value) BMU_savedVarsAcc.showHouseTours = value end,
+			  default = BMU_DefaultsAccount["showHouseTours"],
+         },
 		 {
               type = LHAS.ST_LABEL,
               label = BMU_SI_get(SI_TELE_SETTINGS_PRIORITIZATION_DESCRIPTION),

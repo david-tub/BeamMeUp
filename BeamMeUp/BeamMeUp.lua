@@ -127,6 +127,15 @@ local function alertTeleporterLoaded()
 	-- register events for own houses furniture count update
 	EM:RegisterForEvent(appName, EVENT_PLAYER_ACTIVATED, BMU.updateHouseFurnitureCount)
 	EM:RegisterForEvent(appName, EVENT_HOUSE_FURNITURE_COUNT_UPDATED, BMU.updateHouseFurnitureCount)
+
+    -- Rebuild the account-specific view now that collectible ownership data is
+    -- available, then query only if the shared server pool has new house IDs.
+    if BMU.refreshHouseTourVisibleCache then
+        BMU.refreshHouseTourVisibleCache()
+    end
+    if BMU.checkHouseTourCacheForNewHouses then
+        BMU.checkHouseTourCacheForNewHouses()
+    end
 end
 
 
@@ -826,6 +835,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
     
     local anchorOnMap = not BMU_IsNotKeyboard()
     local showOpenButtonOnMap = not BMU_IsNotKeyboard()
+    local showHouseToursGamepad = not BMU_IsNotKeyboard()
 
     BMU.DefaultsAccount = {
 		["pos_MapScene_x"] = -15,
@@ -844,6 +854,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["hidePVP"] = true,
 		["hideClosedDungeons"] = true,
 		["hideHouses"] = false,
+		["showHouseTours"] = showHouseToursGamepad,
 		["hideDelves"] = false,
 		["hidePublicDungeons"] = false,
 		["savedGold"] = 0,
@@ -886,6 +897,7 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["chatOutputAdditional"] = true,
 		["chatOutputUnlock"] = true,
 		["showContextMenuIcons"] = true, --INS 260203 Baertram
+		["diagnosticChatCommands"] = false,
     }
     
 	BMU.DefaultsServer = {
@@ -899,6 +911,16 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["favoriteListWayshrines"] = {},
 		["zoneSpecificHouses"] = {}, -- maps zoneId to preferred houseId for that zone
 	}
+
+    -- Shared House Tours data is stored separately below, using a fixed
+    -- ZO_SavedVars displayName so every ESO account on the same megaserver
+    -- accesses one common pool. Account/server settings above remain private.
+    BMU.DefaultsHouseTourServerPool = {
+        ["houseTourListings"] = {},
+        ["houseTourKnownHouseIds"] = {},
+        ["houseTourCacheVersion"] = 2,
+        ["houseTourFullScanComplete"] = false,
+    }
 	
 	BMU.DefaultsCharacter = {
 		["defaultTab"] = 0,
@@ -962,6 +984,18 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	--]]
 	BMU.savedVarsAcc =  ZO_SavedVars:NewAccountWide(SVTabName, 			2, nil, BMU.DefaultsAccount, 	nil)
 	BMU.savedVarsServ = ZO_SavedVars:NewAccountWide(SVTabName, 			3, nil, BMU.DefaultsServer, 	GetWorldName())
+    -- The fixed displayName makes this data independent of the currently
+    -- logged-in @account, while GetWorldName() keeps EU/NA/PTS pools separate.
+    -- This uses the built-in ZO_SavedVars API; no additional library is needed.
+    BMU.savedVarsHouseTourServerPool = ZO_SavedVars:NewAccountWide(
+        SVTabName,
+        1,
+        "HouseToursServerWidePool",
+        BMU.DefaultsHouseTourServerPool,
+        GetWorldName(),
+        "BMU_HouseTours_ServerWide_Pool"
+    )
+	if BMU.loadHouseTourSavedCache then BMU.loadHouseTourSavedCache() end
 	BMU.savedVarsChar = ZO_SavedVars:NewCharacterIdSettings(SVTabName, 	3, nil, BMU.DefaultsCharacter, 	nil)
 	local BMU_savedVarsAcc = BMU.savedVarsAcc
 
@@ -983,6 +1017,14 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	EM:RegisterForEvent(appName, EVENT_GAME_CAMERA_UI_MODE_CHANGED, BMU_cameraModeChanged)
 	
 	EM:RegisterForEvent(appName, EVENT_SOCIAL_ERROR, BMU.socialErrorWhilePorting)
+
+    -- Track only explicit House Tours attempts. A successful zone load clears
+    -- the marker; EVENT_JUMP_FAILED triggers a refresh of the House Tours cache.
+    local houseTourEventNamespace = appName .. "_HouseTours"
+    EM:RegisterForEvent(houseTourEventNamespace, EVENT_PLAYER_ACTIVATED, BMU.clearHouseTourPendingVisit)
+    if EVENT_JUMP_FAILED then
+        EM:RegisterForEvent(houseTourEventNamespace, EVENT_JUMP_FAILED, BMU.houseTourJumpFailed)
+    end
 
 	--- initialize slash commands
 	BMU.activateSlashCommands()
@@ -1045,6 +1087,13 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		-- write welcome message to chat when you accept application (automatically welcome)
 		EM:RegisterForEvent(appName, EVENT_GUILD_FINDER_PROCESS_APPLICATION_RESPONSE, BMU.AdminAutoWelcome)
 	end
+	
+	-- House Tours search callback
+    if HOUSE_TOURS_SEARCH_MANAGER then
+        HOUSE_TOURS_SEARCH_MANAGER:RegisterCallback("OnSearchStateChanged", function(searchState, listingType)
+            BMU.onHouseTourSearchComplete(searchState, listingType)
+        end)
+    end
 end
 
 

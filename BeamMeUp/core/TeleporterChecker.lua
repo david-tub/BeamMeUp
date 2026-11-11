@@ -248,22 +248,110 @@ function BMU.formatHouseTourZoneName(zoneName, removeArticles)
     return BMU_formatName(cleanName, removeArticles)
 end
 
--- House Tours are server-specific, so their persistent cache is stored in
--- BMU.savedVarsServ (not in the account-wide settings shared by both servers).
+-- House Tours listings are shared by every ESO account on the same megaserver.
+-- The server-wide SavedVariables handle is created in BeamMeUp.lua with a fixed
+-- displayName and GetWorldName() profile. The visible runtime list is then
+-- projected from that shared pool for the currently logged-in account.
+function BMU.refreshHouseTourVisibleCache()
+    local serverListings = BMU.houseTourServerListings or {}
+    local ownedHouseIds = BMU.getOwnedHouseIdsForHouseTours and BMU.getOwnedHouseIdsForHouseTours() or {}
+    local myDisplayName = GetDisplayName and GetDisplayName() or nil
+    local visibleListings = {}
+
+    for _, listing in ipairs(serverListings) do
+        if listing and listing.houseId
+            and not ownedHouseIds[listing.houseId]
+            and (not myDisplayName or listing.ownerName ~= myDisplayName) then
+            table_insert(visibleListings, listing)
+
+            -- House 102 needs a second runtime map context for the overview
+            -- map. Keep only one record per house in SavedVariables and create
+            -- this presentation-only copy after loading the shared server pool.
+            if listing.houseId == 102 then
+                local worldMapListing = {}
+                for key, value in pairs(listing) do
+                    worldMapListing[key] = value
+                end
+                worldMapListing.houseTourContextZoneId = 980
+                worldMapListing.houseTourMapZoneId = 980
+                worldMapListing.houseTourMapId = GetMapIdByZoneId and GetMapIdByZoneId(980) or nil
+                worldMapListing.mapId = worldMapListing.houseTourMapId
+                worldMapListing.mapIndex = (BMU_getMapIndex and BMU_getMapIndex(980)) or worldMapListing.mapIndex
+                worldMapListing.houseTourDisplayZoneName = BMU.cleanHouseTourZoneName(GetZoneNameById(981))
+                worldMapListing.houseTourDisplayParentZoneName = BMU.formatHouseTourZoneName(GetZoneNameById(981))
+                worldMapListing.houseTourPingX = 0.4457
+                worldMapListing.houseTourPingZ = 0.4160
+                worldMapListing.housePingX = 0.4457
+                worldMapListing.housePingZ = 0.4160
+                table_insert(visibleListings, worldMapListing)
+            end
+        end
+    end
+
+    BMU.houseTourListings = visibleListings
+    return visibleListings
+end
+
 function BMU.loadHouseTourSavedCache()
-    local savedVars = BMU.savedVarsServ
-    if not savedVars then
+    local serverPool = BMU.savedVarsHouseTourServerPool
+    local accountServerVars = BMU.savedVarsServ
+    if not serverPool then
+        -- Defensive fallback for an unexpected initialization problem. Keep the
+        -- old account-scoped cache usable rather than disabling House Tours.
+        local legacyListings = accountServerVars and accountServerVars.houseTourListings or {}
+        BMU.houseTourServerListings = type(legacyListings) == "table" and legacyListings or {}
+        BMU.houseTourKnownHouseIds = accountServerVars and accountServerVars.houseTourKnownHouseIds or nil
+        BMU.houseTourCacheInitialized = accountServerVars and (tonumber(accountServerVars.houseTourCacheVersion) or 0) >= 1 or false
+        for _, listing in ipairs(BMU.houseTourServerListings) do
+            if listing then
+                listing.zoneName = BMU.cleanHouseTourZoneName(listing.zoneName)
+                listing.parentZoneName = BMU.cleanHouseTourZoneName(listing.parentZoneName)
+                listing.houseTourDisplayZoneName = BMU.cleanHouseTourZoneName(listing.houseTourDisplayZoneName)
+                listing.houseTourDisplayParentZoneName = BMU.cleanHouseTourZoneName(listing.houseTourDisplayParentZoneName)
+                listing.houseName = BMU.cleanHouseTourZoneName(listing.houseName)
+                listing.houseNameUnformatted = BMU.cleanHouseTourZoneName(listing.houseNameUnformatted)
+                listing.houseNameFormatted = BMU.cleanHouseTourZoneName(listing.houseNameFormatted)
+                listing.nickName = BMU.cleanHouseTourZoneName(listing.nickName)
+                listing.houseTooltip = BMU.cleanHouseTourTooltip(listing.houseTooltip)
+            end
+        end
+        BMU.refreshHouseTourVisibleCache()
         return
     end
 
-    local cachedListings = savedVars.houseTourListings
+    local cachedListings = serverPool.houseTourListings
     if type(cachedListings) ~= "table" then
         cachedListings = {}
-        savedVars.houseTourListings = cachedListings
+        serverPool.houseTourListings = cachedListings
     end
 
-    -- Normalize entries written by earlier builds as well. In particular,
-    -- remove raw ESO grammatical suffixes before the first list is rendered.
+    -- One-time migration: merge this account's old cache into the shared pool
+    -- until a complete server-wide scan has been committed. Old known-house ID
+    -- sets are deliberately NOT migrated because they were account-specific
+    -- and excluded houses owned by the account that created them.
+    if accountServerVars and not accountServerVars.houseTourServerPoolMigratedV2 then
+        local legacyListings = accountServerVars.houseTourListings
+        if serverPool.houseTourFullScanComplete ~= true and type(legacyListings) == "table" then
+            cachedListings = BMU.mergeHouseTourListings(cachedListings, legacyListings)
+            serverPool.houseTourListings = cachedListings
+        end
+
+        accountServerVars.houseTourListings = nil
+        accountServerVars.houseTourKnownHouseIds = nil
+        accountServerVars.houseTourCacheVersion = nil
+        accountServerVars.houseTourServerPoolMigratedV2 = true
+    end
+
+    -- Version 2 changes the meaning of the cache: it contains the complete
+    -- server-wide pool, including listings for houses owned by other accounts.
+    -- A full scan is required once after migration to build that complete pool.
+    serverPool.houseTourCacheVersion = 2
+    if serverPool.houseTourFullScanComplete ~= true then
+        serverPool.houseTourKnownHouseIds = {}
+    end
+
+    -- Normalize entries from both the previous account cache and the shared
+    -- cache before exposing them to any UI list or tooltip.
     for _, listing in ipairs(cachedListings) do
         if listing then
             listing.zoneName = BMU.cleanHouseTourZoneName(listing.zoneName)
@@ -278,15 +366,17 @@ function BMU.loadHouseTourSavedCache()
         end
     end
 
-    BMU.houseTourListings = cachedListings
-    BMU.houseTourKnownHouseIds = type(savedVars.houseTourKnownHouseIds) == "table" and savedVars.houseTourKnownHouseIds or nil
-    BMU.houseTourCacheInitialized = (tonumber(savedVars.houseTourCacheVersion) or 0) >= 1
+    cachedListings = BMU.mergeHouseTourListings({}, cachedListings)
+    serverPool.houseTourListings = cachedListings
+    BMU.houseTourServerListings = cachedListings
+    BMU.houseTourKnownHouseIds = type(serverPool.houseTourKnownHouseIds) == "table" and serverPool.houseTourKnownHouseIds or {}
+    BMU.houseTourCacheInitialized = serverPool.houseTourFullScanComplete == true
+    BMU.refreshHouseTourVisibleCache()
 end
 
 local function houseTourListingKey(entry)
     if not entry or not entry.houseId then return nil end
-    local contextZone = entry.houseTourContextZoneId or entry.parentZoneId or 0
-    return tostring(entry.houseId) .. ":" .. tostring(contextZone)
+    return tostring(entry.houseId)
 end
 
 function BMU.mergeHouseTourListings(existingListings, newListings)
@@ -305,29 +395,37 @@ function BMU.mergeHouseTourListings(existingListings, newListings)
 end
 
 function BMU.saveHouseTourCache(listings, knownHouseIds)
-    local savedVars = BMU.savedVarsServ
-    local cacheCopy = {}
-    for _, entry in ipairs(listings or {}) do
-        table_insert(cacheCopy, entry)
-    end
+    local cacheCopy = BMU.mergeHouseTourListings({}, listings or {})
 
-    BMU.houseTourListings = cacheCopy
+    BMU.houseTourServerListings = cacheCopy
     BMU.houseTourCacheInitialized = true
 
-    if savedVars then
-        savedVars.houseTourListings = cacheCopy
-        if knownHouseIds then
-            local knownCopy = {}
-            for houseId, value in pairs(knownHouseIds) do
-                if value then knownCopy[houseId] = true end
-            end
-            savedVars.houseTourKnownHouseIds = knownCopy
-            BMU.houseTourKnownHouseIds = knownCopy
-        end
-        savedVars.houseTourCacheVersion = 1
+    local knownCopy = {}
+    for houseId, value in pairs(knownHouseIds or {}) do
+        if value then knownCopy[houseId] = true end
     end
+    BMU.houseTourKnownHouseIds = knownCopy
+
+    local serverPool = BMU.savedVarsHouseTourServerPool
+    if serverPool then
+        serverPool.houseTourListings = cacheCopy
+        serverPool.houseTourKnownHouseIds = knownCopy
+        serverPool.houseTourCacheVersion = 2
+        serverPool.houseTourFullScanComplete = true
+    end
+
+    -- The shared data pool includes entries owned by other accounts. Each
+    -- login sees only the subset relevant to its own owned houses/owner name.
+    BMU.refreshHouseTourVisibleCache()
 end
 
+function BMU.persistHouseTourServerCachePartial()
+    local serverPool = BMU.savedVarsHouseTourServerPool
+    if serverPool then
+        serverPool.houseTourListings = BMU.houseTourServerListings or {}
+        serverPool.houseTourCacheVersion = 2
+    end
+end
 
 -- zone where the player actual is
 function BMU.getPlayersZoneId()
@@ -2669,12 +2767,18 @@ function BMU.getOwnedHouseIdsForHouseTours()
 
     local ownedHouses = {}
     if BMU_IsNotKeyboard() then
-        ownedHouses = ZO_COLLECTIBLE_DATA_MANAGER:GetAllCollectibleDataObjects(
-            { ZO_CollectibleCategoryData.IsHousingCategory },
-            { ZO_CollectibleData.IsUnlocked }
-        )
-    elseif COLLECTIONS_BOOK_SINGLETON then
-        ownedHouses = COLLECTIONS_BOOK_SINGLETON:GetOwnedHouses()
+        if ZO_COLLECTIBLE_DATA_MANAGER and ZO_CollectibleCategoryData and ZO_CollectibleData then
+            local ok, result = pcall(function()
+                return ZO_COLLECTIBLE_DATA_MANAGER:GetAllCollectibleDataObjects(
+                    { ZO_CollectibleCategoryData.IsHousingCategory },
+                    { ZO_CollectibleData.IsUnlocked }
+                )
+            end)
+            if ok and result then ownedHouses = result end
+        end
+    elseif COLLECTIONS_BOOK_SINGLETON and type(COLLECTIONS_BOOK_SINGLETON.GetOwnedHouses) == "function" then
+        local ok, result = pcall(COLLECTIONS_BOOK_SINGLETON.GetOwnedHouses, COLLECTIONS_BOOK_SINGLETON)
+        if ok and result then ownedHouses = result end
     end
 
     for _, house in pairs(ownedHouses) do
@@ -2694,9 +2798,10 @@ function BMU.getOwnedHouseIdsForHouseTours()
 end
 
 -- Build a sorted list of all valid house IDs known to the client.
--- The House Tours UI exposes these IDs as selectable house filters. We use the
--- same pool as the housing collections UI and remove the player's owned houses
--- before executing the BROWSE search.
+-- The House Tours UI exposes these IDs as selectable house filters. The
+-- server-wide pool must include every listing, including houses owned by the
+-- currently logged-in account; those entries are filtered only in the
+-- account-specific visible list.
 function BMU.getAllHouseTourHouseIds()
     local houseIds = {}
     local seen = {}
@@ -2826,18 +2931,17 @@ function BMU.prepareHouseTourBrowseFilter()
         filters:ResetFilters()
     end
 
-    local ownedHouseIds = BMU.getOwnedHouseIdsForHouseTours()
     local selectedHouseIds = BMU.houseTourBrowseSearchHouseIds
     if type(selectedHouseIds) ~= "table" then
         selectedHouseIds = BMU.getAllHouseTourHouseIds()
         BMU.houseTourBrowseSearchHouseIds = selectedHouseIds
     end
+    -- Do not exclude houses owned by this account here. Their listings belong
+    -- in the shared server pool because they may be relevant to other accounts.
+    -- The runtime display list hides them for the account that owns them.
     local browseHouseIds = {}
-
     for _, houseId in ipairs(selectedHouseIds) do
-        if not ownedHouseIds[houseId] then
-            table.insert(browseHouseIds, houseId)
-        end
+        table_insert(browseHouseIds, houseId)
     end
 
     BMU.houseTourBrowseHouseIds = browseHouseIds
@@ -2856,9 +2960,9 @@ function BMU.prepareHouseTourBrowseFilter()
         table.insert(batch, browseHouseIds[index])
     end
 
-    -- The current batch is the "all houses except owned" selection. If ESO's
-    -- maximum is lower than the complete house list, the callback advances to
-    -- the next batch and merges the results.
+    -- The current batch contains the selected house IDs for the shared pool.
+    -- If ESO's maximum is lower than the complete list, the callback advances
+    -- to the next batch and merges the results.
     local ok, method = BMU.setHouseTourHouseIdFilters(filters, batch)
     if ok then
         BMU.houseTourBrowseFilterMethod = method
@@ -2892,7 +2996,8 @@ end
 
 -- Start an asynchronous House Tours BROWSE search.
 -- RECOMMENDED is intentionally not used: the BROWSE result is filtered to all
--- known houses except the player's owned houses, then merged into the cache.
+-- known houses and merged into the shared server-wide cache. Account-specific
+-- exclusions are applied only when projecting the cache into the visible list.
 function BMU.RefreshHouseTours(cacheMode)
     if not HOUSE_TOURS_SEARCH_MANAGER then
         return false
@@ -2917,22 +3022,31 @@ end
 -- current listings. If another batch chain is already active, RefreshHouseTours
 -- queues a complete replacement scan after that chain has finished.
 function BMU.resetHouseTourCacheAndRefresh()
-    local savedVars = BMU.savedVarsServ
-    if savedVars then
-        savedVars.houseTourListings = nil
-        savedVars.houseTourKnownHouseIds = nil
-        savedVars.houseTourCacheVersion = nil
+    local serverPool = BMU.savedVarsHouseTourServerPool
+    if serverPool then
+        serverPool.houseTourListings = {}
+        serverPool.houseTourKnownHouseIds = {}
+        serverPool.houseTourCacheVersion = 2
+        serverPool.houseTourFullScanComplete = false
+    end
+    -- Clear any legacy account-scoped copy left by an interrupted migration.
+    if BMU.savedVarsServ then
+        BMU.savedVarsServ.houseTourListings = nil
+        BMU.savedVarsServ.houseTourKnownHouseIds = nil
+        BMU.savedVarsServ.houseTourCacheVersion = nil
+        BMU.savedVarsServ.houseTourServerPoolMigratedV2 = true
     end
 
+    BMU.houseTourServerListings = {}
     BMU.houseTourListings = {}
-    BMU.houseTourKnownHouseIds = nil
+    BMU.houseTourKnownHouseIds = {}
     BMU.houseTourCacheInitialized = false
     BMU.houseTourCacheCheckedThisSession = true
     BMU.houseTourFallbackByParentZoneId = {}
     BMU.houseTourPendingVisit = nil
 
-    -- Start/queue a full BROWSE scan. The current cache is already cleared, and
-    -- the existing batch implementation commits the new snapshot at completion.
+    -- This intentionally rebuilds the shared server pool, so all accounts on
+    -- this megaserver will use the refreshed result after their next load.
     local started = BMU.RefreshHouseTours("replace")
     if not started and BMU.refreshListAuto then
         BMU.refreshListAuto(false)
@@ -2956,6 +3070,11 @@ function BMU.RequestHouseTourSearch(listingType, cacheMode, searchHouseIds)
 
     cacheMode = cacheMode or "replace"
     BMU.houseTourBrowseCacheMode = cacheMode
+    if cacheMode == "replace" and BMU.savedVarsHouseTourServerPool then
+        -- If the client closes during a full rebuild, the next login retries it
+        -- instead of treating the old snapshot as the completed new scan.
+        BMU.savedVarsHouseTourServerPool.houseTourFullScanComplete = false
+    end
     BMU.houseTourBrowseAllKnownHouseIds = BMU.getAllHouseTourHouseIds()
     BMU.houseTourBrowseSearchHouseIds = searchHouseIds or BMU.houseTourBrowseAllKnownHouseIds
     BMU.houseTourRefreshListings = {}
@@ -2964,12 +3083,13 @@ function BMU.RequestHouseTourSearch(listingType, cacheMode, searchHouseIds)
     local filterOk = BMU.prepareHouseTourBrowseFilter()
     if not filterOk then
         -- Fallback for client revisions where the filter object exposes no
-        -- supported house-ID setter. Owned houses are still excluded below.
+        -- supported house-ID setter. The BROWSE result is still stored in the
+        -- shared pool; account-specific owned-house filtering happens on display.
         BMU.houseTourBrowseFilterActive = false
         BMU.houseTourBrowseFilterBatchCount = 1
     end
 
-    -- There is nothing to query when the only newly-known houses are owned.
+    -- There is nothing to query when the selected house-ID list is empty.
     if #(BMU.houseTourBrowseHouseIds or {}) == 0 then
         local knownHouseIds = {}
         for _, houseId in ipairs(BMU.houseTourBrowseAllKnownHouseIds or {}) do
@@ -2978,7 +3098,7 @@ function BMU.RequestHouseTourSearch(listingType, cacheMode, searchHouseIds)
         if cacheMode == "replace" then
             BMU.saveHouseTourCache({}, knownHouseIds)
         elseif cacheMode == "merge" then
-            BMU.saveHouseTourCache(BMU.houseTourListings or {}, knownHouseIds)
+            BMU.saveHouseTourCache(BMU.houseTourServerListings or {}, knownHouseIds)
         end
         BMU.houseTourRefreshListings = nil
         BMU.houseTourBrowseCacheMode = nil
@@ -3020,36 +3140,40 @@ function BMU.checkHouseTourCacheForNewHouses()
     end
 
     local currentKnown = {}
-    local ownedHouseIds = BMU.getOwnedHouseIdsForHouseTours()
     local newHouseIds = {}
     for _, houseId in ipairs(allHouseIds) do
         currentKnown[houseId] = true
-        if not oldKnown[houseId] and not ownedHouseIds[houseId] then
+        if not oldKnown[houseId] then
             table_insert(newHouseIds, houseId)
         end
     end
 
-    -- Remove cached houses which have since become owned or are no longer part
-    -- of the client's housing catalogue.
+    -- Prune only houses which have disappeared from the client's catalogue.
+    -- Do not filter owned houses here: the server-wide pool must retain them for
+    -- accounts which do not own the same collectibles.
     local validHouseIds = currentKnown
     local filteredCache = {}
-    for _, entry in ipairs(BMU.houseTourListings or {}) do
-        if entry and entry.houseId and validHouseIds[entry.houseId] and not ownedHouseIds[entry.houseId] then
+    for _, entry in ipairs(BMU.houseTourServerListings or {}) do
+        if entry and entry.houseId and validHouseIds[entry.houseId] then
             table_insert(filteredCache, entry)
         end
     end
-    if #filteredCache ~= #(BMU.houseTourListings or {}) then
-        BMU.saveHouseTourCache(filteredCache, oldKnown)
+    if #filteredCache ~= #(BMU.houseTourServerListings or {}) then
+        BMU.houseTourServerListings = filteredCache
+        BMU.persistHouseTourServerCachePartial()
+        BMU.refreshHouseTourVisibleCache()
     end
 
     if #newHouseIds > 0 then
         return BMU.RequestHouseTourSearch(HOUSE_TOURS_LISTING_TYPE_BROWSE, "merge", newHouseIds)
     end
 
-    -- Keep the known-ID set synchronized even when no query is needed.
+    -- Keep the shared known-ID set synchronized even when no query is needed.
     BMU.houseTourKnownHouseIds = currentKnown
-    if BMU.savedVarsServ then
-        BMU.savedVarsServ.houseTourKnownHouseIds = currentKnown
+    if BMU.savedVarsHouseTourServerPool then
+        BMU.savedVarsHouseTourServerPool.houseTourKnownHouseIds = currentKnown
+        BMU.savedVarsHouseTourServerPool.houseTourCacheVersion = 2
+        BMU.savedVarsHouseTourServerPool.houseTourFullScanComplete = true
     end
     return false
 end
@@ -3155,8 +3279,6 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
         return
     end
 
-    local myDisplayName = GetDisplayName()
-    local ownedHouseIds = BMU.getOwnedHouseIdsForHouseTours()
     local listings = {}
     local seenHouseIds = {}
 
@@ -3165,8 +3287,8 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
             local houseId = listingData:GetHouseId()
             local ownerName = listingData:GetOwnerDisplayName()
 
-            if houseId and houseId > 0 and ownerName and ownerName ~= "" and ownerName ~= myDisplayName then
-                if not ownedHouseIds[houseId] and not seenHouseIds[houseId] then
+            if houseId and houseId > 0 and ownerName and ownerName ~= "" then
+                if not seenHouseIds[houseId] then
                     seenHouseIds[houseId] = true
 
                     local collectibleId = listingData:GetCollectibleId() or GetCollectibleIdForHouse(houseId)
@@ -3245,24 +3367,9 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
 
                     table.insert(listings, listing)
 
-                    if houseId == 102 then
-                        local worldMapListing = {}
-                        for k, v in pairs(listing) do
-                            worldMapListing[k] = v
-                        end
-                        worldMapListing.houseTourContextZoneId = 980
-                        worldMapListing.houseTourMapZoneId = 980
-                        worldMapListing.houseTourMapId = GetMapIdByZoneId and GetMapIdByZoneId(980) or nil
-                        worldMapListing.mapId = worldMapListing.houseTourMapId
-                        worldMapListing.mapIndex = BMU_getMapIndex(980) or worldMapListing.mapIndex
-                        worldMapListing.houseTourDisplayZoneName = BMU.cleanHouseTourZoneName(GetZoneNameById(981))
-                        worldMapListing.houseTourDisplayParentZoneName = BMU.formatHouseTourZoneName(GetZoneNameById(981))
-                        worldMapListing.houseTourPingX = 0.4457
-                        worldMapListing.houseTourPingZ = 0.4160
-                        worldMapListing.housePingX = 0.4457
-                        worldMapListing.housePingZ = 0.4160
-                        table.insert(listings, worldMapListing)
-                    end
+                    -- Only one House Tours record per house is stored in the
+                    -- shared SavedVariables pool. The extra map context for
+                    -- house 102 is generated only in the visible runtime view.
                 end
             end
         end
@@ -3275,12 +3382,12 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
 
     local searchMode = BMU.houseTourBrowseCacheMode or "replace"
     if searchMode == "merge" then
-        BMU.houseTourListings = BMU.mergeHouseTourListings(BMU.houseTourListings, BMU.houseTourRefreshListings)
-        -- Persist incremental discoveries batch-by-batch. The checked-ID set is
-        -- only advanced after the final batch, so interrupted scans are retried.
-        if BMU.savedVarsServ then
-            BMU.savedVarsServ.houseTourListings = BMU.houseTourListings
-        end
+        BMU.houseTourServerListings = BMU.mergeHouseTourListings(BMU.houseTourServerListings, BMU.houseTourRefreshListings)
+        BMU.refreshHouseTourVisibleCache()
+        -- Persist incremental discoveries batch-by-batch in the shared server
+        -- pool. The checked-ID set is only advanced after the final batch, so
+        -- interrupted scans are retried by the next account/session.
+        BMU.persistHouseTourServerCachePartial()
     end
 
     BMU.houseTourFallbackByParentZoneId = {}
@@ -3292,7 +3399,7 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
     local currentBatch = BMU.houseTourBrowseFilterBatchIndex or 1
     local batchCount = BMU.houseTourBrowseFilterBatchCount or 1
     local batchResults = #results
-    local cacheEntries = (searchMode == "replace") and #(BMU.houseTourRefreshListings or {}) or #(BMU.houseTourListings or {})
+    local cacheEntries = (searchMode == "replace") and #(BMU.houseTourRefreshListings or {}) or #(BMU.houseTourServerListings or {})
     -- Batch output follows the Debug Mode only. It is intentionally independent
     -- of the optional diagnostic chat-command setting.
     local diagnosticsEnabled = BMU.debugMode
@@ -3388,7 +3495,7 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
 
     local finalListings
     if completedMode == "merge" then
-        finalListings = BMU.mergeHouseTourListings(BMU.houseTourListings, completedListings)
+        finalListings = BMU.mergeHouseTourListings(BMU.houseTourServerListings, completedListings)
     else
         finalListings = BMU.mergeHouseTourListings({}, completedListings)
     end
@@ -3405,7 +3512,7 @@ function BMU.onHouseTourSearchComplete(searchState, listingType)
             "[BMU %s HouseTourBatch] all %d batches complete; cache saved (%d listings); filter reset",
             tostring(teleporterVars.version or "?"),
             batchCount,
-            #(BMU.houseTourListings or {})
+            #(BMU.houseTourServerListings or {})
         ))
     end
 

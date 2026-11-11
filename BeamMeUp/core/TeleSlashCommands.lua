@@ -768,7 +768,7 @@ local function BMU_sc_houseTourDiag()
     table.sort(ownedIds)
 
     d(string.format("========== BMU %s HOUSE TOUR DIAGNOSTIC =========", diagnosticVersion))
-    d(string.format("[BMU %s HouseTourDiag] BROWSE only; owned houses excluded", diagnosticVersion))
+    d(string.format("[BMU %s HouseTourDiag] BROWSE only; all houses stored in shared pool, account-owned/self listings hidden only in the current view", diagnosticVersion))
 
     local ownedLine = {}
     local ownedCount = 0
@@ -802,31 +802,35 @@ local function BMU_sc_houseTourDiag()
         d(string.format("[BMU %s HouseTourDiag] BROWSE: GetSearchResults=nil", diagnosticVersion))
     else
         local found = {}
-        local shown = 0
-        local skippedOwned = 0
+        local sharedPoolCandidates = 0
+        local hiddenFromCurrentAccount = 0
+        local myDisplayName = GetDisplayName()
         for _, listingData in ipairs(results) do
             if listingData then
                 local houseId = listingData.GetHouseId and listingData:GetHouseId() or nil
                 if houseId and houseId > 0 then
                     found[houseId] = true
-                    if ownedHouseIds[houseId] then
-                        skippedOwned = skippedOwned + 1
-                    else
-                        shown = shown + 1
-                        local houseName = listingData.GetHouseName and listingData:GetHouseName() or ""
-                        local ownerName = listingData.GetOwnerDisplayName and listingData:GetOwnerDisplayName() or ""
-                        d(string.format(
-                            "[BMU %s HouseTourDiag] BROWSE #%d: houseId=%s houseName=%s owner=%s",
-                            diagnosticVersion, shown, tostring(houseId), tostring(houseName), tostring(ownerName)
-                        ))
-                    end
+                    sharedPoolCandidates = sharedPoolCandidates + 1
+                    local houseName = listingData.GetHouseName and listingData:GetHouseName() or ""
+                    local ownerName = listingData.GetOwnerDisplayName and listingData:GetOwnerDisplayName() or ""
+                    local hiddenForAccount = ownedHouseIds[houseId] or ownerName == myDisplayName
+                    if hiddenForAccount then hiddenFromCurrentAccount = hiddenFromCurrentAccount + 1 end
+                    d(string.format(
+                        "[BMU %s HouseTourDiag] BROWSE #%d: houseId=%s houseName=%s owner=%s accountView=%s",
+                        diagnosticVersion,
+                        sharedPoolCandidates,
+                        tostring(houseId),
+                        tostring(houseName),
+                        tostring(ownerName),
+                        hiddenForAccount and "HIDDEN" or "VISIBLE"
+                    ))
                 end
             end
         end
 
         d(string.format(
-            "[BMU %s HouseTourDiag] BROWSE returned=%d shown=%d ownedSkipped=%d",
-            diagnosticVersion, #results, shown, skippedOwned
+            "[BMU %s HouseTourDiag] BROWSE returned=%d sharedPoolCandidates=%d hiddenFromCurrentAccount=%d",
+            diagnosticVersion, #results, sharedPoolCandidates, hiddenFromCurrentAccount
         ))
 
         for houseId, name in pairs(wanted) do
@@ -841,14 +845,20 @@ local function BMU_sc_houseTourDiag()
         end
     end
 
-    local cached = BMU.houseTourListings or {}
+    local cached = BMU.houseTourServerListings or {}
+    local visibleCached = BMU.houseTourListings or {}
     local cachedFound = {}
     for _, entry in ipairs(cached) do
         if entry and entry.houseId then
             cachedFound[entry.houseId] = true
         end
     end
-    d(string.format("[BMU %s HouseTourDiag] CACHE entries=%d", diagnosticVersion, #cached))
+    d(string.format(
+        "[BMU %s HouseTourDiag] CACHE serverEntries=%d accountVisibleEntries=%d",
+        diagnosticVersion,
+        #cached,
+        #visibleCached
+    ))
     for houseId, name in pairs(wanted) do
         d(string.format(
             "[BMU %s HouseTourDiag] CACHE TARGET houseId=%d (%s): %s",

@@ -128,8 +128,11 @@ local function alertTeleporterLoaded()
 	EM:RegisterForEvent(appName, EVENT_PLAYER_ACTIVATED, BMU.updateHouseFurnitureCount)
 	EM:RegisterForEvent(appName, EVENT_HOUSE_FURNITURE_COUNT_UPDATED, BMU.updateHouseFurnitureCount)
 
-    -- The persistent House Tours cache is already available. Only query the
-    -- server when the client has gained house IDs since the last completed scan.
+    -- Rebuild the account-specific view now that collectible ownership data is
+    -- available, then query only if the shared server pool has new house IDs.
+    if BMU.refreshHouseTourVisibleCache then
+        BMU.refreshHouseTourVisibleCache()
+    end
     if BMU.checkHouseTourCacheForNewHouses then
         BMU.checkHouseTourCacheForNewHouses()
     end
@@ -907,11 +910,17 @@ local function OnAddOnLoaded(eventCode, addOnName)
 		["houseFurnitureCount_LII"] = {}, -- maps houseId with furniture count
 		["favoriteListWayshrines"] = {},
 		["zoneSpecificHouses"] = {}, -- maps zoneId to preferred houseId for that zone
-        -- Server-specific House Tours results and the set of house IDs already queried.
+	}
+
+    -- Shared House Tours data is stored separately below, using a fixed
+    -- ZO_SavedVars displayName so every ESO account on the same megaserver
+    -- accesses one common pool. Account/server settings above remain private.
+    BMU.DefaultsHouseTourServerPool = {
         ["houseTourListings"] = {},
         ["houseTourKnownHouseIds"] = {},
-        ["houseTourCacheVersion"] = 0,
-	}
+        ["houseTourCacheVersion"] = 2,
+        ["houseTourFullScanComplete"] = false,
+    }
 	
 	BMU.DefaultsCharacter = {
 		["defaultTab"] = 0,
@@ -975,6 +984,17 @@ local function OnAddOnLoaded(eventCode, addOnName)
 	--]]
 	BMU.savedVarsAcc =  ZO_SavedVars:NewAccountWide(SVTabName, 			2, nil, BMU.DefaultsAccount, 	nil)
 	BMU.savedVarsServ = ZO_SavedVars:NewAccountWide(SVTabName, 			3, nil, BMU.DefaultsServer, 	GetWorldName())
+    -- The fixed displayName makes this data independent of the currently
+    -- logged-in @account, while GetWorldName() keeps EU/NA/PTS pools separate.
+    -- This uses the built-in ZO_SavedVars API; no additional library is needed.
+    BMU.savedVarsHouseTourServerPool = ZO_SavedVars:NewAccountWide(
+        SVTabName,
+        1,
+        "HouseToursServerWidePool",
+        BMU.DefaultsHouseTourServerPool,
+        GetWorldName(),
+        "BMU_HouseTours_ServerWide_Pool"
+    )
 	if BMU.loadHouseTourSavedCache then BMU.loadHouseTourSavedCache() end
 	BMU.savedVarsChar = ZO_SavedVars:NewCharacterIdSettings(SVTabName, 	3, nil, BMU.DefaultsCharacter, 	nil)
 	local BMU_savedVarsAcc = BMU.savedVarsAcc

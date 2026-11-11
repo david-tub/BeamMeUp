@@ -137,7 +137,8 @@ BMU.var = {
 
 local teleporterVars = BMU.var
 -- House Tours caches
-BMU.houseTourListings = nil              -- raw listings [{ houseId, ownerName, houseName, collectibleId, houseZoneId, parentZoneId }, ...]
+BMU.houseTourServerListings = nil        -- full shared server pool, including houses owned by other ESO accounts
+BMU.houseTourListings = nil              -- account-specific visible projection of the shared pool
 BMU.houseTourSearchPending = false       -- true while a House Tours search is in progress
 BMU.houseTourFallbackByParentZoneId = {} -- cache: [parentZoneId] = listingData OR false (if there is no result)
 
